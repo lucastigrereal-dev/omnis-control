@@ -1,7 +1,7 @@
 # ESTADO ATUAL RESUMIDO — OMNIS / JARVIS CONTROL
 
-**Gerado em:** 2026-05-03T09:31:01Z
-**Session ID:** `422aab77-dc11-4912-956b-64bea327c90c`
+**Gerado em:** 2026-05-03T09:37:35Z
+**Session ID:** `0487c338-c0fc-433f-afcd-a1870b0ae0da`
 
 ## 1. RISCOS IMEDIATOS
 
@@ -119,7 +119,7 @@ Sistema OMNIS operacional. 98 skills detectadas, 18 containers rodando, Publishe
   - registry_assets: 0
   - registry_accounts: 2
   - queue_items: 42
-  - scan_duration_ms: 78
+  - scan_duration_ms: 77
   - scan_timed_out: False
 
 ## 10. Content Queue (Fase 2B)
