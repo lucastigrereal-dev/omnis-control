@@ -42,7 +42,19 @@ sectors:
       Substitui o setor comercial_sdr do JARVIS Maestro.
       Inclui SDR, CRM, proposta e follow-up automatizado.
     implementation_phase: "3 (pré-planejado)"
-    status: blueprint
+    status: partial
+    available_skills:
+      - create_sales_dm_sequence
+      - crm-pipeline
+      - revenue-tracker
+      - hotel-lead-scorer (doc)
+      - lead-qualifier (doc)
+      - follow-up-generator (doc)
+    next_action: "Conectar SDR skill ao CRM pipeline real"
+    external_systems:
+      - name: daily-prophet-hotels
+        status: configured
+        path: "~/daily-prophet-hotels"
     pattern_stages:
       registry: hotel_database
       queue: lead_queue
@@ -68,7 +80,11 @@ sectors:
       Ciclo de vida de aplicações: ideação → protótipo → build → deploy → monitor.
       Cada app tem seu próprio repo, stack e pipeline.
     implementation_phase: "2 (apps existentes, sem governança central)"
-    status: blueprint
+    status: partial
+    available_skills:
+      - skill-creator
+      - subagent-driven-development (doc)
+    next_action: "Definir app_registry como fonte única de verdade"
     pattern_stages:
       registry: app_registry (github repos)
       queue: feature_queue
@@ -92,7 +108,11 @@ sectors:
       Camada de integração entre OMNIS e sistemas externos.
       Definido em detalhe na Fase 3A (Automation & Integration Registry).
     implementation_phase: "3 (Fase 3A em execução)"
-    status: blueprint
+    status: partial
+    available_skills:
+      - llm-router (~/llm-router/)
+      - setup_n8n_triggers (publisher-os)
+    next_action: "Implementar conectores críticos (n8n, publisher_os)"
     pattern_stages:
       registry: connectors (config/connectors.yaml)
       queue: integration_queue
@@ -139,7 +159,12 @@ sectors:
       Substitui o setor financeiro_metricas do JARVIS Maestro.
       Revenue tracker por perfil, custo operacional, ROI de campanhas.
     implementation_phase: "4 (futuro)"
-    status: blueprint
+    status: partial
+    available_skills:
+      - revenue-tracker
+      - roi-calculator (doc)
+      - revenue.db
+    next_action: "Conectar revenue tracker ao pipeline de vendas"
     pattern_stages:
       registry: revenue_contracts
       queue: billing_queue
@@ -218,7 +243,12 @@ sectors:
       Candidatos: Claude Code nativo, LangGraph, CrewAI, OpenAI Agents.
       Decisão final após TaskState + ToolRegistry locais.
     implementation_phase: "5 (futuro)"
-    status: blueprint
+    status: partial
+    available_skills:
+      - jarvis-router
+      - jarvis-decide
+      - jarvis-delegate
+    next_action: "Escolher runtime (LangGraph vs Claude Code nativo)"
     pattern_stages:
       registry: agent_registry
       queue: mission_queue

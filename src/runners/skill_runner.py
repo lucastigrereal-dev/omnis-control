@@ -3,8 +3,23 @@ import sys
 import os
 import json
 import time
+from pathlib import Path
+from typing import Optional
 
 from src.utils.safe_paths import resolve_skill_path, validate_skill_name
+
+SKILLS_PATH = Path.home() / ".claude" / "skills"
+
+
+def list_skills() -> list[dict]:
+    """Lista skills com run.py disponiveis."""
+    if not SKILLS_PATH.is_dir():
+        return []
+    skills = []
+    for entry in sorted(SKILLS_PATH.iterdir()):
+        if entry.is_dir() and (entry / "run.py").is_file():
+            skills.append({"name": entry.name, "path": str(entry)})
+    return skills
 
 
 def run_skill(

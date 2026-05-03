@@ -83,6 +83,13 @@ def generate(save: bool = False) -> str:
         actions.append("omnis approvals batch --limit 10")
     if unhealthy:
         actions.append(f"containers unhealthy: {', '.join(unhealthy[:2])}")
+    # Akasha health
+    try:
+        from src.memory.akasha_reader import ping as akasha_ping
+        if not akasha_ping():
+            actions.append("Akasha offline — verificar container akasha-postgres")
+    except Exception:
+        actions.append("Akasha reader indisponivel")
     actions.append("Configurar META_APP_SECRET no publisher-os/.env")
     actions = actions[:3]
 

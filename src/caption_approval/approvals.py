@@ -4,6 +4,9 @@ Dependência unidirecional: caption_approval → content_queue.
 Nunca importar content_queue aqui (feito via injeção no CLI).
 """
 
+import csv
+from datetime import datetime
+from pathlib import Path
 from typing import Optional
 
 from .models import (
@@ -11,6 +14,8 @@ from .models import (
     BLOCKED_PLACEHOLDERS, _now_iso,
 )
 from .drafts import DraftsManager
+
+SKIP_PATTERNS = ["[", "]", "TODO", "REVISAR", "PLACEHOLDER"]
 
 
 class PreApprovalResult:
@@ -185,3 +190,59 @@ class ApprovalGate:
                 warning = str(e)
 
         return items[idx], warning
+
+    # ----------------------------------------------------------- Batch Approve
+
+    def batch_approve(self, limit: int = 5,
+                      queue_updater: Optional[callable] = None) -> dict:
+        """Aprova ate N drafts validos de needs_review/revised."""
+        candidates = [
+            d for d in self.dm.list_all()
+            if d.status in (DraftStatus.NEEDS_REVIEW, DraftStatus.REVISED)
+        ]
+
+        approved = 0
+        skipped = 0
+        skip_reasons = []
+
+        for draft in candidates:
+            if approved >= limit:
+                break
+
+            text = draft.caption_text or ""
+            reason = None
+
+            if not text.strip():
+                reason = f"{draft.draft_id[:8]}: content vazio"
+            elif not draft.account_handle:
+                reason = f"{draft.draft_id[:8]}: sem account_handle"
+            else:
+                for pat in SKIP_PATTERNS:
+                    if pat in text:
+                        reason = f"{draft.draft_id[:8]}: placeholder '{pat}'"
+                        break
+
+            if reason:
+                skip_reasons.append(reason)
+                skipped += 1
+                continue
+
+            try:
+                self.approve(draft.draft_id, queue_updater=queue_updater)
+                approved += 1
+            except ValueError as e:
+                skip_reasons.append(f"{draft.draft_id[:8]}: {e}")
+                skipped += 1
+
+        if approved > 0:
+            self._export_approved_latest()
+
+        return {"approved": approved, "skipped": skipped, "skip_reasons": skip_reasons}
+
+    # ------------------------------------------------------ Export approved
+
+    def _export_approved_latest(self) -> None:
+        """Exporta drafts aprovados para CSV em data/exports/."""
+        out = Path(__file__).resolve().parent.parent.parent / "data" / "exports" / "approved_latest.csv"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        self.dm.export_csv(str(out), status_filter=DraftStatus.APPROVED)

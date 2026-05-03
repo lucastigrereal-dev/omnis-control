@@ -7,7 +7,7 @@ import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from src.runners.skill_runner import run_skill
+from src.runners.skill_runner import run_skill, list_skills
 from src.utils.logger import new_session_id, log_tool_run
 from src.utils.safe_paths import validate_skill_name
 
@@ -107,6 +107,27 @@ def test_timeout_enforced():
 
     duration = int((__import__("time").time() - start) * 1000)
     assert duration < 30000, f"Timeout não foi respeitado: {duration}ms"
+
+
+def test_list_skills_returns_at_least_17():
+    """list_skills retorna >= 17 skills (as 17 conhecidas do sistema)."""
+    skills = list_skills()
+    assert len(skills) >= 17, f"Esperado >= 17 skills, got {len(skills)}"
+
+
+def test_list_skills_each_has_name_and_path():
+    """Cada skill tem name e path."""
+    for s in list_skills():
+        assert "name" in s
+        assert "path" in s
+        assert os.path.isdir(s["path"])
+
+
+def test_list_skills_invalid_skill_returns_error():
+    """run_skill invalida retorna returncode=1 com stderr via subprocess."""
+    from src.runners.skill_runner import run_skill
+    with pytest.raises(ValueError):
+        run_skill("skill_inexistente_999")
 
 
 def test_dry_run_does_not_run():

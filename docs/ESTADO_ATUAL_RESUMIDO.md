@@ -1,11 +1,11 @@
 # ESTADO ATUAL RESUMIDO — OMNIS / JARVIS CONTROL
 
-**Gerado em:** 2026-05-03T10:10:36Z
-**Session ID:** `84f0884b-ec8e-4a37-8663-64e59bb3d68d`
+**Gerado em:** 2026-05-03T20:11:31Z
+**Session ID:** `9b6f7088-523f-4fb2-8a09-86b251d105ee`
 
 ## 1. RISCOS IMEDIATOS
 
-- 🔴 **DISCO CRÍTICO**: C:\ — 8.1% livre (75.3 GB de 924.3 GB). Risco de falha em Docker, logs e builds. Não executar builds pesados antes de saneamento.
+- 🔴 **DISCO CRÍTICO**: C:\ — 7.9% livre (72.7 GB de 924.3 GB). Risco de falha em Docker, logs e builds. Não executar builds pesados antes de saneamento.
 
 - 🟡 **Containers unhealthy:** crm-tigre-backend, jarvis_frontend (2 de 18)
 
@@ -119,7 +119,7 @@ Sistema OMNIS operacional. 98 skills detectadas, 18 containers rodando, Publishe
   - registry_assets: 0
   - registry_accounts: 2
   - queue_items: 42
-  - scan_duration_ms: 71
+  - scan_duration_ms: 86
   - scan_timed_out: False
 
 ## 10. Content Queue (Fase 2B)

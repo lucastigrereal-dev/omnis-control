@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 logs/*.jsonl
+logs/briefing_*.md
 diagnose*.json
 .pytest_cache/
 *.egg-info/

@@ -41,6 +41,7 @@ from src.caption_approval import DraftsManager, ApprovalGate, TemplateLibrary
 from src.caption_approval.models import DraftStatus
 from src.caption_approval.drafts import STALE_DAYS
 from src.cli_commands.argos_drafts_cmd import argos_app as argos_drafts_app
+from src.reports import briefing as briefing_mod
 
 app = typer.Typer(
     name="jarvis",
@@ -580,6 +581,190 @@ def report():
     dur = int((time.time() - start) * 1000)
     log_mission(session_id, "report", "success", dur)
 
+
+@app.command()
+def disk():
+    """Analisa uso de disco — read-only."""
+    import subprocess, sys
+    subprocess.run([sys.executable, "scripts/disk_analyze.py"])
+
+
+@app.command()
+def briefing(save: bool = typer.Option(False, "--save")):
+    """Health score + top 3 acoes do dia."""
+    print(briefing_mod.generate(save=save))
+
+
+@app.command()
+def sectors(
+    json_output: bool = typer.Option(False, "--json", help="Output JSON"),
+):
+    """Lista setores do ecossistema com status."""
+    from src.checkers import sectors_check
+    result = sectors_check.check()
+
+    if json_output:
+        import json as _json
+        print(_json.dumps(result, indent=2, ensure_ascii=False))
+        return
+
+    console.print("[bold]Setores do Ecossistema[/bold]\n")
+    for s in result.get("sectors", []):
+        status_icon = {"operational": "[green]●[/green]", "partial": "[yellow]◐[/yellow]", "blueprint": "[dim]○[/dim]"}.get(s["status"], "[dim]?[/dim]")
+        console.print(f"  {status_icon} [cyan]{s['id']:<30}[/cyan] {s['status']:<12} {s['objective']}")
+        if s.get("available_skills"):
+            skills_str = ", ".join(s["available_skills"][:5])
+            console.print(f"    {'':30} Skills: {skills_str}")
+        if s.get("next_action"):
+            console.print(f"    {'':30} Proximo: {s['next_action']}")
+        console.print("")
+
+    console.print(f"[bold]Total:[/bold] {result['total']} setores")
+    grouped = sectors_check.by_status()
+    for st, ids in grouped.items():
+        console.print(f"  {st}: {len(ids)}")
+
+
+# ---------------------------------------------------------------------------
+# SALES COMMANDS
+# ---------------------------------------------------------------------------
+
+
+sales_app = typer.Typer(
+    name="sales",
+    help="Setor sales_revenue — vendas B2B hoteis",
+    add_completion=False,
+)
+app.add_typer(sales_app)
+
+
+@sales_app.command(name="status")
+def sales_status():
+    """Status do setor sales_revenue + Daily Prophet."""
+    from src.checkers import sectors_check, daily_prophet_check
+    sector = sectors_check.get_sector("sales_revenue")
+
+    if sector:
+        console.print("[bold]Setor: sales_revenue[/bold]")
+        console.print(f"  Status: {sector['status']}")
+        console.print(f"  Objetivo: {sector['objective']}")
+        if sector.get("available_skills"):
+            console.print(f"  Skills: {', '.join(sector['available_skills'])}")
+        if sector.get("next_action"):
+            console.print(f"  Proximo: {sector['next_action']}")
+    else:
+        console.print("[red]Setor sales_revenue nao encontrado.[/red]")
+
+    console.print("\n[bold]Daily Prophet Hotels[/bold]")
+    dp = daily_prophet_check.check()
+    if dp["exists"]:
+        console.print(f"  [green]Diretorio:[/green] OK")
+        console.print(f"  .env.local: {'[OK]' if dp['has_env'] else '[!!] ausente'}")
+        console.print(f"  package.json: {'[OK]' if dp.get('package_json') else '[!!] ausente'}")
+        console.print(f"  Scripts: {len(dp.get('scripts', []))}")
+        console.print(f"  Arquivos SQL: {dp.get('sql_files', 0)}")
+        console.print(f"  Status: {dp['status']}")
+    else:
+        console.print(f"  [red]Diretorio nao encontrado em ~/daily-prophet-hotels[/red]")
+        console.print(f"  Status: {dp['status']}")
+
+
+# ---------------------------------------------------------------------------
+# MEMORY COMMANDS
+# ---------------------------------------------------------------------------
+
+
+memory_app = typer.Typer(
+    name="memory",
+    help="Akasha + Qdrant — memorias e indexacao",
+    add_completion=False,
+)
+app.add_typer(memory_app)
+
+
+@memory_app.command(name="recent")
+def mem_recent(
+    limit: int = typer.Option(5, "--limit", help="Numero de memorias"),
+):
+    """Ultimas N memorias do Akasha."""
+    from src.memory.akasha_reader import ping, get_recent_memories
+    if not ping():
+        console.print("[red]Akasha offline[/red]")
+        return
+    memories = get_recent_memories(limit=limit)
+    console.print(f"[bold]Ultimas {len(memories)} memorias:[/bold]\n")
+    for i, m in enumerate(memories, 1):
+        if "error" in m:
+            console.print(f"  [red]{m['error']}[/red]")
+            continue
+        preview = (m.get("content") or "")[:120].replace("\n", " ")
+        console.print(f"  {i}. {preview}...")
+        if m.get("created_at"):
+            console.print(f"     [dim]{m['created_at']}[/dim]")
+
+
+@memory_app.command(name="project")
+def mem_project(
+    project_name: str = typer.Argument(..., help="Nome do projeto"),
+):
+    """Busca contexto de um projeto no Akasha."""
+    from src.memory.akasha_reader import ping, get_project_context
+    if not ping():
+        console.print("[red]Akasha offline[/red]")
+        return
+    ctx = get_project_context(project_name)
+    if ctx:
+        console.print(f"[green]{ctx}[/green]")
+    else:
+        console.print(f"[yellow]Projeto '{project_name}' nao encontrado no Akasha.[/yellow]")
+
+
+# ---------------------------------------------------------------------------
+# LLM COMMANDS
+# ---------------------------------------------------------------------------
+
+
+llm_app = typer.Typer(
+    name="llm",
+    help="LLM Router — modelos e recomendacoes",
+    add_completion=False,
+)
+app.add_typer(llm_app)
+
+
+@llm_app.command(name="models")
+def llm_models():
+    """Lista modelos configurados no LLM Router."""
+    from src.intelligence.llm_router_bridge import list_models, config_available
+    if not config_available():
+        console.print("[yellow]config.yaml nao encontrado em ~/llm-router/[/yellow]")
+        return
+    models = list_models()
+    if not models:
+        console.print("[yellow]Nenhum modelo configurado.[/yellow]")
+        return
+    console.print("[bold]LLM Router — Modelos[/bold]\n")
+    for m in models:
+        params = m.get("litellm_params", {})
+        console.print(f"  [cyan]{m['model_name']:<20}[/cyan] {params.get('model', '?')}")
+        if params.get("api_base"):
+            console.print(f"    {'':20} API: {params['api_base']}")
+
+
+@llm_app.command(name="suggest")
+def llm_suggest(
+    task_type: str = typer.Argument(..., help="Tipo de tarefa (caption, classificacao, etc)"),
+):
+    """Recomenda modelo para um tipo de tarefa."""
+    from src.intelligence.llm_router_bridge import get_model_for_task, list_task_types
+    model = get_model_for_task(task_type)
+    all_types = list_task_types()
+    console.print(f"[bold]Tarefa:[/bold] {task_type}")
+    console.print(f"[bold]Modelo recomendado:[/bold] [green]{model}[/green]")
+    if model in all_types:
+        console.print(f"\n  Outras tarefas usando [cyan]{model}[/cyan]:")
+        for t in all_types[model][:8]:
+            console.print(f"    - {t}")
 
 
 
@@ -1531,6 +1716,30 @@ def app_reject(
     except ValueError as e:
         console.print(f"[red]{e}[/red]")
         raise typer.Exit(1)
+
+
+@approvals_app.command(name="batch")
+def app_batch(
+    limit: int = typer.Option(5, "--limit", help="Maximo de drafts a aprovar"),
+):
+    """Aprova ate N drafts validos de needs_review/revised sem placeholders."""
+    dm = DraftsManager()
+    gate = ApprovalGate(dm)
+    r = gate.batch_approve(limit=limit, queue_updater=_queue_updater)
+    console.print(f"[green]Aprovados:[/green] {r['approved']} | [yellow]Pulados:[/yellow] {r['skipped']}")
+    for s in r["skip_reasons"]:
+        console.print(f"  [yellow]skip:[/yellow] {s}")
+
+
+@approvals_app.command(name="status")
+def app_approvals_status():
+    """Contagem de drafts por status."""
+    from collections import Counter
+    dm = DraftsManager()
+    counts = Counter(d.status for d in dm.list_all())
+    console.print("[bold]Drafts por status:[/bold]")
+    for s, n in sorted(counts.items()):
+        console.print(f"  {s:<20} {n}")
 
 
 # ---------------------------------------------------------------------------
