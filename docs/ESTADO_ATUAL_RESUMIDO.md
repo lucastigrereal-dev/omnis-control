@@ -1,11 +1,11 @@
 # ESTADO ATUAL RESUMIDO — OMNIS / JARVIS CONTROL
 
-**Gerado em:** 2026-05-03T09:37:35Z
-**Session ID:** `0487c338-c0fc-433f-afcd-a1870b0ae0da`
+**Gerado em:** 2026-05-03T09:56:01Z
+**Session ID:** `66b38ae8-9e47-40d2-b5c6-65e70777f825`
 
 ## 1. RISCOS IMEDIATOS
 
-- 🔴 **DISCO CRÍTICO**: C:\ — 8.2% livre (75.9 GB de 924.3 GB). Risco de falha em Docker, logs e builds. Não executar builds pesados antes de saneamento.
+- 🔴 **DISCO CRÍTICO**: C:\ — 8.2% livre (75.4 GB de 924.3 GB). Risco de falha em Docker, logs e builds. Não executar builds pesados antes de saneamento.
 
 - 🟡 **Containers unhealthy:** crm-tigre-backend, jarvis_frontend (2 de 18)
 
@@ -119,14 +119,14 @@ Sistema OMNIS operacional. 98 skills detectadas, 18 containers rodando, Publishe
   - registry_assets: 0
   - registry_accounts: 2
   - queue_items: 42
-  - scan_duration_ms: 77
+  - scan_duration_ms: 89
   - scan_timed_out: False
 
 ## 10. Content Queue (Fase 2B)
 
 - **Contas cadastradas:** 2 (2 ativas)
 - **Itens na fila:** 42
-- **Precisa de asset:** 41
+- **Precisa de asset:** 40
 - **Precisa de legenda:** 0
 - **Aprovados:** 0
 - **Agendados:** 0
@@ -138,11 +138,12 @@ Sistema OMNIS operacional. 98 skills detectadas, 18 containers rodando, Publishe
 ## 11. Caption Approval (Fase 2C)
 
 - **Total de rascunhos:** 41
-- **Pendentes de revisão:** 41
+- **Pendentes de revisão:** 40
 - **Stale (> 3 dias):** 0
 
 **Distribuição por status:**
-  - ⚠️ needs_review: 41
+  - ✅ approved: 1
+  - ⚠️ needs_review: 40
 
 ## 12. Segurança
 
