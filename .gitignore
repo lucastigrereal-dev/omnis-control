@@ -10,3 +10,4 @@ diagnose*.json
 data/*.jsonl
 data/*.csv
 data/exports/*.csv
+data/exports/argos/*.json

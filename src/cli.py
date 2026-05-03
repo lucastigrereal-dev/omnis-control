@@ -40,6 +40,7 @@ from src.content_queue import AccountRegistry, Queue as CQQueue, Account, QueueI
 from src.caption_approval import DraftsManager, ApprovalGate, TemplateLibrary
 from src.caption_approval.models import DraftStatus
 from src.caption_approval.drafts import STALE_DAYS
+from src.cli_commands.argos_drafts_cmd import argos_app as argos_drafts_app
 
 app = typer.Typer(
     name="jarvis",
@@ -496,6 +497,19 @@ def doctor():
     except Exception as e:
         checks["caption_approval"] = {"error": str(e)}
         errors.append(str(e))
+
+    # ── Argos Bridge ────────────────────────────────────
+    try:
+        from src.argos_bridge.draft_builder import stats as argos_stats
+        argos = argos_stats()
+        checks["argos_bridge"] = {
+            "total_drafts": argos["total"],
+            "by_status": argos["by_status"],
+            "by_account": argos["by_account"],
+            "with_warnings": argos["with_warnings"],
+        }
+    except Exception as e:
+        checks["argos_bridge"] = {"error": str(e)}
 
     total_dur = int((time.time() - start_total) * 1000)
 
@@ -1530,6 +1544,7 @@ templates_app = typer.Typer(
     add_completion=False,
 )
 app.add_typer(templates_app)
+app.add_typer(argos_drafts_app)
 
 
 @templates_app.command(name="list")

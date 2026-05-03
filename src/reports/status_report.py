@@ -231,7 +231,29 @@ def generate(session_id: str) -> str:
         lines.append(f"- ⚠️ **Erro ao ler Caption Approval:** {e}")
     lines.append("")
 
-    lines.append("## 12. Segurança")
+    # Argos Bridge section
+    lines.append("## 12. Argos Bridge (Fase 2E)")
+    lines.append("")
+    try:
+        from src.argos_bridge.draft_builder import stats as argos_stats
+        s = argos_stats()
+        lines.append(f"- **Total de ArgosDrafts:** {s['total']}")
+        if s.get("by_status"):
+            lines.append("")
+            lines.append("**Por status:**")
+            for st, count in sorted(s["by_status"].items()):
+                lines.append(f"  - {st}: {count}")
+        if s.get("by_account"):
+            lines.append("**Por conta:**")
+            for ac, count in sorted(s["by_account"].items()):
+                lines.append(f"  - @{ac}: {count}")
+        if s.get("with_warnings"):
+            lines.append(f"- **Com warnings:** {s['with_warnings']}")
+    except Exception as e:
+        lines.append(f"- ⚠️ **Erro ao ler Argos Bridge:** {e}")
+    lines.append("")
+
+    lines.append("## 13. Segurança")
 
     lines.append("")
     lines.append("- Nenhum .env foi lido ou exposto")
@@ -241,7 +263,7 @@ def generate(session_id: str) -> str:
     lines.append("- Path traversal é bloqueado em todos os comandos")
     lines.append("")
 
-    lines.append("## 13. Próximos passos")
+    lines.append("## 14. Próximos passos")
     lines.append("")
     lines.append("1. **Fase 3 — OAuth Meta:** Configurar META_APP_SECRET, rodar OAuth, validar token")
     lines.append("2. **Fase 4 — Memória conectada:** Obsidian read-only -> Qdrant search -> Akasha discovery")
@@ -249,7 +271,7 @@ def generate(session_id: str) -> str:
     lines.append("5. **Fase 6 — Runtime agentic:** LangGraph, tool router, critic loop")
     lines.append("")
 
-    lines.append("## 14. O que NÃO foi alterado")
+    lines.append("## 15. O que NÃO foi alterado")
 
     lines.append("")
     lines.append("- `~/.claude/` — não modificado")
@@ -261,7 +283,7 @@ def generate(session_id: str) -> str:
     lines.append("- Instagram / Meta API — não chamado")
     lines.append("")
 
-    lines.append("## 15. Comandos úteis")
+    lines.append("## 16. Comandos úteis")
 
     lines.append("")
     lines.append("```bash")

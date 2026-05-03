@@ -1,11 +1,11 @@
 # ESTADO ATUAL RESUMIDO — OMNIS / JARVIS CONTROL
 
-**Gerado em:** 2026-05-03T09:56:01Z
-**Session ID:** `66b38ae8-9e47-40d2-b5c6-65e70777f825`
+**Gerado em:** 2026-05-03T10:10:36Z
+**Session ID:** `84f0884b-ec8e-4a37-8663-64e59bb3d68d`
 
 ## 1. RISCOS IMEDIATOS
 
-- 🔴 **DISCO CRÍTICO**: C:\ — 8.2% livre (75.4 GB de 924.3 GB). Risco de falha em Docker, logs e builds. Não executar builds pesados antes de saneamento.
+- 🔴 **DISCO CRÍTICO**: C:\ — 8.1% livre (75.3 GB de 924.3 GB). Risco de falha em Docker, logs e builds. Não executar builds pesados antes de saneamento.
 
 - 🟡 **Containers unhealthy:** crm-tigre-backend, jarvis_frontend (2 de 18)
 
@@ -119,7 +119,7 @@ Sistema OMNIS operacional. 98 skills detectadas, 18 containers rodando, Publishe
   - registry_assets: 0
   - registry_accounts: 2
   - queue_items: 42
-  - scan_duration_ms: 89
+  - scan_duration_ms: 71
   - scan_timed_out: False
 
 ## 10. Content Queue (Fase 2B)
@@ -145,7 +145,11 @@ Sistema OMNIS operacional. 98 skills detectadas, 18 containers rodando, Publishe
   - ✅ approved: 1
   - ⚠️ needs_review: 40
 
-## 12. Segurança
+## 12. Argos Bridge (Fase 2E)
+
+- **Total de ArgosDrafts:** 0
+
+## 13. Segurança
 
 - Nenhum .env foi lido ou exposto
 - Nenhuma API externa foi chamada
@@ -153,14 +157,14 @@ Sistema OMNIS operacional. 98 skills detectadas, 18 containers rodando, Publishe
 - Nenhuma skill foi executada sem confirmação
 - Path traversal é bloqueado em todos os comandos
 
-## 13. Próximos passos
+## 14. Próximos passos
 
 1. **Fase 3 — OAuth Meta:** Configurar META_APP_SECRET, rodar OAuth, validar token
 2. **Fase 4 — Memória conectada:** Obsidian read-only -> Qdrant search -> Akasha discovery
 3. **Fase 5 — Saneamento Docker:** Limpeza de imagens e volumes não utilizados
 5. **Fase 6 — Runtime agentic:** LangGraph, tool router, critic loop
 
-## 14. O que NÃO foi alterado
+## 15. O que NÃO foi alterado
 
 - `~/.claude/` — não modificado
 - `~/publisher-os/` — não modificado
@@ -170,7 +174,7 @@ Sistema OMNIS operacional. 98 skills detectadas, 18 containers rodando, Publishe
 - .env — não lido
 - Instagram / Meta API — não chamado
 
-## 15. Comandos úteis
+## 16. Comandos úteis
 
 ```bash
 python jarvis.py status
