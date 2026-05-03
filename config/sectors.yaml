@@ -1,0 +1,268 @@
+# Setores Enterprise — OMNIS
+
+## Sobre
+
+Este arquivo é a **fonte da verdade** dos setores de negócio do ecossistema OMNIS.
+Cada setor segue o padrão replicável: `Registry → Queue → Draft → Approval → Bridge → Execution → Metrics`.
+
+## Setores
+
+```yaml
+sectors:
+
+  - id: marketing_enterprise
+    objective: "Produção de conteúdo cross-perfil com aprovação e agendamento"
+    description: |
+      Expansão do padrão Instagram para produção em escala.
+      6 perfis, templates por objetivo, approval gate, bridge para Publisher OS.
+    implementation_phase: "2 (implementado até Fase 2E)"
+    status: operational
+    pattern_stages:
+      registry: instagram_accounts (JSONL)
+      queue: content_queue (42 itens)
+      draft: caption_drafts (41 drafts)
+      approval: approval_gate (1 approved)
+      bridge: argos_bridge (1 draft)
+      execution: publisher_os (pending OAuth)
+      metrics: engagement_metrics (planned)
+    risks:
+      - OAuth Meta pendente (META_APP_ID/SECRET)
+      - 0 assets de vídeo scaneados
+    kpis:
+      - posts/dia
+      - approval_rate
+      - bridge_success_rate
+    next_steps:
+      - "Fase 3: OAuth Meta + Publisher OS"
+      - "Fase 5: Saneamento Docker"
+
+  - id: sales_revenue
+    objective: "Pipeline de vendas B2B para hotéis — qualificação, proposta, fechamento"
+    description: |
+      Substitui o setor comercial_sdr do JARVIS Maestro.
+      Inclui SDR, CRM, proposta e follow-up automatizado.
+    implementation_phase: "3 (pré-planejado)"
+    status: blueprint
+    pattern_stages:
+      registry: hotel_database
+      queue: lead_queue
+      draft: proposal_drafts
+      approval: pricing_approval
+      bridge: whatsapp_bridge
+      execution: crm_pipeline
+      metrics: revenue_tracker
+    risks:
+      - SDR skill existe mas sem integração CRM real
+      - CRM pipeline SQLite local sem sync
+    kpis:
+      - leads_qualified/week
+      - proposals_sent
+      - conversion_rate
+    next_steps:
+      - "Conectar SDR skill ao CRM pipeline"
+      - "Automatizar proposta via template"
+
+  - id: app_factory
+    objective: "Fábrica de apps — Daily Prophet Hotels, Instagram Publisher MVP e futuros"
+    description: |
+      Ciclo de vida de aplicações: ideação → protótipo → build → deploy → monitor.
+      Cada app tem seu próprio repo, stack e pipeline.
+    implementation_phase: "2 (apps existentes, sem governança central)"
+    status: blueprint
+    pattern_stages:
+      registry: app_registry (github repos)
+      queue: feature_queue
+      draft: spec_drafts
+      approval: go_no_go
+      bridge: deploy_pipeline
+      execution: vercel_railway
+      metrics: uptime_monitoring
+    risks:
+      - Daily Prophet Hotels sem produção
+      - Instagram Publisher MVP OAuth funcional mas 0 contas conectadas
+    kpis:
+      - apps_in_production
+      - deploy_frequency
+    next_steps:
+      - "Definir app_registry como fonte única de verdade"
+
+  - id: automation_integrations
+    objective: "Conectores e automações entre sistemas — n8n, APIs, webhooks"
+    description: |
+      Camada de integração entre OMNIS e sistemas externos.
+      Definido em detalhe na Fase 3A (Automation & Integration Registry).
+    implementation_phase: "3 (Fase 3A em execução)"
+    status: blueprint
+    pattern_stages:
+      registry: connectors (config/connectors.yaml)
+      queue: integration_queue
+      draft: workflow_drafts
+      approval: connector_approval
+      bridge: n8n_bridge
+      execution: runtime
+      metrics: integration_health
+    risks:
+      - 16 conectores mapeados, 0 conectados
+    kpis:
+      - connectors_connected
+      - workflows_active
+    next_steps:
+      - "Fase 3A: implementar conectores críticos (n8n, publisher_os)"
+
+  - id: memory_knowledge
+    objective: "Base de conhecimento unificada — Akasha, Qdrant, Obsidian, Biblioteca"
+    description: |
+      Camada de memória do ecossistema. Unifica buscas semânticas,
+      documentos declarativos e conhecimento estruturado.
+    implementation_phase: "2 (bases existentes, integração parcial)"
+    status: operational
+    pattern_stages:
+      registry: memory_sources (7 fontes)
+      queue: sync_queue
+      draft: insight_drafts
+      approval: knowledge_approval
+      bridge: qdrant_akasha_bridge
+      execution: semantic_search
+      metrics: retrieval_accuracy
+    risks:
+      - Qdrant inacessível (:6333)
+      - Akasha com 606K chunks sem curadoria
+    kpis:
+      - docs_indexed
+      - retrieval_success_rate
+    next_steps:
+      - "Fase 4: Memória conectada"
+
+  - id: finance_capital
+    objective: "Receitas, custos, precificação e ROI por perfil e campanha"
+    description: |
+      Substitui o setor financeiro_metricas do JARVIS Maestro.
+      Revenue tracker por perfil, custo operacional, ROI de campanhas.
+    implementation_phase: "4 (futuro)"
+    status: blueprint
+    pattern_stages:
+      registry: revenue_contracts
+      queue: billing_queue
+      draft: invoice_drafts
+      approval: payment_approval
+      bridge: payment_gateway
+      execution: revenue_tracker
+      metrics: monthly_recurring_revenue
+    risks:
+      - Revenue tracker SQLite local sem sync
+      - Sem integração com mercado pago/stripe
+    kpis:
+      - mrr
+      - cost_per_post
+      - roi_per_profile
+    next_steps:
+      - "Conectar revenue tracker ao pipeline de vendas"
+
+  - id: security_audit
+    objective: "Auditoria contínua — .env, permissões, logs, containers"
+    description: |
+      Setor transversal. Não tem pipeline próprio.
+      Monitora todos os outros setores.
+      Começa com checkers do OMNIS (doctor) e evolve para auditoria automatizada.
+    implementation_phase: "1 (checkers existem, auditoria formal é futura)"
+    status: operational
+    pattern_stages:
+      registry: audit_log
+      queue: alert_queue
+      draft: incident_drafts
+      approval: response_approval
+      bridge: notification_bridge
+      execution: auto_remediation
+      metrics: security_score
+    risks:
+      - 2 containers unhealthy
+      - Disco crítico (8.2% livre)
+    kpis:
+      - containers_healthy
+      - disk_usage_percent
+      - incidents_resolved
+    next_steps:
+      - "Fase 5: Saneamento Docker"
+      - "Rotação de logs e compressão"
+
+  - id: mission_control
+    objective: "Interface operacional do OMNIS — status, filas, riscos, próximas ações"
+    description: |
+      Camada de comando. O que o operador vê todo dia.
+      É o cockpit: doctor, report, dashboard.
+      Não é um setor de produção — é o display do sistema.
+    implementation_phase: "1 (doctor + report existem)"
+    status: operational
+    pattern_stages:
+      registry: system_registry
+      queue: action_queue
+      draft: report_drafts
+      approval: report_approval
+      bridge: display_bridge
+      execution: dashboard
+      metrics: system_health_score
+    risks:
+      - Sem dashboard visual (hoje CLI only)
+    kpis:
+      - system_uptime
+      - alert_response_time
+    next_steps:
+      - "Dashboard web (Mission Control UI)"
+      - "Notificações proativas (Telegram/WhatsApp)"
+
+  - id: runtime_agentic
+    objective: "Orquestração multi-agente — LangGraph, CrewAI, Claude Code"
+    description: |
+      Camada futura de orquestração. Roteia missões entre agentes,
+      mantém estado de tarefas, valida resultados, decide ações.
+      Candidatos: Claude Code nativo, LangGraph, CrewAI, OpenAI Agents.
+      Decisão final após TaskState + ToolRegistry locais.
+    implementation_phase: "5 (futuro)"
+    status: blueprint
+    pattern_stages:
+      registry: agent_registry
+      queue: mission_queue
+      draft: mission_plan
+      approval: go_no_go
+      bridge: tool_router
+      execution: agentic_loop
+      metrics: mission_success_rate
+    risks:
+      - Runtime não escolhido
+      - Tool routing não implementado
+    kpis:
+      - missions_completed
+      - auto_correction_rate
+    next_steps:
+      - "Fase 6: Runtime agentic (escolha do runtime)"
+      - "Fase 7: CrewAI integration"
+```
+
+## Mapeamento JARVIS Maestro → OMNIS Sectors
+
+| JARVIS Maestro (7 setores) | OMNIS Sector | Status |
+|---------------------------|-------------|--------|
+| midia_conteudo | marketing_enterprise | ✅ operational |
+| comercial_sdr | sales_revenue | 📋 blueprint |
+| conhecimento_inteligencia | memory_knowledge | ✅ operational |
+| produto_tecnologia | app_factory | 📋 blueprint |
+| financeiro_metricas | finance_capital | 📋 blueprint |
+| operacoes_organizacao | mission_control | ✅ operational |
+| vendas_crm | sales_revenue | 📋 blueprint |
+
+## Ordem de Implementação
+
+```text
+1. marketing_enterprise    ← agora (Fases 1-2E concluídas)
+2. automation_integrations ← Fase 3A
+3. sales_revenue           ← próximo ciclo
+4. memory_knowledge        ← Fase 4
+5. app_factory             ← após memory
+6. finance_capital         ← após sales
+7. mission_control         ← contínuo
+8. security_audit          ← transversal desde Fase 1
+9. runtime_agentic         ← Fase 6+
+```
+
+security_audit é transversal: monitora todos os setores desde o início,
+mesmo que a implementação formal venha depois.
