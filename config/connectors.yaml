@@ -1,0 +1,197 @@
+# Conectores OMNIS — Fase 3A
+# Fonte da verdade para integrações entre sistemas
+
+connectors:
+
+  # ── P0 — Essenciais para operação ──
+
+  - id: publisher_os_mcp
+    name: Publisher OS MCP
+    description: "MCP server com 12 tools para produção de conteúdo"
+    type: mcp
+    host: localhost
+    port: 8000
+    status: available
+    auth: none
+    notes: "Server em ~/publisher-os/mcp_server.py"
+    next_step: "Conectar via claude_code MCP config"
+
+  - id: publisher_os_api
+    name: Publisher OS API
+    description: "API HTTP do Publisher OS Core"
+    type: http
+    host: localhost
+    port: 3200
+    status: available
+    auth: none
+    notes: "Cockpit em ~/publisher-os-cockpit"
+
+  - id: akasha_postgres
+    name: Akasha PostgreSQL (pgvector)
+    description: "Base vetorial com 20K docs, 606K chunks"
+    type: postgres
+    host: localhost
+    port: 5432
+    database: akasha
+    status: available
+    auth: env (PGPASSWORD)
+    notes: "Container akasha-postgres"
+    next_step: "Criar usuario OMNIS com acesso read-only"
+
+  - id: instagram_graph_api
+    name: Instagram Graph API (Meta)
+    description: "API para publicacao nos 6 perfis Instagram"
+    type: oauth2
+    host: graph.facebook.com
+    status: pending
+    auth: oauth2 (META_APP_ID/SECRET)
+    notes: "App ID 1434393165369254. 0/6 contas conectadas."
+    next_step: "Fase 3: configurar META_APP_SECRET, rodar OAuth, validar token"
+
+  # ── P1 — Suporte operacional ──
+
+  - id: qdrant
+    name: Qdrant
+    description: "Vector DB para busca semântica (mem0 + kuzu graph)"
+    type: http
+    host: localhost
+    port: 6333
+    status: unavailable
+    auth: none
+    notes: "Porta 6333 inacessível — container pode estar parado"
+    next_step: "Verificar container qdrant e restartar"
+
+  - id: ollama
+    name: Ollama
+    description: "LLM local (qwen2.5:7b, nomic-embed-text)"
+    type: http
+    host: localhost
+    port: 11434
+    status: available
+    auth: none
+    notes: "Parte do Publisher OS stack"
+
+  - id: litellm
+    name: LiteLLM Proxy
+    description: "Gateway para 7 modelos via OpenRouter"
+    type: http
+    host: localhost
+    port: 4002
+    status: available
+    auth: api_key
+    notes: "Master key: sk-pub-os-UwN4DEcTMMzB6SxxSaJpaj"
+    next_step: "Criar key dedicada OMNIS"
+
+  - id: supabase_local
+    name: Supabase DB (publisher-os)
+    description: "Banco local do Publisher OS (postgres)"
+    type: postgres
+    host: localhost
+    port: 5434
+    database: postgres
+    status: available
+    auth: env
+    notes: "Tabela engagement_metrics criada (U6)"
+
+  - id: redis
+    name: Redis (publisher-os)
+    description: "Cache e fila do Publisher OS"
+    type: redis
+    host: localhost
+    port: 6382
+    status: available
+    auth: none
+
+  - id: n8n
+    name: n8n
+    description: "Workflow automation (se disponivel)"
+    type: http
+    host: localhost
+    port: 5678
+    status: unknown
+    auth: none
+    notes: "Pode estar rodando via Docker do publisher-os"
+    next_step: "Verificar se container n8n esta ativo"
+
+  # ── P2 — Futuros ──
+
+  - id: whatsapp_bridge
+    name: WhatsApp Bridge
+    description: "Notificacoes e comunicacao com hoteis"
+    type: api
+    host: pending
+    status: planned
+    auth: pending
+    notes: "Para setor sales_revenue"
+    next_step: "Definir provider (WhatsApp Business API / evolution-api)"
+
+  - id: telegram_bot
+    name: Telegram Bot
+    description: "Notificacoes operacionais (tg-approve reativar)"
+    type: bot
+    host: pending
+    status: planned
+    auth: bot_token
+    notes: "Script desativado em ~/tg-approve/tg-approve.js.DISABLED"
+    next_step: "Reativar tg-approve ou criar notificador OMNIS"
+
+  - id: mercado_pago
+    name: Mercado Pago / Stripe
+    description: "Gateway de pagamento para vendas"
+    type: api
+    host: pending
+    status: planned
+    auth: api_key
+    notes: "Para setor finance_capital"
+    next_step: "Definir provider e criar integração"
+
+  - id: supabase_hotels
+    name: Supabase Hotels (Daily Prophet)
+    description: "Banco do Daily Prophet Hotels (61 tabelas, ~7.1K registros)"
+    type: postgres
+    host: aws (sa-east-1)
+    port: 5432
+    database: postgres
+    status: available
+    auth: connection_string
+    notes: "Project qrcgedbuppodfbfqzocj"
+    next_step: "Criar access layer para consultas OMNIS"
+
+  - id: github_connector
+    name: GitHub API
+    description: "Sincronizacao com repositorios (commits, issues, PRs)"
+    type: api
+    host: api.github.com
+    status: available
+    auth: token
+    notes: "User: lucastigrereal-dev"
+    next_step: "Criar token dedicado OMNIS"
+
+# Integracoes agrupadas por setor
+sector_mappings:
+  marketing_enterprise:
+    - publisher_os_mcp
+    - publisher_os_api
+    - instagram_graph_api
+  sales_revenue:
+    - whatsapp_bridge
+    - github_connector
+    - supabase_hotels
+  memory_knowledge:
+    - akasha_postgres
+    - qdrant
+    - ollama
+  automation_integrations:
+    - n8n
+    - litellm
+    - redis
+  finance_capital:
+    - mercado_pago
+    - supabase_hotels
+  mission_control:
+    - telegram_bot
+    - github_connector
+  runtime_agentic:
+    - ollama
+    - litellm
+    - publisher_os_mcp
