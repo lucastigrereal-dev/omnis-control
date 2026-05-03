@@ -2,7 +2,7 @@
 Testes do Account Mapping + Daily Content Queue (Fase 2B).
 
 Cobre: account CRUD, queue generate, assign, export, segurança.
-Não modifica nada fora de ~/jarvis-control/.
+Não modifica nada fora de ~/omnis-control/.
 """
 
 import os
@@ -474,12 +474,12 @@ class TestQueueOperations:
 class TestSecurity:
     def test_accounts_path_within_control(self):
         from src.content_queue.accounts import ACCOUNTS_PATH
-        control = os.path.expanduser("~/jarvis-control")
+        control = os.path.expanduser("~/omnis-control")
         assert ACCOUNTS_PATH.startswith(control)
 
     def test_queue_path_within_control(self):
         from src.content_queue.queue import QUEUE_PATH
-        control = os.path.expanduser("~/jarvis-control")
+        control = os.path.expanduser("~/omnis-control")
         assert QUEUE_PATH.startswith(control)
 
     def test_no_external_imports(self):

@@ -2,11 +2,11 @@ import os
 import sys
 
 
-CONTROL_DIR = os.path.normpath(os.path.expanduser("~/jarvis-control"))
+CONTROL_DIR = os.path.normpath(os.path.expanduser("~/omnis-control"))
 
 
 def validate_write_path(path: str) -> str:
-    """Validate that path is inside ~/jarvis-control/ and has no traversal.
+    """Validate that path is inside ~/omnis-control/ and has no traversal.
 
     Returns the normalized absolute path.
     Raises PermissionError if the path violates rules.

@@ -18,9 +18,9 @@ SEARCH_ROOTS = [
     os.path.expanduser("~/.claude/skills"),
     os.path.expanduser("~/publisher-os"),
     os.path.expanduser("~/JARVIS_OS"),
-    os.path.expanduser("~/jarvis-control"),
+    os.path.expanduser("~/omnis-control"),
 ]
-CONFIG_PATH = os.path.expanduser("~/jarvis-control/config/paths.yaml")
+CONFIG_PATH = os.path.expanduser("~/omnis-control/config/paths.yaml")
 SCAN_TIMEOUT_S = 30
 
 
@@ -144,7 +144,7 @@ def _check_publisher_video_code() -> list[dict]:
 
 def _check_video_asset_registry() -> dict:
     """Check if the local Video Asset Registry exists and has data."""
-    registry_path = os.path.expanduser("~/jarvis-control/data/video_assets.jsonl")
+    registry_path = os.path.expanduser("~/omnis-control/data/video_assets.jsonl")
     result = {
         "exists": os.path.isfile(registry_path),
         "asset_count": 0,
@@ -160,7 +160,7 @@ def _check_video_asset_registry() -> dict:
 
 def _check_account_registry() -> dict:
     """Check if the Account Registry exists and has data."""
-    path = os.path.expanduser("~/jarvis-control/data/accounts.jsonl")
+    path = os.path.expanduser("~/omnis-control/data/accounts.jsonl")
     result = {"exists": os.path.isfile(path), "account_count": 0}
     if result["exists"]:
         try:
@@ -173,7 +173,7 @@ def _check_account_registry() -> dict:
 
 def _check_content_queue() -> dict:
     """Check if the Content Queue file exists and has data."""
-    path = os.path.expanduser("~/jarvis-control/data/content_queue.jsonl")
+    path = os.path.expanduser("~/omnis-control/data/content_queue.jsonl")
     result = {"exists": os.path.isfile(path), "item_count": 0}
     if result["exists"]:
         try:
@@ -205,21 +205,21 @@ def check() -> dict:
 
     all_evidence = keyword_hits + vtoc_evidence + argos_evidence + pub_evidence
     if registry["exists"]:
-        registry_path = os.path.expanduser("~/jarvis-control/data/video_assets.jsonl")
+        registry_path = os.path.expanduser("~/omnis-control/data/video_assets.jsonl")
         all_evidence.append({
             "path": registry_path,
             "keyword": "video_asset_registry",
             "type": "registry",
         })
     if accounts_reg["exists"]:
-        acc_path = os.path.expanduser("~/jarvis-control/data/accounts.jsonl")
+        acc_path = os.path.expanduser("~/omnis-control/data/accounts.jsonl")
         all_evidence.append({
             "path": acc_path,
             "keyword": "instagram_account_mapping",
             "type": "registry",
         })
     if content_queue["exists"]:
-        cq_path = os.path.expanduser("~/jarvis-control/data/content_queue.jsonl")
+        cq_path = os.path.expanduser("~/omnis-control/data/content_queue.jsonl")
         all_evidence.append({
             "path": cq_path,
             "keyword": "daily_content_queue",

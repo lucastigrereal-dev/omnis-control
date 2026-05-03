@@ -12,7 +12,7 @@ from typing import Optional
 
 from .models import CaptionTemplate
 
-TEMPLATES_PATH = os.path.expanduser("~/jarvis-control/data/caption_templates.json")
+TEMPLATES_PATH = os.path.expanduser("~/omnis-control/data/caption_templates.json")
 
 
 def _default_templates() -> list[CaptionTemplate]:

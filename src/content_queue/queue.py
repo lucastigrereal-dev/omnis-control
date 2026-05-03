@@ -14,8 +14,8 @@ from typing import Optional
 from .models import QueueItem, QueueStatus, _now_iso
 from .accounts import AccountRegistry, _normalize_handle
 
-QUEUE_PATH = os.path.expanduser("~/jarvis-control/data/content_queue.jsonl")
-VIDEO_ASSETS_PATH = os.path.expanduser("~/jarvis-control/data/video_assets.jsonl")
+QUEUE_PATH = os.path.expanduser("~/omnis-control/data/content_queue.jsonl")
+VIDEO_ASSETS_PATH = os.path.expanduser("~/omnis-control/data/video_assets.jsonl")
 MAX_DAYS_DEFAULT = 7
 MAX_DAYS_WITHOUT_FORCE = 30
 MAX_DAYS_ABSOLUTE = 90

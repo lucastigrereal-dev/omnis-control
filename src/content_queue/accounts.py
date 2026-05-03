@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-ACCOUNTS_PATH = os.path.expanduser("~/jarvis-control/data/accounts.jsonl")
+ACCOUNTS_PATH = os.path.expanduser("~/omnis-control/data/accounts.jsonl")
 DEFAULT_POSTING_TIMES = ["08:50", "17:50", "20:50"]
 DEFAULT_FORMATS = ["reels", "stories", "feed", "carousel"]
 

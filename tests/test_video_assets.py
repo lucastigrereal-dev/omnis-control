@@ -2,7 +2,7 @@
 Testes do Video Asset Registry (Fase 2A).
 
 Cobre: modelos, máquina de estados, registry CRUD, scanner, queue.
-Não modifica nada fora de ~/jarvis-control/data/.
+Não modifica nada fora de ~/omnis-control/data/.
 """
 
 import os
@@ -473,9 +473,9 @@ class TestSecurity:
         assert video.read_bytes() == original_content
 
     def test_registry_within_control_dir(self):
-        """Registry path deve estar dentro de ~/jarvis-control/."""
+        """Registry path deve estar dentro de ~/omnis-control/."""
         from src.video_assets.registry import REGISTRY_PATH
-        control = os.path.expanduser("~/jarvis-control")
+        control = os.path.expanduser("~/omnis-control")
         assert REGISTRY_PATH.startswith(control), \
             f"Registry fora do controle: {REGISTRY_PATH}"
 

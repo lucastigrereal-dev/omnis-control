@@ -1,6 +1,6 @@
 _metadata:
   created_at: '2026-04-30T17:00:00-03:00'
-  last_validated: '2026-05-02T21:04:54Z'
+  last_validated: '2026-05-03T09:31:01Z'
   version: 0.1.0
 docker:
   akasha_container_name: akasha-postgres
@@ -50,6 +50,6 @@ video_pipeline:
   - ~/.claude/skills
   - ~/publisher-os
   - ~/JARVIS_OS
-  - ~/jarvis-control
+  - ~/omnis-control
   - ~/Videos
   - ~/Downloads

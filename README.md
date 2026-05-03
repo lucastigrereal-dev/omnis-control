@@ -1,10 +1,10 @@
-# OMNIS / jarvis-control
+# OMNIS / omnis-control
 
 **Cabine mínima de controle do ecossistema Imperium/Jarvis.**
 
 ## O que é
 
-`jarvis-control` é o entrypoint CLI único para diagnosticar, monitorar e registrar o
+`omnis-control` é o entrypoint CLI único para diagnosticar, monitorar e registrar o
 ecossistema existente. Não substitui, não modifica e não duplica nada — apenas
 **enxerga, lista, verifica e registra**.
 
@@ -21,7 +21,7 @@ O ecossistema atual tem múltiplos sistemas sobrepostos:
 - Obsidian vault (7.800+ arquivos)
 
 Não existia entrypoint único, logs estruturados ou orquestrador.
-`jarvis-control` é a primeira camada do plano OMNIS: **primeiro enxergar, depois evoluir**.
+`omnis-control` é a primeira camada do plano OMNIS: **primeiro enxergar, depois evoluir**.
 
 ## Comandos
 
@@ -41,7 +41,7 @@ Não existia entrypoint único, logs estruturados ou orquestrador.
 ## Como instalar
 
 ```bash
-cd ~/jarvis-control
+cd ~/omnis-control
 python -m venv .venv
 source .venv/Scripts/activate    # Git Bash
 # .\.venv\Scripts\Activate.ps1   # PowerShell
@@ -52,7 +52,7 @@ jarvis status
 ## Como rodar sem instalação
 
 ```bash
-cd ~/jarvis-control
+cd ~/omnis-control
 python jarvis.py status
 python jarvis.py doctor > diagnose.json
 ```

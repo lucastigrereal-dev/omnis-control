@@ -43,7 +43,7 @@
 | Princípio | Descrição |
 |-----------|-----------|
 | **Cabine mínima vital** | Só o necessário para diagnosticar e controlar o ecossistema |
-| **Read-only externo** | Nada fora de `~/jarvis-control/` é modificado |
+| **Read-only externo** | Nada fora de `~/omnis-control/` é modificado |
 | **JSONL como storage** | Simples, versionável, sem dependência de banco |
 | **Unidirecional** | `caption_approval → content_queue` (nunca o inverso) |
 | **Autonomia no cercado** | Age dentro do projeto, não mexe no resto do sistema |
@@ -53,7 +53,7 @@
 ## 2. Árvore de Arquivos
 
 ```
-jarvis-control/
+omnis-control/
 ├── config/
 │   └── paths.yaml                        # Caminhos e URLs do ecossistema
 ├── data/
@@ -400,7 +400,7 @@ Suítes:
 | Mecanismo | Descrição |
 |-----------|-----------|
 | **Safe Paths** | Bloqueia path traversal em todos os comandos |
-| **Read-only externo** | Nenhum comando modifica arquivos fora de `~/jarvis-control/` |
+| **Read-only externo** | Nenhum comando modifica arquivos fora de `~/omnis-control/` |
 | **Sem .env exposto** | Nenhuma variável de ambiente é lida ou exposta |
 | **Sem API externa** | Nenhuma chamada a Instagram, Meta, ou APIs externas |
 | **Sem modificação Docker** | Todos os checkers Docker são read-only |

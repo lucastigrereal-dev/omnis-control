@@ -18,7 +18,7 @@ from src.reports import status_report
 
 def test_paths_yaml_loads():
     """paths.yaml carrega sem erro."""
-    path = os.path.expanduser("~/jarvis-control/config/paths.yaml")
+    path = os.path.expanduser("~/omnis-control/config/paths.yaml")
     assert os.path.isfile(path), f"paths.yaml não encontrado em {path}"
     with open(path, encoding="utf-8") as f:
         data = yaml.safe_load(f)
@@ -30,14 +30,14 @@ def test_paths_yaml_loads():
 
 def test_jarvis_py_exists():
     """jarvis.py shim existe e é executável."""
-    path = os.path.expanduser("~/jarvis-control/jarvis.py")
+    path = os.path.expanduser("~/omnis-control/jarvis.py")
     assert os.path.isfile(path)
 
 
 def test_status_does_not_crash():
     """jarvis status não levanta exceção (usa paths reais)."""
     output = subprocess.run(
-        [sys.executable, os.path.expanduser("~/jarvis-control/jarvis.py"), "status"],
+        [sys.executable, os.path.expanduser("~/omnis-control/jarvis.py"), "status"],
         capture_output=True,
         text=True,
         timeout=30,
@@ -61,7 +61,7 @@ def test_run_skill_inexistent_returns_clear_error():
     output = subprocess.run(
         [
             sys.executable,
-            os.path.expanduser("~/jarvis-control/jarvis.py"),
+            os.path.expanduser("~/omnis-control/jarvis.py"),
             "run-skill",
             "skill_inexistente_xyz",
         ],
@@ -76,7 +76,7 @@ def test_run_skill_inexistent_returns_clear_error():
 def test_doctor_does_not_crash():
     """doctor roda sem crash (pode ter warnings, mas não exception)."""
     output = subprocess.run(
-        [sys.executable, os.path.expanduser("~/jarvis-control/jarvis.py"), "doctor"],
+        [sys.executable, os.path.expanduser("~/omnis-control/jarvis.py"), "doctor"],
         capture_output=True,
         text=True,
         timeout=60,
@@ -94,7 +94,7 @@ def test_doctor_does_not_crash():
 def test_skills_command_does_not_crash():
     """skills command não quebra."""
     output = subprocess.run(
-        [sys.executable, os.path.expanduser("~/jarvis-control/jarvis.py"), "skills"],
+        [sys.executable, os.path.expanduser("~/omnis-control/jarvis.py"), "skills"],
         capture_output=True,
         text=True,
         timeout=30,

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-OMNIS / jarvis-control — Cabine mínima de controle do ecossistema.
+OMNIS / omnis-control — Cabine mínima de controle do ecossistema.
 
 Uso:
     python jarvis.py status

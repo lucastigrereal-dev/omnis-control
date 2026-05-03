@@ -14,7 +14,7 @@ import yaml
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-CONTROL_DIR = os.path.expanduser("~/jarvis-control")
+CONTROL_DIR = os.path.expanduser("~/omnis-control")
 PYTHON = sys.executable
 
 

@@ -22,13 +22,13 @@ def test_path_traversal_blocked():
 
 
 def test_outside_write_blocked():
-    """Escrita fora de ~/jarvis-control/ é bloqueada."""
+    """Escrita fora de ~/omnis-control/ é bloqueada."""
     with pytest.raises(PermissionError):
         validate_write_path(os.path.expanduser("~/.claude/skills"))
 
 
 def test_valid_internal_path_ok():
-    """Escrita dentro de ~/jarvis-control/ é permitida."""
+    """Escrita dentro de ~/omnis-control/ é permitida."""
     path = validate_write_path(os.path.join(CONTROL_DIR, "logs", "test.jsonl"))
     assert path.startswith(CONTROL_DIR)
 
@@ -94,6 +94,6 @@ def test_safe_read_outside_blocked():
 
 
 def test_safe_read_control_dir_ok():
-    """safe_read_path permite ~/jarvis-control/."""
+    """safe_read_path permite ~/omnis-control/."""
     path = safe_read_path(CONTROL_DIR)
     assert os.path.isdir(path)

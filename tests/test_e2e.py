@@ -1,5 +1,5 @@
 """
-Testes E2E da Fase E — OMNIS / jarvis-control.
+Testes E2E da Fase E — OMNIS / omnis-control.
 
 Testam o comportamento ponta a ponta da cabine OMNIS sem modificar
 sistemas externos. Usam subprocess para simular o usuário real.
@@ -7,7 +7,7 @@ sistemas externos. Usam subprocess para simular o usuário real.
 Regras:
   - Timeout obrigatório para cada comando.
   - Não quebram se Docker/Qdrant/Publisher estiverem indisponíveis.
-  - Não modificam nada fora de ~/jarvis-control/.
+  - Não modificam nada fora de ~/omnis-control/.
   - Não executam skills reais (dry-run apenas).
   - Não dependem de publicação, tokens ou internet.
 """
@@ -21,7 +21,7 @@ from pathlib import Path
 
 import pytest
 
-CONTROL_DIR = os.path.expanduser("~/jarvis-control")
+CONTROL_DIR = os.path.expanduser("~/omnis-control")
 PYTHON = sys.executable
 OMNIS_SHIM = os.path.join(CONTROL_DIR, "omnis.py")
 JARVIS_SHIM = os.path.join(CONTROL_DIR, "jarvis.py")
@@ -276,7 +276,7 @@ class TestE2E6RunSkillDryRun:
 class TestE2E7Seguranca:
     """
     Segurança E2E:
-      - nenhum arquivo fora de ~/jarvis-control é modificado
+      - nenhum arquivo fora de ~/omnis-control é modificado
       - .env não é lido
       - Docker não é alterado
       - Instagram/Meta/Google Drive não são chamados
@@ -284,7 +284,7 @@ class TestE2E7Seguranca:
 
     def test_no_outside_files_modified(self):
         """Verifica que arquivos de referência fora do controle não mudam."""
-        # snapshot de hash de arquivos conhecidos fora do jarvis-control
+        # snapshot de hash de arquivos conhecidos fora do omnis-control
         ref_files = [
             os.path.expanduser("~/.claude/CLAUDE.md"),
             os.path.expanduser("~/.gitconfig") if os.path.isfile(os.path.expanduser("~/.gitconfig")) else None,

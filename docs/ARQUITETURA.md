@@ -1,4 +1,4 @@
-# ARQUITETURA — OMNIS / jarvis-control
+# ARQUITETURA — OMNIS / omnis-control
 
 ## Arquitetura Atual (Fases 1+2C)
 
@@ -76,7 +76,7 @@
    diagnosticar o ecossistema.
 
 2. **Read-only em sistemas existentes** — As fases 1 e 2 não modificam nada fora de
-   `~/jarvis-control/`. Isso reduz risco a zero.
+   `~/omnis-control/`. Isso reduz risco a zero.
 
 3. **Logs estruturados com session_id** — Prepara o terreno para LangGraph e
    rastreabilidade distribuída.

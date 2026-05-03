@@ -4,7 +4,7 @@ Registro local de assets de vídeo para rastreamento de metadados e status.
 
 ## Armazenamento
 
-- Arquivo: `~/jarvis-control/data/video_assets.jsonl`
+- Arquivo: `~/omnis-control/data/video_assets.jsonl`
 - Formato: JSON Lines (um JSON por linha)
 - Encoding: UTF-8
 - Backup: incluído no git (via `data/*.jsonl` no `.gitignore`)

@@ -11,8 +11,8 @@ from typing import Optional
 
 from .models import CaptionDraft, DraftStatus, ApprovalAction, ApprovalLogEntry, _now_iso
 
-DRAFTS_PATH = os.path.expanduser("~/jarvis-control/data/caption_drafts.jsonl")
-APPROVAL_LOG_PATH = os.path.expanduser("~/jarvis-control/data/approval_log.jsonl")
+DRAFTS_PATH = os.path.expanduser("~/omnis-control/data/caption_drafts.jsonl")
+APPROVAL_LOG_PATH = os.path.expanduser("~/omnis-control/data/approval_log.jsonl")
 STALE_DAYS = 3
 
 

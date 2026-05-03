@@ -10,7 +10,7 @@ from typing import Optional
 from .models import VideoAsset
 from .status import AssetStatus
 
-REGISTRY_PATH = os.path.expanduser("~/jarvis-control/data/video_assets.jsonl")
+REGISTRY_PATH = os.path.expanduser("~/omnis-control/data/video_assets.jsonl")
 
 
 class Registry:

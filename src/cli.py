@@ -1,5 +1,5 @@
 """
-OMNIS / jarvis-control — Cabine mínima de controle do ecossistema.
+OMNIS / omnis-control — Cabine mínima de controle do ecossistema.
 
 Uso:
     python jarvis.py status
@@ -48,7 +48,7 @@ app = typer.Typer(
 )
 console = Console()
 
-PATHS_YAML = os.path.expanduser("~/jarvis-control/config/paths.yaml")
+PATHS_YAML = os.path.expanduser("~/omnis-control/config/paths.yaml")
 
 
 def _load_paths_config() -> dict:
@@ -538,14 +538,14 @@ def report():
     start = time.time()
 
     content = status_report.generate(session_id)
-    report_path = os.path.expanduser("~/jarvis-control/docs/ESTADO_ATUAL_RESUMIDO.md")
+    report_path = os.path.expanduser("~/omnis-control/docs/ESTADO_ATUAL_RESUMIDO.md")
     try:
         with open(report_path, "w", encoding="utf-8") as f:
             f.write(content)
         console.print(f"[green]Relatório gerado:[/green] {report_path}")
 
         # Update last_validated in paths.yaml
-        config_path = os.path.expanduser("~/jarvis-control/config/paths.yaml")
+        config_path = os.path.expanduser("~/omnis-control/config/paths.yaml")
         if os.path.isfile(config_path):
             try:
                 with open(config_path, encoding="utf-8") as f:
@@ -855,7 +855,7 @@ def va_export(
     fmt: str = typer.Option("csv", "--format", help="Formato de exportação (csv)"),
 ):
     """Exporta registro como CSV."""
-    path = os.path.expanduser(f"~/jarvis-control/data/video_assets_export.{fmt}")
+    path = os.path.expanduser(f"~/omnis-control/data/video_assets_export.{fmt}")
     registry = Registry()
     if fmt == "csv":
         registry.export_csv(path)
@@ -1146,9 +1146,9 @@ def cq_export(
     account_filter: str = typer.Option(None, "--account", help="Filtrar por conta"),
 ):
     """Exporta fila como CSV."""
-    Path(os.path.expanduser("~/jarvis-control/data/exports")).mkdir(parents=True, exist_ok=True)
+    Path(os.path.expanduser("~/omnis-control/data/exports")).mkdir(parents=True, exist_ok=True)
     export_name = f"queue_export_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.{fmt}"
-    path = os.path.expanduser(f"~/jarvis-control/data/exports/{export_name}")
+    path = os.path.expanduser(f"~/omnis-control/data/exports/{export_name}")
 
     queue = CQQueue()
     if fmt == "csv":
@@ -1389,9 +1389,9 @@ def cap_export(
 ):
     """Exporta rascunhos como CSV."""
     from pathlib import Path
-    Path(os.path.expanduser("~/jarvis-control/data/exports")).mkdir(parents=True, exist_ok=True)
+    Path(os.path.expanduser("~/omnis-control/data/exports")).mkdir(parents=True, exist_ok=True)
     export_name = f"caption_drafts_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.csv"
-    path = os.path.expanduser(f"~/jarvis-control/data/exports/{export_name}")
+    path = os.path.expanduser(f"~/omnis-control/data/exports/{export_name}")
 
     dm = DraftsManager()
     dm.export_csv(path, status_filter=status_filter, account_filter=account_filter)

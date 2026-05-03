@@ -56,7 +56,7 @@ def test_run_skill_no_payload_ok():
 
 def test_jsonl_log_written():
     """log_tool_run escreve entrada parseable em tool_runs.jsonl."""
-    log_dir = os.path.expanduser("~/jarvis-control/logs")
+    log_dir = os.path.expanduser("~/omnis-control/logs")
     os.makedirs(log_dir, exist_ok=True)
     log_file = os.path.join(log_dir, "tool_runs.jsonl")
 

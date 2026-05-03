@@ -1,5 +1,5 @@
 [project]
-name = "jarvis-control"
+name = "omnis-control"
 version = "0.1.0"
 description = "Cabine mínima de controle do ecossistema OMNIS/Jarvis"
 requires-python = ">=3.11"

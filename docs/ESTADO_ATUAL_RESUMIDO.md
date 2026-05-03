@@ -1,11 +1,11 @@
 # ESTADO ATUAL RESUMIDO — OMNIS / JARVIS CONTROL
 
-**Gerado em:** 2026-05-02T21:04:54Z
-**Session ID:** `aa9665d3-a024-4389-b948-db11f32af9f2`
+**Gerado em:** 2026-05-03T09:31:01Z
+**Session ID:** `422aab77-dc11-4912-956b-64bea327c90c`
 
 ## 1. RISCOS IMEDIATOS
 
-- 🔴 **DISCO CRÍTICO**: C:\ — 8.1% livre (74.8 GB de 924.3 GB). Risco de falha em Docker, logs e builds. Não executar builds pesados antes de saneamento.
+- 🔴 **DISCO CRÍTICO**: C:\ — 8.2% livre (75.9 GB de 924.3 GB). Risco de falha em Docker, logs e builds. Não executar builds pesados antes de saneamento.
 
 - 🟡 **Containers unhealthy:** crm-tigre-backend, jarvis_frontend (2 de 18)
 
@@ -46,30 +46,30 @@ Sistema OMNIS operacional. 98 skills detectadas, 18 containers rodando, Publishe
 
 | Container | Status | Portas |
 |-----------|--------|-------|
-| ✅ publisher-os-publisher-core-1 | Up 2 days | 0.0.0.0:8000->8000/tcp, [::]:8000->8000/ |
+| ✅ publisher-os-publisher-core-1 | Up 3 days | 0.0.0.0:8000->8000/tcp, [::]:8000->8000/ |
 | ✅ publisher-os-litellm-1 | Up 5 days | 0.0.0.0:4002->4000/tcp, [::]:4002->4000/ |
 | ✅ publisher-os-n8n-1 | Up 5 days | 0.0.0.0:5678->5678/tcp, [::]:5678->5678/ |
-| ✅ publisher-os-publish-worker-1 | Up 8 days |  |
-| ✅ open-webui | Up 8 days (healthy) | 0.0.0.0:3100->8080/tcp, [::]:3100->8080/ |
-| ✅ publisher-os-redis-1 | Up 8 days | 0.0.0.0:6382->6379/tcp, [::]:6382->6379/ |
-| ✅ publisher-os-qdrant-1 | Up 8 days | 0.0.0.0:6333-6334->6333-6334/tcp, [::]:6 |
-| ✅ publisher-os-supabase-db-1 | Up 8 days | 0.0.0.0:5434->5432/tcp, [::]:5434->5432/ |
-| ✅ publisher-os-minio-1 | Up 8 days (healthy) | 0.0.0.0:9000-9001->9000-9001/tcp, [::]:9 |
-| ✅ akasha-postgres | Up 8 days (healthy) | 0.0.0.0:5432->5432/tcp, [::]:5432->5432/ |
-| 🔴 crm-tigre-backend | Up 8 days (unhealthy) | 0.0.0.0:4000->4000/tcp, [::]:4000->4000/ |
-| ✅ crm-tigre-frontend | Up 8 days (healthy) | 0.0.0.0:3001->80/tcp, [::]:3001->80/tcp |
-| ✅ crm-tigre-redis | Up 8 days (healthy) | 0.0.0.0:6380->6379/tcp, [::]:6380->6379/ |
-| ✅ crm-tigre-postgres | Up 8 days (healthy) | 0.0.0.0:5433->5432/tcp, [::]:5433->5432/ |
-| ✅ aurora_redis | Up 8 days | 0.0.0.0:6381->6379/tcp, [::]:6381->6379/ |
-| 🔴 jarvis_frontend | Up 8 days (unhealthy) | 0.0.0.0:8080->80/tcp, [::]:8080->80/tcp |
-| ✅ jarvis_executor_api | Up 8 days (healthy) | 0.0.0.0:3000->3000/tcp, [::]:3000->3000/ |
-| ✅ jarvis_postgres | Up 8 days (healthy) | 5432/tcp |
+| ✅ publisher-os-publish-worker-1 | Up 9 days |  |
+| ✅ open-webui | Up 9 days (healthy) | 0.0.0.0:3100->8080/tcp, [::]:3100->8080/ |
+| ✅ publisher-os-redis-1 | Up 9 days | 0.0.0.0:6382->6379/tcp, [::]:6382->6379/ |
+| ✅ publisher-os-qdrant-1 | Up 9 days | 0.0.0.0:6333-6334->6333-6334/tcp, [::]:6 |
+| ✅ publisher-os-supabase-db-1 | Up 9 days | 0.0.0.0:5434->5432/tcp, [::]:5434->5432/ |
+| ✅ publisher-os-minio-1 | Up 9 days (healthy) | 0.0.0.0:9000-9001->9000-9001/tcp, [::]:9 |
+| ✅ akasha-postgres | Up 9 days (healthy) | 0.0.0.0:5432->5432/tcp, [::]:5432->5432/ |
+| 🔴 crm-tigre-backend | Up 9 days (unhealthy) | 0.0.0.0:4000->4000/tcp, [::]:4000->4000/ |
+| ✅ crm-tigre-frontend | Up 9 days (healthy) | 0.0.0.0:3001->80/tcp, [::]:3001->80/tcp |
+| ✅ crm-tigre-redis | Up 9 days (healthy) | 0.0.0.0:6380->6379/tcp, [::]:6380->6379/ |
+| ✅ crm-tigre-postgres | Up 9 days (healthy) | 0.0.0.0:5433->5432/tcp, [::]:5433->5432/ |
+| ✅ aurora_redis | Up 9 days | 0.0.0.0:6381->6379/tcp, [::]:6381->6379/ |
+| 🔴 jarvis_frontend | Up 9 days (unhealthy) | 0.0.0.0:8080->80/tcp, [::]:8080->80/tcp |
+| ✅ jarvis_executor_api | Up 9 days (healthy) | 0.0.0.0:3000->3000/tcp, [::]:3000->3000/ |
+| ✅ jarvis_postgres | Up 9 days (healthy) | 5432/tcp |
 
 ## 7. Memória
 
 - **Qdrant (http://localhost:6333):** inacessível
 - **Akasha (container akasha-postgres):** encontrado
-  - Status: Up 8 days (healthy)
+  - Status: Up 9 days (healthy)
 
 ## 8. Obsidian
 
@@ -119,7 +119,7 @@ Sistema OMNIS operacional. 98 skills detectadas, 18 containers rodando, Publishe
   - registry_assets: 0
   - registry_accounts: 2
   - queue_items: 42
-  - scan_duration_ms: 75
+  - scan_duration_ms: 78
   - scan_timed_out: False
 
 ## 10. Content Queue (Fase 2B)
