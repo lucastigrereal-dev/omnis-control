@@ -18,6 +18,7 @@ IGNORE_DIRS = {"node_modules", ".venv", ".git", "__pycache__", ".next", "dist", 
 SCAN_ROOTS = [
     os.path.expanduser("~/Videos"),
     os.path.expanduser("~/Downloads"),
+    os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data", "inbox", "videos"),
 ]
 MAX_DEPTH = 2
 MAX_FILES = 500

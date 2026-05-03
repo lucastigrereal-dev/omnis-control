@@ -1,14 +1,14 @@
-# Relatório Multifase — R0-lite → Microciclo → 2E → S0 → 3A
+# Relatório Multifase — R0-lite → Microciclo → 2E → S0 → 3A + Consolidação
 
 **Gerado em:** 2026-05-03
 **Projeto:** OMNIS (`~/omnis-control/`)
 **Branch:** master
 **Testes:** 213/213 passando ✅
-**Commits:** 6 (desde o repo oficial)
+**Commits:** 8 (desde o repo oficial)
 
 ## 1. Resumo Executivo
 
-Implementação completa do ciclo **R0-lite → Microciclo → Fase 2E → Fase S0 → Fase 3A** no ecossistema OMNIS. O pipeline de conteúdo agora cobre todo o ciclo: cadastro de contas → fila → rascunho → aprovação → bridge → export. Setores formalizados em YAML. Conectores mapeados.
+Implementação completa do ciclo **R0-lite → Microciclo → Fase 2E → Fase S0 → Fase 3A** + **Consolidação Estratégica** (decisões oficiais, reconciliação de setores, runbooks operacionais, protocolo 15-15-20). O OMNIS agora tem pipeline de conteúdo operacional (contas → fila → draft → aprovação → bridge → export), setores formalizados, conectores mapeados, e documentação estratégica consolidada.
 
 ## 2. O que Foi Feito
 
@@ -24,6 +24,15 @@ Implementação completa do ciclo **R0-lite → Microciclo → Fase 2E → Fase 
 | Fase S0 | docs/ENTERPRISE_SECTORS.md — explicacao do padrao replicavel | ✅ |
 | Fase 3A | config/connectors.yaml — 16 conectores (4 P0, 6 P1, 6 P2) | ✅ |
 | Fase 3A | docs/AUTOMATION_INTEGRATIONS.md — visao geral conectores | ✅ |
+| Consolidação | docs/DECISOES.md — 14 decisões oficiais (D001-D014) | ✅ |
+| Consolidação | docs/SECTORS_RECONCILIATION.md — 9 atuais vs 14 futuros | ✅ |
+| Consolidação | docs/DISK_CLEANUP_PLAN.md — runbook de disco crítico (P0) | ✅ |
+| Consolidação | docs/QDRANT_RECOVERY_RUNBOOK.md — runbook de recovery | ✅ |
+| Consolidação | docs/META_OAUTH_RUNBOOK.md — runbook de preparação OAuth | ✅ |
+| Consolidação | docs/PROTOCOLO_15_15_20.md — protocolo de refinamento | ✅ |
+| Consolidação | docs/templates/15_15_20_TEMPLATE.md — template do protocolo | ✅ |
+| Consolidação | docs/LEGACY_CONTAINERS.md — inventário de containers | ✅ |
+| Consolidação | data/inbox/videos/ adicionado ao SCAN_ROOTS do scanner | ✅ |
 
 ## 3. Pipeline de Conteúdo (Marketing Enterprise)
 
@@ -67,6 +76,8 @@ tests/
 | 71b518d | Microciclo | Pipeline local validado — 1 caption aprovado |
 | 96e9714 | 2E | Argos Draft Bridge completa |
 | 2bb2bb7 | S0 | Enterprise Sector Blueprint completo |
+| 4628e22 | 3A | Automation & Integration Registry |
+| *pendente* | Consolidação | Decisões, runbooks, protocolo 15-15-20 |
 
 ## 6. 9 Setores Enterprise
 
