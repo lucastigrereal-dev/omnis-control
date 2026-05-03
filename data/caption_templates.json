@@ -1,0 +1,92 @@
+[
+  {
+    "template_id": "alcance_reels",
+    "name": "Alcance — Reels",
+    "objective": "alcance",
+    "format": "reels",
+    "hook_template": "[HOOK A REVISAR] — você precisa ver isso!",
+    "body_template": "[CORPO DA LEGENDA A REVISAR]\n\n📍 [LOCAL]",
+    "cta_template": "Salva pra ver depois e compartilha com alguém que precisa saber disso! 💬",
+    "hashtag_suggestions": [
+      "#viagem",
+      "#turismo",
+      "#brasil"
+    ],
+    "notes": "Reels de alcance: hook forte nos primeiros 3 segundos"
+  },
+  {
+    "template_id": "alcance_carousel",
+    "name": "Alcance — Carrossel",
+    "objective": "alcance",
+    "format": "carousel",
+    "hook_template": "[HOOK A REVISAR] — desliza pro lado!",
+    "body_template": "[CORPO DA LEGENDA A REVISAR]\n\n📍 [LOCAL]",
+    "cta_template": "Compartilha com alguém que precisa ver isso! Salva pra consultar depois.",
+    "hashtag_suggestions": [
+      "#viagem",
+      "#turismo",
+      "#brasil"
+    ],
+    "notes": "Carrossel de alcance: primeira foto/chamada forte"
+  },
+  {
+    "template_id": "autoridade_feed",
+    "name": "Autoridade — Feed",
+    "objective": "autoridade",
+    "format": null,
+    "hook_template": "[HOOK A REVISAR] — aqui está o que aprendi:",
+    "body_template": "[CORPO DA LEGENDA A REVISAR]\n\n📍 [LOCAL]",
+    "cta_template": "O que você acha disso? Conta aqui nos comentários! 👇",
+    "hashtag_suggestions": [
+      "#marketing",
+      "#crescimento",
+      "#estrategia"
+    ],
+    "notes": "Conteúdo de autoridade: dados, aprendizados, cases"
+  },
+  {
+    "template_id": "conversao_feed",
+    "name": "Conversão — Feed",
+    "objective": "conversao",
+    "format": null,
+    "hook_template": "[HOOK A REVISAR] — e a melhor parte:",
+    "body_template": "[CORPO DA LEGENDA A REVISAR]\n\n📍 [LOCAL]\n\n👉 [NOME_DO_HOTEL]",
+    "cta_template": "Garanta seu desconto exclusivo no link da bio! 🔗",
+    "hashtag_suggestions": [
+      "#resort",
+      "#hospedagem",
+      "#viagem"
+    ],
+    "notes": "Foco em conversão: desconto, oferta, CTA direto"
+  },
+  {
+    "template_id": "relacionamento_stories",
+    "name": "Relacionamento — Stories/Feed",
+    "objective": "relacionamento",
+    "format": null,
+    "hook_template": "[HOOK A REVISAR] — me conta nos comentários:",
+    "body_template": "[CORPO DA LEGENDA A REVISAR]\n\n📍 [LOCAL]",
+    "cta_template": "Responde aqui: o que você faria no meu lugar? 👇",
+    "hashtag_suggestions": [
+      "#familia",
+      "#momento",
+      "#reflexao"
+    ],
+    "notes": "Engajamento: perguntas, enquetes, opinião"
+  },
+  {
+    "template_id": "teste_flex",
+    "name": "Teste — Formato livre",
+    "objective": "teste",
+    "format": null,
+    "hook_template": "[HOOK A REVISAR] — teste:",
+    "body_template": "[CORPO DA LEGENDA A REVISAR]",
+    "cta_template": "Me diz: funcionou pra você? Comenta aqui!",
+    "hashtag_suggestions": [
+      "#teste",
+      "#novidade",
+      "#experiencia"
+    ],
+    "notes": "Teste: novo formato, novo nicho, novo approach"
+  }
+]

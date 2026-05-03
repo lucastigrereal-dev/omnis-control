@@ -1,0 +1,351 @@
+"""
+Video Pipeline Checker — Módulo de diagnóstico read-only.
+
+Classifica o ecossistema quanto à maturidade do pipeline de vídeo:
+  - operational: 4+ de 5 sinais fortes
+  - partial: 2+ sinais de código executável ou integração real
+  - documented_only: só .md / prompts / roadmap
+  - not_found: nenhum sinal relevante
+  - scan_timeout_partial: scan excedeu timeout
+"""
+
+import os
+import time
+
+import yaml
+
+SEARCH_ROOTS = [
+    os.path.expanduser("~/.claude/skills"),
+    os.path.expanduser("~/publisher-os"),
+    os.path.expanduser("~/JARVIS_OS"),
+    os.path.expanduser("~/jarvis-control"),
+]
+CONFIG_PATH = os.path.expanduser("~/jarvis-control/config/paths.yaml")
+SCAN_TIMEOUT_S = 30
+
+
+def _load_config() -> dict:
+    if not os.path.isfile(CONFIG_PATH):
+        return {}
+    try:
+        with open(CONFIG_PATH, encoding="utf-8") as f:
+            data = yaml.safe_load(f) or {}
+        return data.get("video_pipeline", {})
+    except (yaml.YAMLError, OSError):
+        return {}
+
+
+def _scan_local_video_files(roots: list[str], exts: list[str], timeout_s: int) -> dict:
+    """Scan local directories for video files, with timeout."""
+    deadline = time.time() + timeout_s
+    found = []
+    timed_out = False
+    for root in roots:
+        if time.time() > deadline:
+            timed_out = True
+            break
+        if not os.path.isdir(root):
+            continue
+        try:
+            for dirpath, _dirnames, filenames in os.walk(root, topdown=True):
+                if time.time() > deadline:
+                    timed_out = True
+                    break
+                for f in filenames:
+                    ext = os.path.splitext(f)[1].lower()
+                    if ext in exts:
+                        found.append(os.path.join(dirpath, f))
+        except (OSError, PermissionError):
+            continue
+    return {"files": found, "count": len(found), "timed_out": timed_out}
+
+
+def _check_keyword_in_path(roots: list[str], keywords: list[str]) -> list[dict]:
+    """Check for files/dirs matching video-related keywords."""
+    evidence = []
+    seen = set()
+    for root in roots:
+        if not os.path.isdir(root):
+            continue
+        try:
+            for entry in os.listdir(root):
+                entry_lower = entry.lower()
+                for kw in keywords:
+                    if kw in entry_lower:
+                        dedup_key = f"{root}/{entry}"
+                        if dedup_key not in seen:
+                            seen.add(dedup_key)
+                            evidence.append({
+                                "path": os.path.join(root, entry),
+                                "keyword": kw,
+                                "type": "dir" if os.path.isdir(os.path.join(root, entry)) else "file",
+                            })
+                        break
+        except (OSError, PermissionError):
+            continue
+    return evidence
+
+
+def _check_video_to_content_skill() -> list[dict]:
+    """Check for video_to_content skill."""
+    evidence = []
+    skill_path = os.path.expanduser("~/.claude/skills/video_to_content")
+    if os.path.isdir(skill_path):
+        evidence.append({
+            "path": skill_path,
+            "keyword": "video_to_content/run.py",
+            "type": "skill_executable",
+        })
+    return evidence
+
+
+def _check_argos_bridge_skill() -> list[dict]:
+    """Check for argos-bridge skill."""
+    evidence = []
+    skill_path = os.path.expanduser("~/.claude/skills/argos-bridge")
+    if os.path.isdir(skill_path):
+        evidence.append({
+            "path": skill_path,
+            "keyword": "argos-bridge",
+            "type": "skill_integration",
+        })
+    return evidence
+
+
+def _check_publisher_video_code() -> list[dict]:
+    """Scan publisher-os for video/media related code."""
+    evidence = []
+    pub_root = os.path.expanduser("~/publisher-os")
+    video_terms = ["video", "media", "asset", "reel", "scheduled", "published"]
+    if not os.path.isdir(pub_root):
+        return evidence
+    try:
+        for dirpath, _dirnames, filenames in os.walk(pub_root, topdown=True):
+            for f in filenames:
+                if f.endswith(".py"):
+                    fpath = os.path.join(dirpath, f)
+                    try:
+                        with open(fpath, encoding="utf-8", errors="ignore") as fh:
+                            content = fh.read(5000).lower()
+                        for term in video_terms:
+                            if term in content:
+                                evidence.append({
+                                    "path": fpath,
+                                    "keyword": term,
+                                    "type": "publisher_code",
+                                })
+                                break
+                    except (OSError, PermissionError):
+                        continue
+    except (OSError, PermissionError):
+        pass
+    return evidence
+
+
+def _check_video_asset_registry() -> dict:
+    """Check if the local Video Asset Registry exists and has data."""
+    registry_path = os.path.expanduser("~/jarvis-control/data/video_assets.jsonl")
+    result = {
+        "exists": os.path.isfile(registry_path),
+        "asset_count": 0,
+    }
+    if result["exists"]:
+        try:
+            with open(registry_path, encoding="utf-8") as f:
+                result["asset_count"] = sum(1 for line in f if line.strip())
+        except (OSError, PermissionError):
+            pass
+    return result
+
+
+def _check_account_registry() -> dict:
+    """Check if the Account Registry exists and has data."""
+    path = os.path.expanduser("~/jarvis-control/data/accounts.jsonl")
+    result = {"exists": os.path.isfile(path), "account_count": 0}
+    if result["exists"]:
+        try:
+            with open(path, encoding="utf-8") as f:
+                result["account_count"] = sum(1 for line in f if line.strip())
+        except (OSError, PermissionError):
+            pass
+    return result
+
+
+def _check_content_queue() -> dict:
+    """Check if the Content Queue file exists and has data."""
+    path = os.path.expanduser("~/jarvis-control/data/content_queue.jsonl")
+    result = {"exists": os.path.isfile(path), "item_count": 0}
+    if result["exists"]:
+        try:
+            with open(path, encoding="utf-8") as f:
+                result["item_count"] = sum(1 for line in f if line.strip())
+        except (OSError, PermissionError):
+            pass
+    return result
+
+
+def check() -> dict:
+    """Run all checks and return structured diagnosis."""
+    start = time.time()
+
+    config = _load_config()
+    search_roots = config.get("local_search_roots", SEARCH_ROOTS)
+    known_exts = config.get("known_extensions", [".mp4", ".mov", ".m4v", ".avi", ".webm"])
+    keywords = config.get("keywords", [])
+
+    # --- Scans ---
+    video_files = _scan_local_video_files(search_roots, known_exts, SCAN_TIMEOUT_S)
+    keyword_hits = _check_keyword_in_path(search_roots, keywords)
+    vtoc_evidence = _check_video_to_content_skill()
+    argos_evidence = _check_argos_bridge_skill()
+    pub_evidence = _check_publisher_video_code()
+    registry = _check_video_asset_registry()
+    accounts_reg = _check_account_registry()
+    content_queue = _check_content_queue()
+
+    all_evidence = keyword_hits + vtoc_evidence + argos_evidence + pub_evidence
+    if registry["exists"]:
+        registry_path = os.path.expanduser("~/jarvis-control/data/video_assets.jsonl")
+        all_evidence.append({
+            "path": registry_path,
+            "keyword": "video_asset_registry",
+            "type": "registry",
+        })
+    if accounts_reg["exists"]:
+        acc_path = os.path.expanduser("~/jarvis-control/data/accounts.jsonl")
+        all_evidence.append({
+            "path": acc_path,
+            "keyword": "instagram_account_mapping",
+            "type": "registry",
+        })
+    if content_queue["exists"]:
+        cq_path = os.path.expanduser("~/jarvis-control/data/content_queue.jsonl")
+        all_evidence.append({
+            "path": cq_path,
+            "keyword": "daily_content_queue",
+            "type": "registry",
+        })
+
+    # --- Signals ---
+    signals = {
+        "local_video_files_found": video_files["count"] > 0,
+        "google_drive_code_found": any("drive" in str(e.get("keyword", "")).lower() for e in all_evidence),
+        "video_ingestion_code_found": bool(vtoc_evidence) or any(
+            e.get("keyword") in ("video", "videos") and e.get("type") == "publisher_code"
+            for e in all_evidence
+        ),
+        "video_asset_registry_found": registry["exists"] and registry["asset_count"] > 0,
+        "video_asset_schema_found": any(
+            e.get("keyword") in ("asset", "assets") and e.get("type") in ("publisher_code", "dir", "file")
+            for e in all_evidence
+        ),
+        "content_queue_found": any(
+            "queue" in str(e.get("keyword", "")).lower() for e in all_evidence
+        ),
+        "daily_queue_found": any(
+            "queue" in str(e.get("keyword", "")).lower() for e in all_evidence
+        ),
+        "caption_generation_found": any(
+            e.get("keyword") in ("caption", "hashtags", "seogram") for e in all_evidence
+        ),
+        "publisher_integration_found": bool(argos_evidence) or any(
+            e.get("keyword") in ("publisher", "scheduled", "published") for e in all_evidence
+        ),
+        "instagram_account_mapping_found": any(
+            e.get("keyword") in ("instagram", "instagram_account_mapping") for e in all_evidence
+        ),
+        "account_registry_found": accounts_reg["exists"] and accounts_reg["account_count"] > 0,
+        "content_queue_found_explicit": content_queue["exists"] and content_queue["item_count"] > 0,
+        "used_or_published_marker_found": any(
+            e.get("keyword") in ("scheduled", "published", "calendar") for e in all_evidence
+        ),
+    }
+
+    # --- Evidence dedup ---
+    seen_paths = set()
+    deduped_evidence = []
+    for e in all_evidence:
+        if e["path"] not in seen_paths:
+            seen_paths.add(e["path"])
+            deduped_evidence.append(e)
+
+    # --- Classification ---
+    strong_signals = [
+        signals["video_asset_registry_found"] or signals["video_asset_schema_found"],
+        signals["content_queue_found"] or signals["daily_queue_found"],
+        signals["publisher_integration_found"],
+        signals["instagram_account_mapping_found"],
+        signals["used_or_published_marker_found"],
+    ]
+    strong_count = sum(1 for s in strong_signals if s)
+
+    partial_signals = [
+        signals["video_ingestion_code_found"],
+        signals["caption_generation_found"],
+        signals["google_drive_code_found"],
+        signals["local_video_files_found"],
+        bool(vtoc_evidence),
+        bool(argos_evidence),
+        bool(pub_evidence),
+    ]
+    partial_count = sum(1 for s in partial_signals if s)
+
+    has_executable_code = bool(vtoc_evidence) or bool(argos_evidence) or bool(pub_evidence)
+
+    if video_files.get("timed_out"):
+        classification = "scan_timeout_partial"
+        confidence = "low"
+    elif strong_count >= 4:
+        classification = "operational"
+        confidence = "high"
+    elif has_executable_code and partial_count >= 2:
+        classification = "partial"
+        confidence = "medium"
+    elif has_executable_code:
+        classification = "partial"
+        confidence = "low"
+    elif deduped_evidence:
+        classification = "documented_only"
+        confidence = "low"
+    else:
+        classification = "not_found"
+        confidence = "high"
+
+    # --- Risks ---
+    risks = []
+    if classification == "not_found":
+        risks.append("Nenhum pipeline de vídeo detectado — conteúdo de vídeo é gerenciado manualmente?")
+    if classification == "documented_only":
+        risks.append("Pipeline de vídeo documentado mas sem código executável — risco de defasagem entre docs e implementação.")
+    if classification == "scan_timeout_partial":
+        risks.append("Scan parcial por timeout — pode haver artefatos de vídeo não detectados.")
+    if not signals.get("instagram_account_mapping_found"):
+        risks.append("Nenhum mapeamento de conta Instagram para conteúdo de vídeo encontrado — publicação pode ser manual.")
+    if not signals.get("used_or_published_marker_found"):
+        risks.append(
+            "Nenhum marcador de usado/publicado/agendado encontrado — "
+            "não é possível distinguir conteúdo pendente de publicado."
+        )
+    if registry["exists"] and registry["asset_count"] == 0:
+        risks.append("Registro de vídeo encontrado mas vazio — nenhum asset importado ainda.")
+
+    duration_ms = int((time.time() - start) * 1000)
+
+    return {
+        "classification": classification,
+        "confidence": confidence,
+        "signals": signals,
+        "counts": {
+            "local_video_files": video_files["count"],
+            "keyword_hits": len(keyword_hits),
+            "total_evidence": len(deduped_evidence),
+            "registry_assets": registry["asset_count"],
+            "registry_accounts": accounts_reg["account_count"],
+            "queue_items": content_queue["item_count"],
+            "scan_duration_ms": duration_ms,
+            "scan_timed_out": video_files.get("timed_out", False),
+        },
+        "evidence": deduped_evidence[:20],
+        "evidence_truncated": len(deduped_evidence) > 20 if deduped_evidence else False,
+        "risks": risks,
+    }

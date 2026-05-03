@@ -1,0 +1,55 @@
+_metadata:
+  created_at: '2026-04-30T17:00:00-03:00'
+  last_validated: '2026-05-02T21:04:54Z'
+  version: 0.1.0
+docker:
+  akasha_container_name: akasha-postgres
+paths:
+  claude_registry_path: ~/.claude/registry
+  claude_skills_path: ~/.claude/skills
+  jarvis_os_docs_path: ~/JARVIS_OS
+  obsidian_vault_path: ~/Desktop/ARQUIVOS_MANUS_CLAUDE/OBSIDIAN/ComandoCentral
+  publisher_os_path: ~/publisher-os
+services:
+  litellm_url: http://localhost:4002
+  n8n_url: http://localhost:5678
+  publisher_api_url: http://localhost:8000
+  qdrant_url: http://localhost:6333
+video_pipeline:
+  keywords:
+  - video
+  - videos
+  - reels
+  - media
+  - asset
+  - assets
+  - drive
+  - google_drive
+  - google drive
+  - upload
+  - inbox
+  - content_queue
+  - content queue
+  - queue
+  - calendar
+  - scheduled
+  - published
+  - caption
+  - hashtags
+  - seogram
+  - argos
+  - publisher
+  - instagram
+  known_extensions:
+  - .mp4
+  - .mov
+  - .m4v
+  - .avi
+  - .webm
+  local_search_roots:
+  - ~/.claude/skills
+  - ~/publisher-os
+  - ~/JARVIS_OS
+  - ~/jarvis-control
+  - ~/Videos
+  - ~/Downloads
