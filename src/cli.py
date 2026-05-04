@@ -1813,6 +1813,169 @@ def tmp_show(
     if t.notes:
         console.print(f"  Notas: {t.notes}")
 
+# ---------------------------------------------------------------------------
+# WORKFLOW COMMANDS
+# ---------------------------------------------------------------------------
+
+
+workflow_app = typer.Typer(
+    name="workflow",
+    help="Pipeline ponta a ponta: IDEA → PRODUCE → DRAFT → QUEUE",
+    add_completion=False,
+)
+app.add_typer(workflow_app)
+
+
+@workflow_app.command(name="run")
+def wf_run(
+    topic: str = typer.Argument(..., help="Tema do conteúdo"),
+    pagina: str = typer.Option(..., "--pagina", help="Handle Instagram (ex: afamiliatigrereal)"),
+    formato: str = typer.Option("carrossel", "--formato", help="carrossel, reel, feed, stories"),
+    objective: str = typer.Option("alcance", "--objective", help="alcance, autoridade, conversao, relacionamento"),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Simular sem executar"),
+):
+    """Executa pipeline completo: IDEA → PLAN → BRIEF → PRODUCE → DRAFT."""
+    from src.workflow import WorkflowEngine
+
+    engine = WorkflowEngine()
+    result = engine.run(
+        topic=topic,
+        pagina=pagina,
+        formato=formato,
+        objective=objective,
+        dry_run=dry_run,
+    )
+
+    console.print(f"\n[bold]Workflow:[/bold] {result.workflow_id[:8]} — {topic}")
+    console.print(f"  Página: @{pagina}  |  Formato: {formato}")
+
+    for stage, status in result.stages.items():
+        icon = {"success": "[green]✅[/green]", "failed": "[red]❌[/red]",
+                "running": "[yellow]⏳[/yellow]", "pending": "[dim]⬜[/dim]",
+                "skipped": "[blue]⏭️[/blue]", "blocked": "[red]🚫[/red]"}
+        s = result.stages[stage]
+        console.print(f"  {icon.get(s, '❓')} {stage}: {s}")
+
+    if result.queue_id:
+        console.print(f"\n  Queue ID: {result.queue_id[:8]}")
+    if result.draft_id:
+        console.print(f"  Draft ID: {result.draft_id[:8]}")
+    if result.job_id:
+        console.print(f"  Job ID: {result.job_id[:8]}")
+    if result.errors:
+        console.print(f"\n  [red]Erros ({len(result.errors)}):[/red]")
+        for e in result.errors:
+            console.print(f"    - {e}")
+
+    # Next action
+    if result.draft_id:
+        console.print(f"\n[bold]Próximo passo:[/bold] aprovar o draft com:")
+        console.print(f"  omnis approvals approve {result.draft_id[:8]}")
+    elif result.queue_id:
+        console.print(f"\n[bold]Próximo passo:[/bold] criar legenda com:")
+        console.print(f"  omnis captions create {result.queue_id[:8]} --text \"...\"")
+
+
+@workflow_app.command(name="enqueue")
+def wf_enqueue(
+    draft_id: str = typer.Argument(..., help="ID do ArgosDraft"),
+):
+    """Enfileira um draft no Publisher OS BullMQ para publicação."""
+    from src.workflow import WorkflowEngine
+
+    engine = WorkflowEngine()
+    result = engine.enqueue_draft(draft_id)
+
+    if result.get("error"):
+        console.print(f"[red]Erro:[/red] {result['error']}")
+        raise typer.Exit(1)
+
+    console.print(f"[green]Draft {draft_id[:8]} enfileirado com sucesso![/green]")
+    if result.get("result"):
+        console.print(f"  Resposta: {result['result']}")
+
+
+@workflow_app.command(name="status")
+def wf_status():
+    """Status do ecossistema de workflow."""
+    from src.workflow import WorkflowEngine
+
+    engine = WorkflowEngine()
+    status_data = engine.status()
+
+    console.print("[bold]Workflow Engine — Status[/bold]\n")
+
+    # Publisher OS
+    pub = status_data.get("publisher_os", {})
+    pub_status = pub.get("status", "unknown")
+    pub_icon = "[green]OK[/green]" if pub_status == "ok" else "[red]OFFLINE[/red]"
+    console.print(f"  Publisher OS: {pub_icon}")
+    if pub.get("error"):
+        console.print(f"    [red]{pub['error']}[/red]")
+
+    # Queue
+    q = status_data.get("queue", {})
+    console.print(f"\n  Content Queue: {q.get('total', 0)} itens")
+    console.print(f"    needs_asset: {q.get('needs_asset', 0)}")
+    console.print(f"    needs_caption: {q.get('needs_caption', 0)}")
+    console.print(f"    approved: {q.get('approved', 0)}")
+    console.print(f"    scheduled: {q.get('scheduled', 0)}")
+
+    # Workflows recentes
+    wf_list = status_data.get("workflows", [])
+    console.print(f"\n  Workflows recentes: {len(wf_list)}")
+    for w in wf_list[-5:]:
+        stages_ok = sum(1 for s in w.get("stages", {}).values() if s == "success")
+        stages_total = len(w.get("stages", {}))
+        console.print(f"    [{w['workflow_id'][:8]}] {w['topic'][:30]:30} {stages_ok}/{stages_total}")
+
+
+@workflow_app.command(name="list")
+def wf_list(
+    limit: int = typer.Option(10, "--limit", help="Número de workflows"),
+):
+    """Lista workflows executados."""
+    import json as _json
+    from pathlib import Path
+
+    wf_path = os.path.expanduser("~/omnis-control/data/workflow_results.jsonl")
+    if not os.path.isfile(wf_path):
+        console.print("Nenhum workflow executado ainda.")
+        return
+
+    items = []
+    with open(wf_path, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                try:
+                    items.append(_json.loads(line))
+                except _json.JSONDecodeError:
+                    continue
+
+    items = items[-limit:]
+    table = Table(title=f"Workflows ({len(items)})")
+    table.add_column("ID", style="cyan")
+    table.add_column("Tema")
+    table.add_column("Página")
+    table.add_column("Formato")
+    table.add_column("Stages")
+    table.add_column("Criado")
+
+    for w in items:
+        stages_ok = sum(1 for s in w.get("stages", {}).values() if s == "success")
+        stages_total = len(w.get("stages", {}))
+        table.add_row(
+            w["workflow_id"][:8],
+            w.get("topic", "?")[:25],
+            f"@{w.get('pagina', '?')}",
+            w.get("formato", "?"),
+            f"{stages_ok}/{stages_total}",
+            w.get("created_at", "?")[:10],
+        )
+    console.print(table)
+
+
 if __name__ == "__main__":
     app()
 
