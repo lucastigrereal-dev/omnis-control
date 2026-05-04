@@ -1,0 +1,140 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Skill Manifest",
+  "description": "Schema for OMNIS skill manifests. Each executable or doc skill in the ecosystem must have a manifest.json describing its interface, risk profile, and lifecycle.",
+  "type": "object",
+  "required": [
+    "name", "version", "description", "status", "risk_level", "mode",
+    "owner", "tags", "inputs_schema", "outputs_schema",
+    "created_at", "updated_at", "approval_required"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Unique skill identifier (kebab-case or snake_case)",
+      "pattern": "^[a-z][a-z0-9_-]*$"
+    },
+    "version": {
+      "type": "string",
+      "description": "Semantic version",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "description": {
+      "type": "string",
+      "description": "One-line description of what the skill does"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "proposed", "active", "deprecated", "blocked"],
+      "description": "Current status in the skill lifecycle"
+    },
+    "risk_level": {
+      "type": "string",
+      "enum": ["low", "medium", "high"],
+      "description": "Risk level of executing this skill"
+    },
+    "mode": {
+      "type": "string",
+      "enum": ["read_only", "draft_only", "local_write", "external_action", "dangerous"],
+      "description": "Execution mode — determines what resources the skill accesses"
+    },
+    "owner": {
+      "type": "string",
+      "description": "Owner sector or person (e.g. 'marketing_enterprise', 'lucas')"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Classification tags for discovery and routing"
+    },
+    "inputs_schema": {
+      "type": "object",
+      "description": "JSON Schema for expected inputs",
+      "properties": {
+        "type": { "type": "string", "enum": ["object"] },
+        "properties": { "type": "object" },
+        "required": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "outputs_schema": {
+      "type": "object",
+      "description": "JSON Schema for expected outputs",
+      "properties": {
+        "type": { "type": "string", "enum": ["object"] },
+        "properties": { "type": "object" },
+        "required": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "allowed_tools": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tools this skill is allowed to call"
+    },
+    "denied_tools": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Tools explicitly denied for this skill"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Python packages or external dependencies required"
+    },
+    "permissions": {
+      "type": "object",
+      "description": "Filesystem and network permissions",
+      "properties": {
+        "allow_read_paths": { "type": "array", "items": { "type": "string" } },
+        "allow_write_paths": { "type": "array", "items": { "type": "string" } },
+        "allow_network": { "type": "boolean" }
+      }
+    },
+    "examples": {
+      "type": "array",
+      "items": { "type": "object" },
+      "description": "Example input/output pairs"
+    },
+    "test_command": {
+      "type": "string",
+      "description": "Shell command to smoke-test this skill"
+    },
+    "approval_required": {
+      "type": "boolean",
+      "description": "Whether human approval is required before execution"
+    },
+    "lifecycle": {
+      "type": "string",
+      "enum": ["experimental", "validated", "production", "deprecated"],
+      "description": "Lifecycle stage"
+    },
+    "deprecated": {
+      "type": "boolean",
+      "description": "Whether the skill is deprecated"
+    },
+    "replacement": {
+      "type": "string",
+      "description": "Name of the replacement skill if deprecated"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 creation timestamp"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 last-updated timestamp"
+    }
+  },
+  "allOf": [
+    {
+      "description": "Skills with mode external_action or dangerous must have approval_required: true",
+      "if": {
+        "properties": { "mode": { "enum": ["external_action", "dangerous"] } }
+      },
+      "then": {
+        "properties": { "approval_required": { "const": true } }
+      }
+    }
+  ]
+}

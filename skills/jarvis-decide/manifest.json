@@ -1,0 +1,62 @@
+{
+  "name": "jarvis-decide",
+  "version": "1.0.0",
+  "description": "Decision Engine que prioriza acoes baseado em formula multi-fator",
+  "status": "active",
+  "risk_level": "low",
+  "mode": "read_only",
+  "owner": "mission_control",
+  "tags": [
+    "decide",
+    "prioritization",
+    "decision",
+    "core"
+  ],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "options": {
+        "type": "array"
+      },
+      "context": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "options"
+    ]
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "ranking": {
+        "type": "array"
+      },
+      "selected": {
+        "type": "string"
+      },
+      "score": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "ranking"
+    ]
+  },
+  "allowed_tools": [],
+  "denied_tools": [],
+  "dependencies": [],
+  "permissions": {
+    "allow_read_paths": [],
+    "allow_write_paths": [],
+    "allow_network": false
+  },
+  "examples": [],
+  "test_command": "python -m src.cli skill-info jarvis-decide",
+  "approval_required": false,
+  "lifecycle": "production",
+  "deprecated": false,
+  "replacement": "",
+  "created_at": "2026-05-04T23:41:25Z",
+  "updated_at": "2026-05-04T23:41:25Z"
+}

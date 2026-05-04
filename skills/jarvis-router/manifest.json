@@ -1,0 +1,62 @@
+{
+  "name": "jarvis-router",
+  "version": "1.0.0",
+  "description": "Classifica intencao do operador e roteia para o setor correto",
+  "status": "active",
+  "risk_level": "low",
+  "mode": "read_only",
+  "owner": "mission_control",
+  "tags": [
+    "router",
+    "intent",
+    "classification",
+    "core"
+  ],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "message": {
+        "type": "string"
+      },
+      "context": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "message"
+    ]
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "sector": {
+        "type": "string"
+      },
+      "confidence": {
+        "type": "number"
+      },
+      "skill": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "sector"
+    ]
+  },
+  "allowed_tools": [],
+  "denied_tools": [],
+  "dependencies": [],
+  "permissions": {
+    "allow_read_paths": [],
+    "allow_write_paths": [],
+    "allow_network": false
+  },
+  "examples": [],
+  "test_command": "python -m src.cli skill-info jarvis-router",
+  "approval_required": false,
+  "lifecycle": "production",
+  "deprecated": false,
+  "replacement": "",
+  "created_at": "2026-05-04T23:41:25Z",
+  "updated_at": "2026-05-04T23:41:25Z"
+}

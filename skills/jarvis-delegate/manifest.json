@@ -1,0 +1,59 @@
+{
+  "name": "jarvis-delegate",
+  "version": "1.0.0",
+  "description": "Roteia requisicao para a skill mais adequada baseado no registry",
+  "status": "active",
+  "risk_level": "medium",
+  "mode": "local_write",
+  "owner": "mission_control",
+  "tags": [
+    "delegate",
+    "router",
+    "skills",
+    "core"
+  ],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "intent": {
+        "type": "string"
+      },
+      "params": {
+        "type": "object"
+      }
+    },
+    "required": [
+      "intent"
+    ]
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "skill": {
+        "type": "string"
+      },
+      "confidence": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "skill"
+    ]
+  },
+  "allowed_tools": [],
+  "denied_tools": [],
+  "dependencies": [],
+  "permissions": {
+    "allow_read_paths": [],
+    "allow_write_paths": [],
+    "allow_network": false
+  },
+  "examples": [],
+  "test_command": "python -m src.cli skill-info jarvis-delegate",
+  "approval_required": false,
+  "lifecycle": "production",
+  "deprecated": false,
+  "replacement": "",
+  "created_at": "2026-05-04T23:41:25Z",
+  "updated_at": "2026-05-04T23:41:25Z"
+}

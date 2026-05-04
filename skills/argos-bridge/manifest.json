@@ -1,0 +1,62 @@
+{
+  "name": "argos-bridge",
+  "version": "1.0.0",
+  "description": "Bridge entre Content Queue e ARGOS Drafts no Publisher OS",
+  "status": "active",
+  "risk_level": "medium",
+  "mode": "external_action",
+  "owner": "automation_integrations",
+  "tags": [
+    "argos",
+    "bridge",
+    "publisher-os",
+    "draft"
+  ],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "topic": {
+        "type": "string"
+      },
+      "pagina": {
+        "type": "string"
+      },
+      "formato": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "topic"
+    ]
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "job_id": {
+        "type": "string"
+      },
+      "status": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "job_id"
+    ]
+  },
+  "allowed_tools": [],
+  "denied_tools": [],
+  "dependencies": [],
+  "permissions": {
+    "allow_read_paths": [],
+    "allow_write_paths": [],
+    "allow_network": true
+  },
+  "examples": [],
+  "test_command": "python -m src.cli skill-info argos-bridge",
+  "approval_required": true,
+  "lifecycle": "validated",
+  "deprecated": false,
+  "replacement": "",
+  "created_at": "2026-05-04T23:41:25Z",
+  "updated_at": "2026-05-04T23:41:25Z"
+}

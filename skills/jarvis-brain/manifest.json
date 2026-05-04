@@ -1,0 +1,60 @@
+{
+  "name": "jarvis-brain",
+  "version": "1.0.0",
+  "description": "Busca contexto multi-fonte (Akasha, Qdrant, Obsidian)",
+  "status": "active",
+  "risk_level": "low",
+  "mode": "read_only",
+  "owner": "memory_knowledge",
+  "tags": [
+    "brain",
+    "context",
+    "search",
+    "memory",
+    "core"
+  ],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string"
+      },
+      "sources": {
+        "type": "array"
+      }
+    },
+    "required": [
+      "query"
+    ]
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "context": {
+        "type": "string"
+      },
+      "sources_used": {
+        "type": "array"
+      }
+    },
+    "required": [
+      "context"
+    ]
+  },
+  "allowed_tools": [],
+  "denied_tools": [],
+  "dependencies": [],
+  "permissions": {
+    "allow_read_paths": [],
+    "allow_write_paths": [],
+    "allow_network": false
+  },
+  "examples": [],
+  "test_command": "python -m src.cli skill-info jarvis-brain",
+  "approval_required": false,
+  "lifecycle": "production",
+  "deprecated": false,
+  "replacement": "",
+  "created_at": "2026-05-04T23:41:25Z",
+  "updated_at": "2026-05-04T23:41:25Z"
+}

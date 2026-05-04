@@ -1,0 +1,63 @@
+{
+  "name": "generate_seogram_caption",
+  "version": "1.0.0",
+  "description": "Gera legenda SEO-otimizada para Instagram com palavras-chave",
+  "status": "active",
+  "risk_level": "low",
+  "mode": "draft_only",
+  "owner": "marketing_enterprise",
+  "tags": [
+    "caption",
+    "seo",
+    "instagram",
+    "content"
+  ],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "topic": {
+        "type": "string"
+      },
+      "perfil": {
+        "type": "string"
+      },
+      "keywords": {
+        "type": "array"
+      }
+    },
+    "required": [
+      "topic",
+      "perfil"
+    ]
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "caption": {
+        "type": "string"
+      },
+      "seo_score": {
+        "type": "number"
+      }
+    },
+    "required": [
+      "caption"
+    ]
+  },
+  "allowed_tools": [],
+  "denied_tools": [],
+  "dependencies": [],
+  "permissions": {
+    "allow_read_paths": [],
+    "allow_write_paths": [],
+    "allow_network": false
+  },
+  "examples": [],
+  "test_command": "python -m src.cli skill-info generate_seogram_caption",
+  "approval_required": false,
+  "lifecycle": "production",
+  "deprecated": false,
+  "replacement": "",
+  "created_at": "2026-05-04T23:41:25Z",
+  "updated_at": "2026-05-04T23:41:25Z"
+}

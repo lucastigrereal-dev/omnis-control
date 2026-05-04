@@ -1,0 +1,64 @@
+{
+  "name": "jarvis-memory-write",
+  "version": "1.0.0",
+  "description": "Persiste resultados de execucao em Akasha, Qdrant e git",
+  "status": "active",
+  "risk_level": "medium",
+  "mode": "local_write",
+  "owner": "memory_knowledge",
+  "tags": [
+    "memory",
+    "persist",
+    "akasha",
+    "git",
+    "core"
+  ],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "content": {
+        "type": "object"
+      },
+      "source": {
+        "type": "string"
+      },
+      "tags": {
+        "type": "array"
+      }
+    },
+    "required": [
+      "content",
+      "source"
+    ]
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "status": {
+        "type": "string"
+      },
+      "location": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "status"
+    ]
+  },
+  "allowed_tools": [],
+  "denied_tools": [],
+  "dependencies": [],
+  "permissions": {
+    "allow_read_paths": [],
+    "allow_write_paths": [],
+    "allow_network": false
+  },
+  "examples": [],
+  "test_command": "python -m src.cli skill-info jarvis-memory-write",
+  "approval_required": false,
+  "lifecycle": "production",
+  "deprecated": false,
+  "replacement": "",
+  "created_at": "2026-05-04T23:41:25Z",
+  "updated_at": "2026-05-04T23:41:25Z"
+}

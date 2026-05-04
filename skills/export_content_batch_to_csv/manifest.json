@@ -1,0 +1,57 @@
+{
+  "name": "export_content_batch_to_csv",
+  "version": "1.0.0",
+  "description": "Exporta lote da Content Queue para CSV",
+  "status": "active",
+  "risk_level": "low",
+  "mode": "local_write",
+  "owner": "marketing_enterprise",
+  "tags": [
+    "export",
+    "csv",
+    "content-queue",
+    "batch"
+  ],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "status": {
+        "type": "string"
+      },
+      "limit": {
+        "type": "integer"
+      }
+    },
+    "required": []
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "file": {
+        "type": "string"
+      },
+      "count": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "file"
+    ]
+  },
+  "allowed_tools": [],
+  "denied_tools": [],
+  "dependencies": [],
+  "permissions": {
+    "allow_read_paths": [],
+    "allow_write_paths": [],
+    "allow_network": false
+  },
+  "examples": [],
+  "test_command": "python -m src.cli skill-info export_content_batch_to_csv",
+  "approval_required": false,
+  "lifecycle": "production",
+  "deprecated": false,
+  "replacement": "",
+  "created_at": "2026-05-04T23:41:25Z",
+  "updated_at": "2026-05-04T23:41:25Z"
+}

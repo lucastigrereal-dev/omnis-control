@@ -1,0 +1,63 @@
+{
+  "name": "create_instagram_carousel",
+  "version": "1.0.0",
+  "description": "Gera roteiro de carrossel para Instagram com brief de design",
+  "status": "active",
+  "risk_level": "low",
+  "mode": "draft_only",
+  "owner": "marketing_enterprise",
+  "tags": [
+    "carousel",
+    "instagram",
+    "content",
+    "design"
+  ],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "topic": {
+        "type": "string"
+      },
+      "perfil": {
+        "type": "string"
+      },
+      "slides": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "topic",
+      "perfil"
+    ]
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "script": {
+        "type": "array"
+      },
+      "design_brief": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "script"
+    ]
+  },
+  "allowed_tools": [],
+  "denied_tools": [],
+  "dependencies": [],
+  "permissions": {
+    "allow_read_paths": [],
+    "allow_write_paths": [],
+    "allow_network": false
+  },
+  "examples": [],
+  "test_command": "python -m src.cli skill-info create_instagram_carousel",
+  "approval_required": false,
+  "lifecycle": "production",
+  "deprecated": false,
+  "replacement": "",
+  "created_at": "2026-05-04T23:41:25Z",
+  "updated_at": "2026-05-04T23:41:25Z"
+}

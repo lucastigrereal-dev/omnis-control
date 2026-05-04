@@ -1,0 +1,60 @@
+{
+  "name": "OMNIS — Approval to Export Pipeline",
+  "nodes": [
+    {
+      "id": "manual-trigger",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "parameters": {}
+    },
+    {
+      "id": "validate-payload",
+      "name": "Validate Approved Payload",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [500, 300],
+      "parameters": {
+        "language": "python",
+        "code": "# Validate approved payload from OMNIS\n# INPUT: expects json with draft_id, caption, perfil, asset_url\n# All fields are placeholders — replace with real OMNIS data source\n\nitems = Input.getInputData()\noutput = []\n\nfor item in items:\n    json_data = item.json\n    required = ['draft_id', 'caption', 'perfil', 'asset_url']\n    missing = [f for f in required if f not in json_data]\n    \n    if missing:\n        raise ValueError(f'Missing required fields: {missing}')\n    \n    if not json_data.get('approved', False):\n        raise ValueError(f'Draft {json_data.get(\"draft_id\")} is not approved')\n    \n    output.append({\n        'json': {\n            'validated': True,\n            'draft_id': json_data['draft_id'],\n            'caption': json_data['caption'],\n            'perfil': json_data['perfil'],\n            'asset_url': json_data['asset_url'],\n            'timestamp': json_data.get('timestamp', ''),\n            'validated_at': '{{ Date.now() }}'\n        }\n    })\n\nreturn output"
+      }
+    },
+    {
+      "id": "build-export",
+      "name": "Build Export Package",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [750, 300],
+      "parameters": {
+        "language": "python",
+        "code": "# Build export-ready JSON package\n# This node prepares content for external scheduling\n\nitems = Input.getInputData()\noutput = []\n\nfor item in items:\n    data = item.json\n    \n    export_package = {\n        'draft_id': data['draft_id'],\n        'caption': data['caption'],\n        'perfil': data['perfil'],\n        'asset_url': data['asset_url'],\n        'scheduled_at': data.get('scheduled_at', ''),\n        'export_version': '1.0',\n        'exported_at': '{{ Date.now() }}',\n        'source': 'omnis-approval-flow'\n    }\n    \n    output.append({'json': export_package})\n\nreturn output"
+      }
+    },
+    {
+      "id": "notify-operator",
+      "name": "Notify Operator",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [1000, 300],
+      "parameters": {}
+    }
+  ],
+  "connections": {
+    "manual-trigger": {
+      "main": [[{ "node": "validate-payload", "type": "main", "index": 0 }]]
+    },
+    "validate-payload": {
+      "main": [[{ "node": "build-export", "type": "main", "index": 0 }]]
+    },
+    "build-export": {
+      "main": [[{ "node": "notify-operator", "type": "main", "index": 0 }]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": ["omnis", "approval", "export", "pipeline"],
+  "versionId": "omnis-wf-approval-v1"
+}

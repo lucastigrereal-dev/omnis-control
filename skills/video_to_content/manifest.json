@@ -1,0 +1,62 @@
+{
+  "name": "video_to_content",
+  "version": "1.0.0",
+  "description": "Converte video bruto em formato publicavel com metadados",
+  "status": "active",
+  "risk_level": "medium",
+  "mode": "local_write",
+  "owner": "marketing_enterprise",
+  "tags": [
+    "video",
+    "content",
+    "conversion",
+    "assets"
+  ],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "video_path": {
+        "type": "string"
+      },
+      "perfil": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "video_path"
+    ]
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "output_path": {
+        "type": "string"
+      },
+      "duration": {
+        "type": "number"
+      },
+      "status": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "output_path"
+    ]
+  },
+  "allowed_tools": [],
+  "denied_tools": [],
+  "dependencies": [],
+  "permissions": {
+    "allow_read_paths": [],
+    "allow_write_paths": [],
+    "allow_network": false
+  },
+  "examples": [],
+  "test_command": "python -m src.cli skill-info video_to_content",
+  "approval_required": false,
+  "lifecycle": "validated",
+  "deprecated": false,
+  "replacement": "",
+  "created_at": "2026-05-04T23:41:25Z",
+  "updated_at": "2026-05-04T23:41:25Z"
+}

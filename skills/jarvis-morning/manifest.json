@@ -1,0 +1,53 @@
+{
+  "name": "jarvis-morning",
+  "version": "1.0.0",
+  "description": "Briefing matinal com health score, acoes e metricas do ecossistema",
+  "status": "active",
+  "risk_level": "low",
+  "mode": "read_only",
+  "owner": "mission_control",
+  "tags": [
+    "morning",
+    "briefing",
+    "daily",
+    "core"
+  ],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "briefing": {
+        "type": "string"
+      },
+      "health_score": {
+        "type": "number"
+      },
+      "top_actions": {
+        "type": "array"
+      }
+    },
+    "required": [
+      "briefing"
+    ]
+  },
+  "allowed_tools": [],
+  "denied_tools": [],
+  "dependencies": [],
+  "permissions": {
+    "allow_read_paths": [],
+    "allow_write_paths": [],
+    "allow_network": false
+  },
+  "examples": [],
+  "test_command": "python -m src.cli skill-info jarvis-morning",
+  "approval_required": false,
+  "lifecycle": "production",
+  "deprecated": false,
+  "replacement": "",
+  "created_at": "2026-05-04T23:41:25Z",
+  "updated_at": "2026-05-04T23:41:25Z"
+}

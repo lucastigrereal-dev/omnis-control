@@ -12,3 +12,5 @@ data/*.jsonl
 data/*.csv
 data/exports/*.csv
 data/exports/argos/*.json
+docs/_claude_input/
+docs/DIAGNOSTICO_FASE_0.md

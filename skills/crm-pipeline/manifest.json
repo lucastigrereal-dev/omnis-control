@@ -1,0 +1,60 @@
+{
+  "name": "crm-pipeline",
+  "version": "1.0.0",
+  "description": "Pipeline de CRM local para vendas B2B com 6 modos",
+  "status": "active",
+  "risk_level": "medium",
+  "mode": "local_write",
+  "owner": "sales_revenue",
+  "tags": [
+    "crm",
+    "sales",
+    "pipeline",
+    "b2b",
+    "sqlite"
+  ],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "mode": {
+        "type": "string"
+      },
+      "data": {
+        "type": "object"
+      }
+    },
+    "required": [
+      "mode"
+    ]
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "result": {
+        "type": "string"
+      },
+      "count": {
+        "type": "integer"
+      }
+    },
+    "required": [
+      "result"
+    ]
+  },
+  "allowed_tools": [],
+  "denied_tools": [],
+  "dependencies": [],
+  "permissions": {
+    "allow_read_paths": [],
+    "allow_write_paths": [],
+    "allow_network": false
+  },
+  "examples": [],
+  "test_command": "python -m src.cli skill-info crm-pipeline",
+  "approval_required": false,
+  "lifecycle": "production",
+  "deprecated": false,
+  "replacement": "",
+  "created_at": "2026-05-04T23:41:25Z",
+  "updated_at": "2026-05-04T23:41:25Z"
+}

@@ -1,0 +1,62 @@
+{
+  "name": "jarvis-guardrails",
+  "version": "1.0.0",
+  "description": "Valida acoes contra regras de seguranca antes de executar",
+  "status": "active",
+  "risk_level": "low",
+  "mode": "read_only",
+  "owner": "security_audit",
+  "tags": [
+    "guardrails",
+    "security",
+    "validation",
+    "core"
+  ],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "action": {
+        "type": "string"
+      },
+      "params": {
+        "type": "object"
+      }
+    },
+    "required": [
+      "action"
+    ]
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "allowed": {
+        "type": "boolean"
+      },
+      "reason": {
+        "type": "string"
+      },
+      "severity": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "allowed"
+    ]
+  },
+  "allowed_tools": [],
+  "denied_tools": [],
+  "dependencies": [],
+  "permissions": {
+    "allow_read_paths": [],
+    "allow_write_paths": [],
+    "allow_network": false
+  },
+  "examples": [],
+  "test_command": "python -m src.cli skill-info jarvis-guardrails",
+  "approval_required": false,
+  "lifecycle": "production",
+  "deprecated": false,
+  "replacement": "",
+  "created_at": "2026-05-04T23:41:25Z",
+  "updated_at": "2026-05-04T23:41:25Z"
+}
