@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OMNIS Skill Manifest",
+  "type": "object",
+  "required": ["name", "version", "description", "status", "risk_level", "mode", "owner"],
+  "properties": {
+    "name": {"type": "string", "pattern": "^[a-z][a-z0-9_-]*$"},
+    "version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "description": {"type": "string", "minLength": 10},
+    "status": {"enum": ["draft", "tested", "approved", "active", "deprecated", "archived"]},
+    "risk_level": {"enum": ["low", "medium", "high", "critical"]},
+    "mode": {"enum": ["read_only", "local_side_effects", "external_side_effects"]},
+    "owner": {"type": "string"},
+    "tags": {"type": "array", "items": {"type": "string"}},
+    "inputs_schema": {"type": "object"},
+    "outputs_schema": {"type": "object"},
+    "test_command": {"type": "string"},
+    "approval_required": {"type": "boolean"},
+    "created_at": {"type": "string", "format": "date-time"},
+    "updated_at": {"type": "string", "format": "date-time"}
+  }
+}

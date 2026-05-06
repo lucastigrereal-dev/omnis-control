@@ -1,14 +1,29 @@
+"""Skill runner — executa skills do projeto OMNIS.
+
+SKILLS_PATH resolve para o diretório skills/ do projeto OMNIS.
+Pode ser sobrescrito via env var OMNIS_SKILLS_PATH para uso em testes/CI.
+"""
+import json
+import os
 import subprocess
 import sys
-import os
-import json
 import time
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from src.utils.safe_paths import resolve_skill_path, validate_skill_name
 
-SKILLS_PATH = Path.home() / ".claude" / "skills"
+# PROJECT_ROOT = ~/omnis-control/ (3 levels up: src/runners/skill_runner.py)
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+
+# SKILLS_PATH com 3 fallbacks em ordem de prioridade:
+#   1. env OMNIS_SKILLS_PATH (override explícito para testes)
+#   2. <PROJECT_ROOT>/skills/ (caso normal)
+#   3. ~/.claude/skills/ (legacy, retrocompat — DEPRECATED)
+SKILLS_PATH = Path(
+    os.getenv("OMNIS_SKILLS_PATH")
+    or str(PROJECT_ROOT / "skills")
+)
 
 
 def list_skills() -> list[dict]:
@@ -31,7 +46,7 @@ def run_skill(
     """Run a skill by name with timeout and safety checks.
 
     Args:
-        skill_name: Name of the skill directory under ~/.claude/skills/
+        skill_name: Name of the skill directory under skills/
         payload_path: Optional path to JSON payload file
         timeout: Timeout in seconds (max 300)
         dry_run: If True, only validate and return dry-run info
@@ -47,7 +62,7 @@ def run_skill(
 
     skill_dir = resolve_skill_path(skill_name)
     if not skill_dir:
-        raise ValueError(f"Skill '{skill_name}' não encontrada em ~/.claude/skills/")
+        raise ValueError(f"Skill '{skill_name}' não encontrada em {SKILLS_PATH}")
 
     run_py = os.path.join(skill_dir, "run.py")
     if not os.path.isfile(run_py):

@@ -1,0 +1,1 @@
+# Ver RELATORIO_MANIFESTO_COMPARADO.md na sessao Claude
