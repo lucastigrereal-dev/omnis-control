@@ -55,11 +55,12 @@ def validate_skill_name(name: str) -> str:
 def resolve_skill_path(name: str) -> str | None:
     """Resolve skill name to its directory path.
 
-    Checks ~/.claude/skills/<name>/run.py and ~/.claude/skills/<name>/.
+    Checks <PROJECT>/skills/<name>/ for run.py.
+    Respects OMNIS_SKILLS_PATH env override.
     Returns the directory path if found, None otherwise.
     """
     safe = validate_skill_name(name)
-    skills_dir = os.path.expanduser("~/.claude/skills")
+    skills_dir = os.getenv("OMNIS_SKILLS_PATH") or os.path.join(CONTROL_DIR, "skills")
     candidate = os.path.join(skills_dir, safe)
 
     if not os.path.isdir(candidate):

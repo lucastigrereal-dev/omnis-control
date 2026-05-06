@@ -74,7 +74,7 @@ def test_resolve_skill_inexistent():
 
 def test_resolve_skill_real():
     """resolve_skill_path encontra skill real se existir."""
-    skills_dir = os.path.expanduser("~/.claude/skills")
+    skills_dir = os.path.join(CONTROL_DIR, "skills")
     real = [
         d
         for d in os.listdir(skills_dir)
