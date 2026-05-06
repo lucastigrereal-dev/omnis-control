@@ -19,27 +19,6 @@ from src.creative_production.exporter import export_package, list_packages
 from src.creative_production.review import approve_brief, reject_brief, is_ready_for_argos
 
 
-@pytest.fixture
-def empty_data(tmp_path):
-    """Redirect data dirs to tmp for isolation."""
-    import src.creative_production.briefs as bmod
-    import src.creative_production.production_queue as qmod
-    import src.creative_production.exporter as emod
-    original_briefs = bmod.BRIEFS_FILE
-    original_queue = bmod.DATA_DIR
-    original_exp = emod.EXPORT_DIR
-    bmod.BRIEFS_FILE = tmp_path / "creative_briefs.jsonl"
-    bmod.REVIEW_LOG = tmp_path / "creative_review_log.jsonl"
-    bmod.DATA_DIR = tmp_path
-    qmod.QUEUE_FILE = tmp_path / "production_queue.jsonl"
-    qmod.DATA_DIR = tmp_path
-    emod.EXPORT_DIR = tmp_path / "exports"
-    yield tmp_path
-    bmod.BRIEFS_FILE = original_briefs
-    bmod.DATA_DIR = original_queue
-    emod.EXPORT_DIR = original_exp
-
-
 def test_create_brief(empty_data):
     brief = create_brief(
         queue_id="q-001",

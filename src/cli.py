@@ -41,6 +41,7 @@ from src.caption_approval import DraftsManager, ApprovalGate, TemplateLibrary
 from src.caption_approval.models import DraftStatus
 from src.caption_approval.drafts import STALE_DAYS
 from src.cli_commands.argos_drafts_cmd import argos_app as argos_drafts_app
+from src.cli_commands.creative_cmd import creative_app as creative_cmd_app
 from src.reports import briefing as briefing_mod
 
 app = typer.Typer(
@@ -1754,6 +1755,7 @@ templates_app = typer.Typer(
 )
 app.add_typer(templates_app)
 app.add_typer(argos_drafts_app)
+app.add_typer(creative_cmd_app)
 
 
 @templates_app.command(name="list")

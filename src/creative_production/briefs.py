@@ -136,6 +136,19 @@ def create_review(brief_id: str, status: str, notes: str = "") -> CreativeReview
     return review
 
 
+def brief_stats() -> dict:
+    """Aggregated statistics for creative briefs."""
+    from collections import Counter
+    briefs = list_briefs()
+    by_status = Counter(b.status for b in briefs if b.status)
+    by_format = Counter(b.format for b in briefs if b.format)
+    return {
+        "total": len(briefs),
+        "by_status": dict(by_status),
+        "by_format": dict(by_format),
+    }
+
+
 def validate_queue_exists(queue_id: str) -> bool:
     """Check if a queue ID exists in the content queue."""
     queue_items = _load_jsonl(DATA_DIR / "content_queue.jsonl")
