@@ -1,0 +1,59 @@
+============================================================
+ OMNIS — Disk & Infra Safety Audit (READ-ONLY)
+ Started: 2026-05-06T15:07:59.920341
+============================================================
+
+[0/5] Overall disk usage...
+  80.5 GB free / 992.5 GB (8.1%)
+
+[1/5] Project directories...
+  sizing omnis-control... 118.4 MB
+  sizing publisher-os... 412.8 MB
+  sizing JARVIS_OS... 1.8 MB
+  sizing llm-router... 50.3 KB
+  sizing biblioteca_sabedoria... 49.8 MB
+  sizing daily-prophet-hotels... 970.0 MB
+  sizing .claude... ERROR
+  sizing Downloads/instagram-publisher... 812.6 MB
+
+[2/5] node_modules scan (maxdepth 4)...
+  searching omnis-control... 0 found
+  searching publisher-os... 0 found
+  searching JARVIS_OS... 0 found
+  searching llm-router... 0 found
+  searching biblioteca_sabedoria... 0 found
+  searching daily-prophet-hotels... 0 found
+  searching .claude... 0 found
+  searching Downloads/instagram-publisher... 0 found
+  TOTAL node_modules: 0 dirs, 0.0 B
+
+[3/5] Large files (>100 MB)...
+  searching omnis-control... 0 found
+  searching publisher-os... 0 found
+  searching JARVIS_OS... 0 found
+  searching llm-router... 0 found
+  searching biblioteca_sabedoria... 0 found
+  searching daily-prophet-hotels... 0 found
+  searching .claude... 0 found
+  searching Downloads/instagram-publisher... 0 found
+
+[4/5] Archive files (.zip, .tar.gz, .tgz, .rar)...
+  0 files, 0.0 B total
+
+[5/5] Docker reclaimable (from omnis doctor)...
+  Safe reclaim: ~70 GB (docker image prune + builder prune)
+  Dangerous: ~75 GB (docker system prune --volumes)
+
+============================================================
+ SUMMARY
+============================================================
+  Disk:     80.5 GB free (8.1%)
+  Projects: 8 dirs (2.5 GB)
+  node_modules: 0 dirs (0.0 GB)
+  Archives: 0 files (0.0 GB)
+  Docker safe prune: ~70 GB
+
+  See docs/DISK_CLEANUP_CANDIDATES.md for detailed plan
+  See docs/DISK_INFRA_SAFETY_PLAN.md for execution order
+
+  Report saved: C:\Users\lucas\omnis-control\docs\disk_audit_report.json
