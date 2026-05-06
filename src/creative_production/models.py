@@ -9,11 +9,11 @@ class CreativeBrief:
     """Brief criativo para produção de um conteúdo."""
     creative_brief_id: str
     queue_id: str
-    caption_draft_id: Optional[str]
     account_handle: str
     format: str  # carrossel, reel, foto, video
     objective: str
     visual_direction: str
+    caption_draft_id: Optional[str] = None
     script: str = ""
     shot_list: str = ""
     design_notes: str = ""
