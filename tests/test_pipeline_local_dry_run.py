@@ -271,3 +271,80 @@ class TestPipelineCLI:
         assert "httpx" not in source
         assert "requests" not in source
         assert "aiohttp" not in source
+
+
+# ── Tests: Prefix matching (BUG #1) ──────────────────────────────────────────
+
+
+class TestPrefixMatching:
+    def test_prefix_matching_resolves_truncated_queue_id(self, tmp_path):
+        """Queue.get aceita ID truncado (8 chars) e retorna item completo (12 chars)."""
+        queue_path = tmp_path / "content_queue.jsonl"
+        full_id = uuid.uuid4().hex[:12]
+        short_id = full_id[:8]
+
+        q = ContentQueue(path=str(queue_path))
+        item = QueueItem(
+            queue_id=full_id,
+            account_handle="lucastigrereal",
+            date="2026-05-07",
+            time="08:50",
+            format="carrossel",
+            objective="alcance",
+            status=QueueStatus.NEEDS_CAPTION,
+        )
+        with open(queue_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(item.to_dict(), ensure_ascii=False) + "\n")
+
+        q_reload = ContentQueue(path=str(queue_path))
+        found = q_reload.get(short_id)
+        assert found is not None
+        assert found.queue_id == full_id
+
+    def test_pipeline_normaliza_id_curto_antes_busca_caption(self, tmp_path):
+        """Pipeline usa ID completo após resolver via Queue.get()."""
+        from src.pipeline_local.service import PIPELINE_RUNS_PATH as ORIG_PATH
+        import src.pipeline_local.service as svc_mod
+
+        full_id = uuid.uuid4().hex[:12]
+        short_id = full_id[:8]
+
+        # Criar queue item + caption aprovado
+        queue_path = tmp_path / "content_queue.jsonl"
+        q = ContentQueue(path=str(queue_path))
+        item = QueueItem(
+            queue_id=full_id,
+            account_handle="lucastigrereal",
+            date="2026-05-07", time="08:50",
+            format="carrossel", objective="alcance",
+            status=QueueStatus.NEEDS_CAPTION,
+        )
+        with open(queue_path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(item.to_dict(), ensure_ascii=False) + "\n")
+
+        drafts_path = tmp_path / "caption_drafts.jsonl"
+        log_path = tmp_path / "approval_log.jsonl"
+        dm = DraftsManager(drafts_path=str(drafts_path), log_path=str(log_path))
+        draft = dm.create(
+            queue_id=full_id,
+            account_handle="lucastigrereal",
+            caption_text="Legenda aprovada para prefix test.",
+            format="carrossel",
+        )
+        dm.update(draft.draft_id, status="approved")
+
+        svc_mod.PIPELINE_RUNS_PATH = str(tmp_path / "pipeline_runs.jsonl")
+        try:
+            service = PipelineLocalService()
+            service.queue.path = str(queue_path)
+            service.caption_mgr.drafts_path = str(drafts_path)
+            service.caption_mgr.log_path = str(log_path)
+
+            result = service.run_local_content_pipeline(short_id)
+            # Não deve bloquear por CAPTION_NOT_APPROVED
+            assert result.block_reason != PipelineBlockReason.CAPTION_NOT_APPROVED, \
+                f"Esperava encontrar caption aprovado, mas bloqueou: {result.block_reason}"
+            assert result.caption_draft_id is not None, \
+                f"caption_draft_id deveria existir, mas veio None. warnings={result.warnings}"
+        finally:
+            svc_mod.PIPELINE_RUNS_PATH = ORIG_PATH

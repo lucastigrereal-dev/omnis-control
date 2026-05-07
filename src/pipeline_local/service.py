@@ -72,6 +72,8 @@ class PipelineLocalService:
             try:
                 # ── Stage 1: Load Queue Item ────────────────────────────────
                 queue_item = self.queue.get(queue_item_id)
+                if queue_item:
+                    queue_item_id = queue_item.queue_id  # normaliza ID truncado → completo
                 if not queue_item:
                     result.status = PipelineRunStatus.BLOCKED
                     result.block_reason = PipelineBlockReason.QUEUE_ITEM_NOT_FOUND
@@ -174,11 +176,16 @@ class PipelineLocalService:
     # ── Internal helpers ─────────────────────────────────────────────────────
 
     def _find_approved_caption(self, queue_id: str) -> Optional[str]:
-        """Busca um caption aprovado para este queue_id."""
+        """Busca um caption aprovado para este queue_id (com prefix matching)."""
         drafts = self.caption_mgr.list_all()
         for d in drafts:
             if d.queue_id == queue_id and d.status == "approved":
                 return d.draft_id
+        # Prefix match (IDs truncados)
+        matches = [d for d in drafts
+                   if d.queue_id.startswith(queue_id) and d.status == "approved"]
+        if len(matches) == 1:
+            return matches[0].draft_id
         return None
 
     def _find_or_create_brief(
