@@ -20,3 +20,7 @@ data/metrics/
 data/dryrun_publishes/
 data/publisher_store/
 skill_reports/
+data/missions/contracts/*.json
+data/missions/contracts/*.hash
+data/missions/events/*.jsonl
+data/missions/index.jsonl
