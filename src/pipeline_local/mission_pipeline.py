@@ -9,6 +9,7 @@ from src.missions.repository import JsonlRepository, MissionRepository
 from src.missions.events import EventEnvelope, EventType
 from src.missions.state_machine import MissionStatus
 from src.missions.runtime import checkpoint_mission, get_resume_context
+from src.tool_registry import get_tool_availability
 from src.pipeline_local.service import PipelineLocalService
 from src.pipeline_local.models import PipelineRunStatus, PipelineBlockReason
 from src.pipeline_local.mission_models import (
@@ -127,6 +128,15 @@ def run_mission_content_pipeline(
                 "queue_item_id": resolved_queue_id,
                 "caption_draft_id": resolved_caption_id,
                 "how": "Contexto queue/caption resolvido — pipeline pronto para executar"})
+
+    # Light tool availability check (P0.8)
+    dry_run_tool = get_tool_availability("publisher_local_dry_run")
+    if dry_run_tool is None:
+        result.add_warning("Tool Registry: publisher_local_dry_run nao registrado. Execute 'tools discover'.")
+    elif dry_run_tool.status == "blocked":
+        result.add_warning(f"Tool Registry: publisher_local_dry_run esta {dry_run_tool.status}.")
+    elif dry_run_tool.status != "dry_run":
+        result.add_warning(f"Tool Registry: publisher_local_dry_run status={dry_run_tool.status}, esperado dry_run.")
 
     # ── Stage 3: Check caption approval status ────────────────────
     if resolved_caption_id:

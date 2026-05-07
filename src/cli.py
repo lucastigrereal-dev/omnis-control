@@ -46,6 +46,7 @@ from src.cli_commands.publisher_cmd import publisher_app as publisher_cli_app
 from src.cli_commands.forge_cmd import forge_app as forge_cli_app
 from src.cli_commands.pipeline_cmd import pipeline_app as pipeline_cli_app
 from src.cli_commands.missions_cmd import missions_app
+from src.cli_commands.tools_cmd import tools_app
 from src.reports import briefing as briefing_mod
 
 app = typer.Typer(
@@ -1764,6 +1765,7 @@ app.add_typer(publisher_cli_app)
 app.add_typer(forge_cli_app)
 app.add_typer(pipeline_cli_app)
 app.add_typer(missions_app)
+app.add_typer(tools_app)
 
 
 @templates_app.command(name="list")

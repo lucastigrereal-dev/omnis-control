@@ -26,3 +26,5 @@ data/missions/events/*.jsonl
 data/missions/index.jsonl
 data/pipeline_runs/*.json
 data/pipeline_runs/*.jsonl
+data/tool_registry/tools.jsonl
+data/tool_registry/validation_log.jsonl

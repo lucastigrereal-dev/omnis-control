@@ -261,7 +261,13 @@ class JsonlRepository(MissionRepository):
                 continue
         if not checkpoints:
             return None
-        checkpoints.sort(key=lambda d: (d.get("created_at", ""), d.get("checkpoint_id", "")), reverse=True)
+        checkpoints.sort(
+            key=lambda d: (
+                d.get("state", {}).get("last_event_sequence", 0),
+                d.get("created_at", ""),
+            ),
+            reverse=True,
+        )
         return checkpoints[0]
 
     def get_checkpoint(self, mission_id: str, checkpoint_id: str) -> Optional[Dict[str, Any]]:
