@@ -12,6 +12,11 @@ from rich.panel import Panel
 from src.tool_registry.registry import ToolRegistry
 from src.tool_registry.discovery import discover_known_tools
 from src.tool_registry.errors import ToolRegistryError
+from src.tool_registry.healthcheck import (
+    HealthStatus,
+    is_healthcheck_allowed,
+    get_checker_name,
+)
 
 tools_app = typer.Typer(
     name="tools",
@@ -262,6 +267,167 @@ def tools_update_status(
     else:
         console.print(f"[green]Status atualizado![/green]")
         console.print(f"  {tool_id}: {new_status}")
+
+
+@tools_app.command(name="health")
+def tools_health(
+    tool_id: str = typer.Argument(..., help="Tool ID para healthcheck"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Executa healthcheck read-only em uma ferramenta.
+
+    Nao chama OAuth, nao chama APIs externas sensiveis, nao publica nada.
+    """
+    registry = _repo()
+    tool = registry.get_tool(tool_id)
+    if tool is None:
+        console.print(f"[red]Ferramenta '{tool_id}' nao encontrada.[/red]")
+        raise typer.Exit(1)
+
+    if not is_healthcheck_allowed(tool_id):
+        console.print(f"[yellow]Ferramenta '{tool_id}' nao possui healthcheck definido.[/yellow]")
+        raise typer.Exit(1)
+
+    result = registry.run_healthcheck(tool_id)
+
+    if result is None:
+        console.print("[red]Erro ao executar healthcheck.[/red]")
+        raise typer.Exit(1)
+
+    if json_output:
+        print(result.model_dump_json(indent=2))
+        return
+
+    console.print(f"[bold]Healthcheck: {tool.name}[/bold]")
+    console.print(f"  Status antes: {_status_label(result.status_before)}")
+
+    hc_style = {
+        HealthStatus.OK: "[green]",
+        HealthStatus.DEGRADED: "[yellow]",
+        HealthStatus.BLOCKED: "[red]",
+        HealthStatus.FAILED: "[red]",
+        HealthStatus.NOT_CHECKED: "[dim]",
+        HealthStatus.NOT_CONFIGURED: "[dim]",
+    }.get(result.health_status, "")
+
+    console.print(f"  Health status: {hc_style}{result.health_status}[/]")
+    console.print(f"  Status depois: {_status_label(result.status_after)}")
+    console.print(f"  Duracao: {result.duration_ms}ms")
+    console.print(f"  Mensagem: {result.message}")
+    if result.error_code:
+        console.print(f"  Error code: [red]{result.error_code}[/red]")
+    if result.recommendation:
+        console.print(f"  [bold]Recomendacao:[/bold] {result.recommendation}")
+
+
+@tools_app.command(name="health-all")
+def tools_health_all(
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Executa healthcheck em todas as ferramentas com checker read-only.
+
+    Pula ferramentas sem checker (manual, externo).
+    Nao chama OAuth, nao chama APIs externas sensiveis.
+    """
+    registry = _repo()
+    all_tools = registry.list_tools()
+
+    if not all_tools:
+        console.print("Tool Registry vazio. Execute 'tools discover' primeiro.")
+        return
+
+    if json_output:
+        results = []
+        for tool in all_tools:
+            tid = tool.tool_id
+            if not is_healthcheck_allowed(tid) or get_checker_name(tid) is None:
+                continue
+            result = registry.run_healthcheck(tid)
+            if result is not None:
+                results.append(result.model_dump())
+        print(json.dumps(results, indent=2, ensure_ascii=False))
+        return
+
+    console.print(f"[bold]Executando healthcheck em ferramentas read-only...[/bold]\n")
+    results = []
+
+    for tool in all_tools:
+        tid = tool.tool_id
+        if not is_healthcheck_allowed(tid):
+            continue
+        checker = get_checker_name(tid)
+        if checker is None:
+            continue
+
+        result = registry.run_healthcheck(tid)
+        if result is not None:
+            results.append(result)
+            hc_style = {
+                HealthStatus.OK: "[green]",
+                HealthStatus.DEGRADED: "[yellow]",
+                HealthStatus.BLOCKED: "[red]",
+                HealthStatus.FAILED: "[red]",
+            }.get(result.health_status, "")
+            console.print(
+                f"  {result.tool_id:<30} {hc_style}{result.health_status:<12}[/]"
+                f" {result.duration_ms}ms  {result.message[:60]}"
+            )
+
+    ok = sum(1 for r in results if r.health_status == HealthStatus.OK)
+    degraded = sum(1 for r in results if r.health_status == HealthStatus.DEGRADED)
+    blocked = sum(1 for r in results if r.health_status == HealthStatus.BLOCKED)
+    console.print(
+        f"\n[bold]Resumo:[/bold] {len(results)} verificadas | "
+        f"[green]{ok} ok[/green] | "
+        f"[yellow]{degraded} degraded[/yellow] | "
+        f"[red]{blocked} blocked[/red]"
+    )
+
+
+@tools_app.command(name="health-report")
+def tools_health_report(
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Relatorio do ultimo healthcheck de cada ferramenta."""
+    registry = _repo()
+    report = registry.get_healthcheck_report()
+
+    if not report:
+        console.print("Nenhum healthcheck registrado. Execute 'tools discover' primeiro.")
+        return
+
+    if json_output:
+        print(json.dumps(report, indent=2, ensure_ascii=False))
+        return
+
+    table = Table(title=f"Healthcheck Report — {len(report)} ferramentas")
+    table.add_column("Tool ID", style="cyan", no_wrap=True)
+    table.add_column("Nome")
+    table.add_column("Operacional")
+    table.add_column("Health")
+    table.add_column("Mensagem")
+    table.add_column("Ultimo check")
+
+    for r in report:
+        hs = r["health_status"]
+        hc_style = {
+            "ok": "[green]",
+            "degraded": "[yellow]",
+            "blocked": "[red]",
+            "failed": "[red]",
+            "not_checked": "[dim]",
+            "not_configured": "[dim]",
+        }.get(hs, "")
+
+        table.add_row(
+            r["tool_id"],
+            r["name"][:25],
+            _status_label(r["status"]),
+            f"{hc_style}{hs}[/]",
+            r["message"][:50] if r["message"] else "-",
+            r["last_checked"] or "-",
+        )
+    console.print(table)
 
 
 # Import ToolStatus for the status command ordering
