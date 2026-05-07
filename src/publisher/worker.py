@@ -2,7 +2,7 @@
 from __future__ import annotations
 import asyncio
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from .pipeline import PublishPipeline, JsonLStore
@@ -54,12 +54,12 @@ class PublishWorker:
         if not content_id:
             return False
 
-        start_time = datetime.utcnow()
+        start_time = datetime.now(timezone.utc)
         try:
             ctx = await self.pipeline.stage_publish(
                 self.pipeline._load(content_id)
             )
-            elapsed = (datetime.utcnow() - start_time).total_seconds()
+            elapsed = (datetime.now(timezone.utc) - start_time).total_seconds()
             logger.info("job_completed", extra={"content_id": content_id, "elapsed": elapsed, "status": ctx.status.value})
             return True
         except Exception as e:

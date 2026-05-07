@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-05-04T21:11:48.312765",
+  "generated_at": "2026-05-07T08:38:41.742933",
   "repo": "C:\\Users\\lucas\\omnis-control",
   "disk_summary": {
     "total_gb": 992.5,
-    "used_gb": 920.9,
-    "free_gb": 71.6,
-    "percent_free": 7.2
+    "used_gb": 905.7,
+    "free_gb": 86.8,
+    "percent_free": 8.7
   },
   "project_directories": [
     {
       "name": "omnis-control",
       "path": "C:\\Users\\lucas\\omnis-control",
-      "size_bytes": 119859234,
-      "size_human": "114.3 MB",
+      "size_bytes": 133322940,
+      "size_human": "127.1 MB",
       "exists": true,
       "accessible": true
     },
@@ -51,18 +51,18 @@
     {
       "name": "daily-prophet-hotels",
       "path": "C:\\Users\\lucas\\daily-prophet-hotels",
-      "size_bytes": 1017157788,
-      "size_human": "970.0 MB",
+      "size_bytes": 374032003,
+      "size_human": "356.7 MB",
       "exists": true,
       "accessible": true
     },
     {
       "name": ".claude",
       "path": "C:\\Users\\lucas\\.claude",
-      "size_bytes": 0,
-      "size_human": "ERROR",
+      "size_bytes": 2279727624,
+      "size_human": "2.1 GB",
       "exists": true,
-      "accessible": false
+      "accessible": true
     },
     {
       "name": "Downloads/instagram-publisher",

@@ -4,7 +4,7 @@ import uuid
 import json
 import logging
 from typing import Any, Dict, List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 from .statemachine import ContentContext, ContentStatus, InvalidTransitionError
@@ -203,7 +203,7 @@ class PublishPipeline:
             "media_urls": ctx.media_urls,
             "retry_count": ctx.retry_count,
             "error_log": ctx.error_log,
-            "updated_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
         }
         if extra:
             data.update(extra)

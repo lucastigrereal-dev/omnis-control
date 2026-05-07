@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import Enum
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 import logging
 
@@ -77,7 +77,7 @@ class ContentContext:
             "actor": actor,
             "reason": reason,
             "payload": payload or {},
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         self.transitions.append(transition)
         logger.info(
@@ -96,7 +96,7 @@ class ContentContext:
         self.error_log.append({
             "stage": stage,
             "error": error,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "retry_count": self.retry_count,
         })
         self.retry_count += 1

@@ -4,7 +4,7 @@ import logging
 import json
 import sys
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict
 
 SENSITIVE_PATTERNS = [
@@ -18,7 +18,7 @@ class StructuredFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         log_entry: Dict[str, Any] = {
-            "timestamp": datetime.utcfromtimestamp(record.created).isoformat() + "Z",
+            "timestamp": datetime.fromtimestamp(record.created, tz=timezone.utc).isoformat(),
             "level": record.levelname,
             "logger": record.name,
             "message": self._redact(record.getMessage()),

@@ -10,7 +10,7 @@ import os
 import time
 import uuid
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timezone
 from functools import wraps
 from pathlib import Path
 from typing import Any, Callable, Dict, Generator, Optional
@@ -74,9 +74,9 @@ class LocalTracer:
             "attributes": attributes,
             "duration_ms": round(elapsed * 1000, 2),
             "error": error,
-            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "timestamp": datetime.now(timezone.utc).isoformat() + "Z",
         }
-        log_path = self.dir / f"{datetime.utcnow().strftime('%Y%m%d')}.jsonl"
+        log_path = self.dir / f"{datetime.now(timezone.utc).strftime('%Y%m%d')}.jsonl"
         with open(log_path, "a", encoding="utf-8") as f:
             f.write(json.dumps(entry, ensure_ascii=False, default=str) + "\n")
 
@@ -124,9 +124,9 @@ def record_metric(name: str, value: float, labels: Optional[Dict[str, str]] = No
         "metric": name,
         "value": value,
         "labels": labels or {},
-        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "timestamp": datetime.now(timezone.utc).isoformat() + "Z",
     }
-    log_path = METRICS_DIR / f"{datetime.utcnow().strftime('%Y%m%d')}.jsonl"
+    log_path = METRICS_DIR / f"{datetime.now(timezone.utc).strftime('%Y%m%d')}.jsonl"
     with open(log_path, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry, ensure_ascii=False) + "\n")
     logger.debug("metric recorded", extra={"metric": name, "value": value})

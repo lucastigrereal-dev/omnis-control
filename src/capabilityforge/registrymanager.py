@@ -4,7 +4,7 @@ import json
 import logging
 import threading
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -58,7 +58,7 @@ class RegistryManager:
             entries = self._load_all()
             for i, entry in enumerate(entries):
                 if entry["name"] == name:
-                    entries[i] = {**entry, **updates, "updated_at": datetime.utcnow().isoformat()}
+                    entries[i] = {**entry, **updates, "updated_at": datetime.now(timezone.utc).isoformat()}
                     self._write_all(entries)
                     logger.info("Skill atualizada", extra={"skill": name})
                     return
@@ -97,7 +97,7 @@ class RegistryManager:
             "tags": entry.tags,
             "path": str(entry.path) if entry.path else "",
             "manifest_path": str(entry.manifest_path) if entry.manifest_path else "",
-            "created_at": entry.created_at.isoformat() if entry.created_at else datetime.utcnow().isoformat(),
-            "updated_at": entry.updated_at.isoformat() if entry.updated_at else datetime.utcnow().isoformat(),
+            "created_at": entry.created_at.isoformat() if entry.created_at else datetime.now(timezone.utc).isoformat(),
+            "updated_at": entry.updated_at.isoformat() if entry.updated_at else datetime.now(timezone.utc).isoformat(),
             "usage_stats": entry.usage_stats,
         }

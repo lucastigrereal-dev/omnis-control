@@ -6,7 +6,7 @@ import json
 import os
 import subprocess
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from urllib.request import Request, urlopen
 
@@ -57,7 +57,7 @@ def salvar_akasha(conteudo: str, setor: str, skill_origem: str = "",
             "skill_origem": skill_origem,
             "tags": tags or [],
             "fingerprint": fingerprint,
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         if metadata_extra:
             metadata.update(metadata_extra)

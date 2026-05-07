@@ -6,7 +6,7 @@ from __future__ import annotations
 import json
 import logging
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -110,7 +110,7 @@ class CapabilityForge:
         content = f"""# Proposta de Skill: {ctx.spec.name}
 
 **Setor:** {ctx.sector}
-**Data:** {datetime.utcnow().strftime('%Y-%m-%d')}
+**Data:** {datetime.now(timezone.utc).strftime('%Y-%m-%d')}
 **Estado:** {ctx.state.name}
 
 ## Descricao

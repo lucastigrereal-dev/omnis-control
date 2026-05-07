@@ -7,7 +7,7 @@ from __future__ import annotations
 import json
 import logging
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -42,7 +42,7 @@ class MetaAPIDryRun:
             "media_urls": media_urls,
             "format": format,
             "status": "published_dry_run",
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         log_path = self.dir / f"{idempotency_key[:16]}.jsonl"
         with open(log_path, "w", encoding="utf-8") as f:
