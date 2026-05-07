@@ -28,3 +28,5 @@ data/pipeline_runs/*.json
 data/pipeline_runs/*.jsonl
 data/tool_registry/tools.jsonl
 data/tool_registry/validation_log.jsonl
+data/metrics_spine/metrics.jsonl
+data/metrics_spine/runs.jsonl

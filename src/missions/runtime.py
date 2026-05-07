@@ -9,6 +9,7 @@ from src.missions.repository import JsonlRepository, MissionRepository
 from src.missions.events import EventEnvelope
 from src.missions.state import TaskState
 from src.missions.state_machine import MissionStatus, assert_transition
+from src.metrics import quick_record_metric
 
 
 def checkpoint_mission(
@@ -52,6 +53,8 @@ def checkpoint_mission(
     appended = repo.append_event(event)
     repo.save_checkpoint(mission_id, checkpoint_id, state)
 
+    quick_record_metric("checkpoint_created", 1, mission_id=mission_id, event_type="checkpoint_created")
+
     return {
         "checkpoint_id": checkpoint_id,
         "mission_id": mission_id,
@@ -87,6 +90,9 @@ def pause_mission(
         payload={"reason": reason},
     )
     appended = repo.append_event(event)
+
+    quick_record_metric("mission_paused", 1, mission_id=mission_id, event_type="mission_paused",
+                        metadata={"reason": reason})
 
     return {
         "mission_id": mission_id,
@@ -131,6 +137,8 @@ def resume_mission(
         payload={"resume_context": resume_context},
     )
     appended = repo.append_event(event)
+
+    quick_record_metric("mission_resumed", 1, mission_id=mission_id, event_type="mission_resumed")
 
     return {
         "mission_id": mission_id,
@@ -201,6 +209,9 @@ def retry_mission(
         payload={"trigger": "retry", "attempt": state.retry_count + 1},
     )
     appended = repo.append_event(resume_event)
+
+    quick_record_metric("retry_attempted", 1, mission_id=mission_id, event_type="retry_attempted",
+                        metadata={"attempt": state.retry_count + 1})
 
     return {
         "mission_id": mission_id,

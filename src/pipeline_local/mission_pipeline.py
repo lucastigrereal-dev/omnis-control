@@ -40,6 +40,11 @@ def run_mission_content_pipeline(
     run_id = uuid.uuid4().hex[:12]
     result = MissionPipelineResult(run_id=run_id, mission_id=mission_id)
 
+    # Metrics: start run
+    from src.metrics import get_recorder
+    rec = get_recorder()
+    rec.start_run(mission_id, run_id)
+
     # ── Stage 0: Validate mission exists ──────────────────────────
     try:
         contract = repo.get_contract(mission_id)
@@ -260,6 +265,10 @@ def run_mission_content_pipeline(
         result.status = MissionPipelineStatus.FAILED
 
     result.finished_at = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    rec.finish_run(run_id, result.status,
+                   warnings_count=len(result.warnings),
+                   events_count=len(result.events_emitted),
+                   retries_count=current_state.retry_count if current_state else 0)
     return result
 
 

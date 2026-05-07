@@ -18,5 +18,9 @@ def get_tool_availability(tool_id: str) -> Optional[ToolRecord]:
             return blocked
     """
     registry = ToolRegistry()
-    return registry.get_tool(tool_id)
+    tool = registry.get_tool(tool_id)
+    if tool is not None:
+        from src.metrics import quick_record_metric
+        quick_record_metric("tool_consultation", 1, tool_id=tool_id, status=tool.status)
+    return tool
 
