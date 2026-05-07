@@ -44,6 +44,7 @@ from src.cli_commands.argos_drafts_cmd import argos_app as argos_drafts_app
 from src.cli_commands.creative_cmd import creative_app as creative_cmd_app
 from src.cli_commands.publisher_cmd import publisher_app as publisher_cli_app
 from src.cli_commands.forge_cmd import forge_app as forge_cli_app
+from src.cli_commands.pipeline_cmd import pipeline_app as pipeline_cli_app
 from src.reports import briefing as briefing_mod
 
 app = typer.Typer(
@@ -1760,6 +1761,7 @@ app.add_typer(argos_drafts_app)
 app.add_typer(creative_cmd_app)
 app.add_typer(publisher_cli_app)
 app.add_typer(forge_cli_app)
+app.add_typer(pipeline_cli_app)
 
 
 @templates_app.command(name="list")
