@@ -8,6 +8,7 @@ from typing import Optional
 from src.missions.repository import JsonlRepository, MissionRepository
 from src.missions.events import EventEnvelope, EventType
 from src.missions.state_machine import MissionStatus
+from src.missions.runtime import checkpoint_mission, get_resume_context
 from src.pipeline_local.service import PipelineLocalService
 from src.pipeline_local.models import PipelineRunStatus, PipelineBlockReason
 from src.pipeline_local.mission_models import (
@@ -49,6 +50,13 @@ def run_mission_content_pipeline(
 
     # ── Stage 1: Check current state (idempotency) ────────────────
     current_state = repo.project(mission_id)
+
+    if current_state.status == MissionStatus.PAUSED:
+        result.status = MissionPipelineStatus.BLOCKED
+        result.block_reason = MissionPipelineBlockReason.MISSION_PAUSED
+        result.add_warning(f"Mission is PAUSED. Execute: python jarvis.py mission resume {mission_id[:12]}")
+        result.add_evidence("resume_context", get_resume_context(mission_id, repo), "Contexto para resume")
+        return result
 
     if current_state.status == MissionStatus.COMPLETED:
         result.status = MissionPipelineStatus.ALREADY_COMPLETED
@@ -113,6 +121,13 @@ def run_mission_content_pipeline(
 
     result.queue_item_id = resolved_queue_id
 
+    # Checkpoint: contexto resolvido
+    _emit_event(repo, result, mission_id, "evidence_recorded", "pipeline",
+               {"evidence_type": "context_resolved",
+                "queue_item_id": resolved_queue_id,
+                "caption_draft_id": resolved_caption_id,
+                "how": "Contexto queue/caption resolvido — pipeline pronto para executar"})
+
     # ── Stage 3: Check caption approval status ────────────────────
     if resolved_caption_id:
         from src.caption_approval import DraftsManager
@@ -157,6 +172,9 @@ def run_mission_content_pipeline(
                 return result
 
     # ── Stage 4: Execute pipeline ──────────────────────────────────
+    # Checkpoint pré-execução
+    checkpoint_mission(mission_id, repo, label="pre-pipeline-execution")
+
     # Emit mission_started if first time
     if current_state.status == MissionStatus.DRAFT:
         _emit_event(repo, result, mission_id, "mission_started", "pipeline",

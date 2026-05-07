@@ -19,6 +19,13 @@ from src.missions.models import (
     Sector,
 )
 from src.missions.repository import JsonlRepository
+from src.missions.runtime import (
+    checkpoint_mission,
+    pause_mission,
+    resume_mission,
+    retry_mission,
+    get_resume_context,
+)
 from src.missions.state_machine import MissionStatus
 
 missions_app = typer.Typer(
@@ -305,6 +312,159 @@ def mission_state(
             console.print(f"    [{e.get('stage', '?')}] {e.get('error', '')[:80]}")
 
     console.print(f"\n  Última atualização: {state.last_updated}")
+
+
+@missions_app.command(name="pause")
+def mission_pause(
+    mission_id: str = typer.Argument(..., help="ID da mission"),
+    reason: Optional[str] = typer.Option(None, "--reason", help="Motivo da pausa"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Pausa uma missão em execução."""
+    repo = _repo()
+    actual_id = _resolve_id(repo, mission_id)
+    if actual_id is None:
+        console.print(f"[red]Mission não encontrada: {mission_id}[/red]")
+        raise typer.Exit(1)
+
+    try:
+        result = pause_mission(actual_id, reason=reason or "", repo=repo)
+    except Exception as e:
+        console.print(f"[red]Erro ao pausar: {e}[/red]")
+        raise typer.Exit(1)
+
+    if json_output:
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+    else:
+        console.print(f"[green]Missão pausada.[/green]")
+        console.print(f"  ID: [cyan]{result['mission_id'][:16]}...[/cyan]")
+        if result.get("reason"):
+            console.print(f"  Motivo: {result['reason']}")
+
+
+@missions_app.command(name="resume")
+def mission_resume(
+    mission_id: str = typer.Argument(..., help="ID da mission"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Resume uma missão pausada."""
+    repo = _repo()
+    actual_id = _resolve_id(repo, mission_id)
+    if actual_id is None:
+        console.print(f"[red]Mission não encontrada: {mission_id}[/red]")
+        raise typer.Exit(1)
+
+    try:
+        result = resume_mission(actual_id, repo=repo)
+    except Exception as e:
+        console.print(f"[red]Erro ao resumir: {e}[/red]")
+        raise typer.Exit(1)
+
+    if json_output:
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+    else:
+        console.print(f"[green]Missão resumida.[/green]")
+        console.print(f"  ID: [cyan]{result['mission_id'][:16]}...[/cyan]")
+        ctx = result.get("resume_context", {})
+        if ctx.get("current_step"):
+            console.print(f"  Step para continuar: {ctx['current_step']}")
+        if ctx.get("completed_steps"):
+            console.print(f"  Steps já completados: {', '.join(ctx['completed_steps'])}")
+
+
+@missions_app.command(name="retry")
+def mission_retry(
+    mission_id: str = typer.Argument(..., help="ID da mission"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Retenta uma missão que falhou."""
+    repo = _repo()
+    actual_id = _resolve_id(repo, mission_id)
+    if actual_id is None:
+        console.print(f"[red]Mission não encontrada: {mission_id}[/red]")
+        raise typer.Exit(1)
+
+    try:
+        result = retry_mission(actual_id, repo=repo)
+    except Exception as e:
+        console.print(f"[red]Erro ao retentar: {e}[/red]")
+        raise typer.Exit(1)
+
+    if json_output:
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+    else:
+        if result["status"] == "blocked":
+            console.print(f"[red]Retry bloqueado.[/red]")
+            console.print(f"  {result.get('reason', '')}")
+        else:
+            console.print(f"[green]Retry iniciado![/green]")
+            console.print(f"  Tentativa: {result.get('retry_attempt', '?')}")
+            console.print(f"  Retries restantes: {result.get('remaining_retries', '?')}")
+
+
+@missions_app.command(name="checkpoint")
+def mission_checkpoint(
+    mission_id: str = typer.Argument(..., help="ID da mission"),
+    label: Optional[str] = typer.Option(None, "--label", help="Label descritiva do checkpoint"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Cria um checkpoint manual do estado atual da missão."""
+    repo = _repo()
+    actual_id = _resolve_id(repo, mission_id)
+    if actual_id is None:
+        console.print(f"[red]Mission não encontrada: {mission_id}[/red]")
+        raise typer.Exit(1)
+
+    result = checkpoint_mission(actual_id, repo=repo, label=label or "")
+
+    if json_output:
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+    else:
+        console.print(f"[green]Checkpoint criado![/green]")
+        console.print(f"  Checkpoint ID: [cyan]{result['checkpoint_id']}[/cyan]")
+        console.print(f"  Mission: {result['mission_id'][:16]}...")
+        if result.get("label"):
+            console.print(f"  Label: {result['label']}")
+
+
+@missions_app.command(name="resume-context")
+def mission_resume_context(
+    mission_id: str = typer.Argument(..., help="ID da mission"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Mostra o contexto necessário para retomar uma missão."""
+    repo = _repo()
+    actual_id = _resolve_id(repo, mission_id)
+    if actual_id is None:
+        console.print(f"[red]Mission não encontrada: {mission_id}[/red]")
+        raise typer.Exit(1)
+
+    ctx = get_resume_context(actual_id, repo=repo)
+
+    if json_output:
+        print(json.dumps(ctx, indent=2, ensure_ascii=False))
+    else:
+        console.print(f"[bold]Resume Context — {ctx.get('title', '?')}[/bold]")
+        console.print(f"  Status: {ctx.get('status', '?')}")
+        console.print(f"  Resumable: {'[green]Sim[/green]' if ctx.get('resumable') else '[red]Não[/red]'}")
+        if ctx.get("current_step"):
+            console.print(f"  Step Atual: {ctx['current_step']}")
+        if ctx.get("completed_steps"):
+            console.print(f"  Steps Completados: {', '.join(ctx['completed_steps'])}")
+        if ctx.get("retry_count"):
+            console.print(f"  Retries: {ctx['retry_count']}/{ctx.get('max_retries', '?')}")
+        if ctx.get("pause_reason"):
+            console.print(f"  Pause Reason: {ctx['pause_reason']}")
+        if ctx.get("artifacts"):
+            console.print(f"  Artifacts ({len(ctx['artifacts'])}):")
+            for a in ctx['artifacts'][:10]:
+                console.print(f"    - {a}")
+        if ctx.get("latest_checkpoint"):
+            console.print(f"  Latest Checkpoint: {ctx['latest_checkpoint']}")
+        if ctx.get("errors"):
+            console.print(f"  Últimos erros:")
+            for e in ctx["errors"]:
+                console.print(f"    [{e.get('stage', '?')}] {e.get('error', '')[:80]}")
 
 
 def _resolve_id(repo: JsonlRepository, id_fragment: str) -> Optional[str]:

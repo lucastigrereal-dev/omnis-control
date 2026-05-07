@@ -29,8 +29,14 @@ class TaskState(BaseModel):
     last_event_sequence: int = 0
     last_updated: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     retry_count: int = 0
+    max_retries: int = 3
     budget_exceeded: bool = False
     approval_pending: bool = False
+    checkpoint_id: Optional[str] = None
+    checkpoint_at: Optional[datetime] = None
+    pause_reason: Optional[str] = None
+    resume_context: Dict[str, Any] = Field(default_factory=dict)
+    evidence_trail: list[Dict[str, Any]] = Field(default_factory=list)
 
 
 def _base_state(contract: MissionContract) -> TaskState:
@@ -155,6 +161,7 @@ def _apply_event(state: TaskState, ev: EventEnvelope) -> TaskState:
 
         case "mission_paused":
             kwargs["status"] = MissionStatus.PAUSED
+            kwargs["pause_reason"] = ev.payload.get("reason", "")
 
         case "mission_resumed":
             kwargs["status"] = MissionStatus.RUNNING
@@ -167,5 +174,27 @@ def _apply_event(state: TaskState, ev: EventEnvelope) -> TaskState:
 
         case "mission_cancelled":
             kwargs["status"] = MissionStatus.CANCELLED
+
+        case "checkpoint_created":
+            kwargs["checkpoint_id"] = ev.payload.get("checkpoint_id", "")
+            kwargs["checkpoint_at"] = ev.timestamp
+            kwargs["resume_context"] = ev.payload.get("resume_context", {})
+            trail = list(state.evidence_trail)
+            trail.append({
+                "type": "checkpoint",
+                "checkpoint_id": ev.payload.get("checkpoint_id", ""),
+                "label": ev.payload.get("label", ""),
+                "timestamp": ev.timestamp.isoformat() if hasattr(ev.timestamp, "isoformat") else str(ev.timestamp),
+                "sequence": ev.sequence,
+            })
+            kwargs["evidence_trail"] = trail
+
+        case "evidence_recorded":
+            trail = list(state.evidence_trail)
+            evidence = dict(ev.payload)
+            evidence["sequence"] = ev.sequence
+            evidence["timestamp"] = ev.timestamp.isoformat() if hasattr(ev.timestamp, "isoformat") else str(ev.timestamp)
+            trail.append(evidence)
+            kwargs["evidence_trail"] = trail
 
     return state.model_copy(update=kwargs)

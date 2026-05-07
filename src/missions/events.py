@@ -33,6 +33,8 @@ EventType = Literal[
     "mission_completed",
     "mission_failed",
     "mission_cancelled",
+    "checkpoint_created",
+    "evidence_recorded",
 ]
 
 EVENT_TYPES: tuple[EventType, ...] = (
@@ -61,6 +63,8 @@ EVENT_TYPES: tuple[EventType, ...] = (
     "mission_completed",
     "mission_failed",
     "mission_cancelled",
+    "checkpoint_created",
+    "evidence_recorded",
 )
 
 

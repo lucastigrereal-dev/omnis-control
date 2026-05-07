@@ -11,6 +11,8 @@ from typing import Any, Dict, List, Optional
 
 from src.missions.models import MissionContract
 from src.missions.events import EventEnvelope, EventType
+import uuid
+
 from src.missions.state import TaskState, project_from_events
 from src.missions.state_machine import MissionStatus
 
@@ -50,6 +52,18 @@ class MissionRepository(ABC):
     def project(self, mission_id: str) -> TaskState:
         """Projeta TaskState atual."""
 
+    @abstractmethod
+    def save_checkpoint(self, mission_id: str, checkpoint_id: str, state: TaskState) -> str:
+        """Salva snapshot de checkpoint em disco. Retorna path."""
+
+    @abstractmethod
+    def get_latest_checkpoint(self, mission_id: str) -> Optional[Dict[str, Any]]:
+        """Retorna o checkpoint mais recente ou None."""
+
+    @abstractmethod
+    def get_checkpoint(self, mission_id: str, checkpoint_id: str) -> Optional[Dict[str, Any]]:
+        """Retorna checkpoint específico ou None."""
+
 
 class JsonlRepository(MissionRepository):
     """Storage file-based: JSON contracts + JSONL events + hash verification."""
@@ -60,12 +74,14 @@ class JsonlRepository(MissionRepository):
         self.base_dir = Path(base_dir)
         self.contracts_dir = self.base_dir / "contracts"
         self.events_dir = self.base_dir / "events"
+        self.checkpoints_dir = self.base_dir / "checkpoints"
         self.index_path = self.base_dir / "index.jsonl"
         self._ensure_dirs()
 
     def _ensure_dirs(self) -> None:
         self.contracts_dir.mkdir(parents=True, exist_ok=True)
         self.events_dir.mkdir(parents=True, exist_ok=True)
+        self.checkpoints_dir.mkdir(parents=True, exist_ok=True)
 
     # ------------------------------------------------------------------
     # Contract
@@ -208,6 +224,53 @@ class JsonlRepository(MissionRepository):
         contract = self.get_contract(mission_id)
         events = self.get_events(mission_id)
         return project_from_events(contract, events)
+
+    # ------------------------------------------------------------------
+    # Checkpoints
+    # ------------------------------------------------------------------
+
+    def save_checkpoint(self, mission_id: str, checkpoint_id: str, state: TaskState) -> str:
+        """Salva snapshot do TaskState como checkpoint em disco."""
+        ckpt_dir = self.checkpoints_dir / mission_id
+        ckpt_dir.mkdir(parents=True, exist_ok=True)
+        ckpt_path = ckpt_dir / f"{checkpoint_id}.json"
+        data = {
+            "checkpoint_id": checkpoint_id,
+            "mission_id": mission_id,
+            "state": json.loads(state.model_dump_json()),
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        }
+        ckpt_path.write_text(
+            json.dumps(data, ensure_ascii=True, separators=(",", ":")),
+            encoding="utf-8",
+        )
+        return str(ckpt_path)
+
+    def get_latest_checkpoint(self, mission_id: str) -> Optional[Dict[str, Any]]:
+        """Retorna o checkpoint mais recente por created_at."""
+        ckpt_dir = self.checkpoints_dir / mission_id
+        if not ckpt_dir.exists():
+            return None
+        checkpoints = []
+        for p in ckpt_dir.glob("*.json"):
+            try:
+                raw = p.read_text(encoding="utf-8")
+                data = json.loads(raw)
+                checkpoints.append(data)
+            except (json.JSONDecodeError, Exception):
+                continue
+        if not checkpoints:
+            return None
+        checkpoints.sort(key=lambda d: (d.get("created_at", ""), d.get("checkpoint_id", "")), reverse=True)
+        return checkpoints[0]
+
+    def get_checkpoint(self, mission_id: str, checkpoint_id: str) -> Optional[Dict[str, Any]]:
+        """Retorna checkpoint específico por ID."""
+        ckpt_path = self.checkpoints_dir / mission_id / f"{checkpoint_id}.json"
+        if not ckpt_path.exists():
+            return None
+        raw = ckpt_path.read_text(encoding="utf-8")
+        return json.loads(raw)
 
     # ------------------------------------------------------------------
     # Listing
