@@ -140,8 +140,8 @@ def brief_stats() -> dict:
     """Aggregated statistics for creative briefs."""
     from collections import Counter
     briefs = list_briefs()
-    by_status = Counter(b.status for b in briefs if b.status)
-    by_format = Counter(b.format for b in briefs if b.format)
+    by_status = Counter(b.get("status") for b in briefs if b.get("status"))
+    by_format = Counter(b.get("format") for b in briefs if b.get("format"))
     return {
         "total": len(briefs),
         "by_status": dict(by_status),
