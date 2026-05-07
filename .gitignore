@@ -24,3 +24,5 @@ data/missions/contracts/*.json
 data/missions/contracts/*.hash
 data/missions/events/*.jsonl
 data/missions/index.jsonl
+data/pipeline_runs/*.json
+data/pipeline_runs/*.jsonl
