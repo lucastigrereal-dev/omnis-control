@@ -263,3 +263,270 @@ def oauth_start() -> None:
         title="READY (bloqueio de seguranca ativo)"
     ))
     console.print(f"\n[bold]Status:[/bold] [yellow]human_required[/yellow] — aguardando Lucas acordado para OAuth real.")
+
+
+@oauth_app.command(name="accounts")
+def oauth_accounts(
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Lista todas as contas com status de OAuth readiness.
+
+    Nao mostra secrets, tokens ou valores reais.
+    """
+    from src.content_queue.accounts import AccountRegistry
+    from src.oauth_readiness.account_readiness import (
+        build_account_readiness,
+        normalize_handle,
+        KNOWN_HANDLES,
+    )
+    from src.oauth_readiness.checklist import get_env_probe_summary
+
+    registry = AccountRegistry()
+    accounts = registry.list_all()
+    probe = get_env_probe_summary()
+
+    env_status: dict[str, str] = {}
+    for r in probe.results:
+        env_status[r.canonical_name] = r.status
+
+    callback_ok = False
+    try:
+        from src.oauth_readiness.checklist import _check_callback_route_exists
+        callback_check = _check_callback_route_exists()
+        callback_ok = callback_check.passed
+    except Exception:
+        pass
+
+    # Enrich with known handles not in registry
+    seen_handles = {normalize_handle(a.handle) for a in accounts}
+    readiness_list = []
+    for a in accounts:
+        readiness_list.append(
+            build_account_readiness(
+                handle=a.handle,
+                account_registry_id=a.account_id,
+                env_probe_results=env_status,
+                has_asset=False,
+                has_caption=False,
+                callback_http_200=callback_ok,
+            )
+        )
+
+    if json_output:
+        import json as _json
+        output = [
+            {
+                "handle": r.account_handle,
+                "registry_id": r.account_registry_id,
+                "risk_level": r.risk_level.value,
+                "is_test_candidate": r.is_test_candidate,
+                "oauth_ready": r.ready_for_oauth,
+                "first_post_ready": r.ready_for_first_post,
+                "blockers": r.blockers,
+                "warnings": r.warnings,
+                "next_actions": r.next_actions,
+            }
+            for r in readiness_list
+        ]
+        print(_json.dumps(output, indent=2, ensure_ascii=False))
+        return
+
+    if not readiness_list:
+        console.print("[yellow]Nenhuma conta encontrada no registry.[/yellow]")
+        console.print("[dim]Handles conhecidos (nao registrados):[/dim]")
+        for h, info in KNOWN_HANDLES.items():
+            risk_color = {
+                "critical": "red",
+                "high": "yellow",
+                "medium": "dim",
+                "low": "green",
+            }.get(info["risk"].value, "dim")
+            console.print(f"  @{h} — {info['followers']:,} seguidores — [{risk_color}]risk: {info['risk'].value}[/{risk_color}]")
+        console.print("\n[dim]Use 'omnis oauth account-readiness <handle>' para avaliar uma conta.[/dim]")
+        return
+
+    # Sort: critical/high first, then medium/low
+    risk_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
+    readiness_list.sort(key=lambda r: (risk_order.get(r.risk_level.value, 9), r.account_handle))
+
+    table = Table(title=f"Contas — OAuth Readiness ({len(readiness_list)})")
+    table.add_column("Handle", style="cyan")
+    table.add_column("Risk")
+    table.add_column("Test?")
+    table.add_column("OAuth")
+    table.add_column("Biz ID")
+    table.add_column("Page ID")
+    table.add_column("Token")
+
+    for r in readiness_list:
+        risk_style = {
+            "critical": "[red]",
+            "high": "[yellow]",
+            "medium": "[dim]",
+            "low": "[green]",
+        }.get(r.risk_level.value, "")
+
+        test_icon = "[green]sim[/green]" if r.is_test_candidate else "[red]bloqueado[/red]"
+        oauth_icon = "[green]ready[/green]" if r.ready_for_oauth else "[red]no-go[/red]"
+        biz_icon = "[green]ok[/green]" if r.instagram_business_account_id_status == "present" else "[dim]faltando[/dim]"
+        page_icon = "[green]ok[/green]" if r.facebook_page_id_status == "present" else "[dim]faltando[/dim]"
+        token_icon = "[green]ok[/green]" if r.token_status == "present" else "[dim]faltando[/dim]"
+
+        table.add_row(
+            f"@{r.account_handle}",
+            f"{risk_style}{r.risk_level.value}[/{risk_style}]",
+            test_icon,
+            oauth_icon,
+            biz_icon,
+            page_icon,
+            token_icon,
+        )
+    console.print(table)
+
+    # Missing handles
+    missing = [h for h in KNOWN_HANDLES if h not in seen_handles]
+    if missing:
+        console.print(f"\n[dim]Handles conhecidos nao registrados: {', '.join('@' + h for h in missing)}[/dim]")
+
+
+@oauth_app.command(name="account-readiness")
+def oauth_account_readiness(
+    handle: str = typer.Argument(..., help="Handle da conta (ex: @afamiliatigrereal)"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Mostra readiness detalhada de uma conta para OAuth/publicacao.
+
+    NUNCA mostra secrets, tokens ou valores reais.
+    """
+    from src.oauth_readiness.account_readiness import (
+        build_account_readiness,
+        normalize_handle,
+        risk_for_handle,
+        is_allowed_first_test,
+        KNOWN_HANDLES,
+    )
+    from src.oauth_readiness.checklist import get_env_probe_summary
+    from src.content_queue.accounts import AccountRegistry
+
+    norm = normalize_handle(handle)
+    registry = AccountRegistry()
+    account = registry.get_by_handle(norm)
+
+    probe = get_env_probe_summary()
+    env_status: dict[str, str] = {}
+    for r in probe.results:
+        env_status[r.canonical_name] = r.status
+
+    callback_ok = False
+    try:
+        from src.oauth_readiness.checklist import _check_callback_route_exists
+        callback_check = _check_callback_route_exists()
+        callback_ok = callback_check.passed
+    except Exception:
+        pass
+
+    readiness = build_account_readiness(
+        handle=norm,
+        account_registry_id=account.account_id if account else None,
+        env_probe_results=env_status,
+        has_asset=False,
+        has_caption=False,
+        callback_http_200=callback_ok,
+    )
+
+    if json_output:
+        import json as _json
+        output = {
+            "handle": readiness.account_handle,
+            "registry_id": readiness.account_registry_id,
+            "risk_level": readiness.risk_level.value,
+            "is_test_candidate": readiness.is_test_candidate,
+            "oauth_ready": readiness.ready_for_oauth,
+            "first_post_ready": readiness.ready_for_first_post,
+            "instagram_business_account_id": readiness.instagram_business_account_id_status,
+            "facebook_page_id": readiness.facebook_page_id_status,
+            "meta_app_secret": readiness.meta_app_secret_status,
+            "meta_graph_version": readiness.meta_graph_version_status,
+            "callback": readiness.callback_status,
+            "token": readiness.token_status,
+            "asset": readiness.asset_candidate_status,
+            "caption": readiness.caption_candidate_status,
+            "blockers": readiness.blockers,
+            "warnings": readiness.warnings,
+            "next_actions": readiness.next_actions,
+        }
+        # Add known handle info if not in registry
+        if not account:
+            info = KNOWN_HANDLES.get(norm)
+            if info:
+                output["source"] = "known_handle"
+                output["followers"] = info["followers"]
+                output["niche"] = info["niche"]
+        print(_json.dumps(output, indent=2, ensure_ascii=False))
+        return
+
+    # Rich output
+    status_emoji = {
+        "ready": "[green]READY[/green]",
+        "partial": "[yellow]PARTIAL[/yellow]",
+        "blocked": "[red]BLOCKED[/red]",
+        "human_required": "[yellow]HUMAN_REQUIRED[/yellow]",
+        "not_configured": "[dim]NOT CONFIGURED[/dim]",
+    }
+
+    oauth_status = "ready" if readiness.ready_for_oauth else "blocked"
+    first_post_status = "ready" if readiness.ready_for_first_post else "blocked"
+
+    info = ""
+    if not account:
+        known = KNOWN_HANDLES.get(norm)
+        if known:
+            info = f"\n[dim]Fonte: handles conhecidos (nao esta no registry)[/dim]"
+            info += f"\n[dim]Seguidores: {known['followers']:,} | Nicho: {known['niche']}[/dim]"
+
+    console.print(Panel(
+        f"[bold]Account: @{readiness.account_handle}[/bold]"
+        f"{info}\n"
+        f"Risk Level: {status_emoji.get(readiness.risk_level.value, readiness.risk_level.value)}\n"
+        f"Test Candidate: {'[green]Sim[/green]' if readiness.is_test_candidate else '[red]Nao (bloqueado)[/red]'}\n"
+        f"OAuth Ready: {status_emoji[oauth_status]}\n"
+        f"First Post Ready: {status_emoji[first_post_status]}",
+        title="P1.6A — Account Readiness"
+    ))
+
+    # Fields table
+    ftable = Table(title="Campos")
+    ftable.add_column("Campo", style="cyan")
+    ftable.add_column("Status")
+    for label, status in [
+        ("Instagram Business Account ID", readiness.instagram_business_account_id_status),
+        ("Facebook Page ID", readiness.facebook_page_id_status),
+        ("META_APP_SECRET", readiness.meta_app_secret_status),
+        ("META_GRAPH_VERSION", readiness.meta_graph_version_status),
+        ("Callback Route", readiness.callback_status),
+        ("Access Token", readiness.token_status),
+        ("Asset", readiness.asset_candidate_status),
+        ("Caption", readiness.caption_candidate_status),
+    ]:
+        s_style = {
+            "present": "[green]present[/green]",
+            "missing": "[red]missing[/red]",
+            "empty": "[yellow]empty[/yellow]",
+            "alias_present": "[yellow]alias[/yellow]",
+            "not_configured": "[dim]not configured[/dim]",
+        }.get(status, status)
+        ftable.add_row(label, s_style)
+    console.print(ftable)
+
+    if readiness.blockers:
+        console.print("\n[bold red]Blockers:[/bold red]")
+        for b in readiness.blockers:
+            console.print(f"  [red]x[/red] {b}")
+    if readiness.warnings:
+        console.print("\n[bold yellow]Warnings:[/bold yellow]")
+        for w in readiness.warnings:
+            console.print(f"  [yellow]![/yellow] {w}")
+    if readiness.next_actions:
+        console.print("\n[bold]Next Actions:[/bold]")
+        for a in readiness.next_actions:
+            console.print(f"  [cyan]>[/cyan] {a}")

@@ -31,3 +31,4 @@ data/tool_registry/validation_log.jsonl
 data/tool_registry/healthcheck_log.jsonl
 data/metrics_spine/metrics.jsonl
 data/metrics_spine/runs.jsonl
+config/meta_accounts.yaml

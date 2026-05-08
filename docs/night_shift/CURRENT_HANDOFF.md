@@ -1,27 +1,28 @@
-# CURRENT HANDOFF — P1.5 → P1.6
+# CURRENT HANDOFF — P1.6A → P1.6
 
 **Data:** 2026-05-08 | **Turno:** Diurno | **Operador:** Lucas
 
 ---
 
-## O que P1.5 entregou
+## O que P1.6A entregou
 
-1. **Callback OAuth fixado** — rota `GET /api/v1/argos/oauth/callback` no Publisher OS saiu de 404 → 200 com JSON seguro em 3 cenarios (sem code, com code, com erro)
-2. **OMNIS readiness atualizada** — detecta callback HTTP 200 vs 404, 10/15 checks passam
-3. **Config alignment documentado** — fonte canonica `~/publisher-os/.env`, aliases mapeados, regras claras
-4. **Asset Gate documentado** — candidato 0b79aa1c em @lucastigrereal (690K, alto risco), sem asset, NO-GO
-5. **8 novos docs** — audit, config, checklist, asset gate, go/no-go, final report, state snapshot, handoff
+1. **Account Registry Audit** — 2 contas no OMNIS, 4 handles conhecidos ausentes
+2. **AccountOAuthReadiness model** — Pydantic v2 com risk levels (critical/high/medium/low)
+3. **CLI `oauth accounts`** — tabela Rich com risco, OAuth status, test candidate
+4. **CLI `oauth account-readiness <handle>`** — blockers/warnings/next_actions por conta
+5. **Config template** — `config/meta_accounts.example.yaml` com 6 contas, sem IDs reais
+6. **Interface contract** — `docs/INTERFACE_OMNIS_PUBLISHER.md`
+7. **Safe First Post Plan** — @afamiliatigrereal como candidata, regras de asset seguro
+8. **Split-Brain doc** — OMNIS vs Publisher OS account sources
+9. **Smoke E2E** — 8 testes de pipeline completo sem Meta
+10. **57 novos testes** — total de 788 (era 731)
 
 ---
 
-## O que NAO foi feito (por design)
+## Contas: Bloqueio Ativo
 
-- NENHUM push para remote
-- NENHUM OAuth real
-- NENHUM token exchange
-- NENHUMA chamada a API Meta
-- NENHUM post real
-- NENHUMA alteracao de .env
+- **@lucastigrereal**: CRITICAL — bloqueado para primeiro teste (hard block)
+- **@afamiliatigrereal**: MEDIUM — candidata recomendada
 
 ---
 
@@ -29,42 +30,38 @@
 
 | Repo | Branch | Commit | Push? |
 |---|---|---|---|
-| omnis-control | master | `46854f6` | NAO |
-| publisher-os | argos-evolucao-passo-0 | `cf4b8d7` | NAO |
+| omnis-control | master | (a commitar) | NAO |
+| publisher-os | argos-evolucao-passo-0 | cf4b8d7 | NAO |
 
 ---
 
 ## Para retomar (P1.6)
 
-Lucas precisa fazer MANUALMENTE antes de chamar o Claude:
+Lucas precisa fazer MANUALMENTE:
 
 1. Pegar `META_APP_SECRET` em https://developers.facebook.com/apps/1434393165369254
 2. Editar `C:\Users\lucas\publisher-os\.env`:
    - `META_APP_SECRET=<valor real>`
    - `META_GRAPH_VERSION=v20.0`
    - Renomear `INSTAGRAM_BUSINESS_ID` → `INSTAGRAM_BUSINESS_ACCOUNT_ID` + preencher
+   - `FACEBOOK_PAGE_ID=<valor real>`
 3. Rodar `python jarvis.py oauth probe` e confirmar PRESENT
-
-So depois o Claude entra para validar e iniciar OAuth real.
+4. Rodar `python jarvis.py oauth accounts` e confirmar @afamiliatigrereal como candidate
+5. Rodar `python jarvis.py oauth account-readiness @afamiliatigrereal` e confirmar `ready_for_oauth: true`
 
 ---
 
 ## Comandos Uteis
 
 ```bash
-# Validacao pos-setup
 python jarvis.py oauth probe
 python jarvis.py oauth validate
-
-# Se tudo PRESENT, iniciar OAuth
-python jarvis.py oauth start
-
-# Status do pipeline
+python jarvis.py oauth accounts
+python jarvis.py oauth account-readiness @afamiliatigrereal
+python jarvis.py oauth account-readiness @lucastigrereal
 python jarvis.py post preflight
-python jarvis.py tools health-report
-python jarvis.py metrics today
 ```
 
 ---
 
-**Handoff limpo. Proxima parada: P1.6 quando Lucas destravar as credenciais.**
+**Handoff limpo. Proximo: P1.6 quando Lucas destravar credenciais.**

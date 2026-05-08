@@ -1,0 +1,45 @@
+# Template seguro de contas Meta/Instagram para OAuth
+# Nao contem IDs reais. Valores reais vao em config/meta_accounts.yaml (gitignored).
+
+accounts:
+  - handle: "@afamiliatigrereal"
+    risk_level: "medium"
+    use_as_first_test: true
+    instagram_business_account_id: ""
+    facebook_page_id: ""
+    notes: "Conta preferida para primeiro teste controlado se estiver vinculada corretamente."
+
+  - handle: "@lucastigrereal"
+    risk_level: "critical"
+    use_as_first_test: false
+    instagram_business_account_id: ""
+    facebook_page_id: ""
+    notes: "Conta grande. Bloqueada para primeiro teste."
+
+  - handle: "@agenteviajabrasil"
+    risk_level: "high"
+    use_as_first_test: false
+    instagram_business_account_id: ""
+    facebook_page_id: ""
+    notes: "Conta grande. Nao usar no primeiro teste."
+
+  - handle: "@oinatalrn"
+    risk_level: "high"
+    use_as_first_test: false
+    instagram_business_account_id: ""
+    facebook_page_id: ""
+    notes: "Conta grande/turismo. Nao usar no primeiro teste."
+
+  - handle: "@oquecomernatalrn"
+    risk_level: "medium"
+    use_as_first_test: false
+    instagram_business_account_id: ""
+    facebook_page_id: ""
+    notes: "Pode ser candidata futura."
+
+  - handle: "@natalaivoueu"
+    risk_level: "medium"
+    use_as_first_test: false
+    instagram_business_account_id: ""
+    facebook_page_id: ""
+    notes: "Pode ser candidata futura."
