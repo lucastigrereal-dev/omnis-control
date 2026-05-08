@@ -11,14 +11,17 @@
 
 ## 2. O que já foi feito nesta sessão
 - [x] Gate 0 — Estado inicial verificado
-- [ ] Fase 1 — Consolidação P1.1b
-- [ ] Fase 2 — OAuth Readiness
-- [ ] Fase 3 — First Post Preflight
-- [ ] Fase 4 — Auditoria final
+- [x] Fase 1 — Consolidação P1.1b
+- [x] Fase 2 — OAuth Readiness (commit 603f040)
+- [x] Fase 3 — First Post Preflight (commit 73461fe)
+- [x] Fase 4 — Auditoria final
 
 ## 3. Commits criados nesta sessão
 | Commit | Mensagem | Conteúdo |
 |---|---|---|
+| a3578a9 | docs(tools): consolidate publisher recovery state (P1.1b) | Docs recovery + state + handoff |
+| 603f040 | feat(oauth): add meta oauth readiness gate (12 checks, 24 tests) | src/oauth_readiness/ + CLI + tests |
+| 73461fe | feat(post): add first post preflight gate (8 checks, 25 tests) | src/first_post/ + CLI + tests |
 
 ## 4. Arquivos criados/alterados
 | Arquivo | Status | Observação |
