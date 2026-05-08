@@ -95,8 +95,14 @@ class TestCLIToolsHealthAll:
 class TestCLIToolsHealthReport:
     """tools health-report — relatorio de healthchecks."""
 
-    def test_health_report_empty(self, runner):
+    def test_health_report_empty(self, runner, tmp_path, monkeypatch):
         """Sem tools cadastradas."""
+        base = str(tmp_path / "tool_registry")
+
+        def _mock_repo():
+            return ToolRegistry(base_dir=base)
+
+        monkeypatch.setattr("src.cli_commands.tools_cmd._repo", _mock_repo)
         result = runner.invoke(app, ["tools", "health-report"])
         assert result.exit_code == 0
         assert "Nenhum" in result.stdout or "discover" in result.stdout.lower()
