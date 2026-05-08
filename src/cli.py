@@ -49,6 +49,7 @@ from src.cli_commands.missions_cmd import missions_app
 from src.cli_commands.tools_cmd import tools_app
 from src.cli_commands.metrics_cmd import metrics_app
 from src.cli_commands.oauth_cmd import oauth_app
+from src.cli_commands.post_cmd import post_app
 from src.reports import briefing as briefing_mod
 
 app = typer.Typer(
@@ -1770,6 +1771,7 @@ app.add_typer(missions_app)
 app.add_typer(tools_app)
 app.add_typer(metrics_app)
 app.add_typer(oauth_app)
+app.add_typer(post_app)
 
 
 @templates_app.command(name="list")
