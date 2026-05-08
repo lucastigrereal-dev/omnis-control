@@ -160,25 +160,90 @@ def _check_disk_space() -> OAuthReadinessCheck:
 
 
 def _check_callback_route_exists() -> OAuthReadinessCheck:
-    """Rota de callback HTTP no Publisher OS existe (HEAD request seguro)."""
+    """Rota de callback HTTP no Publisher OS responde (GET)."""
     import urllib.request
+    import json as _json
     try:
         req = urllib.request.Request(
             "http://localhost:8000/api/v1/argos/oauth/callback",
-            method="HEAD",
+            method="GET",
         )
         res = urllib.request.urlopen(req, timeout=5)
-        # Qualquer resposta < 500 indica que a rota existe
         passed = res.status < 500
+
+        # Tenta parsear o JSON para classificacao fina
+        detail = f"HTTP {res.status}"
+        recommendation = ""
+        try:
+            body = _json.loads(res.read())
+            cb_status = body.get("status", "")
+            if cb_status in ("human_required", "received_code_dry_run"):
+                detail = f"HTTP {res.status} — rota implementada (P1.5)"
+            elif cb_status == "oauth_error":
+                detail = f"HTTP {res.status} — rota OK (reportou erro OAuth sem token real)"
+            else:
+                detail = f"HTTP {res.status} — rota existe"
+        except Exception:
+            pass
+
         return OAuthReadinessCheck(
             check_id="callback_route_exists",
             label="Rota de callback OAuth no Publisher OS",
             passed=passed,
             required=True,
-            detail=f"HTTP {res.status}" if passed else f"Rota respondeu {res.status}",
-            recommendation="Implemente /api/v1/argos/oauth/callback no Publisher OS" if not passed else "",
+            detail=detail,
+            recommendation=recommendation,
+        )
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return OAuthReadinessCheck(
+                check_id="callback_route_exists",
+                label="Rota de callback OAuth no Publisher OS",
+                passed=False,
+                required=True,
+                status=OAuthReadinessStatus.BLOCKED,
+                detail="HTTP 404 — rota nao implementada",
+                recommendation="Implementar /api/v1/argos/oauth/callback no Publisher OS (ver P1.5)",
+            )
+        return OAuthReadinessCheck(
+            check_id="callback_route_exists",
+            label="Rota de callback OAuth no Publisher OS",
+            passed=False,
+            required=True,
+            detail=f"HTTP {e.code} — erro inesperado",
+            recommendation="Verificar logs do Publisher OS",
+        )
+    except urllib.error.URLError as e:
+        reason = str(e.reason).lower() if hasattr(e, "reason") else str(e).lower()
+        if "refused" in reason or "connection" in reason:
+            return OAuthReadinessCheck(
+                check_id="callback_route_exists",
+                label="Rota de callback OAuth no Publisher OS",
+                passed=False,
+                required=True,
+                status=OAuthReadinessStatus.BLOCKED,
+                detail="Conexao recusada — Publisher OS offline?",
+                recommendation="Inicie o Publisher OS: docker compose up -d publisher-core",
+            )
+        return OAuthReadinessCheck(
+            check_id="callback_route_exists",
+            label="Rota de callback OAuth no Publisher OS",
+            passed=False,
+            required=True,
+            detail=f"Erro de rede: {e}",
+            recommendation="Verificar Publisher OS",
         )
     except Exception as e:
+        if "timeout" in str(e).lower() or "timed out" in str(e).lower():
+            return OAuthReadinessCheck(
+                check_id="callback_route_exists",
+                label="Rota de callback OAuth no Publisher OS",
+                passed=False,
+                required=True,
+                status=OAuthReadinessStatus.BLOCKED,
+                detail="Timeout — Publisher OS nao respondeu",
+                recommendation="Verifique se Publisher OS esta rodando",
+            )
         return OAuthReadinessCheck(
             check_id="callback_route_exists",
             label="Rota de callback OAuth no Publisher OS",
