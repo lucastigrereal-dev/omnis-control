@@ -1,18 +1,28 @@
-"""OAuth Readiness Checklist — 12 precondicoes. P1.2a.
+"""OAuth Readiness Checklist — precondicoes usando env_probe. P1.4.
 
-Cada check e uma funcao pura: recebe estado do filesystem e retorna
-OAuthReadinessCheck. Nenhuma le .env, nenhuma chama API externa,
-nenhuma executa OAuth real.
+Cada check usa env_probe para detectar presenca de variaveis
+sem nunca ler valores reais.
 """
 from __future__ import annotations
 
 import os
-import json
 import subprocess
 import sys
 from typing import Callable, List
 
 from src.oauth_readiness.models import OAuthReadinessCheck, OAuthReadinessStatus
+from src.oauth_readiness.env_probe import (
+    probe_env_vars,
+    safe_summary,
+    EnvVarStatus,
+    DEFAULT_META_VARS,
+)
+
+
+def _run_probe():
+    """Executa probe contra .env canonico uma vez e retorna summary."""
+    env_path = os.path.expanduser("~/publisher-os/.env")
+    return probe_env_vars(env_path)
 
 
 def _check_docker_running() -> OAuthReadinessCheck:
@@ -45,7 +55,6 @@ def _check_docker_running() -> OAuthReadinessCheck:
 def _check_publisher_os_healthy() -> OAuthReadinessCheck:
     """Publisher Core :8000 responde."""
     import urllib.request
-    import urllib.error
     try:
         req = urllib.request.Request("http://localhost:8000/health", method="GET")
         res = urllib.request.urlopen(req, timeout=5)
@@ -65,30 +74,12 @@ def _check_publisher_os_healthy() -> OAuthReadinessCheck:
             passed=False,
             required=True,
             detail=f"Nao acessivel: {e}",
-            recommendation="Inicie o publisher-os: cd ~/publisher-os && docker compose up -d publisher-core redis supabase-db",
+            recommendation="Inicie o publisher-os: cd ~/publisher-os && docker compose up -d publisher-core",
         )
 
 
 def _check_supabase_db_accessible() -> OAuthReadinessCheck:
     """Supabase Postgres :5434 aceita conexoes."""
-    import urllib.request
-    import urllib.error
-    try:
-        req = urllib.request.Request("http://localhost:5434", method="GET")
-        res = urllib.request.urlopen(req, timeout=5)
-        passed = True
-        return OAuthReadinessCheck(
-            check_id="supabase_db_accessible",
-            label="Supabase Postgres acessivel",
-            passed=passed,
-            required=True,
-            detail="Porta 5434 responde",
-            recommendation="",
-        )
-    except Exception:
-        # Postgres nao fala HTTP — vamos tentar verificar o container
-        pass
-
     try:
         result = subprocess.run(
             ["docker", "inspect", "publisher-os-supabase-db-1",
@@ -168,130 +159,34 @@ def _check_disk_space() -> OAuthReadinessCheck:
         )
 
 
-def _check_meta_app_id_exists() -> OAuthReadinessCheck:
-    """Verifica se META_APP_ID esta configurado (sem ler valor)."""
-    env_example = os.path.expanduser("~/publisher-os/.env.example")
-    has_example = False
-    if os.path.isfile(env_example):
-        try:
-            with open(env_example, encoding="utf-8") as f:
-                for line in f:
-                    if line.startswith("META_APP_ID=") and len(line.strip().split("=", 1)[1]) > 0:
-                        has_example = True
-                        break
-        except OSError:
-            pass
-
-    return OAuthReadinessCheck(
-        check_id="meta_app_id_exists",
-        label="META_APP_ID documentado no .env.example",
-        passed=has_example,
-        required=True,
-        detail="Variavel presente no .env.example" if has_example else ".env.example nao contem META_APP_ID",
-        recommendation="Adicione META_APP_ID ao .env.example" if not has_example else "",
-    )
-
-
-def _check_meta_app_secret_exists() -> OAuthReadinessCheck:
-    """Verifica se META_APP_SECRET esta documentado (sem ler valor)."""
-    env_example = os.path.expanduser("~/publisher-os/.env.example")
-    has_example = False
-    if os.path.isfile(env_example):
-        try:
-            with open(env_example, encoding="utf-8") as f:
-                for line in f:
-                    if line.startswith("META_APP_SECRET=") and len(line.strip().split("=", 1)[1]) > 0:
-                        has_example = True
-                        break
-        except OSError:
-            pass
-
-    return OAuthReadinessCheck(
-        check_id="meta_app_secret_exists",
-        label="META_APP_SECRET documentado no .env.example",
-        passed=has_example,
-        required=True,
-        detail="Variavel presente no .env.example" if has_example else ".env.example nao contem META_APP_SECRET",
-        recommendation="Adicione META_APP_SECRET ao .env.example" if not has_example else "",
-    )
-
-
-def _check_meta_app_id_configured() -> OAuthReadinessCheck:
-    """Verifica se .env existe com META_APP_ID preenchido (sem ler valor real).
-
-    Apenas detecta PRESENÇA do arquivo e da variavel, NUNCA le o valor.
-    """
-    env_path = os.path.expanduser("~/publisher-os/.env")
-    if not os.path.isfile(env_path):
+def _check_callback_route_exists() -> OAuthReadinessCheck:
+    """Rota de callback HTTP no Publisher OS existe (HEAD request seguro)."""
+    import urllib.request
+    try:
+        req = urllib.request.Request(
+            "http://localhost:8000/api/v1/argos/oauth/callback",
+            method="HEAD",
+        )
+        res = urllib.request.urlopen(req, timeout=5)
+        # Qualquer resposta < 500 indica que a rota existe
+        passed = res.status < 500
         return OAuthReadinessCheck(
-            check_id="meta_app_id_configured",
-            label="META_APP_ID preenchido no .env",
+            check_id="callback_route_exists",
+            label="Rota de callback OAuth no Publisher OS",
+            passed=passed,
+            required=True,
+            detail=f"HTTP {res.status}" if passed else f"Rota respondeu {res.status}",
+            recommendation="Implemente /api/v1/argos/oauth/callback no Publisher OS" if not passed else "",
+        )
+    except Exception as e:
+        return OAuthReadinessCheck(
+            check_id="callback_route_exists",
+            label="Rota de callback OAuth no Publisher OS",
             passed=False,
             required=True,
-            status=OAuthReadinessStatus.NOT_CONFIGURED,
-            detail=".env nao encontrado em ~/publisher-os/",
-            recommendation="Copie .env.example para .env e preencha META_APP_ID",
+            detail=f"Nao acessivel: {e}",
+            recommendation="Verifique se Publisher OS esta rodando e a rota existe",
         )
-
-    return OAuthReadinessCheck(
-        check_id="meta_app_id_configured",
-        label="META_APP_ID preenchido no .env",
-        passed=False,
-        required=True,
-        status=OAuthReadinessStatus.HUMAN_REQUIRED,
-        detail=".env existe — verificacao de valor requer operador humano",
-        recommendation="Lucas precisa verificar se META_APP_ID tem valor real no .env",
-    )
-
-
-def _check_meta_app_secret_configured() -> OAuthReadinessCheck:
-    """Verifica se .env existe com META_APP_SECRET preenchido (sem ler valor real)."""
-    env_path = os.path.expanduser("~/publisher-os/.env")
-    if not os.path.isfile(env_path):
-        return OAuthReadinessCheck(
-            check_id="meta_app_secret_configured",
-            label="META_APP_SECRET preenchido no .env",
-            passed=False,
-            required=True,
-            status=OAuthReadinessStatus.NOT_CONFIGURED,
-            detail=".env nao encontrado em ~/publisher-os/",
-            recommendation="Copie .env.example para .env e preencha META_APP_SECRET",
-        )
-
-    return OAuthReadinessCheck(
-        check_id="meta_app_secret_configured",
-        label="META_APP_SECRET preenchido no .env",
-        passed=False,
-        required=True,
-        status=OAuthReadinessStatus.HUMAN_REQUIRED,
-        detail=".env existe — verificacao de valor requer operador humano",
-        recommendation="Lucas precisa verificar se META_APP_SECRET tem valor real no .env",
-    )
-
-
-def _check_meta_callback_url_documented() -> OAuthReadinessCheck:
-    """Verifica se callback URL esta documentada no .env.example."""
-    env_example = os.path.expanduser("~/publisher-os/.env.example")
-    has_cb = False
-    if os.path.isfile(env_example):
-        try:
-            with open(env_example, encoding="utf-8") as f:
-                for line in f:
-                    if "REDIRECT" in line.upper() or "CALLBACK" in line.upper():
-                        if "=" in line and len(line.strip().split("=", 1)[1]) > 0:
-                            has_cb = True
-                            break
-        except OSError:
-            pass
-
-    return OAuthReadinessCheck(
-        check_id="meta_callback_url_documented",
-        label="Callback URL documentada no .env.example",
-        passed=has_cb,
-        required=True,
-        detail="URL de callback encontrada" if has_cb else "Nenhuma REDIRECT/CALLBACK URI no .env.example",
-        recommendation="Adicione META_REDIRECT_URI ao .env.example" if not has_cb else "",
-    )
 
 
 def _check_instagram_accounts_registered() -> OAuthReadinessCheck:
@@ -345,19 +240,70 @@ def _check_network_outbound() -> OAuthReadinessCheck:
         )
 
 
+def _make_env_check(result) -> OAuthReadinessCheck:
+    """Converte EnvProbeResult em OAuthReadinessCheck, sem valores."""
+    status = result.status
+    passed = status == EnvVarStatus.PRESENT
+
+    if status == EnvVarStatus.PRESENT:
+        oauth_status = OAuthReadinessStatus.READY
+        detail = "Presente e valido"
+        recommendation = ""
+    elif status == EnvVarStatus.EMPTY:
+        oauth_status = OAuthReadinessStatus.HUMAN_REQUIRED
+        detail = "Variavel existe mas esta vazia"
+        recommendation = f"Preencha {result.canonical_name} no .env"
+    elif status == EnvVarStatus.MISSING:
+        oauth_status = OAuthReadinessStatus.HUMAN_REQUIRED if result.required else OAuthReadinessStatus.BLOCKED
+        detail = f"Variavel nao encontrada no .env"
+        recommendation = f"Adicione {result.canonical_name} ao .env" if result.required else f"Opcional: adicione {result.canonical_name}"
+    elif status == EnvVarStatus.ALIAS_PRESENT:
+        oauth_status = OAuthReadinessStatus.READY
+        detail = f"Encontrada via alias '{result.var_name}'"
+        recommendation = f"Padronize para nome canonico: {result.canonical_name}"
+    elif status == EnvVarStatus.INVALID_FORMAT:
+        oauth_status = OAuthReadinessStatus.HUMAN_REQUIRED
+        detail = result.format_note or "Formato invalido"
+        recommendation = f"Corrija o formato de {result.canonical_name}"
+    else:
+        oauth_status = OAuthReadinessStatus.FAILED
+        detail = f"Status desconhecido: {status}"
+        recommendation = "Investigue"
+
+    return OAuthReadinessCheck(
+        check_id=f"env_{result.canonical_name.lower()}",
+        label=f"{result.canonical_name} configurado",
+        passed=passed,
+        required=result.required,
+        status=oauth_status,
+        detail=detail,
+        recommendation=recommendation,
+    )
+
+
 def get_all_checks() -> List[Callable[[], OAuthReadinessCheck]]:
-    """Retorna a lista ordenada dos 12 checks."""
-    return [
+    """Retorna lista de checks: infra + probe de variaveis + integracao."""
+    checks: List[Callable[[], OAuthReadinessCheck]] = [
         _check_docker_running,
         _check_publisher_os_healthy,
         _check_supabase_db_accessible,
         _check_redis_accessible,
         _check_disk_space,
-        _check_meta_app_id_exists,
-        _check_meta_app_secret_exists,
-        _check_meta_app_id_configured,
-        _check_meta_app_secret_configured,
-        _check_meta_callback_url_documented,
-        _check_instagram_accounts_registered,
-        _check_network_outbound,
+        _check_callback_route_exists,
     ]
+
+    # Adiciona checks de variaveis do env_probe
+    probe = _run_probe()
+    for result in probe.results:
+        def _make_bound_check(r=result):
+            return _make_env_check(r)
+        checks.append(_make_bound_check)
+
+    checks.append(_check_instagram_accounts_registered)
+    checks.append(_check_network_outbound)
+    return checks
+
+
+def get_env_probe_summary():
+    """Retorna EnvProbeSummary para uso externo (CLI probe command)."""
+    return _run_probe()

@@ -93,27 +93,134 @@ def oauth_readiness(
 
 @oauth_app.command(name="checklist")
 def oauth_checklist() -> None:
-    """Lista os 12 checks exatos, sem executa-los."""
-    console.print("[bold]OAuth Readiness Checklist — 12 precondicoes[/bold]\n")
+    """Lista todos os checks de preparacao, sem executa-los."""
+    from src.oauth_readiness.checklist import get_all_checks
 
-    items = [
-        ("docker_running", "Docker daemon acessivel", True),
-        ("publisher_os_healthy", "Publisher Core health endpoint (:8000)", True),
-        ("supabase_db_accessible", "Supabase Postgres acessivel (:5434)", True),
-        ("redis_accessible", "Redis acessivel (:6382)", False),
-        ("disk_space", "Espaco em disco >= 5% livre", True),
-        ("meta_app_id_exists", "META_APP_ID documentado no .env.example", True),
-        ("meta_app_secret_exists", "META_APP_SECRET documentado no .env.example", True),
-        ("meta_app_id_configured", "META_APP_ID preenchido no .env (verificacao humana)", True),
-        ("meta_app_secret_configured", "META_APP_SECRET preenchido no .env (verificacao humana)", True),
-        ("meta_callback_url_documented", "Callback URL documentada no .env.example", True),
-        ("instagram_accounts_registered", "Contas Instagram cadastradas no AccountRegistry", True),
-        ("network_outbound", "Conectividade com graph.facebook.com", False),
-    ]
+    checks = get_all_checks()
+    console.print(f"[bold]OAuth Readiness Checklist — {len(checks)} precondicoes[/bold]\n")
 
-    for check_id, label, required in items:
-        req_str = "[bold]OBRIGATORIO[/bold]" if required else "[dim]opcional[/dim]"
-        console.print(f"  [cyan]{check_id:<35}[/cyan] {label:<60} {req_str}")
+    for fn in checks:
+        try:
+            c = fn()
+            req_str = "[bold]OBRIGATORIO[/bold]" if c.required else "[dim]opcional[/dim]"
+            console.print(f"  [cyan]{c.check_id:<38}[/cyan] {c.label:<55} {req_str}")
+        except Exception:
+            name = fn.__name__
+            console.print(f"  [red]{name:<38}[/red] {'(falhou ao carregar)':<55} [dim]---[/dim]")
+
+
+@oauth_app.command(name="probe")
+def oauth_probe(
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Verifica variaveis Meta no .env com seguranca — sem mostrar valores.
+
+    Retorna status de cada variavel: present, missing, empty, invalid_format.
+    NUNCA imprime ou armazena valores reais.
+    """
+    from src.oauth_readiness.checklist import get_env_probe_summary
+    from src.oauth_readiness.env_probe import safe_summary
+
+    probe = get_env_probe_summary()
+
+    if json_output:
+        print(json.dumps(probe.to_dict(), indent=2, ensure_ascii=False))
+        return
+
+    console.print(Panel(
+        f"[bold]OAuth Meta — Env Probe[/bold]\n"
+        f"Arquivo: {probe.source_path}\n"
+        f"Existe: {'[green]Sim[/green]' if probe.file_exists else '[red]Nao[/red]'}\n"
+        f"Variaveis: {probe.present_count} presentes, "
+        f"{probe.empty_count} vazias, "
+        f"{probe.missing_count} ausentes",
+        title="P1.4"
+    ))
+
+    for r in probe.results:
+        icon = {
+            "present": "[green]PRESENT[/green]",
+            "missing": "[dim]MISSING[/dim]",
+            "empty": "[yellow]EMPTY[/yellow]",
+            "invalid_format": "[red]INVALID[/red]",
+            "alias_present": "[yellow]ALIAS[/yellow]",
+        }.get(r.status, "[?]")
+        req = " [bold](obrigatorio)[/bold]" if r.required else ""
+        note = f" [dim]({r.format_note})[/dim]" if r.format_note else ""
+        alias_info = f" [dim](alias: {r.found_via_alias})[/dim]" if r.found_via_alias else ""
+        console.print(f"  {icon} {r.var_name}{req}{alias_info}{note}")
+
+    console.print(f"\n[dim]Use 'omnis oauth readiness' para o report completo de infra + env.[/dim]")
+
+
+@oauth_app.command(name="validate")
+def oauth_validate(
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Valida readiness completa: probe + infra + resumo do que falta."""
+    from src.oauth_readiness.checklist import get_env_probe_summary
+
+    checker = get_checker()
+    report = checker.check_all()
+    probe = get_env_probe_summary()
+
+    if json_output:
+        output = {
+            "overall_status": report.overall_status,
+            "can_proceed": report.can_proceed,
+            "total_checks": report.total_checks,
+            "passed": report.passed,
+            "failed": report.failed,
+            "blocked_by_required": report.blocked_by_required,
+            "next_action": report.next_action,
+            "env_probe": probe.to_dict(),
+            "checked_at": report.checked_at,
+        }
+        print(json.dumps(output, indent=2, ensure_ascii=False))
+        return
+
+    status_style = _status_style(report.overall_status)
+    console.print(Panel(
+        f"[bold]OAuth Meta — Validacao Completa[/bold]\n"
+        f"Status: {status_style}{report.overall_status}[/]  |  "
+        f"Checks: {report.passed}/{report.total_checks} passaram  |  "
+        f"Bloqueios: {report.blocked_by_required}",
+        title="P1.4"
+    ))
+
+    # Resumo de variaveis
+    console.print(f"\n[bold]Variaveis no .env:[/bold]")
+    for r in probe.results:
+        if r.status == "present":
+            continue
+        icon = {
+            "missing": "[red]FALTA[/red]",
+            "empty": "[yellow]VAZIO[/yellow]",
+            "invalid_format": "[red]INVALIDO[/red]",
+            "alias_present": "[yellow]ALIAS[/yellow]",
+        }.get(r.status, "[?]")
+        console.print(f"  {icon} {r.canonical_name}")
+
+    if probe.present_count == probe.total_checked:
+        console.print(f"  [green]Todas as {probe.total_checked} variaveis presentes[/green]")
+
+    # Bloqueios de infra
+    failed_infra = [c for c in report.checks if not c.passed and c.required and not c.check_id.startswith("env_")]
+    if failed_infra:
+        console.print(f"\n[bold]Infra com problema:[/bold]")
+        for c in failed_infra:
+            console.print(f"  [red]x[/red] {c.label}: {c.recommendation}")
+
+    console.print(f"\n[bold]Acao necessaria:[/bold] {report.next_action}")
+
+    # GO/NO-GO
+    if report.overall_status == "ready":
+        console.print(f"\n[green][bold]GO[/bold] para OAuth manual controlado.[/green]")
+        console.print(f"[yellow]AVISO:[/yellow] OAuth real exige Lucas acordado no navegador.")
+    elif report.overall_status == "human_required":
+        console.print(f"\n[yellow][bold]NO-GO[/bold] — requer acao humana.[/yellow]")
+    else:
+        console.print(f"\n[red][bold]NO-GO[/bold] — bloqueios precisam ser resolvidos.[/red]")
 
 
 @oauth_app.command(name="start")
@@ -124,29 +231,30 @@ def oauth_start() -> None:
 
     if not report.can_proceed:
         console.print("[red]OAuth NAO pode ser iniciado. Precondicoes nao atendidas.[/red]")
-        console.print(f"\nExecute 'omnis oauth readiness' para ver os bloqueios.")
+        console.print(f"\nExecute 'omnis oauth validate' para ver o que falta.")
         console.print(f"\n{report.next_action}")
         raise typer.Exit(1)
 
     if report.overall_status == OAuthReadinessStatus.HUMAN_REQUIRED:
         console.print(Panel(
             "[yellow]OAuth requer acao humana[/yellow]\n\n"
-            "Lucas precisa preencher META_APP_ID e META_APP_SECRET no arquivo:\n"
+            "Variaveis obrigatorias precisam ser preenchidas no arquivo:\n"
             "  ~/publisher-os/.env\n\n"
-            "Depois de preenchido, execute novamente:\n"
+            "Use 'omnis oauth probe' para ver quais estao vazias.\n"
+            "Depois de preenchido:\n"
             "  omnis oauth readiness\n"
             "  omnis oauth start",
             title="HUMAN REQUIRED"
         ))
         console.print(f"\n[bold]Status:[/bold] {report.overall_status}")
-        console.print(f"[bold]Próximo:[/bold] Preencher .env com credenciais Meta reais quando Lucas acordar.")
+        console.print(f"[bold]Próximo:[/bold] Preencher .env com credenciais Meta reais.")
         raise typer.Exit(1)
 
     console.print(Panel(
-        "[yellow]OAuth pronto para iniciar — fluxo real bloqueado por segurança[/yellow]\n\n"
-        "Este comando nunca executa OAuth real durante a Night Shift.\n"
+        "[yellow]OAuth pronto para iniciar — fluxo real bloqueado por seguranca[/yellow]\n\n"
+        "Este comando nunca executa OAuth real sem autorizacao.\n"
         "Quando Lucas autorizar, o fluxo sera:\n"
-        "  1. Carregar META_APP_ID/SECRET do .env\n"
+        "  1. Carregar credenciais do .env\n"
         "  2. Gerar URL de autorizacao Meta\n"
         "  3. Lucas autoriza no navegador\n"
         "  4. Callback captura o code\n"
@@ -154,4 +262,4 @@ def oauth_start() -> None:
         "  6. Armazenar token no cofre seguro",
         title="READY (bloqueio de seguranca ativo)"
     ))
-    console.print(f"\nStatus: [yellow]human_required[/yellow] — aguardando Lucas acordado.")
+    console.print(f"\n[bold]Status:[/bold] [yellow]human_required[/yellow] — aguardando Lucas acordado para OAuth real.")

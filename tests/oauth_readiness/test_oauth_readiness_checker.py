@@ -1,4 +1,4 @@
-"""Tests para OAuth Readiness Checker — P1.2a."""
+"""Tests para OAuth Readiness Checker — P1.4."""
 from __future__ import annotations
 
 import pytest
@@ -12,30 +12,39 @@ class TestOAuthReadinessChecker:
         checker = OAuthReadinessChecker()
         report = checker.check_all()
         assert isinstance(report, OAuthReadinessReport)
-        assert report.total_checks == 12
-        assert len(report.checks) == 12
+        assert report.total_checks > 0
+        assert report.total_checks == len(report.checks)
 
-    def test_checker_all_checks_have_ids(self):
+    def test_checker_infra_checks_exist(self):
         checker = OAuthReadinessChecker()
         report = checker.check_all()
         ids = {c.check_id for c in report.checks}
-        assert "docker_running" in ids
-        assert "publisher_os_healthy" in ids
-        assert "supabase_db_accessible" in ids
-        assert "redis_accessible" in ids
-        assert "disk_space" in ids
-        assert "meta_app_id_exists" in ids
-        assert "meta_app_secret_exists" in ids
-        assert "meta_app_id_configured" in ids
-        assert "meta_app_secret_configured" in ids
-        assert "meta_callback_url_documented" in ids
-        assert "instagram_accounts_registered" in ids
-        assert "network_outbound" in ids
+        infra_ids = {
+            "docker_running", "publisher_os_healthy",
+            "supabase_db_accessible", "redis_accessible", "disk_space",
+            "callback_route_exists", "instagram_accounts_registered", "network_outbound",
+        }
+        assert infra_ids.issubset(ids), f"Faltam checks de infra: {infra_ids - ids}"
+
+    def test_checker_env_var_checks_exist(self):
+        checker = OAuthReadinessChecker()
+        report = checker.check_all()
+        ids = {c.check_id for c in report.checks}
+        expected_env = {
+            "env_meta_app_id",
+            "env_meta_app_secret",
+            "env_meta_redirect_uri",
+            "env_meta_graph_version",
+            "env_instagram_business_account_id",
+            "env_facebook_page_id",
+            "env_meta_access_token",
+        }
+        assert expected_env.issubset(ids), f"Faltam checks de env vars: {expected_env - ids}"
 
     def test_checker_produces_aggregated_counts(self):
         checker = OAuthReadinessChecker()
         report = checker.check_all()
-        assert report.passed + report.failed == 12
+        assert report.passed + report.failed == report.total_checks
         assert report.passed >= 0
         assert report.failed >= 0
         assert report.blocked_by_required >= 0
@@ -77,21 +86,12 @@ class TestOAuthReadinessChecker:
         check = _check_docker_running()
         assert isinstance(check.passed, bool), f"passed deve ser bool, recebeu {type(check.passed)}: {check.passed!r}"
 
-    def test_checker_no_env_read(self, monkeypatch):
-        """Garante que o checker nao tenta ler .env real."""
-        call_count = 0
-        original_open = open
-
-        def _tracked_open(*args, **kwargs):
-            nonlocal call_count
-            path = args[0] if args else ""
-            if ".env" in str(path) and ".env.example" not in str(path):
-                call_count += 1
-            return original_open(*args, **kwargs)
-
-        monkeypatch.setattr("builtins.open", _tracked_open)
+    def test_env_probe_never_leaks_values(self):
+        """Garante que checks de env vars nunca contem valores reais no output."""
         checker = OAuthReadinessChecker()
-        checker.check_all()
-        # O checker so deve abrir .env.example, nunca .env
-        # (pode abrir .env.example para checks de documentacao)
-        assert call_count == 0, f"Checker abriu .env {call_count}x — nao deveria ler .env"
+        report = checker.check_all()
+        for c in report.checks:
+            if c.check_id.startswith("env_"):
+                # Detail nao deve conter nada parecido com segredo
+                assert "sk_" not in c.detail.lower()
+                assert c.detail != ""

@@ -60,9 +60,11 @@ class OAuthReadinessChecker:
 
         # Determine next_action
         if has_human_gates:
+            human_labels = [r.label for r in human_required]
             next_action = (
-                "Lucas precisa preencher META_APP_ID e META_APP_SECRET no .env. "
-                "Depois rodar: omnis oauth start"
+                f"Lucas precisa preencher {len(human_required)} variavel(is) no .env: "
+                f"{', '.join(human_labels)}. "
+                f"Depois rodar: omnis oauth readiness"
             )
         elif blocked_by_required > 0:
             failed_ids = [r.check_id for r in required_failed]
@@ -74,6 +76,7 @@ class OAuthReadinessChecker:
 
         return OAuthReadinessReport(
             overall_status=overall,
+            total_checks=len(results),
             passed=passed,
             failed=failed,
             blocked_by_required=blocked_by_required,
