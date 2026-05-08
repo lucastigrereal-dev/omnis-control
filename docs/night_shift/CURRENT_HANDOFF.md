@@ -1,81 +1,70 @@
-# OMNIS — CURRENT HANDOFF NIGHT SHIFT
+# CURRENT HANDOFF — P1.5 → P1.6
 
-## 1. Estado atual
-- Data/hora: 2026-05-08 01:08 UTC (22:08 UTC-3)
-- Branch: master
-- Último commit: fa7bdbd feat(tools): add read-only healthchecks
-- Working tree: clean (apenas docs/night_shift/ novo)
-- Testes atuais: 641 passed, 1 skipped
-- Fase atual: Gate 0 concluído
-- Status: iniciando Fase 1
+**Data:** 2026-05-08 | **Turno:** Diurno | **Operador:** Lucas
 
-## 2. O que já foi feito nesta sessão
-- [x] Gate 0 — Estado inicial verificado
-- [x] Fase 1 — Consolidação P1.1b
-- [x] Fase 2 — OAuth Readiness (commit 603f040)
-- [x] Fase 3 — First Post Preflight (commit 73461fe)
-- [x] Fase 4 — Auditoria final
+---
 
-## 3. Commits criados nesta sessão
-| Commit | Mensagem | Conteúdo |
-|---|---|---|
-| a3578a9 | docs(tools): consolidate publisher recovery state (P1.1b) | Docs recovery + state + handoff |
-| 603f040 | feat(oauth): add meta oauth readiness gate (12 checks, 24 tests) | src/oauth_readiness/ + CLI + tests |
-| 73461fe | feat(post): add first post preflight gate (8 checks, 25 tests) | src/first_post/ + CLI + tests |
+## O que P1.5 entregou
 
-## 4. Arquivos criados/alterados
-| Arquivo | Status | Observação |
-|---|---|---|
-| docs/night_shift/ | criado | Pasta night shift |
-| tests/tool_registry/test_tool_health_cli.py | alterado | Fix test_health_report_empty isolamento |
-| docs/night_shift/NIGHT_SHIFT_2026_05_07_START.md | criado | Relatório inicial |
-| docs/night_shift/CURRENT_HANDOFF.md | criado | Este arquivo |
+1. **Callback OAuth fixado** — rota `GET /api/v1/argos/oauth/callback` no Publisher OS saiu de 404 → 200 com JSON seguro em 3 cenarios (sem code, com code, com erro)
+2. **OMNIS readiness atualizada** — detecta callback HTTP 200 vs 404, 10/15 checks passam
+3. **Config alignment documentado** — fonte canonica `~/publisher-os/.env`, aliases mapeados, regras claras
+4. **Asset Gate documentado** — candidato 0b79aa1c em @lucastigrereal (690K, alto risco), sem asset, NO-GO
+5. **8 novos docs** — audit, config, checklist, asset gate, go/no-go, final report, state snapshot, handoff
 
-## 5. Testes rodados
-| Comando | Resultado |
-|---|---|
-| python -m pytest tests/ -q | 641 passed, 1 skipped |
+---
 
-## 6. Decisões tomadas
-- Decisão: Corrigir test_health_report_empty com isolamento tmp_path
-- Motivo: Registry populado por tools discover anterior quebrava o teste
-- Impacto: Mínimo — 3 linhas adicionadas ao teste
+## O que NAO foi feito (por design)
 
-## 7. Bloqueios encontrados
-| Bloqueio | Gravidade | Ação recomendada |
-|---|---|---|
-| Nenhum até agora | - | - |
+- NENHUM push para remote
+- NENHUM OAuth real
+- NENHUM token exchange
+- NENHUMA chamada a API Meta
+- NENHUM post real
+- NENHUMA alteracao de .env
 
-## 8. Próxima ação exata
+---
 
-Consolidar P1.1b — criar docs finais de recovery e estado OMNIS:
+## Estado dos Repos
 
-```bash
-cd ~/omnis-control
-# Criar docs/tools/P1_1B_RECOVERY_PUBLISHER_OS_FINAL.md
-# Criar docs/state/OMNIS_STATE_AFTER_P1_1B.md
-# Rodar health-all, metrics today
-# Commit de consolidação
-```
+| Repo | Branch | Commit | Push? |
+|---|---|---|---|
+| omnis-control | master | `46854f6` | NAO |
+| publisher-os | argos-evolucao-passo-0 | `cf4b8d7` | NAO |
 
-## 9. O que NÃO foi feito
+---
 
-* OAuth real
-* Chamada Meta
-* Publicação real
-* Leitura de .env
-* Docker prune
-* Volume prune
-* LangGraph
-* API externa sensível
-* Push
+## Para retomar (P1.6)
 
-## 10. Como continuar se o contexto acabar
+Lucas precisa fazer MANUALMENTE antes de chamar o Claude:
+
+1. Pegar `META_APP_SECRET` em https://developers.facebook.com/apps/1434393165369254
+2. Editar `C:\Users\lucas\publisher-os\.env`:
+   - `META_APP_SECRET=<valor real>`
+   - `META_GRAPH_VERSION=v20.0`
+   - Renomear `INSTAGRAM_BUSINESS_ID` → `INSTAGRAM_BUSINESS_ACCOUNT_ID` + preencher
+3. Rodar `python jarvis.py oauth probe` e confirmar PRESENT
+
+So depois o Claude entra para validar e iniciar OAuth real.
+
+---
+
+## Comandos Uteis
 
 ```bash
-cd ~/omnis-control
-cat docs/night_shift/CURRENT_HANDOFF.md
-git status --short
-git log --oneline -8
-python -m pytest tests/ -q
+# Validacao pos-setup
+python jarvis.py oauth probe
+python jarvis.py oauth validate
+
+# Se tudo PRESENT, iniciar OAuth
+python jarvis.py oauth start
+
+# Status do pipeline
+python jarvis.py post preflight
+python jarvis.py tools health-report
+python jarvis.py metrics today
 ```
+
+---
+
+**Handoff limpo. Proxima parada: P1.6 quando Lucas destravar as credenciais.**
