@@ -16,13 +16,14 @@
 | Fase 3 | P1.3a First Post Preflight (8 checks) | done |
 | Fase 4 | Auditoria final | done |
 
-## Commits criados (3)
+## Commits criados (4)
 
 | Commit | Mensagem |
 |---|---|
 | a3578a9 | docs(tools): consolidate publisher recovery state (P1.1b) |
 | 603f040 | feat(oauth): add meta oauth readiness gate (12 checks, 24 tests) |
 | 73461fe | feat(post): add first post preflight gate (8 checks, 25 tests) |
+| bd9e7d5 | docs(night-shift): final audit report — 3 commits, 49 new tests, 690 total |
 
 ## Estado final
 

@@ -68,14 +68,30 @@ def post_preflight(
         table.add_row(c.label, _check_icon(c.passed), req, c.detail[:60])
     console.print(table)
 
-    if report.blocked > 0:
-        blocked_checks = [c for c in report.checks if not c.passed and c.required]
-        console.print(f"\n[bold red]{report.blocked} bloqueio(s):[/bold red]")
-        for c in blocked_checks:
-            console.print(f"  [red]x[/red] {c.label}: {c.recommendation}")
+    # Diagnostico
+    console.print(f"\n[bold]Diagnostico:[/bold]")
 
-    console.print(f"\n[bold]Próximo passo:[/bold] {report.next_action}")
-    console.print(f"\n[bold]Itens prontos para publicar:[/bold] {report.ready_items}")
+    failed_required = [c for c in report.checks if not c.passed and c.required]
+    failed_optional = [c for c in report.checks if not c.passed and not c.required]
+
+    if failed_required:
+        console.print(f"  [red]Bloqueios ({len(failed_required)}):[/red]")
+        for c in failed_required:
+            console.print(f"    - {c.label}: {c.recommendation}")
+
+    if failed_optional:
+        console.print(f"  [yellow]Avisos ({len(failed_optional)}):[/yellow]")
+        for c in failed_optional:
+            console.print(f"    - {c.label}: {c.recommendation}")
+
+    if report.ready_items > 0:
+        console.print(f"  [green]{report.ready_items} item(ns) pronto(s) para revisao humana[/green]")
+
+    if not failed_required and not failed_optional:
+        console.print(f"  [green]Todos os checks passaram[/green]")
+
+    console.print(f"\n[bold]Proximo passo:[/bold] {report.next_action}")
+    console.print(f"[bold]Itens prontos para publicar:[/bold] {report.ready_items}")
 
     if report.ready_items > 0:
         console.print(f"\n[dim]Use 'omnis post package' para ver detalhes do conteudo.[/dim]")

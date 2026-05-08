@@ -22,7 +22,7 @@ def _check_docker_running() -> OAuthReadinessCheck:
             ["docker", "info", "--format", "{{.ServerVersion}}"],
             capture_output=True, text=True, timeout=10,
         )
-        passed = result.returncode == 0 and result.stdout.strip()
+        passed = result.returncode == 0 and bool(result.stdout.strip())
         return OAuthReadinessCheck(
             check_id="docker_running",
             label="Docker daemon acessivel",

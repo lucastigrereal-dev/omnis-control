@@ -70,7 +70,7 @@ class FirstPostPreflight:
             from src.content_queue import Queue as CQQueue
             queue = CQQueue()
             items = queue.list_all()
-            scheduled = [i for i in items if i.status in ("approved", "scheduled")]
+            scheduled = [i for i in items if i.status in ("approved", "scheduled", "caption_ready")]
             passed = len(scheduled) > 0
             return PreflightCheck(
                 check_id="queue_items",

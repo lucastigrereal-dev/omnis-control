@@ -67,6 +67,16 @@ class TestOAuthReadinessChecker:
             assert isinstance(c.passed, bool)
             assert isinstance(c.required, bool)
 
+    def test_checker_docker_running_returns_bool(self):
+        """Garante que _check_docker_running sempre retorna bool em passed.
+
+        Bug P1.3b: result.returncode == 0 and result.stdout.strip()
+        retornava a string '29.2.1' em vez de True.
+        """
+        from src.oauth_readiness.checklist import _check_docker_running
+        check = _check_docker_running()
+        assert isinstance(check.passed, bool), f"passed deve ser bool, recebeu {type(check.passed)}: {check.passed!r}"
+
     def test_checker_no_env_read(self, monkeypatch):
         """Garante que o checker nao tenta ler .env real."""
         call_count = 0
