@@ -1,97 +1,99 @@
-# CURRENT HANDOFF — P1.9 completo
+# CURRENT HANDOFF — P2.4 completo
 
 **Data:** 2026-05-09 | **Operador:** Lucas
 
 ---
 
-## Decisao estrategica ativa
+## Bloco P2.0-P2.4 entregue
 
-**OAuth congelado. Fabrica offline e prioridade.**
+5 fases. 5 commits separados. 328/328 testes.
 
-Ver: `docs/decisions/DECISAO_OAUTH_CONGELADO_FABRICA_PRIMEIRO.md`
-
-Condicao para voltar ao OAuth:
-- 5 pacotes offline uteis/validados com status READY; OU
-- Decisao humana explicita de Lucas.
-
----
-
-## O que P1.9 entregou
-
-1. **Asset Assignment Center** — `src/asset_assignment/` (3 modulos)
-2. **`assets` CLI** — `assignment-status`, `add-mock`, `ready-candidates`
-3. **`_load_asset()` funcional** — bug AssetRegistry->Registry corrigido
-4. **Carousel READY** — pipeline completo com asset mock
-5. **140/140 testes** — 117 offline_factory + 23 asset_assignment
+| Fase | Commit | Descricao |
+|---|---|---|
+| P2.0 | 1726209 | Render Engine HTML Preview |
+| P2.1 | 281cd46 | Visual Quality Layer (score 0-100) |
+| P2.2 | a8c87e2 | Campaign Package 10 Posts |
+| P2.3 | 01c2ce6 | Manual Publishing Tracker |
+| P2.4 | af858e0 | Client Delivery ZIP |
 
 ---
 
-## Pipeline validado (smoke executado)
+## Pipeline completo
 
-```bash
-python jarvis.py assets add-mock natal_reel_01.mp4 --queue-id 0b79aa1c --format carousel
-# -> asset_id: mock_80c3b530, atribuido ao slot
-
-python jarvis.py offline package-carousel 0b79aa1c
-# -> status: READY
-
-python jarvis.py offline validate <pkg_id>
-# -> score: 100/100
-
-python jarvis.py offline zip <pkg_id>
-# -> 3KB zip
+```
+assets add-mock -> assign -> offline package-carousel -> READY
+render package  -> HTML preview
+quality package -> score 90+/100
+offline zip     -> ZIP pacote
+campaign create -> 10 posts
+campaign zip    -> ZIP campanha
+manual-publish mark -> registro humano
+delivery create -> entrega comercial
+delivery zip    -> ZIP cliente
 ```
 
 ---
 
-## Comandos disponiveis (P1.7 + P1.8 + P1.9)
+## Todos os comandos
 
 ```bash
 # Assets
-python jarvis.py assets assignment-status <queue_id>
+python jarvis.py assets assignment-status <id>
 python jarvis.py assets add-mock <nome> --queue-id <id> --format carousel
 python jarvis.py assets ready-candidates
 
 # Offline
-python jarvis.py offline package-carousel <queue_id>
-python jarvis.py offline package-carousel <queue_id> --slides 7
-python jarvis.py offline package-reels <queue_id>
-python jarvis.py offline package-post <queue_id>
+python jarvis.py offline package-carousel <id>
+python jarvis.py offline package-reels <id>
+python jarvis.py offline package-post <id>
 python jarvis.py offline list
-python jarvis.py offline show <package_id_prefix>
-python jarvis.py offline validate <package_id_prefix>
-python jarvis.py offline zip <package_id_prefix>
+python jarvis.py offline validate <pkg_id>
+python jarvis.py offline zip <pkg_id>
+
+# Render
+python jarvis.py render package <pkg_id>
+python jarvis.py render list
+
+# Quality
+python jarvis.py quality package <pkg_id>
+python jarvis.py quality package <pkg_id> --json
+
+# Campaign
+python jarvis.py campaign create --name "Natal" --count 10
+python jarvis.py campaign list
+python jarvis.py campaign validate <id>
+python jarvis.py campaign zip <id>
+
+# Manual Publish
+python jarvis.py manual-publish mark <pkg_id> --url "https://..."
+python jarvis.py manual-publish list
+
+# Delivery
+python jarvis.py delivery create --from-package <pkg_id>
+python jarvis.py delivery create --from-campaign <campaign_id>
+python jarvis.py delivery zip <delivery_id>
 ```
 
 ---
 
-## Estado local
+## OAuth
 
-| Dado | Quantidade |
-|---|---|
-| Itens na fila | 42 |
-| Captions aprovadas | 1 (1d482d82 / 0b79aa1c) |
-| Assets no registry | 1 (mock_80c3b530) |
-| Testes passando | 140/140 |
+CONGELADO. Precisam: 5 READY validados (atual: 1) ou override de Lucas.
 
 ---
 
-## Bloqueios ativos
+## Testes
 
-- **OAuth Meta** — congelado por decisao estrategica
-- **Post real** — bloqueado ate OAuth + revisao humana
-
----
-
-## Proximas fases possiveis
-
-| Fase | Descricao |
-|---|---|
-| P2.0 | Render Engine HTML/PNG |
-| P2.1 | Video Edit Plan + FFmpeg |
-| P2.2 | Campaign Package 10 Posts |
-| P1.6 | Manual OAuth Gate (CONGELADO) |
+```
+328/328 PASS
+```
 
 ---
 
-**P1.9 entregue. Fabrica offline madura. Proximo: Lucas decide.**
+## Proxima fase
+
+Lucas decide: P2.5 (video plan), P2.6 (dashboard CLI), ou retomar P1.6 (OAuth).
+
+---
+
+**P2.0-P2.4 entregues. Fabrica offline madura. Proxima decisao: Lucas.**
