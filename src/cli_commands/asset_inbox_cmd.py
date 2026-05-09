@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Optional
 
 import typer
 from rich.console import Console
@@ -171,6 +172,63 @@ def cmd_show(
     console.print(f"  fp_match   : {asset.fingerprint_match}")
     console.print(f"  status     : {asset.status}")
     console.print(f"  importado  : {asset.created_at}")
+
+
+@asset_inbox_app.command(name="assign")
+def cmd_assign(
+    asset_id: str = typer.Argument(..., help="ID do asset importado (ai_...)"),
+    queue_id: Optional[str] = typer.Option(None, "--queue", help="ID do slot na content queue"),
+    mission_id: Optional[str] = typer.Option(None, "--mission", help="ID da mission package"),
+    force: bool = typer.Option(False, "--force", help="Substituir assign existente na queue"),
+    json_out: bool = typer.Option(False, "--json", help="Saida em JSON"),
+) -> None:
+    """Atribui asset importado a um slot da queue ou mission package."""
+    from src.asset_inbox import assignment as asgn_mod
+
+    if queue_id is None and mission_id is None:
+        console.print("[red]Erro: use --queue <queue_id> ou --mission <mission_id>[/red]")
+        raise typer.Exit(1)
+
+    if queue_id is not None and mission_id is not None:
+        console.print("[red]Erro: use --queue OU --mission, nao ambos simultaneamente[/red]")
+        raise typer.Exit(1)
+
+    if queue_id is not None:
+        result = asgn_mod.assign_to_queue(
+            asset_id=asset_id,
+            queue_id=queue_id,
+            force=force,
+            inbox_registry_path=asgn_mod.DEFAULT_INBOX_REGISTRY_PATH,
+            video_assets_path=asgn_mod.DEFAULT_VIDEO_ASSETS_PATH,
+            queue_path=asgn_mod.DEFAULT_QUEUE_PATH,
+        )
+    else:
+        result = asgn_mod.assign_to_mission(
+            asset_id=asset_id,
+            mission_id=mission_id,
+            inbox_registry_path=asgn_mod.DEFAULT_INBOX_REGISTRY_PATH,
+            packages_root=asgn_mod.DEFAULT_PACKAGES_ROOT,
+        )
+
+    if json_out:
+        console.print_json(json.dumps(result.to_dict(), ensure_ascii=False))
+        if result.blockers:
+            raise typer.Exit(1)
+        return
+
+    status_color = "green" if result.status == "assigned" else "red"
+    console.print(Panel("[bold]Asset Assign[/bold]", expand=False))
+    console.print(f"  Status     : [{status_color}]{result.status}[/{status_color}]")
+    console.print(f"  asset_id   : {result.asset_id}")
+    console.print(f"  target     : {result.target_type}/{result.target_id}")
+    if result.warnings:
+        for w in result.warnings:
+            console.print(f"  [yellow]WARNING: {w}[/yellow]")
+    if result.blockers:
+        for b in result.blockers:
+            console.print(f"  [red]BLOCKER: {b}[/red]")
+        raise typer.Exit(1)
+    console.print(f"\n  [dim]Proximo passo: B8D E2E Smoke Mission[/dim]")
 
 
 def _fmt_bytes(n: int) -> str:
