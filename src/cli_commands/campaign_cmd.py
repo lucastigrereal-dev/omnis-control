@@ -95,3 +95,81 @@ def cmd_campaign_zip(
         raise typer.Exit(1)
     console.print(f"[green]ZIP criado[/green] — {result['zip_path']}")
     console.print(f"  Tamanho: {result['size_kb']}KB")
+
+
+def _grade_style(grade: str) -> str:
+    return {"ready": "green", "needs_adjustment": "yellow", "blocked": "red", "unscored": "dim"}.get(grade, "")
+
+
+@campaign_app.command("audit")
+def cmd_campaign_audit(
+    campaign_id: str = typer.Argument(..., help="ID (ou prefixo) da campanha"),
+    json_out: bool = typer.Option(False, "--json", help="Saida em JSON"),
+) -> None:
+    """Audita qualidade dos pacotes de uma campanha."""
+    from src.campaign_auditor.service import audit_campaign, CampaignNotFoundError as AuditNotFound
+
+    try:
+        result = audit_campaign(campaign_id)
+    except AuditNotFound as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(1)
+
+    if json_out:
+        console.print_json(json.dumps(result.to_dict(), ensure_ascii=False))
+        return
+
+    grade = result.overall_grade()
+    style = _grade_style(grade)
+    avg_str = f"{result.avg_score}/100" if result.avg_score is not None else "N/A"
+    console.print(f"[bold]Campanha:[/bold] {result.campaign_id} — {result.campaign_name}")
+    console.print(f"  Conta   : @{result.account_handle}")
+    console.print(f"  Score   : [{style}]{avg_str} ({grade})[/{style}]")
+    console.print(f"  Posts   : {result.scored_posts} scored / {result.unscored_posts} sem pacote")
+    console.print(f"  Ready   : {result.ready_count} | Ajuste: {result.needs_adjustment_count} | Bloqueado: {result.blocked_count}")
+
+    if result.errors:
+        for e in result.errors:
+            console.print(f"  [red]{e}[/red]")
+
+
+@campaign_app.command("audit-all")
+def cmd_campaign_audit_all(
+    json_out: bool = typer.Option(False, "--json", help="Saida em JSON"),
+) -> None:
+    """Audita qualidade de todas as campanhas."""
+    from src.campaign_auditor.service import audit_all_campaigns
+
+    results = audit_all_campaigns()
+
+    if json_out:
+        console.print_json(json.dumps([r.to_dict() for r in results], ensure_ascii=False))
+        return
+
+    if not results:
+        console.print("[yellow]Nenhuma campanha encontrada.[/yellow]")
+        return
+
+    table = Table(title=f"Auditoria de Campanhas ({len(results)})")
+    table.add_column("ID", style="cyan")
+    table.add_column("Nome")
+    table.add_column("Conta")
+    table.add_column("Score Medio", justify="right")
+    table.add_column("Pronto", justify="right")
+    table.add_column("Bloqueado", justify="right")
+    table.add_column("Grade")
+
+    for r in results:
+        grade = r.overall_grade()
+        style = _grade_style(grade)
+        avg = f"{r.avg_score:.0f}" if r.avg_score is not None else "N/A"
+        table.add_row(
+            r.campaign_id[:14],
+            r.campaign_name[:20],
+            f"@{r.account_handle}",
+            avg,
+            str(r.ready_count),
+            str(r.blocked_count),
+            f"[{style}]{grade}[/{style}]" if style else grade,
+        )
+    console.print(table)
