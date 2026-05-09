@@ -1,9 +1,9 @@
-# OMNIS State — Atual (P6.0 aguardando)
+# OMNIS State — Atual (P6 completo)
 
 **Data:** 2026-05-09
 **Branch:** master
-**Fase concluida:** P5 Integration Wire — 0dc09ca
-**Testes:** 1375 passed, 4 skipped
+**Fase concluida:** P6 Capability Forge Lite — d41d1ce
+**Testes:** 1628 passed, 4 skipped, 0 failures
 
 ---
 
