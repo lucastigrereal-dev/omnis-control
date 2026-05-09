@@ -1,72 +1,72 @@
-# OMNIS Próximo Roadmap — P5+
+# OMNIS Próximo Roadmap — P8+
 
-**Data:** 2026-05-09 | **Base:** P4 completo, ~1513 testes
+**Data:** 2026-05-09 | **Base:** P7 completo, ~1,341 testes
 
-> P4.0–P4.4 ENTREGUES: Mission Orchestrator, Sector Registry, Skill Matcher, Capability Gap Detector, Approval Center Local.
-> Roadmap abaixo reflete P5+.
-
-## P4.0 — Mission Status Dashboard
-
-**Objetivo:** Visão unificada do estado de todas as missões ativas.
-
-- CLI: `mission dashboard` — lista missões com status, asset, report
-- Combina: mission_packages/ + asset_inbox_registry.jsonl + mission_reports.jsonl
-- Output: tabela Rich com colunas: mission_id | intent | account | asset_assigned | outcome
-- Testes: 15 mínimo
-- **Sem LangGraph. Sem CrewAI. Sem rede.**
-
-## P4.1 — Asset Inbox → Queue Bridge
-
-**Objetivo:** Fluxo direto de asset importado para queue slot com verificação de formato.
-
-- CLI: `asset-inbox assign <id> --queue <queue_id>` já existe
-- Adicionar: validação de formato (jpg/png → image, mp4/mov → video) ao criar VideoAsset
-- Adicionar: `asset-inbox bridge --date <YYYY-MM-DD>` — atribui asset a slot livre do dia
-- Testes: 12 mínimo
-
-## P4.2 — Mission Package Validator
-
-**Objetivo:** Validate completude e qualidade de um mission package.
-
-- CLI: `mission validate <mission_id>` — score 0–100
-- Checks: arquivos obrigatórios, asset_reference.json, manifest campos, sem placeholders
-- Output JSON com score + blockers + warnings
-- Testes: 15 mínimo
-
-## P4.3 — Delivery Zip Builder
-
-**Objetivo:** Criar zip de entrega de mission package pronto para compartilhar.
-
-- CLI: `mission zip <mission_id>` → `exports/zips/<mission_id>.zip`
-- Inclui: todos os arquivos do pacote exceto artefatos de teste
-- Gitignored: `exports/zips/`
-- Testes: 10 mínimo
-
-## P4.4 — Mission Summary HTML Render
-
-**Objetivo:** Render HTML legível do mission brief para revisão offline.
-
-- CLI: `mission render <mission_id>` → `exports/renders/<mission_id>.html`
-- Template minimalista, sem JS externo, sem CDN
-- Inclui: brief + plano + asset info + checklist
-- Gitignored: `exports/renders/`
-- Testes: 10 mínimo
-
-## P4.5 — Multi-Mission Batch Runner
-
-**Objetivo:** Criar múltiplas missões em batch a partir de CSV.
-
-- CLI: `mission batch <csv_path>` — colunas: request_text, account_handle, objective
-- Relatório de batch: quantas criadas, erros, IDs
-- Testes: 12 mínimo
-- **Sem LangGraph. Sem CrewAI. Sem rede.**
+> P7 ENTREGUE: Role Registry, Squad Composer Lite, Task Decomposition, Squad Execution Plan, Squad E2E Flow.
+> Roadmap abaixo reflete P8+.
 
 ---
 
-## Não Implementar Nesta Fase
+## P8.0 — Execution Graph Lite
+
+**Objetivo:** DAG de tarefas com estados (pending → running → done → failed), sem agentes reais.
+
+- Model: ExecutionGraph, StepNode, StepStatus
+- Topological sort com paralelismo simulado
+- CLI: `graph plan "<request>"` — gera DAG visual
+- Testes: 15 minimo
+- **Sem agentes reais. SemLangGraph. Sem CrewAI.**
+
+---
+
+## P8.1 — Step Runner Dry-Run
+
+**Objetivo:** Simular execucao de cada step do DAG, registrando timestamps e status fake.
+
+- Model: StepRun, StepRunLog
+- Runner deterministico por role
+- CLI: `graph run "<request>" --dry-run`
+- Testes: 15 minimo
+
+---
+
+## P8.2 — Replay / Resume Squad Run
+
+**Objetivo:** Retomar squad run interrompido, pulando steps ja concluidos.
+
+- Model: SquadRunResumePoint
+- Store: JSONL com estado de cada step
+- CLI: `squad-run resume <run_id>`
+- Testes: 12 minimo
+
+---
+
+## P8.3 — Approval-Integrated Squad Run
+
+**Objetivo:** Conectar approval_center ao squad_run — so executa steps apos aprovacao.
+
+- Bridge: approval_center ↔ squad_execution
+- CLI: `squad-run request-approval <run_id>` + `squad-run approve <run_id>`
+- Testes: 12 minimo
+
+---
+
+## P8.4 — E2E Mission → Squad → Package
+
+**Objetivo:** Fluxo completo: mission builder → squad composer → task plan → execution → package delivery.
+
+- E2E test integrando P3 (missions) + P7 (squads) + P2 (packages)
+- Testes: 10 minimo
+
+---
+
+## Nao Implementar Nesta Fase
 
 - LangGraph
 - CrewAI
+- OpenHands
 - Meta API / Instagram
 - OAuth
 - Qualquer chamada de rede
+- Agentes reais
+- Execucao real de tarefas
