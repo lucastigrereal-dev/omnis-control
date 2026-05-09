@@ -9,6 +9,7 @@ from src.mission_orchestrator.models import OrchestratorRun, _now_iso
 from src.mission_orchestrator.planner import build_plan
 from src.mission_orchestrator.executor import execute
 from src.mission_orchestrator.errors import RunNotFoundError
+from src.mission_orchestrator.execution_manifest import write_manifest
 
 BASE = Path(__file__).resolve().parent.parent.parent
 DEFAULT_RUNS_ROOT = BASE / "exports" / "orchestrator_runs"
@@ -55,6 +56,33 @@ def run(
         config_path=config_path,
     )
     orch_run = execute(orch_run, packages_root=packages_root)
+    _persist(orch_run, runs_root, runs_log)
+    return orch_run
+
+
+def run_with_approval(
+    request_text: str,
+    account_handle: str = "",
+    objective: str = "engajamento",
+    dry_run: bool = True,
+    allow_unknown: bool = False,
+    approval_id: Optional[str] = None,
+    runs_root: Path = DEFAULT_RUNS_ROOT,
+    runs_log: Path = DEFAULT_RUNS_LOG,
+    packages_root: Optional[Path] = None,
+    approvals_log: Optional[Path] = None,
+) -> OrchestratorRun:
+    """Plan + execute with approval gate enforcement. Returns OrchestratorRun."""
+    orch_run = build_plan(
+        request_text=request_text,
+        account_handle=account_handle,
+        objective=objective,
+        dry_run=dry_run,
+        allow_unknown=allow_unknown,
+    )
+    if approval_id is not None:
+        orch_run.approval_id = approval_id
+    orch_run = execute(orch_run, packages_root=packages_root, approvals_log=approvals_log)
     _persist(orch_run, runs_root, runs_log)
     return orch_run
 
@@ -116,6 +144,7 @@ def _persist(
     _write(run_dir / "03_execution_log.md", _build_exec_log_md(orch_run))
     _write(run_dir / "04_outputs.md", _build_outputs_md(orch_run))
     _write(run_dir / "05_next_action.md", _build_next_action_md(orch_run))
+    write_manifest(orch_run, run_dir)
 
     Path(runs_log).parent.mkdir(parents=True, exist_ok=True)
     with Path(runs_log).open("a", encoding="utf-8") as f:
