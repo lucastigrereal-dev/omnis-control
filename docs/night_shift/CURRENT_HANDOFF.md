@@ -1,6 +1,35 @@
-# CURRENT HANDOFF — B8A Read-Only Scanner completo
+# CURRENT HANDOFF — P4 Local Executive Brain completo
 
 **Data:** 2026-05-09 | **Operador:** Lucas
+
+---
+
+## O que foi feito
+
+### P4.3 — Capability Gap Detector (21 testes)
+- `src/capability_gap/` — models, detector, store, errors
+- CLI: `omnis capability-gap detect/list/show`
+- Bugs corrigidos: `store.get()` usava `limit=0` (slice vazio); CLI nao passava `DEFAULT_GAPS_LOG` explicitamente
+
+### P4.4 — Approval Center Local (26 testes)
+- `src/approval_center/` — models, store, service, errors
+- CLI: `omnis approvals-center request/list/show/approve/reject`
+- Maquina de estados: pending → approved | rejected (double-resolve bloqueia)
+- Store: append-only JSONL com deduplicacao por `request_id` (ultimo registro vence)
+
+## Commits pendentes
+
+```
+git add src/capability_gap src/cli_commands/capability_gap_cmd.py tests/capability_gap docs/capability_gap
+git commit -m "feat(capabilities): add local capability gap detector"
+
+git add src/approval_center src/cli_commands/approval_center_cmd.py src/routers/system_router.py tests/approval_center docs/approval_center docs/p4 docs/state/OMNIS_STATE_AFTER_P4_4.md docs/night_shift/CURRENT_HANDOFF.md
+git commit -m "feat(approvals): add local approval center + P4 checkpoint"
+```
+
+## Proximo bloco sugerido
+
+P5: Integration Wire — conectar skill_matcher → approval_center no fluxo de producao
 
 ---
 

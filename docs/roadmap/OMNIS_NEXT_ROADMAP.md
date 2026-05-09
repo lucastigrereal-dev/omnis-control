@@ -1,6 +1,9 @@
-# OMNIS Próximo Roadmap — P4.0–P4.5
+# OMNIS Próximo Roadmap — P5+
 
-**Data:** 2026-05-09 | **Base:** P3 selado, 1375 testes
+**Data:** 2026-05-09 | **Base:** P4 completo, ~1513 testes
+
+> P4.0–P4.4 ENTREGUES: Mission Orchestrator, Sector Registry, Skill Matcher, Capability Gap Detector, Approval Center Local.
+> Roadmap abaixo reflete P5+.
 
 ## P4.0 — Mission Status Dashboard
 
