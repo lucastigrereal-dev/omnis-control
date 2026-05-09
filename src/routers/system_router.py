@@ -24,6 +24,7 @@ def register(app: typer.Typer) -> None:
     from src.cli_commands.mission_builder_cmd import mission_builder_app
     from src.cli_commands.mission_report_cmd import mission_report_app
     from src.cli_commands.mission_orchestrator_cmd import orchestrator_app
+    from src.cli_commands.sectors_registry_cmd import sector_registry_app
 
     app.add_typer(argos_app)
     app.add_typer(creative_app)
@@ -40,3 +41,4 @@ def register(app: typer.Typer) -> None:
     app.add_typer(mission_builder_app)
     app.add_typer(mission_report_app)
     app.add_typer(orchestrator_app)
+    app.add_typer(sector_registry_app)

@@ -1,0 +1,118 @@
+sectors:
+  marketing:
+    name: Marketing Premium
+    keywords:
+      - conteudo
+      - campanha
+      - post
+      - instagram
+      - reels
+      - carrossel
+      - carousel
+      - stories
+      - feed
+      - publicacao
+      - legenda
+    default_outputs:
+      - campaign_package
+      - content_package
+      - delivery_zip
+    risk_level: low
+
+  sales:
+    name: Vendas e CRM
+    keywords:
+      - lead
+      - crm
+      - follow-up
+      - proposta
+      - vendas
+      - closer
+      - hotel
+      - parceria
+      - collab
+      - publi
+    default_outputs:
+      - sales_script
+      - crm_plan
+      - followup_sequence
+    risk_level: medium
+
+  apps:
+    name: App Factory
+    keywords:
+      - app
+      - dashboard
+      - api
+      - sistema
+      - banco de dados
+      - software
+      - saas
+      - plataforma
+    default_outputs:
+      - prd
+      - repo_plan
+      - technical_spec
+    risk_level: high
+
+  operations:
+    name: Operacoes
+    keywords:
+      - processo
+      - sop
+      - checklist
+      - organizacao
+      - rotina
+      - workflow
+      - validacao
+      - auditoria
+    default_outputs:
+      - sop
+      - checklist
+      - runbook
+    risk_level: low
+
+  knowledge:
+    name: Conhecimento
+    keywords:
+      - contexto
+      - knowledge
+      - documento
+      - memoria
+      - akasha
+      - pesquisa
+      - briefing
+    default_outputs:
+      - context_pack
+      - knowledge_pack
+    risk_level: low
+
+  finance:
+    name: Financeiro
+    keywords:
+      - roi
+      - receita
+      - custo
+      - preco
+      - financeiro
+      - faturamento
+      - lucro
+    default_outputs:
+      - financial_report
+      - pricing_plan
+    risk_level: medium
+
+  automation:
+    name: Automacao
+    keywords:
+      - n8n
+      - workflow
+      - integracao
+      - automacao
+      - webhook
+      - cron
+      - script
+    default_outputs:
+      - workflow_plan
+      - automation_spec
+    risk_level: high
