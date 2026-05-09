@@ -19,17 +19,19 @@ def match_capabilities(
     config_path: Optional[Path] = None,
     sector_filter: Optional[str] = None,
     limit: int = 5,
+    include_planned: bool = False,
 ) -> list[SkillMatchResult]:
-    """Return top matching active capabilities for a request text.
+    """Return top matching active (and optionally planned) capabilities for a request text.
 
     Returns up to `limit` results sorted by confidence descending.
     """
     caps = load_capabilities(config_path)
     norm_text = _normalize(text)
     results = []
+    allowed_statuses = {"active", "planned"} if include_planned else {"active"}
 
     for cap in caps:
-        if cap.status != "active":
+        if cap.status not in allowed_statuses:
             continue
         if sector_filter and cap.sector != sector_filter:
             continue
@@ -55,10 +57,13 @@ def match_capabilities(
 def list_capabilities(
     config_path: Optional[Path] = None,
     active_only: bool = True,
+    include_planned: bool = False,
 ) -> list[Capability]:
     caps = load_capabilities(config_path)
-    if active_only:
+    if active_only and not include_planned:
         return [c for c in caps if c.status == "active"]
+    if include_planned:
+        return [c for c in caps if c.status in ("active", "planned")]
     return caps
 
 

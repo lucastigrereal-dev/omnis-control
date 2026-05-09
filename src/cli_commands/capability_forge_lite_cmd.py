@@ -274,3 +274,40 @@ def cmd_mark_rejected(
         raise typer.Exit(1)
 
     console.print(f"[yellow]Proposal {proposal_id} rejeitada.[/yellow]")
+
+
+@capability_forge_lite_app.command(name="register")
+def cmd_register(
+    proposal_id: str = typer.Argument(..., help="ID da proposal aprovada (prop_...)"),
+    json_out: bool = typer.Option(False, "--json"),
+) -> None:
+    """Registra capability aprovada em capabilities.yaml como 'planned'."""
+    import json as _json
+    from src.capability_forge_lite import store as store_mod
+    from src.capability_forge_lite.registrar import register_capability
+    from src.capability_forge_lite.errors import (
+        ProposalNotFoundError,
+        ProposalNotApprovedError,
+        DuplicateCapabilityError,
+    )
+
+    try:
+        cap_id = register_capability(proposal_id, proposals_log=store_mod.DEFAULT_PROPOSALS_LOG)
+    except ProposalNotFoundError as e:
+        console.print(f"[red]Erro: {e}[/red]")
+        raise typer.Exit(1)
+    except ProposalNotApprovedError as e:
+        console.print(f"[red]Erro: {e}[/red]")
+        raise typer.Exit(1)
+    except DuplicateCapabilityError as e:
+        console.print(f"[red]Erro: {e}[/red]")
+        raise typer.Exit(1)
+
+    if json_out:
+        console.print_json(_json.dumps({"capability_id": cap_id, "status": "planned"}, ensure_ascii=False))
+        return
+
+    console.print(Panel("[bold]Capability Registered[/bold]", expand=False))
+    console.print(f"  capability_id : {cap_id}")
+    console.print(f"  status        : [blue]planned[/blue]")
+    console.print(f"  file          : config/capabilities.yaml")
