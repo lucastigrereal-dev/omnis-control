@@ -33,3 +33,4 @@ data/metrics_spine/metrics.jsonl
 data/metrics_spine/runs.jsonl
 config/meta_accounts.yaml
 exports/offline_factory/
+exports/offline_factory_zips/

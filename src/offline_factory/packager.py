@@ -46,14 +46,30 @@ def _load_caption(queue_id: str) -> Optional[dict]:
 
 
 def _load_queue_item(queue_id: str) -> Optional[dict]:
-    """Load queue item data. Returns None if not found."""
+    """Load queue item metadata (date, time, format, account, status). Never raises."""
     try:
-        from src.content_queue.accounts import AccountRegistry
-        registry = AccountRegistry()
-        # Queue data is not directly accessible via accounts module
-        # We read from the CLI output or from data files
-        # For now, return minimal data from captions
+        from src.content_queue.queue import Queue
+        q = Queue()
+        item = q.get(queue_id)
+        if item:
+            return item.to_dict()
+    except Exception:
         pass
+    return None
+
+
+def _load_asset(queue_id: str) -> Optional[dict]:
+    """Load video/image asset assigned to this queue slot. Patchable in tests."""
+    try:
+        from src.content_queue.queue import Queue
+        q = Queue()
+        item = q.get(queue_id)
+        if item and getattr(item, "asset_id", None):
+            from src.video_assets.registry import AssetRegistry
+            reg = AssetRegistry()
+            asset = reg.get(item.asset_id)
+            if asset:
+                return asset.to_dict()
     except Exception:
         pass
     return None
@@ -142,7 +158,13 @@ def _build_publishing_checklist(package_type: PackageType) -> str:
         "[ ] Lucas acordado e autorizando publicacao",
     ]
     specific = []
-    if package_type == PackageType.CAROUSEL:
+    if package_type == PackageType.SINGLE_POST:
+        specific = [
+            "[ ] Imagem/video com qualidade minima 1080px",
+            "[ ] Legenda revisada e sem erros",
+            "[ ] Hashtags no comentario (opcional: 1a resposta)",
+        ]
+    elif package_type == PackageType.CAROUSEL:
         specific = [
             "[ ] Ordem dos slides verificada",
             "[ ] Primeiro slide com hook forte",
@@ -181,6 +203,7 @@ def create_carousel_package(
     package_dir = EXPORT_ROOT / pkg_id
 
     caption_data = _load_caption(queue_id)
+    queue_item = _load_queue_item(queue_id)
 
     warnings: list[str] = []
     blockers: list[str] = []
@@ -196,12 +219,13 @@ def create_carousel_package(
         seo_keywords = caption_data.get("hashtags", [])[:10]
         hashtags = caption_data.get("hashtags", [])
         cta = caption_data.get("cta", "")
-        if account_handle:
-            pass
-        else:
+        if not account_handle:
             account_handle = caption_data.get("account_handle", "")
     else:
         warnings.append("Nenhuma caption aprovada encontrada — pacote parcial")
+        # Fallback: try queue item for account when caption is absent
+        if not account_handle and queue_item:
+            account_handle = queue_item.get("account_handle", "")
         if not account_handle:
             account_handle = "desconhecido"
 
@@ -209,7 +233,8 @@ def create_carousel_package(
         blockers.append("Caption ausente — necessario aprovar legenda antes do pacote")
         next_actions.append("Aprovar legenda: python jarvis.py captions approve <draft_id>")
 
-    has_asset = False  # Always false for now — no assets in system
+    asset_data = _load_asset(queue_id)
+    has_asset = asset_data is not None
 
     if not has_asset:
         warnings.append("Nenhum asset atribuido ao slot — pacote parcial")
@@ -287,6 +312,16 @@ def create_carousel_package(
             readme.append(f"- {a}")
     _safe_write(package_dir / "README.md", "\n".join(readme))
     files.append("README.md")
+
+    # Optional HTML preview (no hard dependency)
+    try:
+        from src.creative_production.html_renderer import render_carousel_preview
+        _safe_write(package_dir / "carousel_preview.html", render_carousel_preview(
+            title=title, caption=caption_text, slides=num_slides,
+        ))
+        files.append("carousel_preview.html")
+    except Exception:
+        pass  # Preview unavailable — not a blocker
 
     # Build package object
     pkg = DeliveryPackage(
@@ -480,6 +515,124 @@ def create_reels_script_package(
         blockers=blockers,
         next_actions=next_actions,
         hashtags=hashtags,
+    )
+
+    manifest_path = generate_manifest(pkg, package_dir)
+    pkg.manifest_path = str(manifest_path)
+    files.append("manifest.json")
+
+    return pkg
+
+
+def create_post_package(
+    queue_id: str,
+    account_handle: str = "",
+) -> DeliveryPackage:
+    """Create a single-post delivery package from a queue item.
+
+    Minimal package: caption, hashtags, cta, checklist, manifest.
+    No slides. No visual brief. No script.
+    NEVER calls external APIs. NEVER publishes.
+    """
+    pkg_id = f"post_{queue_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    package_dir = EXPORT_ROOT / pkg_id
+
+    caption_data = _load_caption(queue_id)
+    queue_item = _load_queue_item(queue_id)
+    asset_data = _load_asset(queue_id)
+    has_asset = asset_data is not None
+
+    warnings: list[str] = []
+    blockers: list[str] = []
+    next_actions: list[str] = []
+    files: list[str] = []
+    hashtags: list[str] = []
+    cta = ""
+    title = f"Post Package — {queue_id}"
+
+    if caption_data:
+        title = f"Post — {caption_data.get('objective', 'conteudo')} — {queue_id[:8]}"
+        hashtags = caption_data.get("hashtags", [])
+        cta = caption_data.get("cta", "")
+        if not account_handle:
+            account_handle = caption_data.get("account_handle", "")
+    else:
+        blockers.append("Caption ausente — necessario aprovar legenda antes do pacote")
+        next_actions.append("Aprovar legenda: python jarvis.py captions approve <draft_id>")
+        if not account_handle and queue_item:
+            account_handle = queue_item.get("account_handle", "")
+        if not account_handle:
+            account_handle = "desconhecido"
+
+    if not has_asset:
+        warnings.append("Nenhum asset atribuido ao slot — pacote parcial")
+        next_actions.append("Atribuir asset: python jarvis.py queue assign <queue_id> <asset_id>")
+
+    status = PackageStatus.PARTIAL
+    if blockers:
+        status = PackageStatus.BLOCKED
+    elif has_asset and not warnings:
+        status = PackageStatus.READY
+
+    package_dir.mkdir(parents=True, exist_ok=True)
+
+    caption_text = caption_data.get("caption_text", "") if caption_data else "(Legenda pendente)"
+    _safe_write(package_dir / "caption.md", caption_text)
+    files.append("caption.md")
+
+    _safe_write(package_dir / "hashtags.md", "\n".join(hashtags) if hashtags else "(Hashtags pendentes)")
+    files.append("hashtags.md")
+
+    _safe_write(package_dir / "cta.md", cta if cta else "(CTA pendente)")
+    files.append("cta.md")
+
+    _safe_write(package_dir / "publishing_checklist.md", _build_publishing_checklist(PackageType.SINGLE_POST))
+    files.append("publishing_checklist.md")
+
+    readme = [
+        f"# {title}",
+        "",
+        f"**Package ID:** {pkg_id}",
+        f"**Queue ID:** {queue_id}",
+        f"**Account:** {account_handle}",
+        f"**Type:** Single Post",
+        f"**Status:** {status.value}",
+        f"**Generated:** {datetime.now().isoformat(timespec='seconds')}",
+        "",
+        "## Arquivos",
+    ]
+    for f in files:
+        readme.append(f"- [{f}]({f})")
+    if warnings:
+        readme.append("\n## Warnings")
+        for w in warnings:
+            readme.append(f"- {w}")
+    if blockers:
+        readme.append("\n## Blockers")
+        for b in blockers:
+            readme.append(f"- {b}")
+    if next_actions:
+        readme.append("\n## Next Actions")
+        for a in next_actions:
+            readme.append(f"- {a}")
+    _safe_write(package_dir / "README.md", "\n".join(readme))
+    files.append("README.md")
+
+    pkg = DeliveryPackage(
+        package_id=pkg_id,
+        package_type=PackageType.SINGLE_POST,
+        title=title,
+        account_handle=account_handle,
+        source_queue_id=queue_id,
+        source_caption_id=caption_data.get("draft_id") if caption_data else None,
+        output_dir=str(package_dir),
+        files=files,
+        status=status,
+        warnings=warnings,
+        blockers=blockers,
+        next_actions=next_actions,
+        hashtags=hashtags,
+        cta=cta,
     )
 
     manifest_path = generate_manifest(pkg, package_dir)
