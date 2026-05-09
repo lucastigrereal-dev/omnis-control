@@ -1,9 +1,9 @@
-# OMNIS State After P1.7 — Offline Delivery Factory
+# OMNIS State After P1.7b — Offline Delivery Factory + Pillow Fix
 
 **Data:** 2026-05-09
 **Branch:** master
-**Commit:** (ver apos commit da P1.7)
-**Testes:** 788 (base P1.6A) + 63 (P1.7) = ~851
+**Commits:** P1.7 (f5b947b) + P1.7b (pendente commit)
+**Testes:** 788 (base P1.6A) + 68 (P1.7) = ~856
 
 ---
 
@@ -15,9 +15,33 @@
 4. **Manifesto JSON** — indice completo com package_id, status, files, warnings, blockers, next_actions
 5. **CLI `offline`** — 4 comandos: package-carousel, package-reels, list, show
 6. **Status automatico** — blocked (sem caption) / partial (sem asset) / ready (completo)
-7. **63 novos testes** — models, manifest, packager, CLI
+7. **68 novos testes** — models, manifest, packager, CLI
 8. **Blueprint video pipeline** — plano para ffmpeg + Whisper (nao implementado)
 9. **GO/NO-GO claro** — producao offline=GO, OAuth=NO-GO, post real=NO-GO
+
+---
+
+## O que P1.7b entregou
+
+1. **Pillow 12.2.0 instalado** — elimina bloqueio pre-existente `ModuleNotFoundError: No module named 'PIL'`
+2. **`pyproject.toml`** — `"Pillow>=10.0.0"` formalizado em `dependencies`
+3. **`_load_caption` corrigido** — `DraftsManager().list_all()` com prefixo match (`startswith`)
+4. **Unicode fix CLI** — `->` em vez de `->` para compatibilidade Windows cp1252
+5. **Smoke real executado** — `carousel_0b79aa1c_20260509_082453`, status=partial, @lucastigrereal, 6 arquivos
+6. **Docs atualizados** — smoke doc, handoff, state
+
+---
+
+## Smoke Package Gerado
+
+| Campo | Valor |
+|---|---|
+| Package ID | carousel_0b79aa1c_20260509_082453 |
+| Status | partial |
+| Conta | @lucastigrereal |
+| Caption ID | 1d482d8231e3 |
+| Arquivos | 6 |
+| Warning | Nenhum asset atribuido ao slot |
 
 ---
 
@@ -47,27 +71,18 @@ exports/offline_factory/<package_id>/
 
 - **OAuth Meta** — 4 vars pendentes no .env (META_APP_SECRET, INSTAGRAM_BUSINESS_ACCOUNT_ID, FACEBOOK_PAGE_ID, META_GRAPH_VERSION)
 - **Post real** — bloqueado ate OAuth completo + revisao humana
+- **Asset slot vazio** — pacotes ficam `partial` ate P1.8 ser implementada
 
 ---
 
-## Proxima Fase Recomendada
+## Proximas Fases
 
-**P1.6 (Manual Credential Validation Gate):**
-
-Lucas preenche manualmente no `.env`:
-1. `META_APP_SECRET` — em developers.facebook.com/apps/1434393165369254
-2. `META_GRAPH_VERSION=v20.0`
-3. `INSTAGRAM_BUSINESS_ACCOUNT_ID=<valor>`
-4. `FACEBOOK_PAGE_ID=<valor>`
-
-Depois rodar:
-```bash
-python jarvis.py oauth probe
-python jarvis.py oauth accounts
-python jarvis.py oauth account-readiness @afamiliatigrereal
-```
-
-Nenhum codigo novo necessario para P1.6 — e tarefa manual.
+| Fase | Descricao | Prioridade |
+|---|---|---|
+| P1.8 | Asset Assignment Center — atribuir video/imagem ao slot | Alta |
+| P1.9 | Campaign Package — 10 posts em batch | Media |
+| P2.0 | Real Render Engine — ffmpeg + Whisper | Media |
+| P1.6 | Manual OAuth Gate — Lucas preenche credenciais Meta | Manual |
 
 ---
 

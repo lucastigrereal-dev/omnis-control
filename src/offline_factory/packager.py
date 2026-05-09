@@ -29,11 +29,17 @@ def _safe_write(path: Path, content: str) -> Path:
 def _load_caption(queue_id: str) -> Optional[dict]:
     """Load approved caption for a queue item."""
     try:
-        from src.caption_approval.drafts import get_drafts_by_queue
-        drafts = get_drafts_by_queue(queue_id)
-        for d in drafts:
-            if d.status == "approved":
-                return d.to_dict()
+        from src.caption_approval.drafts import DraftsManager
+        dm = DraftsManager()
+        # Check all drafts for this queue — find any approved one (prefix match)
+        all_drafts = [
+            d for d in dm.list_all()
+            if (d.queue_id == queue_id or d.queue_id.startswith(queue_id))
+            and d.status == "approved"
+        ]
+        if all_drafts:
+            # Most recent approved draft
+            return all_drafts[-1].to_dict()
     except Exception:
         pass
     return None

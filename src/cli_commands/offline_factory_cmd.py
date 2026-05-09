@@ -81,7 +81,7 @@ def package_carousel(
     if pkg.next_actions:
         console.print(f"\n[bold]Next actions:[/bold]")
         for a in pkg.next_actions:
-            console.print(f"  → {a}")
+            console.print(f"  -> {a}")
 
     console.print(f"\n[dim]Manifesto: {pkg.manifest_path}[/dim]")
 
@@ -131,7 +131,7 @@ def package_reels(
     if pkg.next_actions:
         console.print(f"\n[bold]Next actions:[/bold]")
         for a in pkg.next_actions:
-            console.print(f"  → {a}")
+            console.print(f"  -> {a}")
 
     console.print(f"\n[dim]Manifesto: {pkg.manifest_path}[/dim]")
 
@@ -231,4 +231,4 @@ def offline_show(
     if next_actions:
         console.print(f"\n[bold]Next actions:[/bold]")
         for a in next_actions:
-            console.print(f"  → {a}")
+            console.print(f"  -> {a}")

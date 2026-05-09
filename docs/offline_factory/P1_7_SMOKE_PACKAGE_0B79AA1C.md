@@ -1,68 +1,77 @@
-# P1.7 — Smoke Test: queue_id 0b79aa1c
+# P1.7b — Smoke Test: queue_id 0b79aa1c
 
 **Data:** 2026-05-09
 **Queue ID:** 0b79aa1c
-**Draft ID:** 1d482d82
+**Draft ID:** 1d482d8231e3
 
 ---
 
-## Resultado: BLOQUEADO (pre-existente)
-
-O smoke `python jarvis.py offline package-carousel 0b79aa1c` nao pode ser executado
-porque `PIL` (Pillow) nao esta instalado no `.venv`.
+## Resultado: SUCESSO (partial — esperado)
 
 ```
-ModuleNotFoundError: No module named 'PIL'
-```
-
-A cadeia de imports e:
-```
-jarvis.py
-  → src/cli.py
-  → src/cli_commands/creative_cmd.py
-  → src/creative_production/exporter.py
-  → src/creative_production/mock_image_generator.py
-  → from PIL import Image, ImageDraw, ImageFont  ← FALHA AQUI
-```
-
-Este bloqueio e **pre-existente** (existia antes da P1.7).
-Todos os outros comandos CLI (`python jarvis.py status`, `doctor`, etc.)
-tambem falham pelo mesmo motivo.
-
----
-
-## O que funcionou
-
-Os testes P1.7 passam 100% (68/68) porque importam diretamente:
-- `from src.offline_factory import create_carousel_package`
-- `from src.cli_commands.offline_factory_cmd import offline_app`
-
-A offline_factory NAO depende de PIL. O bloqueio e no creative_cmd.py.
-
----
-
-## Como resolver (futuro)
-
-```bash
-cd C:\Users\lucas\omnis-control
-.venv\Scripts\pip install Pillow
 python jarvis.py offline package-carousel 0b79aa1c
 ```
 
-Ou tornar PIL opcional em `mock_image_generator.py`:
-```python
-try:
-    from PIL import Image, ImageDraw, ImageFont
-    PILLOW_AVAILABLE = True
-except ImportError:
-    PILLOW_AVAILABLE = False
+Pacote gerado com status `partial` — correto, pois nenhum asset visual foi atribuido ao slot.
+
+---
+
+## Pacote Gerado
+
+| Campo | Valor |
+|---|---|
+| Package ID | carousel_0b79aa1c_20260509_082453 |
+| Tipo | carousel_package |
+| Conta | @lucastigrereal |
+| Queue ID | 0b79aa1c |
+| Caption ID | 1d482d8231e3 |
+| Status | partial |
+| Gerado em | 2026-05-09T11:24:53Z |
+
+---
+
+## Arquivos (6)
+
+| Arquivo | Tamanho |
+|---|---|
+| caption.md | 336 bytes |
+| seo_metadata.json | 675 bytes |
+| visual_brief.md | 696 bytes |
+| slides_outline.md | 683 bytes |
+| publishing_checklist.md | 500 bytes |
+| README.md | 606 bytes |
+| manifest.json | (indice) |
+
+---
+
+## Warning (esperado)
+
 ```
+! Nenhum asset atribuido ao slot — pacote parcial
+```
+
+Status `partial` e o comportamento correto quando nao ha asset. O pacote fica pronto para receber o video/imagem na P1.8 (Asset Assignment Center).
+
+---
+
+## Fix P1.7b incluido neste smoke
+
+- **Pillow 12.2.0 instalado** — resolve pre-existente `ModuleNotFoundError: No module named 'PIL'`
+- **`pyproject.toml`** — `"Pillow>=10.0.0"` adicionado em `dependencies`
+- **`_load_caption` corrigido** — usa `DraftsManager().list_all()` com prefixo match (`startswith`)
+- **Unicode fix** — `->` em vez de `->` no CLI (Windows cp1252)
 
 ---
 
 ## Status dos Testes
 
 ```
-tests/offline_factory/: 68/68 PASS ✅
-jarvis.py (CLI real): BLOQUEADO por PIL (pre-existente) ❌
+tests/offline_factory/: 68/68 PASS
+jarvis.py (CLI real):   FUNCIONAL (smoke OK)
 ```
+
+---
+
+## Proxima fase
+
+**P1.8 Asset Assignment Center** — permite atribuir video/imagem ao slot, elevando status de `partial` para `ready`.
