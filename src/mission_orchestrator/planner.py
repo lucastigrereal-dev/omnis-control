@@ -26,6 +26,8 @@ def build_plan(
 ) -> OrchestratorRun:
     """Build an OrchestratorRun with planned steps. No execution."""
     from src.mission_builder.intent import detect_intent
+    from src.skill_matcher.matcher import match_capabilities
+    from src.sector_registry.matcher import match_sector
 
     kwargs = {}
     if config_path is not None:
@@ -33,7 +35,12 @@ def build_plan(
 
     intent, deliverable, description = detect_intent(request_text, **kwargs)
 
-    if intent == "unknown" and not allow_unknown:
+    # P5.0 — wire P4 sector/capability/gap intelligence
+    cap_results = match_capabilities(request_text)
+    sector_result = match_sector(request_text)
+
+    # Raise only when intent is unknown AND no capability covers the request
+    if intent == "unknown" and not cap_results and not allow_unknown:
         raise UnknownIntentError(
             f"Intent desconhecido para: '{request_text}'. "
             "Tente mencionar: carrossel, reels, campanha, post, stories."
@@ -46,6 +53,18 @@ def build_plan(
         dry_run=dry_run,
         intent=intent,
     )
+
+    # Populate P4 intelligence fields
+    run.sector_id = sector_result.sector_id if sector_result else "unknown"
+    run.matched_capabilities = [c.capability_id for c in cap_results]
+
+    if cap_results:
+        run.approval_required = any(c.risk_level in ("medium", "high") for c in cap_results)
+    else:
+        from src.capability_gap.detector import detect as detect_gap
+        gap_result = detect_gap(request_text)
+        run.suggested_gap_ids = [g.gap_id for g in gap_result.gaps]
+        run.approval_required = any(g.risk_level in ("medium", "high") for g in gap_result.gaps)
 
     steps = [
         OrchestratorStep(

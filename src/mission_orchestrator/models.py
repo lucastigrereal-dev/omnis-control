@@ -55,6 +55,11 @@ class OrchestratorRun:
     status: str
     steps: list[OrchestratorStep] = field(default_factory=list)
     mission_id: Optional[str] = None
+    sector_id: Optional[str] = None
+    matched_capabilities: list[str] = field(default_factory=list)
+    suggested_gap_ids: list[str] = field(default_factory=list)
+    approval_required: bool = False
+    approval_id: Optional[str] = None
     warnings: list[str] = field(default_factory=list)
     blockers: list[str] = field(default_factory=list)
     created_at: str = field(default_factory=_now_iso)
@@ -90,6 +95,11 @@ class OrchestratorRun:
             "status": self.status,
             "steps": [s.to_dict() for s in self.steps],
             "mission_id": self.mission_id,
+            "sector_id": self.sector_id,
+            "matched_capabilities": self.matched_capabilities,
+            "suggested_gap_ids": self.suggested_gap_ids,
+            "approval_required": self.approval_required,
+            "approval_id": self.approval_id,
             "warnings": self.warnings,
             "blockers": self.blockers,
             "created_at": self.created_at,
