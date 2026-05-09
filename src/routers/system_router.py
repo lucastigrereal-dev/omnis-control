@@ -33,6 +33,7 @@ def register(app: typer.Typer) -> None:
     from src.cli_commands.squad_composer_cmd import squad_composer_app
     from src.cli_commands.task_decomposer_cmd import task_decomposer_app
     from src.cli_commands.squad_execution_cmd import squad_execution_app
+    from src.cli_commands.execution_graph_cmd import execution_graph_app
 
     app.add_typer(argos_app)
     app.add_typer(creative_app)
@@ -58,3 +59,4 @@ def register(app: typer.Typer) -> None:
     app.add_typer(squad_composer_app)
     app.add_typer(task_decomposer_app)
     app.add_typer(squad_execution_app)
+    app.add_typer(execution_graph_app)
