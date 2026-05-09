@@ -14,7 +14,9 @@
 | B5 | P2.9 | Knowledge + Context Pack Unified | done |
 | B6 | P3.0 | Mission Builder + Package (deterministico) | done |
 | B7 | P3.1 | Mission Report / Close | done |
-| B8 | P3.2 | Real Asset Inbox (GATE HUMANO) | pending |
+| B8A | P3.2 | Real Asset Inbox — Read-Only Scanner | done |
+| B8B | P3.2+ | Safe Import Registry | pending |
+| B8C | P3.2+ | Assign Real Asset → Package READY | pending |
 
 ## Suite cumulativa
 
@@ -31,7 +33,24 @@
 | 1951ee7 | B6 | Mission Builder — 48 testes |
 | 69e3f0d | B7 | Mission Report — 21 testes |
 
-## Proximos passos
+## Commits
 
-CP2 — suite completa pos-B7 (em execucao).
-B8 — Real Asset Inbox (GATE HUMANO: Lucas precisa aprovar).
+| Commit | Bloco | Descricao |
+|---|---|---|
+| 1951ee7 | B6 | Mission Builder — 48 testes |
+| 69e3f0d | B7 | Mission Report — 21 testes |
+| (B8A) | B8A | Asset Inbox Read-Only Scanner — 48 testes |
+
+## Suite acumulada
+
+| Checkpoint | Testes |
+|---|---|
+| P2.4.1 baseline | 1114 passed |
+| CP1 (B0-B5) | 1179 passed |
+| CP2 (B0-B7) | 1250 passed |
+| B8A isolado | 48 passed, 1 skipped |
+
+## Proximos blocos (gate humano)
+
+B8B — Safe Import Registry (copia para quarentena).
+B8C — Assign Real Asset → Package READY.

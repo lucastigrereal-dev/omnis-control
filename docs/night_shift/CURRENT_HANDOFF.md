@@ -1,4 +1,4 @@
-# CURRENT HANDOFF — P3.1 (B6+B7) completo
+# CURRENT HANDOFF — B8A Read-Only Scanner completo
 
 **Data:** 2026-05-09 | **Operador:** Lucas
 
@@ -113,11 +113,26 @@ CONGELADO. Precisam: 5 READY validados (atual: 1) ou override de Lucas.
 
 ---
 
-## Próxima fase
+## B8A entregue
 
-B8 (P3.2) — Real Asset Inbox. **GATE HUMANO obrigatório.**
-Lucas precisa dar green-light explícito antes de implementar.
+Scanner read-only: scan(), fingerprint chunks 8KB, path traversal bloqueado.
+CLI: `python jarvis.py asset-inbox scan <path> [--json] [--limit N] [--exclude dir]`
+48/48 testes, 1 skip (symlinks Windows).
+Confirmado: NUNCA move, copia, apaga ou modifica arquivo real.
+
+## Suite acumulada
+
+| Checkpoint | Testes |
+|---|---|
+| CP2 (B0-B7) | 1250/1250 PASS |
+| B8A isolado | 48 passed, 1 skipped |
+| offline+assignment | 140 passed |
+
+## Proxima fase
+
+B8B — Safe Import Registry (gate humano de Lucas).
+B8C — Assign Real Asset → Package READY (gate humano de Lucas).
 
 ---
 
-**B0-B7 entregues. ~1250 testes. Gate B8: aguardando Lucas.**
+**B0-B8A entregues. Proximos: B8B e B8C aguardam gate Lucas.**
