@@ -1,0 +1,2 @@
+class CapabilityGapError(Exception):
+    pass
