@@ -140,18 +140,55 @@ class StepRunLog:
         }
 
 
+RUN_STATUS_BLOCKED = "blocked_pending_approval"
+
+
 @dataclass
 class StepRun:
     """Complete dry-run execution of a graph."""
     graph_run_id: str
     graph_id: str
     request: str
-    status: str  # running | done | failed
+    status: str  # running | done | failed | blocked_pending_approval
     step_states: dict[str, str]  # step_id → status
     logs: list[StepRunLog]
     started_at: str
     finished_at: str
     graph_snapshot: dict | None = None  # graph.to_dict() for resume/replay
+    approval_id: str | None = None  # linked approval request
+    approval_required: bool = False  # whether approval was checked
+
+    @classmethod
+    def blocked(
+        cls,
+        graph: "ExecutionGraph",
+        reason: str = "",
+        approval_id: str | None = None,
+        approval_required: bool = False,
+    ) -> "StepRun":
+        """Create a blocked StepRun (approval pending or rejected)."""
+        from datetime import datetime, timezone
+        now = datetime.now(timezone.utc).isoformat()
+        log = StepRunLog(
+            step_id="",
+            role_id="",
+            status=RUN_STATUS_BLOCKED,
+            message=reason,
+            timestamp=now,
+        )
+        return cls(
+            graph_run_id=_make_run_id(),
+            graph_id=graph.graph_id,
+            request=graph.request,
+            status=RUN_STATUS_BLOCKED,
+            step_states={},
+            logs=[log],
+            started_at=now,
+            finished_at=now,
+            graph_snapshot=graph.to_dict(),
+            approval_id=approval_id,
+            approval_required=approval_required,
+        )
 
     def to_dict(self) -> dict:
         return {
@@ -164,4 +201,6 @@ class StepRun:
             "started_at": self.started_at,
             "finished_at": self.finished_at,
             "graph_snapshot": self.graph_snapshot,
+            "approval_id": self.approval_id,
+            "approval_required": self.approval_required,
         }

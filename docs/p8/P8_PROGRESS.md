@@ -11,7 +11,7 @@
 | P8.0 | — | Execution Graph Models + Builder | 16/10 | ✅ done |
 | P8.1 | — | Step Runner Dry-Run | 21/15 | ✅ done |
 | P8.2 | — | Replay / Resume Squad Run | 15/12 | ✅ done |
-| P8.3 | — | Approval-Integrated Graph Run | —/12 | ⬜ pending |
+| P8.3 | — | Approval-Integrated Graph Run | 20/12 | ✅ done |
 | P8.4 | — | Event Log + Metrics | —/10 | ⬜ pending |
 | P8.5 | — | Mission → Squad → Graph Integration | —/10 | ⬜ pending |
 | P8.6 | — | E2E Mission → Squad → Graph → Approval | —/10 | ⬜ pending |
@@ -25,11 +25,11 @@
 P8.0 execution_graph:      16/10 PASS
 P8.1 step_runner:          21/15 PASS
 P8.2 replay_resume:        15/12 PASS
-P8.3 approval_graph:        —/12
+P8.3 approval_graph:       20/12 PASS
 P8.4 event_log_metrics:     —/10
 P8.5 mission_squad_graph:   —/10
 P8.6 e2e graph flow:        —/10
 P8.7 seal:                  —
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-TOTAL P8:                   52/79
+TOTAL P8:                   72/79
 ```

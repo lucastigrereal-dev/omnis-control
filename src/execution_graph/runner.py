@@ -23,6 +23,8 @@ def run_graph_dry(
     skip_done: set[str] | None = None,
     run_id: str | None = None,
     include_snapshot: bool = False,
+    approval_id: str | None = None,
+    approval_required: bool = False,
 ) -> StepRun:
     """Simulate executing all steps in topological order. No side effects.
 
@@ -32,6 +34,8 @@ def run_graph_dry(
         skip_done: Optional set of step_ids to skip (already done in previous run).
         run_id: Optional graph_run_id to reuse (for resume).
         include_snapshot: If True, include graph.to_dict() in the result.
+        approval_id: Optional approval request ID that authorized this run.
+        approval_required: Whether approval was checked before running.
     """
     if not graph.nodes:
         raise ExecutionGraphError("Cannot run empty graph")
@@ -123,6 +127,8 @@ def run_graph_dry(
         started_at=started_at,
         finished_at=_now(),
         graph_snapshot=snapshot,
+        approval_id=approval_id,
+        approval_required=approval_required,
     )
 
 

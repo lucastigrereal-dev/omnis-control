@@ -215,6 +215,60 @@ def cmd_run_replay(
     console.print(f"  steps           : {len(step_run.step_states)}")
 
 
+@execution_graph_app.command(name="run-gated")
+def cmd_run_gated(
+    request: str = typer.Argument(..., help="Pedido em linguagem natural"),
+    approval_id: str = typer.Option(None, "--approval-id", help="Approval request ID (if already created)"),
+    json_out: bool = typer.Option(False, "--json"),
+) -> None:
+    """Executa um grafo com gate de aprovacao (bloqueia se nao aprovado)."""
+    from src.squad_composer.composer import compose_squad
+    from src.task_decomposer.decomposer import decompose_squad
+    from src.execution_graph.builder import build_graph
+    from src.execution_graph.approval_bridge import run_graph_with_approval_gate
+    from src.execution_graph.store import write_manifest, DEFAULT_STORE_ROOT
+
+    squad = compose_squad(request)
+    task_plan = decompose_squad(squad)
+    graph = build_graph(squad, task_plan)
+
+    step_run = run_graph_with_approval_gate(
+        graph,
+        squad_plan=squad,
+        approval_id=approval_id,
+    )
+
+    # Persist
+    run_dir = DEFAULT_STORE_ROOT / step_run.graph_run_id
+    write_manifest(run_dir, step_run.to_dict())
+
+    if json_out:
+        console.print_json(json.dumps(step_run.to_dict(), ensure_ascii=False))
+        return
+
+    status = step_run.status
+    color = {"done": "green", "failed": "red", "blocked_pending_approval": "yellow"}.get(status, "yellow")
+
+    console.print(Panel(f"[bold]Graph Run (Gated)[/bold] — {step_run.graph_run_id}", expand=False))
+    console.print(f"  request         : {step_run.request[:60]}")
+    console.print(f"  graph_id        : {step_run.graph_id}")
+    console.print(f"  status          : [{color}]{status}[/{color}]")
+    console.print(f"  approval_req    : {step_run.approval_required}")
+    console.print(f"  approval_id     : {step_run.approval_id or 'N/A'}")
+
+    if status == "blocked_pending_approval":
+        if step_run.logs:
+            console.print(f"\n  [yellow]{step_run.logs[0].message}[/yellow]")
+    else:
+        table = Table(title="Step States")
+        table.add_column("step_id", style="dim")
+        table.add_column("status")
+        for sid, s in step_run.step_states.items():
+            sc = {"done": "green", "failed": "red", "skipped": "yellow"}.get(s, "white")
+            table.add_row(sid, f"[{sc}]{s}[/{sc}]")
+        console.print(table)
+
+
 def _status_color(status: str) -> str:
     return {"done": "green", "failed": "red"}.get(status, "yellow")
 
