@@ -23,6 +23,8 @@ FAKE_CAPTION = {
 @pytest.fixture(autouse=True)
 def temp_export_root(tmp_path, monkeypatch):
     monkeypatch.setattr(packager_mod, "EXPORT_ROOT", tmp_path / "offline_factory")
+    monkeypatch.setattr(packager_mod, "_load_queue_item", lambda *a, **kw: None)
+    monkeypatch.setattr(packager_mod, "_load_asset", lambda *a, **kw: None)
 
 
 class TestCreateCarouselPackage:

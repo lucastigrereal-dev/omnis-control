@@ -65,8 +65,8 @@ def _load_asset(queue_id: str) -> Optional[dict]:
         q = Queue()
         item = q.get(queue_id)
         if item and getattr(item, "asset_id", None):
-            from src.video_assets.registry import AssetRegistry
-            reg = AssetRegistry()
+            from src.video_assets.registry import Registry
+            reg = Registry()
             asset = reg.get(item.asset_id)
             if asset:
                 return asset.to_dict()

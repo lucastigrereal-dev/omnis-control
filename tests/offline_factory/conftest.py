@@ -33,6 +33,7 @@ FAKE_ASSET = {
 def temp_export_root(tmp_path, monkeypatch):
     """Redirect all package exports to tmp_path and isolate from real system data."""
     monkeypatch.setattr(packager_mod, "EXPORT_ROOT", tmp_path / "offline_factory")
-    # Isolate _load_queue_item so real content_queue.jsonl doesn't bleed into tests
+    # Isolate both loaders so real JSONL data doesn't bleed into tests
     monkeypatch.setattr(packager_mod, "_load_queue_item", lambda *a, **kw: None)
+    monkeypatch.setattr(packager_mod, "_load_asset", lambda *a, **kw: None)
     return tmp_path / "offline_factory"

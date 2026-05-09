@@ -1,6 +1,6 @@
-# CURRENT HANDOFF — P1.8 completo -> P1.9
+# CURRENT HANDOFF — P1.9 completo
 
-**Data:** 2026-05-09 | **Turno:** Diurno | **Operador:** Lucas
+**Data:** 2026-05-09 | **Operador:** Lucas
 
 ---
 
@@ -16,37 +16,47 @@ Condicao para voltar ao OAuth:
 
 ---
 
-## O que P1.8 entregou
+## O que P1.9 entregou
 
-1. **`package-post`** — novo pacote de post simples (caption + hashtags + cta + checklist)
-2. **`offline validate`** — verifica integridade + score 0-100, detecta arquivos sumidos, detecta secrets
-3. **`offline zip`** — gera ZIP do pacote para entrega manual (stdlib, zero deps)
-4. **`_load_asset()` patchavel** — carousel e post agora podem chegar em READY
-5. **`_load_queue_item()` funcional** — enriquece pacote com metadados do slot
-6. **117 testes** — 68 (P1.7) + 49 (P1.8) = todos PASS
-7. **Docs operacionais** — catalog, runbook, go-no-go, report, decisao estrategica
+1. **Asset Assignment Center** — `src/asset_assignment/` (3 modulos)
+2. **`assets` CLI** — `assignment-status`, `add-mock`, `ready-candidates`
+3. **`_load_asset()` funcional** — bug AssetRegistry->Registry corrigido
+4. **Carousel READY** — pipeline completo com asset mock
+5. **140/140 testes** — 117 offline_factory + 23 asset_assignment
 
 ---
 
-## Dados locais auditados
-
-| Dado | Quantidade |
-|---|---|
-| Itens na fila | 42 |
-| Drafts de legenda | 42 |
-| Captions aprovadas | 1 (1d482d82 / queue 0b79aa1c) |
-| Pacotes offline gerados | 4 (todos carousel_0b79aa1c de testes anteriores) |
-
----
-
-## Comandos disponiveis (P1.7 + P1.8)
+## Pipeline validado (smoke executado)
 
 ```bash
-python jarvis.py offline --help
+python jarvis.py assets add-mock natal_reel_01.mp4 --queue-id 0b79aa1c --format carousel
+# -> asset_id: mock_80c3b530, atribuido ao slot
+
 python jarvis.py offline package-carousel 0b79aa1c
-python jarvis.py offline package-carousel 0b79aa1c --slides 7
-python jarvis.py offline package-reels 0b79aa1c
-python jarvis.py offline package-post 0b79aa1c
+# -> status: READY
+
+python jarvis.py offline validate <pkg_id>
+# -> score: 100/100
+
+python jarvis.py offline zip <pkg_id>
+# -> 3KB zip
+```
+
+---
+
+## Comandos disponiveis (P1.7 + P1.8 + P1.9)
+
+```bash
+# Assets
+python jarvis.py assets assignment-status <queue_id>
+python jarvis.py assets add-mock <nome> --queue-id <id> --format carousel
+python jarvis.py assets ready-candidates
+
+# Offline
+python jarvis.py offline package-carousel <queue_id>
+python jarvis.py offline package-carousel <queue_id> --slides 7
+python jarvis.py offline package-reels <queue_id>
+python jarvis.py offline package-post <queue_id>
 python jarvis.py offline list
 python jarvis.py offline show <package_id_prefix>
 python jarvis.py offline validate <package_id_prefix>
@@ -55,47 +65,33 @@ python jarvis.py offline zip <package_id_prefix>
 
 ---
 
-## Estado dos Repos
+## Estado local
 
-| Repo | Branch | Ultimo Commit | Push? |
-|---|---|---|---|
-| omnis-control | master | P1.8 (pendente commit) | NAO |
-| publisher-os | argos-evolucao-passo-0 | cf4b8d7 | NAO |
-
----
-
-## Bloqueios Ativos
-
-- **@lucastigrereal**: CRITICAL — OAuth bloqueado (congelado por decisao)
-- **@afamiliatigrereal**: MEDIUM — candidata recomendada para OAuth futuro
-- **Asset slot vazio** — pacotes carousel/post ficam `partial` ate P1.9
+| Dado | Quantidade |
+|---|---|
+| Itens na fila | 42 |
+| Captions aprovadas | 1 (1d482d82 / 0b79aa1c) |
+| Assets no registry | 1 (mock_80c3b530) |
+| Testes passando | 140/140 |
 
 ---
 
-## Proxima fase: P1.9 — Asset Assignment Center
+## Bloqueios ativos
 
-Permite atribuir video/imagem a um slot da fila via CLI.
-Quando asset for atribuido, `_load_asset()` retorna dado real.
-Pacotes elevam de `partial` para `ready` automaticamente.
-
-```bash
-# Futuro P1.9:
-python jarvis.py queue assign <queue_id> <asset_id>
-python jarvis.py offline package-carousel <queue_id>  # -> status: ready
-```
+- **OAuth Meta** — congelado por decisao estrategica
+- **Post real** — bloqueado ate OAuth + revisao humana
 
 ---
 
-## Comandos uteis
+## Proximas fases possiveis
 
-```bash
-python -m pytest tests/offline_factory/ -v
-python -m pytest tests/ -q
-python jarvis.py offline list
-python jarvis.py offline validate <package_id>
-python jarvis.py post preflight
-```
+| Fase | Descricao |
+|---|---|
+| P2.0 | Render Engine HTML/PNG |
+| P2.1 | Video Edit Plan + FFmpeg |
+| P2.2 | Campaign Package 10 Posts |
+| P1.6 | Manual OAuth Gate (CONGELADO) |
 
 ---
 
-**P1.8 entregue. Proximo: P1.9 (Asset Assignment Center).**
+**P1.9 entregue. Fabrica offline madura. Proximo: Lucas decide.**

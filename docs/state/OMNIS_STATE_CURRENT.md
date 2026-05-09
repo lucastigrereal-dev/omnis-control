@@ -1,9 +1,9 @@
-# OMNIS State — Atual (P1.8)
+# OMNIS State — Atual (P1.9)
 
 **Data:** 2026-05-09
 **Branch:** master
-**Fase concluida:** P1.8 — Offline Factory Stabilization
-**Testes:** ~905 (base P1.7b + 49 novos P1.8)
+**Fase concluida:** P1.9 — Asset Assignment Center
+**Testes:** 140 (offline_factory 117 + asset_assignment 23)
 
 ---
 
@@ -27,6 +27,16 @@ Ver: `docs/decisions/DECISAO_OAUTH_CONGELADO_FABRICA_PRIMEIRO.md`
 
 ---
 
+## Asset Assignment Center (P1.9)
+
+| Comando | Descricao |
+|---|---|
+| `assets assignment-status <id>` | Verifica se slot tem asset + caption |
+| `assets add-mock <nome> --queue-id <id>` | Adiciona asset mock ao registry |
+| `assets ready-candidates` | Lista slots prontos para empacotar |
+
+---
+
 ## Modulos core offline
 
 ```
@@ -36,8 +46,10 @@ src/offline_factory/
   packager.py    — create_*_package(), _load_asset(), _load_queue_item(), list_packages()
   validator.py   — validate_package(), validate_by_id(), ValidationResult
   zipper.py      — zip_package(), ZipResult
-  errors.py      — OfflineFactoryError e subclasses
-  __init__.py    — exports publicos
+
+src/asset_assignment/
+  models.py      — AssetAssignmentResult
+  service.py     — check_assignment_status(), add_mock_asset(), list_ready_candidates()
 ```
 
 ---
@@ -45,9 +57,9 @@ src/offline_factory/
 ## Dados locais (2026-05-09)
 
 - **Fila:** 42 itens
-- **Drafts:** 42 legendas
-- **Aprovadas:** 1 (1d482d82 / queue 0b79aa1c / @lucastigrereal)
-- **Pacotes gerados:** 4 (testes smoke anteriores)
+- **Captions aprovadas:** 1 (1d482d82 / queue 0b79aa1c / @lucastigrereal)
+- **Assets no registry:** 1 (mock_80c3b530 — mock, atribuido a 0b79aa1c)
+- **Status do slot 0b79aa1c:** READY para empacotar
 
 ---
 
@@ -55,6 +67,8 @@ src/offline_factory/
 
 ```
 tests/offline_factory/: 117/117 PASS
+tests/asset_assignment/:  23/23  PASS
+TOTAL:                   140/140 PASS
 ```
 
 ---
@@ -62,7 +76,6 @@ tests/offline_factory/: 117/117 PASS
 ## Bloqueios ativos
 
 - **OAuth Meta** — congelado por decisao estrategica
-- **Asset slot** — `_load_asset()` retorna None para todos os slots (sem P1.9 ainda)
 - **Post real** — bloqueado ate OAuth + revisao humana
 
 ---
@@ -71,7 +84,6 @@ tests/offline_factory/: 117/117 PASS
 
 | Fase | Descricao | Prioridade |
 |---|---|---|
-| P1.9 | Asset Assignment Center | Alta |
 | P2.0 | Render Engine HTML/PNG | Media |
 | P2.1 | Video Edit Plan + FFmpeg | Media |
 | P2.2 | Campaign Package 10 Posts | Media |
@@ -82,7 +94,7 @@ tests/offline_factory/: 117/117 PASS
 ## Roadmap offline completo
 
 ```text
-P1.8 DONE -> P1.9 (asset) -> P2.0 (render) -> P2.1 (video plan)
+P1.8 DONE -> P1.9 DONE -> P2.0 (render) -> P2.1 (video plan)
           -> P2.2 (campaign) -> P2.3 (tracker) -> P2.4 (zip delivery)
           -> P2.5 (quality score)
           -> P1.6 (OAuth) — so quando fabrica estiver madura
