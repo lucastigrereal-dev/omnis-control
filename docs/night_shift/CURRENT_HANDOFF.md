@@ -1,76 +1,75 @@
-# CURRENT HANDOFF — P8 Execution Graph Lite iniciado
+# CURRENT HANDOFF — P9 Work Order System iniciado
 
 **Data:** 2026-05-09 | **Operador:** Lucas
 
 ---
 
-## O que foi feito (P7 completo)
+## O que foi feito (P8 completo)
 
-### P7.0 — Role Registry (12 testes)
-- `src/role_registry/` — Role, RoleMatch, loader, matcher, errors
-- CLI: `jarvis.py role-registry list|show|match`
-- 12 roles registrados em YAML
+### P8.0 — Execution Graph Models + Builder (16 testes)
+- `src/execution_graph/models.py` — StepNode, GraphRun, ExecutionGraph
+- `src/execution_graph/builder.py` — Builder com Kahn topological sort
+- CLI: `jarvis.py graph build "<request>"`
 
-### P7.1 — Squad Composer Lite (13 testes)
-- `src/squad_composer/` — SquadPlan, SquadRoleAssignment, composer
-- CLI: `jarvis.py squad compose "<request>"`
-- Deterministico, sem LLM, sem rede
+### P8.1 — Step Runner Dry-Run (21 testes)
+- `src/execution_graph/runner.py` — Dry-run com fail_at injection
+- Simula steps por role, sem agentes reais
 
-### P7.2 — Task Decomposition (14 testes)
-- `src/task_decomposer/` — SquadTask, TaskPlan, decomposer
-- CLI: `jarvis.py tasks-plan from-request "<request>"`
-- Deteccao de ciclos, ordenacao topologica, templates por role
+### P8.2 — Replay / Resume Squad Run (15 testes)
+- `src/execution_graph/replay.py` — Resume e replay de graph runs
 
-### P7.3 — Squad Execution Plan Dry-Run (14 testes)
-- `src/squad_execution/` — SquadExecutionPlan, planner, exporter
-- CLI: `jarvis.py squad-run plan|show|list`
-- Exporta 7 arquivos por run, manifest JSON, approval gate
+### P8.3 — Approval-Integrated Graph Run (20 testes)
+- `src/execution_graph/approval_bridge.py` — Gate enforcement para medium/high risk
 
-### P7.4 — Squad E2E Flow (19 testes)
-- `tests/e2e/test_p7_squad_composer_flow.py`
-- 6 cenarios validados
+### P8.4 — Event Log + Metrics (25 testes)
+- `src/execution_graph/events.py` — Append-only JSONL event log
+- `src/execution_graph/metrics.py` — Compute run metrics
 
----
+### P8.5 — Mission → Squad → Graph Integration (26 testes)
+- `src/execution_graph/mission_bridge.py` — build_graph_from_orchestrator, run_full_pipeline
 
-## P8 Global Gate (ABERTO)
-
-- Gate docs criados: `docs/p8/P8_GLOBAL_GATE.md`, `docs/p8/P8_PROGRESS.md`
-- Diretórios: `docs/p8/`, `docs/execution_graph/` prontos
-- Baseline: ec215b9 (P7 Final Seal), ~1,341 testes
+### P8.6 — E2E Mission → Squad → Graph → Approval (14 testes)
+- `tests/execution_graph/test_e2e_pipeline.py` — 14 cenarios E2E
+- Full lifecycle: request → block → approve → run → done
 
 ---
 
-## Commits P7
+## P9 Global Gate (ABERTO)
 
-```
-ec215b9 docs(p7): seal squad composer lite milestone
-0b0f00c feat(squads): add dry-run squad execution plans
-637a236 feat(tasks): add deterministic squad task decomposition
-fe13e81 feat(squads): add local squad composer lite
-81d9db9 feat(roles): add declarative role registry
-```
+- Gate docs criados: `docs/p9/P9_GLOBAL_GATE.md`, `docs/p9/P9_PROGRESS.md`
+- State atualizado: `docs/state/OMNIS_STATE_CURRENT.md`
+- Baseline: e9a5dcb (P8 Final Seal), 137 P8 tests + ~1723 outros
 
 ---
 
-## Pipeline completo (P7)
+## Commits P8
 
 ```
-request → sector → capabilities → roles → squad → task plan → squad run manifest → approval gate
+e9a5dcb feat(p8): E2E pipeline + Final Seal — 137/79 tests, 0 LLM, 0 network
+19d01bb feat(graph): add structured event log and metrics aggregation
+45a2575 feat(graph): add approval-integrated graph run (gate enforcement)
+2645ee9 feat(graph): add replay and resume for execution graphs
+3e760bd feat(graph): add dry-run step runner
+0e0c324 feat(graph): add execution graph models and builder
 ```
 
 ---
 
-## Suite P7
+## Pipeline completo (P8)
 
 ```
-tests/role_registry:      12/12 PASS
-tests/squad_composer:     13/13 PASS
-tests/task_decomposer:    14/14 PASS
-tests/squad_execution:    14/14 PASS
-tests/e2e (P7 flow):      19/19 PASS
-tests/e2e (acumulados):   49/49 PASS
+request → intent → sector → squad → task plan → execution graph → step runner → approval gate → event log → metrics
+```
+
+---
+
+## Suite P8
+
+```
+tests/execution_graph:    137/137 PASS
+tests/e2e (P8 flow):      14/14 PASS (inclusos nos 137)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-TOTAL validado:          121/121 PASS
+TOTAL validado:          137/137 PASS
 ```
 
 ---
@@ -83,7 +82,8 @@ CONGELADO. Precisam: 5 READY validados ou override de Lucas.
 
 ## Proximo bloco
 
-P8.0 Execution Graph Models + Builder — DAG de tarefas com estados, sem agentes reais.
-- Criar `src/execution_graph/` (models.py, builder.py, validator.py, errors.py)
-- CLI: `jarvis.py graph build "<request>"`
+P9.0 Work Order Models + Builder — transforma graph nodes em work orders rastreaveis.
+- Criar `src/work_order/` (models.py, builder.py, validator.py, errors.py)
+- CLI: `jarvis.py work-order build "<request>"`
 - 10 testes minimo
+- 10 statuses, 9 output types, runtime em exports/work_orders/
