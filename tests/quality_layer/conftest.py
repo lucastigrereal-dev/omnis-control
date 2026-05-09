@@ -39,7 +39,9 @@ def full_package(tmp_path) -> Path:
 def patched_roots(tmp_path, monkeypatch, full_package):
     export_root = tmp_path / "exports" / "offline_factory"
     render_root = tmp_path / "exports" / "rendered"
+    scores_log = tmp_path / "data" / "quality_scores.jsonl"
     _make_render_dir(render_root, "carousel_full_test")
     monkeypatch.setattr(svc_mod, "EXPORT_ROOT", export_root)
     monkeypatch.setattr(svc_mod, "RENDER_ROOT", render_root)
+    monkeypatch.setattr(svc_mod, "SCORES_LOG", scores_log)
     return export_root, render_root

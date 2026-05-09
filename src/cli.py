@@ -40,23 +40,6 @@ from src.content_queue import AccountRegistry, Queue as CQQueue, Account, QueueI
 from src.caption_approval import DraftsManager, ApprovalGate, TemplateLibrary
 from src.caption_approval.models import DraftStatus
 from src.caption_approval.drafts import STALE_DAYS
-from src.cli_commands.argos_drafts_cmd import argos_app as argos_drafts_app
-from src.cli_commands.creative_cmd import creative_app as creative_cmd_app
-from src.cli_commands.publisher_cmd import publisher_app as publisher_cli_app
-from src.cli_commands.forge_cmd import forge_app as forge_cli_app
-from src.cli_commands.pipeline_cmd import pipeline_app as pipeline_cli_app
-from src.cli_commands.missions_cmd import missions_app
-from src.cli_commands.tools_cmd import tools_app
-from src.cli_commands.metrics_cmd import metrics_app
-from src.cli_commands.oauth_cmd import oauth_app
-from src.cli_commands.post_cmd import post_app
-from src.cli_commands.offline_factory_cmd import offline_app
-from src.cli_commands.assets_cmd import assets_app
-from src.cli_commands.render_cmd import render_app
-from src.cli_commands.quality_cmd import quality_app
-from src.cli_commands.campaign_cmd import campaign_app
-from src.cli_commands.manual_publish_cmd import manual_publish_app
-from src.cli_commands.delivery_cmd import delivery_app
 from src.reports import briefing as briefing_mod
 
 app = typer.Typer(
@@ -651,7 +634,6 @@ sales_app = typer.Typer(
     help="Setor sales_revenue — vendas B2B hoteis",
     add_completion=False,
 )
-app.add_typer(sales_app)
 
 
 @sales_app.command(name="status")
@@ -695,7 +677,6 @@ memory_app = typer.Typer(
     help="Akasha + Qdrant — memorias e indexacao",
     add_completion=False,
 )
-app.add_typer(memory_app)
 
 
 @memory_app.command(name="recent")
@@ -745,7 +726,6 @@ llm_app = typer.Typer(
     help="LLM Router — modelos e recomendacoes",
     add_completion=False,
 )
-app.add_typer(llm_app)
 
 
 @llm_app.command(name="models")
@@ -839,7 +819,6 @@ video_assets_app = typer.Typer(
     help="Gerencia o registro local de assets de vídeo",
     add_completion=False,
 )
-app.add_typer(video_assets_app)
 
 
 @video_assets_app.command(name="scan")
@@ -1090,7 +1069,6 @@ accounts_app = typer.Typer(
     help="Gerencia o cadastro local de contas Instagram",
     add_completion=False,
 )
-app.add_typer(accounts_app)
 
 
 @accounts_app.command(name="add")
@@ -1193,7 +1171,6 @@ queue_app = typer.Typer(
     help="Gerencia a fila diária de conteúdo (planejamento local)",
     add_completion=False,
 )
-app.add_typer(queue_app)
 
 
 @queue_app.command(name="generate")
@@ -1390,7 +1367,6 @@ captions_app = typer.Typer(
     help="Gerencia rascunhos de legenda (Fase 2C)",
     add_completion=False,
 )
-app.add_typer(captions_app)
 
 
 def _queue_updater(queue_id: str, status: str) -> bool:
@@ -1623,7 +1599,6 @@ approvals_app = typer.Typer(
     help="Gate de aprovação de legendas (Fase 2C)",
     add_completion=False,
 )
-app.add_typer(approvals_app)
 
 
 @approvals_app.command(name="pending")
@@ -1768,24 +1743,6 @@ templates_app = typer.Typer(
     help="Gerencia templates de legenda",
     add_completion=False,
 )
-app.add_typer(templates_app)
-app.add_typer(argos_drafts_app)
-app.add_typer(creative_cmd_app)
-app.add_typer(publisher_cli_app)
-app.add_typer(forge_cli_app)
-app.add_typer(pipeline_cli_app)
-app.add_typer(missions_app)
-app.add_typer(tools_app)
-app.add_typer(metrics_app)
-app.add_typer(oauth_app)
-app.add_typer(post_app)
-app.add_typer(offline_app)
-app.add_typer(assets_app)
-app.add_typer(render_app)
-app.add_typer(quality_app)
-app.add_typer(campaign_app)
-app.add_typer(manual_publish_app)
-app.add_typer(delivery_app)
 
 
 @templates_app.command(name="list")
@@ -1855,7 +1812,6 @@ workflow_app = typer.Typer(
     help="Pipeline ponta a ponta: IDEA → PRODUCE → DRAFT → QUEUE",
     add_completion=False,
 )
-app.add_typer(workflow_app)
 
 
 @workflow_app.command(name="run")
@@ -2006,6 +1962,28 @@ def wf_list(
             w.get("created_at", "?")[:10],
         )
     console.print(table)
+
+
+# ---------------------------------------------------------------------------
+# REGISTRATION BLOCK — centralizado, ordem determinística
+# ---------------------------------------------------------------------------
+
+from src.routers import factory_router, system_router
+
+factory_router.register(app)   # assets, offline, render, quality, campaign, manual-publish, delivery
+system_router.register(app)    # argos-drafts, creative, publisher, forge, pipeline, missions, tools, metrics, oauth, post
+
+# Inline apps (definidos neste arquivo)
+app.add_typer(sales_app)
+app.add_typer(memory_app)
+app.add_typer(llm_app)
+app.add_typer(video_assets_app)
+app.add_typer(accounts_app)
+app.add_typer(queue_app)
+app.add_typer(captions_app)
+app.add_typer(approvals_app)
+app.add_typer(templates_app)
+app.add_typer(workflow_app)
 
 
 if __name__ == "__main__":

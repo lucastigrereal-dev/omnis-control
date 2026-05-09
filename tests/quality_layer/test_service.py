@@ -2,7 +2,7 @@
 import pytest
 from src.quality_layer.errors import PackageNotFoundError
 from src.quality_layer.models import QualityGrade
-from src.quality_layer.service import score_package
+from src.quality_layer.service import score_package, load_scores
 
 
 class TestScorePackage:
@@ -43,3 +43,30 @@ class TestScorePackage:
         with patch("requests.post") as mock_post:
             score_package("carousel_full_test", export_root=export_root, render_root=render_root)
             mock_post.assert_not_called()
+
+    def test_score_appended_to_log(self, patched_roots):
+        import src.quality_layer.service as svc_mod
+        export_root, render_root = patched_roots
+        scores_log = svc_mod.SCORES_LOG  # already patched to tmp_path by patched_roots fixture
+        score_package("carousel_full_test", export_root=export_root, render_root=render_root)
+        rows = load_scores(scores_log)
+        assert len(rows) == 1
+        assert "score" in rows[0]
+        assert "scored_at" in rows[0]
+
+
+class TestLoadScores:
+    def test_returns_empty_when_no_file(self, tmp_path):
+        assert load_scores(tmp_path / "nonexistent.jsonl") == []
+
+    def test_loads_rows(self, tmp_path):
+        import json
+        log = tmp_path / "scores.jsonl"
+        log.write_text(
+            json.dumps({"score": 85, "package_id": "pkg1"}) + "\n" +
+            json.dumps({"score": 72, "package_id": "pkg2"}) + "\n",
+            encoding="utf-8",
+        )
+        rows = load_scores(log)
+        assert len(rows) == 2
+        assert rows[0]["score"] == 85
