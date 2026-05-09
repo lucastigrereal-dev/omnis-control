@@ -1,9 +1,9 @@
-# OMNIS State — Atual (P1.9)
+# OMNIS State — Atual (P4.0 iniciando)
 
 **Data:** 2026-05-09
 **Branch:** master
-**Fase concluida:** P1.9 — Asset Assignment Center
-**Testes:** 140 (offline_factory 117 + asset_assignment 23)
+**Fase concluida:** P3 Final Seal — 48be445
+**Testes:** 1375 passed, 4 skipped
 
 ---
 

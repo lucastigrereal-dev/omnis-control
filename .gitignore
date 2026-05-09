@@ -37,3 +37,5 @@ exports/offline_factory_zips/
 exports/mission_packages/
 storage/asset_inbox/
 data/asset_inbox_registry.jsonl
+exports/orchestrator_runs/
+data/orchestrator_runs.jsonl
