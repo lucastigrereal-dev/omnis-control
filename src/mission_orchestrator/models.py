@@ -56,6 +56,8 @@ class OrchestratorRun:
     steps: list[OrchestratorStep] = field(default_factory=list)
     mission_id: Optional[str] = None
     sector_id: Optional[str] = None
+    squad_id: Optional[str] = None
+    graph_run_id: Optional[str] = None
     matched_capabilities: list[str] = field(default_factory=list)
     suggested_gap_ids: list[str] = field(default_factory=list)
     approval_required: bool = False
@@ -96,6 +98,8 @@ class OrchestratorRun:
             "steps": [s.to_dict() for s in self.steps],
             "mission_id": self.mission_id,
             "sector_id": self.sector_id,
+            "squad_id": self.squad_id,
+            "graph_run_id": self.graph_run_id,
             "matched_capabilities": self.matched_capabilities,
             "suggested_gap_ids": self.suggested_gap_ids,
             "approval_required": self.approval_required,

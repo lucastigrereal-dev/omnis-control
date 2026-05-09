@@ -103,6 +103,20 @@ def build_plan(
             status="pending",
             notes="Executar após validação humana",
         ),
+        OrchestratorStep(
+            step_id="s06",
+            label="Compor squad a partir do request",
+            module="squad_composer",
+            command=f"jarvis squad compose \"{request_text}\"",
+            status="pending" if not dry_run else "pending",
+        ),
+        OrchestratorStep(
+            step_id="s07",
+            label="Construir e executar grafo de passos",
+            module="execution_graph",
+            command=f"jarvis graph build \"{request_text}\"",
+            status="pending" if not dry_run else "pending",
+        ),
     ]
 
     run.steps = steps

@@ -127,6 +127,81 @@ def cmd_status(
     console.print(f"  criado  : {orch_run.created_at}")
 
 
+@orchestrator_app.command(name="run-full")
+def cmd_run_full(
+    request: str = typer.Argument(..., help="Pedido em linguagem natural"),
+    account: str = typer.Option("", "--account", help="Handle da conta"),
+    objective: str = typer.Option("engajamento", "--objective"),
+    dry_run: bool = typer.Option(True, "--dry-run/--no-dry-run"),
+    allow_unknown: bool = typer.Option(False, "--allow-unknown"),
+    json_out: bool = typer.Option(False, "--json"),
+) -> None:
+    """Pipeline completo: Orchestrator → Squad → Graph (dry-run)."""
+    from src.execution_graph.mission_bridge import run_full_pipeline
+
+    orch_run, step_run = run_full_pipeline(
+        request_text=request,
+        account_handle=account,
+        objective=objective,
+        dry_run=dry_run,
+        allow_unknown=allow_unknown,
+    )
+
+    if orch_run is None:
+        console.print("[red]Pipeline failed: orchestrator returned None[/red]")
+        raise typer.Exit(1)
+
+    if json_out:
+        result = {
+            "orchestrator": orch_run.to_dict(),
+            "graph": step_run.to_dict() if step_run else None,
+        }
+        console.print_json(json.dumps(result, ensure_ascii=False))
+        return
+
+    orch_color = "green" if orch_run.status in ("dry_run", "complete") else "red"
+    console.print(Panel(f"[bold]Full Pipeline Run[/bold] — {orch_run.run_id}", expand=False))
+    console.print(f"  orchestrator    : [{orch_color}]{orch_run.status}[/{orch_color}]")
+    console.print(f"  intent          : {orch_run.intent}")
+    console.print(f"  sector          : {orch_run.sector_id}")
+    console.print(f"  approval_req    : {orch_run.approval_required}")
+
+    if step_run is None:
+        console.print(f"  graph           : [red]not executed[/red]")
+        if orch_run.blockers:
+            for b in orch_run.blockers:
+                console.print(f"  [red]BLOCKER: {b}[/red]")
+        raise typer.Exit(1)
+
+    graph_color = {"done": "green", "failed": "red", "blocked_pending_approval": "yellow"}.get(
+        step_run.status, "yellow"
+    )
+    console.print(f"  graph_run_id    : {step_run.graph_run_id}")
+    console.print(f"  graph_status    : [{graph_color}]{step_run.status}[/{graph_color}]")
+    console.print(f"  steps executed  : {len(step_run.step_states)}")
+    console.print(f"  squad_id        : {orch_run.squad_id or 'N/A'}")
+
+    # Orchestrator steps
+    console.print(f"\n  [bold]Orchestrator Steps:[/bold]")
+    for s in orch_run.steps:
+        color = {"done": "green", "skipped": "dim", "failed": "red"}.get(s.status, "white")
+        console.print(f"    [{color}][{s.status}][/{color}] {s.label}")
+
+    # Graph steps
+    if step_run.status not in ("blocked_pending_approval",):
+        table = Table(title="Graph Step States")
+        table.add_column("step_id", style="dim")
+        table.add_column("status")
+        for sid, s in step_run.step_states.items():
+            sc = {"done": "green", "failed": "red", "skipped": "yellow"}.get(s, "white")
+            table.add_row(sid, f"[{sc}]{s}[/{sc}]")
+        console.print(table)
+
+    if orch_run.blockers:
+        for b in orch_run.blockers:
+            console.print(f"  [red]BLOCKER: {b}[/red]")
+
+
 @orchestrator_app.command(name="list")
 def cmd_list(
     limit: int = typer.Option(10, "--limit"),
