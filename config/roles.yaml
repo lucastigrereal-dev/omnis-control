@@ -1,0 +1,98 @@
+roles:
+  marketing_strategist:
+    name: Marketing Strategist
+    sectors: ["marketing"]
+    responsibilities:
+      - define campaign strategy
+      - maps audience and objectives
+      - chooses content pillars
+    outputs:
+      - strategy_brief
+      - campaign_angle
+    risk_level: low
+
+  copywriter:
+    name: Copywriter
+    sectors: ["marketing", "sales"]
+    responsibilities:
+      - writes captions
+      - writes CTAs
+      - writes scripts
+    outputs:
+      - caption
+      - script
+      - dm_sequence
+    risk_level: low
+
+  visual_director:
+    name: Visual Director
+    sectors: ["marketing"]
+    responsibilities:
+      - defines visual direction
+      - creates visual brief
+    outputs:
+      - visual_brief
+      - creative_direction
+    risk_level: low
+
+  video_planner:
+    name: Video Planner
+    sectors: ["marketing"]
+    responsibilities:
+      - creates shot list
+      - creates video plan
+      - defines hooks
+    outputs:
+      - video_plan
+      - shot_list
+    risk_level: low
+
+  sales_strategist:
+    name: Sales Strategist
+    sectors: ["sales"]
+    responsibilities:
+      - creates offer logic
+      - maps objections
+      - creates pitch
+    outputs:
+      - pitch
+      - objection_map
+    risk_level: medium
+
+  app_architect:
+    name: App Architect
+    sectors: ["apps"]
+    responsibilities:
+      - defines app scope
+      - maps entities
+      - writes technical plan
+    outputs:
+      - prd
+      - technical_spec
+      - data_model
+    risk_level: high
+
+  qa_auditor:
+    name: QA Auditor
+    sectors: ["operations", "apps", "marketing"]
+    responsibilities:
+      - validates outputs
+      - checks risks
+      - scores quality
+    outputs:
+      - quality_report
+      - blocker_report
+    risk_level: low
+
+  operations_manager:
+    name: Operations Manager
+    sectors: ["operations"]
+    responsibilities:
+      - creates SOPs
+      - tracks workflow
+      - defines next actions
+    outputs:
+      - sop
+      - checklist
+      - runbook
+    risk_level: low
