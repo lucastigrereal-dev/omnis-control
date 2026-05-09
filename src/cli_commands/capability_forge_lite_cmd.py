@@ -125,3 +125,69 @@ def cmd_show(
     if p.approval_id:
         console.print(f"  approval_id  : {p.approval_id}")
     console.print(f"  criado       : {p.created_at}")
+
+
+@capability_forge_lite_app.command(name="export-spec")
+def cmd_export_spec(
+    proposal_id: str = typer.Argument(..., help="ID da proposal (prop_...)"),
+    json_out: bool = typer.Option(False, "--json"),
+) -> None:
+    """Exporta arquivos de spec para uma proposal."""
+    from src.capability_forge_lite import store as store_mod
+    from src.capability_forge_lite.spec_exporter import export_spec
+    from src.capability_forge_lite.errors import ProposalNotFoundError
+
+    try:
+        spec_dir = export_spec(proposal_id, proposals_log=store_mod.DEFAULT_PROPOSALS_LOG)
+    except ProposalNotFoundError as e:
+        console.print(f"[red]Erro: {e}[/red]")
+        raise typer.Exit(1)
+
+    if json_out:
+        import json as _json
+        console.print_json(_json.dumps({"spec_dir": str(spec_dir)}, ensure_ascii=False))
+        return
+
+    console.print(Panel("[bold]Spec Exported[/bold]", expand=False))
+    console.print(f"  spec_dir : {spec_dir}")
+    console.print("  arquivos : capability_manifest.json, CAPABILITY_SPEC.md,")
+    console.print("             implementation_plan.md, risk_assessment.md, next_actions.md")
+
+
+@capability_forge_lite_app.command(name="validate-spec")
+def cmd_validate_spec(
+    proposal_id: str = typer.Argument(..., help="ID da proposal (prop_...)"),
+    json_out: bool = typer.Option(False, "--json"),
+) -> None:
+    """Valida arquivos de spec exportados para uma proposal."""
+    from src.capability_forge_lite import store as store_mod
+    from src.capability_forge_lite.spec_validator import validate_spec
+    from src.capability_forge_lite.errors import ProposalNotFoundError
+
+    try:
+        result = validate_spec(proposal_id, proposals_log=store_mod.DEFAULT_PROPOSALS_LOG)
+    except ProposalNotFoundError as e:
+        console.print(f"[red]Erro: {e}[/red]")
+        raise typer.Exit(1)
+
+    if json_out:
+        import json as _json
+        console.print_json(_json.dumps(result, ensure_ascii=False))
+        return
+
+    status_color = "green" if result["valid"] else "red"
+    status_text = "VALID" if result["valid"] else "INVALID"
+    console.print(Panel(f"[bold]Spec Validation — [{status_color}]{status_text}[/{status_color}][/bold]", expand=False))
+    console.print(f"  proposal_id    : {result['proposal_id']}")
+    console.print(f"  spec_dir       : {result['spec_dir']}")
+    console.print(f"  files_present  : {len(result['files_present'])}/5")
+    if result["files_missing"]:
+        for f in result["files_missing"]:
+            console.print(f"  [red]missing[/red]       : {f}")
+    console.print(f"  manifest_valid : {result['manifest_valid']}")
+    if result["manifest_errors"]:
+        for err in result["manifest_errors"]:
+            console.print(f"  [red]error[/red]         : {err}")
+    console.print(f"  no_secrets     : {result['no_secrets']}")
+    if not result["valid"]:
+        raise typer.Exit(1)
