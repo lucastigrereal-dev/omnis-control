@@ -50,13 +50,27 @@
 
 ## BLOCOS CONCLUÍDOS
 
-_(nenhum ainda — aguardando execução)_
+| Bloco | Commit | Testes adicionados | Status |
+|---|---|---|---|
+| B0 P2.5A | dd09973 | 0 (refactor puro) | ✅ |
+| B1 P2.6 | dd09973 | +13 (dashboard+quality) | ✅ |
+| B2 P2.5 | f7c40ee | +23 (video production) | ✅ |
+| B3 P2.7 | d43c129 | +11 (campaign auditor) | ✅ |
+| B4 P2.8 | 4f9242f | +18 (delivery templates+brand kits) | ✅ |
+| B5 P2.9 | 7fd8d84 | +23 (knowledge+context pack) | ✅ |
+| CP1 | — | 1205 collected / baseline 1114 | aguardando suite |
 
 ---
 
 ## COMMITS DESTA EXPANSÃO
 
-_(será preenchido a cada bloco)_
+| Commit | Descrição |
+|---|---|
+| dd09973 | refactor(cli): B0+B1 — CLI Router + Offline Dashboard |
+| f7c40ee | feat(video): B2 — Video Production Plan (P2.5) |
+| d43c129 | feat(campaign): B3 — Campaign Quality Batch Auditor (P2.7) |
+| 4f9242f | feat(delivery): B4 — Delivery Templates + Brand Kits (P2.8) |
+| 7fd8d84 | feat(knowledge): B5 — Knowledge + Context Pack (P2.9) |
 
 ---
 
@@ -71,12 +85,12 @@ _(será preenchido a cada bloco)_
 | campaign create/zip | ✅ |
 | manual-publish mark | ✅ |
 | delivery create/zip | ✅ |
-| dashboard CLI | ❌ B1 |
-| video production plan | ❌ B2 |
-| campaign audit | ❌ B3 |
-| delivery templates | ❌ B4 |
-| knowledge/context pack | ❌ B5 |
-| mission builder | ❌ B6 |
+| dashboard CLI | ✅ B1 |
+| video production plan | ✅ B2 |
+| campaign audit | ✅ B3 |
+| delivery templates | ✅ B4 |
+| knowledge/context pack | ✅ B5 |
+| mission builder | ❌ B6 (GATE HUMANO) |
 | mission report | ❌ B7 |
-| real asset inbox | ❌ B8 |
+| real asset inbox | ❌ B8 (GATE HUMANO) |
 | OAuth / post real | ❌ CONGELADO |
