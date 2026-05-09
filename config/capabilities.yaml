@@ -1,0 +1,141 @@
+capabilities:
+  offline_package_carousel:
+    sector: marketing
+    command: "jarvis offline package-carousel"
+    output: carousel_package
+    risk_level: low
+    status: active
+    keywords:
+      - carrossel
+      - carousel
+      - slides
+
+  offline_package_post:
+    sector: marketing
+    command: "jarvis offline package-post"
+    output: single_post_package
+    risk_level: low
+    status: active
+    keywords:
+      - post
+      - publicacao
+      - feed
+
+  offline_package_reels:
+    sector: marketing
+    command: "jarvis offline package-reels"
+    output: reels_package
+    risk_level: low
+    status: active
+    keywords:
+      - reels
+      - video
+      - roteiro
+
+  campaign_package:
+    sector: marketing
+    command: "jarvis campaign create"
+    output: campaign_package
+    risk_level: low
+    status: active
+    keywords:
+      - campanha
+      - campaign
+      - 10 posts
+      - serie
+
+  render_html:
+    sector: marketing
+    command: "jarvis render package"
+    output: html_preview
+    risk_level: low
+    status: active
+    keywords:
+      - html
+      - preview
+      - visualizar
+
+  quality_score:
+    sector: operations
+    command: "jarvis quality package"
+    output: quality_report
+    risk_level: low
+    status: active
+    keywords:
+      - qualidade
+      - quality
+      - validar
+      - score
+
+  asset_inbox_import:
+    sector: operations
+    command: "jarvis asset-inbox import"
+    output: imported_asset
+    risk_level: medium
+    status: active
+    keywords:
+      - asset
+      - importar
+      - arquivo
+      - imagem
+      - video
+
+  mission_report:
+    sector: operations
+    command: "jarvis mission-report close"
+    output: mission_report
+    risk_level: low
+    status: active
+    keywords:
+      - fechar
+      - relatorio
+      - encerrar
+      - missao
+
+  delivery_zip:
+    sector: marketing
+    command: "jarvis delivery create"
+    output: client_delivery_zip
+    risk_level: low
+    status: active
+    keywords:
+      - entrega
+      - zip
+      - cliente
+      - delivery
+
+  crm_pipeline:
+    sector: sales
+    command: "jarvis crm pipeline"
+    output: crm_plan
+    risk_level: medium
+    status: active
+    keywords:
+      - crm
+      - lead
+      - pipeline
+      - follow-up
+
+  knowledge_pack:
+    sector: knowledge
+    command: "jarvis knowledge pack-list"
+    output: knowledge_pack
+    risk_level: low
+    status: active
+    keywords:
+      - conhecimento
+      - contexto
+      - briefing
+      - akasha
+
+  app_factory_spec:
+    sector: apps
+    command: "jarvis app spec create"
+    output: technical_spec
+    risk_level: high
+    status: active
+    keywords:
+      - app
+      - sistema
+      - api
+      - software
