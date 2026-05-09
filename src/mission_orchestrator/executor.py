@@ -14,22 +14,53 @@ from src.mission_orchestrator.models import (
     RUN_STATUS_DRY_RUN,
     RUN_STATUS_COMPLETE,
     RUN_STATUS_FAILED,
+    RUN_STATUS_BLOCKED,
     _now_iso,
 )
 from src.mission_orchestrator.errors import UnknownIntentError
+from src.mission_orchestrator.approval_gate import (
+    check_approval_gate,
+    create_approval_request,
+    GATE_NOT_REQUIRED,
+    GATE_APPROVED,
+    GATE_REJECTED,
+    GATE_BLOCKED,
+)
+
+RUN_STATUS_BLOCKED_APPROVAL = "blocked_pending_approval"
 
 
 def execute(
     run: OrchestratorRun,
     packages_root: Optional[Path] = None,
+    approvals_log: Optional[Path] = None,
 ) -> OrchestratorRun:
     """Execute the orchestration run (dry-run: only steps s01 and s02).
 
-    s01: detect intent (already done in plan)
-    s02: create mission package via mission_builder
-    s03-s04: skipped (require asset — manual step)
-    s05: pending (requires human validation)
+    If run.approval_required is True and no approved approval_id is set,
+    auto-creates an approval request and returns blocked status.
     """
+    # P5.1 — Approval enforcement gate
+    gate_status = check_approval_gate(run, approvals_log=approvals_log)
+
+    if gate_status == GATE_REJECTED:
+        run.status = RUN_STATUS_BLOCKED
+        run.blockers.append("Approval rejected — cannot execute this run")
+        run.completed_at = _now_iso()
+        return run
+
+    if gate_status == GATE_BLOCKED:
+        # Auto-create approval request if one doesn't exist
+        if run.approval_id is None:
+            req_id = create_approval_request(run, approvals_log=approvals_log)
+            run.approval_id = req_id
+        run.status = RUN_STATUS_BLOCKED_APPROVAL
+        run.blockers.append(
+            f"Approval required. Use: jarvis approvals-center approve {run.approval_id}"
+        )
+        run.completed_at = _now_iso()
+        return run
+
     try:
         _execute_s01(run)
         _execute_s02(run, packages_root)
