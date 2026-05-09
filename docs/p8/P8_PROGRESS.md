@@ -1,0 +1,35 @@
+# P8 Progress — Execution Graph Lite
+
+**Data início:** 2026-05-09 | **Base:** P7 Final Seal (ec215b9)
+
+---
+
+## Blocos
+
+| Bloco | Commit | Descrição | Testes | Status |
+|---|---|---|---|---|
+| P8.0 | — | Execution Graph Models + Builder | —/10 | ⬜ pending |
+| P8.1 | — | Step Runner Dry-Run | —/15 | ⬜ pending |
+| P8.2 | — | Replay / Resume Squad Run | —/12 | ⬜ pending |
+| P8.3 | — | Approval-Integrated Graph Run | —/12 | ⬜ pending |
+| P8.4 | — | Event Log + Metrics | —/10 | ⬜ pending |
+| P8.5 | — | Mission → Squad → Graph Integration | —/10 | ⬜ pending |
+| P8.6 | — | E2E Mission → Squad → Graph → Approval | —/10 | ⬜ pending |
+| P8.7 | — | Final Seal | — | ⬜ pending |
+
+---
+
+## Totais
+
+```
+P8.0 execution_graph:       —/10
+P8.1 step_runner:           —/15
+P8.2 replay_resume:         —/12
+P8.3 approval_graph:        —/12
+P8.4 event_log_metrics:     —/10
+P8.5 mission_squad_graph:   —/10
+P8.6 e2e graph flow:        —/10
+P8.7 seal:                  —
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TOTAL P8:                    0/79
+```

@@ -1,4 +1,4 @@
-# CURRENT HANDOFF — P7 Squad Composer Lite completo
+# CURRENT HANDOFF — P8 Execution Graph Lite iniciado
 
 **Data:** 2026-05-09 | **Operador:** Lucas
 
@@ -24,27 +24,35 @@
 ### P7.3 — Squad Execution Plan Dry-Run (14 testes)
 - `src/squad_execution/` — SquadExecutionPlan, planner, exporter
 - CLI: `jarvis.py squad-run plan|show|list`
-- Exporta 6 arquivos por run, manifest JSON, approval gate
+- Exporta 7 arquivos por run, manifest JSON, approval gate
 
 ### P7.4 — Squad E2E Flow (19 testes)
 - `tests/e2e/test_p7_squad_composer_flow.py`
-- 6 cenarios: marketing, app high risk, unknown fallback, no external actions, planner convenience, dependency integrity
+- 6 cenarios validados
+
+---
+
+## P8 Global Gate (ABERTO)
+
+- Gate docs criados: `docs/p8/P8_GLOBAL_GATE.md`, `docs/p8/P8_PROGRESS.md`
+- Diretórios: `docs/p8/`, `docs/execution_graph/` prontos
+- Baseline: ec215b9 (P7 Final Seal), ~1,341 testes
 
 ---
 
 ## Commits P7
 
 ```
+ec215b9 docs(p7): seal squad composer lite milestone
 0b0f00c feat(squads): add dry-run squad execution plans
 637a236 feat(tasks): add deterministic squad task decomposition
 fe13e81 feat(squads): add local squad composer lite
 81d9db9 feat(roles): add declarative role registry
-56f7fd9 docs(p7): record squad composer lite gate
 ```
 
 ---
 
-## Pipeline completo
+## Pipeline completo (P7)
 
 ```
 request → sector → capabilities → roles → squad → task plan → squad run manifest → approval gate
@@ -73,6 +81,9 @@ CONGELADO. Precisam: 5 READY validados ou override de Lucas.
 
 ---
 
-## Proximo bloco sugerido
+## Proximo bloco
 
-P8.0 Execution Graph Lite — DAG de tarefas com estados, sem agentes reais.
+P8.0 Execution Graph Models + Builder — DAG de tarefas com estados, sem agentes reais.
+- Criar `src/execution_graph/` (models.py, builder.py, validator.py, errors.py)
+- CLI: `jarvis.py graph build "<request>"`
+- 10 testes minimo
