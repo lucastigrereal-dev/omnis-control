@@ -28,6 +28,7 @@ def register(app: typer.Typer) -> None:
     from src.cli_commands.skill_matcher_cmd import skill_matcher_app
     from src.cli_commands.capability_gap_cmd import capability_gap_app
     from src.cli_commands.approval_center_cmd import approval_center_app
+    from src.cli_commands.capability_forge_lite_cmd import capability_forge_lite_app
 
     app.add_typer(argos_app)
     app.add_typer(creative_app)
@@ -48,3 +49,4 @@ def register(app: typer.Typer) -> None:
     app.add_typer(skill_matcher_app)
     app.add_typer(capability_gap_app)
     app.add_typer(approval_center_app)
+    app.add_typer(capability_forge_lite_app)
