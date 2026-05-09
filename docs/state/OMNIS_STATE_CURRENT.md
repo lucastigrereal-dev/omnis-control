@@ -1,8 +1,8 @@
-# OMNIS State — Atual (P5.0 iniciando)
+# OMNIS State — Atual (P6.0 aguardando)
 
 **Data:** 2026-05-09
 **Branch:** master
-**Fase concluida:** P4 Local Executive Brain — c438c95
+**Fase concluida:** P5 Integration Wire — 0dc09ca
 **Testes:** 1375 passed, 4 skipped
 
 ---
