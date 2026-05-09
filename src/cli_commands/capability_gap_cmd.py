@@ -120,3 +120,59 @@ def cmd_show(
     console.print(f"  status    : {gap.status}")
     console.print(f"  recommend : {gap.recommendation}")
     console.print(f"  criado    : {gap.created_at}")
+
+
+@capability_gap_app.command(name="request-approval")
+def cmd_request_approval(
+    gap_id: str = typer.Argument(..., help="ID do gap (gap_...)"),
+    json_out: bool = typer.Option(False, "--json"),
+) -> None:
+    """Cria approval request para implementar uma capability em falta."""
+    from src.capability_gap import store as store_mod
+    from src.approval_center import store as approval_store_mod
+    from src.capability_gap.workflow import request_approval_for_gap
+    from src.capability_gap.errors import CapabilityGapError
+
+    try:
+        req_id = request_approval_for_gap(
+            gap_id,
+            gaps_log=store_mod.DEFAULT_GAPS_LOG,
+            approvals_log=approval_store_mod.DEFAULT_APPROVALS_LOG,
+        )
+    except CapabilityGapError as e:
+        console.print(f"[red]Erro: {e}[/red]")
+        raise typer.Exit(1)
+
+    if json_out:
+        console.print_json(json.dumps({"gap_id": gap_id, "approval_id": req_id}, ensure_ascii=False))
+        return
+    console.print(f"[green]Approval criado:[/green] {req_id}")
+    console.print(f"  Aprovar: jarvis approvals-center approve {req_id}")
+
+
+@capability_gap_app.command(name="mark-planned")
+def cmd_mark_planned(
+    gap_id: str = typer.Argument(..., help="ID do gap"),
+    approval_id: str = typer.Option(..., "--approval-id", "-a"),
+    json_out: bool = typer.Option(False, "--json"),
+) -> None:
+    """Marca gap como planned (requer approval aprovado)."""
+    from src.capability_gap import store as store_mod
+    from src.approval_center import store as approval_store_mod
+    from src.capability_gap.workflow import mark_gap_planned
+    from src.capability_gap.errors import CapabilityGapError
+
+    try:
+        gap = mark_gap_planned(
+            gap_id, approval_id,
+            gaps_log=store_mod.DEFAULT_GAPS_LOG,
+            approvals_log=approval_store_mod.DEFAULT_APPROVALS_LOG,
+        )
+    except CapabilityGapError as e:
+        console.print(f"[red]Erro: {e}[/red]")
+        raise typer.Exit(1)
+
+    if json_out:
+        console.print_json(json.dumps(gap.to_dict(), ensure_ascii=False))
+        return
+    console.print(f"[blue]Planned:[/blue] {gap.gap_id} → {gap.missing_capability}")
