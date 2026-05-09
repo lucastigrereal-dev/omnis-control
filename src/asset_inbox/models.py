@@ -1,4 +1,4 @@
-"""Asset Inbox models — read-only scan results. Never modifies files."""
+"""Asset Inbox models — scan + import + registry. Never modifies originals."""
 from __future__ import annotations
 
 import uuid
@@ -68,6 +68,80 @@ class AssetInboxItem:
             "warnings": self.warnings,
         }
 
+
+# ── Import models ────────────────────────────────────────────────────────────
+
+IMPORT_STATUS_IMPORTED = "imported"
+IMPORT_STATUS_DUPLICATE = "duplicate"
+IMPORT_STATUS_BLOCKED = "blocked"
+IMPORT_STATUS_FAILED = "failed"
+IMPORT_STATUS_MISSING_SOURCE = "missing_source"
+IMPORT_STATUS_FP_MISMATCH = "fingerprint_mismatch"
+IMPORT_STATUS_UNSUPPORTED = "unsupported_extension"
+IMPORT_STATUS_TOO_LARGE = "too_large"
+
+BASE_STORAGE_ROOT = "storage/asset_inbox"
+BASE_REGISTRY_PATH = "data/asset_inbox_registry.jsonl"
+
+
+@dataclass
+class ImportedAsset:
+    asset_id: str
+    source_path: str
+    stored_path: str
+    file_name: str
+    extension: str
+    media_type: str
+    size_bytes: int
+    source_fingerprint: str
+    stored_fingerprint: str
+    fingerprint_match: bool
+    status: str
+    warnings: list[str] = field(default_factory=list)
+    blockers: list[str] = field(default_factory=list)
+    created_at: str = field(default_factory=_now_iso)
+
+    def to_dict(self) -> dict:
+        return {
+            "asset_id": self.asset_id,
+            "source_path": self.source_path,
+            "stored_path": self.stored_path,
+            "file_name": self.file_name,
+            "extension": self.extension,
+            "media_type": self.media_type,
+            "size_bytes": self.size_bytes,
+            "source_fingerprint": self.source_fingerprint,
+            "stored_fingerprint": self.stored_fingerprint,
+            "fingerprint_match": self.fingerprint_match,
+            "status": self.status,
+            "warnings": self.warnings,
+            "blockers": self.blockers,
+            "created_at": self.created_at,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "ImportedAsset":
+        return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
+
+
+@dataclass
+class AssetImportResult:
+    asset: Optional[ImportedAsset]
+    status: str
+    warnings: list[str] = field(default_factory=list)
+    blockers: list[str] = field(default_factory=list)
+
+    def to_dict(self) -> dict:
+        return {
+            "asset": self.asset.to_dict() if self.asset else None,
+            "status": self.status,
+            "warnings": self.warnings,
+            "blockers": self.blockers,
+            "next_actions": ["B8C Assign Imported Asset → Package READY"],
+        }
+
+
+# ── Scan result ───────────────────────────────────────────────────────────────
 
 @dataclass
 class AssetInboxScanResult:

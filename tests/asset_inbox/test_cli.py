@@ -79,3 +79,79 @@ def test_cli_scan_no_secrets_in_output(tmp_path):
     assert "meta_app_secret" not in output
     assert "instagram_token" not in output
     assert "password" not in output
+
+
+# ── B8B CLI tests ─────────────────────────────────────────────────────────────
+
+from src.asset_inbox import importer as imp_mod
+from src.asset_inbox import registry as reg_mod
+
+
+def test_cli_import_jpg(tmp_path, monkeypatch):
+    storage = tmp_path / "storage"
+    reg = tmp_path / "reg.jsonl"
+    monkeypatch.setattr(imp_mod, "DEFAULT_STORAGE_ROOT", storage)
+    monkeypatch.setattr(imp_mod, "DEFAULT_REGISTRY_PATH", reg)
+    monkeypatch.setattr(reg_mod, "DEFAULT_REGISTRY_PATH", reg)
+    f = make_file(tmp_path, "photo.jpg")
+    result = runner.invoke(app, ["asset-inbox", "import", str(f)])
+    assert result.exit_code == 0, result.output
+    assert "imported" in result.output.lower() or "asset_id" in result.output.lower()
+
+
+def test_cli_import_json_output(tmp_path, monkeypatch):
+    storage = tmp_path / "storage"
+    reg = tmp_path / "reg.jsonl"
+    monkeypatch.setattr(imp_mod, "DEFAULT_STORAGE_ROOT", storage)
+    monkeypatch.setattr(imp_mod, "DEFAULT_REGISTRY_PATH", reg)
+    monkeypatch.setattr(reg_mod, "DEFAULT_REGISTRY_PATH", reg)
+    f = make_file(tmp_path, "clip.mp4", b"fake video")
+    result = runner.invoke(app, ["asset-inbox", "import", str(f), "--json"])
+    assert result.exit_code == 0, result.output
+    data = json.loads(result.output)
+    assert data["status"] == "imported"
+    assert data["asset"]["fingerprint_match"] is True
+
+
+def test_cli_list_empty(tmp_path, monkeypatch):
+    reg = tmp_path / "reg.jsonl"
+    monkeypatch.setattr(reg_mod, "DEFAULT_REGISTRY_PATH", reg)
+    result = runner.invoke(app, ["asset-inbox", "list"])
+    assert result.exit_code == 0, result.output
+
+
+def test_cli_list_after_import(tmp_path, monkeypatch):
+    storage = tmp_path / "storage"
+    reg = tmp_path / "reg.jsonl"
+    monkeypatch.setattr(imp_mod, "DEFAULT_STORAGE_ROOT", storage)
+    monkeypatch.setattr(imp_mod, "DEFAULT_REGISTRY_PATH", reg)
+    monkeypatch.setattr(reg_mod, "DEFAULT_REGISTRY_PATH", reg)
+    f = make_file(tmp_path, "photo.jpg")
+    runner.invoke(app, ["asset-inbox", "import", str(f)])
+    result = runner.invoke(app, ["asset-inbox", "list", "--json"])
+    assert result.exit_code == 0, result.output
+    data = json.loads(result.output)
+    assert isinstance(data, list)
+    assert len(data) == 1
+
+
+def test_cli_show_not_found(tmp_path, monkeypatch):
+    reg = tmp_path / "reg.jsonl"
+    monkeypatch.setattr(reg_mod, "DEFAULT_REGISTRY_PATH", reg)
+    result = runner.invoke(app, ["asset-inbox", "show", "ai_nonexistent"])
+    assert result.exit_code != 0
+
+
+def test_cli_show_found(tmp_path, monkeypatch):
+    storage = tmp_path / "storage"
+    reg = tmp_path / "reg.jsonl"
+    monkeypatch.setattr(imp_mod, "DEFAULT_STORAGE_ROOT", storage)
+    monkeypatch.setattr(imp_mod, "DEFAULT_REGISTRY_PATH", reg)
+    monkeypatch.setattr(reg_mod, "DEFAULT_REGISTRY_PATH", reg)
+    f = make_file(tmp_path, "photo.jpg")
+    import_result = runner.invoke(app, ["asset-inbox", "import", str(f), "--json"])
+    asset_id = json.loads(import_result.output)["asset"]["asset_id"]
+    result = runner.invoke(app, ["asset-inbox", "show", asset_id, "--json"])
+    assert result.exit_code == 0, result.output
+    data = json.loads(result.output)
+    assert data["asset_id"] == asset_id

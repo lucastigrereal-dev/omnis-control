@@ -35,3 +35,5 @@ config/meta_accounts.yaml
 exports/offline_factory/
 exports/offline_factory_zips/
 exports/mission_packages/
+storage/asset_inbox/
+data/asset_inbox_registry.jsonl
