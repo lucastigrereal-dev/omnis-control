@@ -13,7 +13,7 @@
 | B4 | P2.8 | Delivery Templates + Brand Kits (upsert) | done |
 | B5 | P2.9 | Knowledge + Context Pack Unified | done |
 | B6 | P3.0 | Mission Builder + Package (deterministico) | done |
-| B7 | P3.1 | Mission Report / Close | pending |
+| B7 | P3.1 | Mission Report / Close | done |
 | B8 | P3.2 | Real Asset Inbox (GATE HUMANO) | pending |
 
 ## Suite cumulativa
@@ -24,8 +24,14 @@
 | CP1 (B0-B5) | 1179 passed |
 | B6 isolado | 48 passed |
 
+## Commits
+
+| Commit | Bloco | Descricao |
+|---|---|---|
+| 1951ee7 | B6 | Mission Builder — 48 testes |
+| 69e3f0d | B7 | Mission Report — 21 testes |
+
 ## Proximos passos
 
-B7 — Mission Report / Close.
-CP2 — suite completa pos-B7.
-B8 — Real Asset Inbox (requer gate humano de Lucas).
+CP2 — suite completa pos-B7 (em execucao).
+B8 — Real Asset Inbox (GATE HUMANO: Lucas precisa aprovar).

@@ -1,21 +1,22 @@
-# CURRENT HANDOFF — P3.0 (B6) completo
+# CURRENT HANDOFF — P3.1 (B6+B7) completo
 
 **Data:** 2026-05-09 | **Operador:** Lucas
 
 ---
 
-## B6 (P3.0) — Mission Builder entregue
+## B6+B7 (P3.0+P3.1) entregues
 
-7 módulos Python + CLI + config YAML. 48/48 testes. Isolamento total de src/missions/.
+B6 — Mission Builder: 7 módulos, 48/48 testes, commit 1951ee7
+B7 — Mission Report: 4 módulos, 21/21 testes, commit 69e3f0d
 
-| Módulo | Descricao |
-|---|---|
-| `config/intents.yaml` | Padrões deterministicos por intent |
-| `src/mission_builder/intent.py` | detect_intent() — sem LLM, sem rede |
-| `src/mission_builder/planner.py` | build_plan() — extrai conta, slots, etapas |
-| `src/mission_builder/package_exporter.py` | export_package() — 6 arquivos + manifest |
-| `src/mission_builder/executor.py` | run() — orquestra plan + export |
-| `src/cli_commands/mission_builder_cmd.py` | CLI: plan + run --dry-run |
+Pipeline completo:
+```
+pedido -> mission-builder plan -> mission-builder run --dry-run
+                                -> pacote (6 arquivos + manifest)
+[executar manualmente]
+-> mission-report close --outcome completed --url "..."
+   -> 07_mission_report.md + data/mission_reports.jsonl
+```
 
 ## Suite acumulada
 
@@ -24,6 +25,9 @@
 | P2.4.1 baseline | 1114 passed |
 | CP1 (B0-B5) | 1179 passed |
 | B6 isolado | 48 passed |
+| B7 isolado | 21 passed |
+| B6+B7 juntos | 69 passed |
+| CP2 (B0-B7) | em execucao |
 
 ---
 
@@ -111,10 +115,9 @@ CONGELADO. Precisam: 5 READY validados (atual: 1) ou override de Lucas.
 
 ## Próxima fase
 
-B7 (P3.1) — Mission Report / Close.
-CP2 — suite completa pos-B7.
-B8 (P3.2) — Real Asset Inbox (requer gate humano de Lucas).
+B8 (P3.2) — Real Asset Inbox. **GATE HUMANO obrigatório.**
+Lucas precisa dar green-light explícito antes de implementar.
 
 ---
 
-**B0-B6 entregues. 1227 testes. Próxima: B7 Mission Report.**
+**B0-B7 entregues. ~1250 testes. Gate B8: aguardando Lucas.**
