@@ -54,6 +54,7 @@ from src.cli_commands.offline_factory_cmd import offline_app
 from src.cli_commands.assets_cmd import assets_app
 from src.cli_commands.render_cmd import render_app
 from src.cli_commands.quality_cmd import quality_app
+from src.cli_commands.campaign_cmd import campaign_app
 from src.reports import briefing as briefing_mod
 
 app = typer.Typer(
@@ -1780,6 +1781,7 @@ app.add_typer(offline_app)
 app.add_typer(assets_app)
 app.add_typer(render_app)
 app.add_typer(quality_app)
+app.add_typer(campaign_app)
 
 
 @templates_app.command(name="list")
