@@ -64,6 +64,21 @@ class StepNode:
             "assigned_role": self.assigned_role,
         }
 
+    @classmethod
+    def from_dict(cls, d: dict) -> "StepNode":
+        return cls(
+            step_id=d["step_id"],
+            task_id=d["task_id"],
+            role_id=d["role_id"],
+            title=d["title"],
+            description=d["description"],
+            expected_output=d["expected_output"],
+            depends_on=list(d.get("depends_on", [])),
+            status=StepStatus(d.get("status", "pending")),
+            estimated_duration=d.get("estimated_duration", "5min"),
+            assigned_role=d.get("assigned_role", ""),
+        )
+
 
 @dataclass
 class ExecutionGraph:
@@ -91,6 +106,19 @@ class ExecutionGraph:
             "topological_order": self.topological_order,
             "created_at": self.created_at,
         }
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "ExecutionGraph":
+        return cls(
+            graph_id=d["graph_id"],
+            request=d["request"],
+            squad_id=d["squad_id"],
+            task_plan_id=d["task_plan_id"],
+            nodes=[StepNode.from_dict(n) for n in d["nodes"]],
+            edges=[tuple(e) for e in d["edges"]],
+            topological_order=list(d.get("topological_order", [])),
+            created_at=d.get("created_at", ""),
+        )
 
 
 @dataclass
@@ -123,6 +151,7 @@ class StepRun:
     logs: list[StepRunLog]
     started_at: str
     finished_at: str
+    graph_snapshot: dict | None = None  # graph.to_dict() for resume/replay
 
     def to_dict(self) -> dict:
         return {
@@ -134,4 +163,5 @@ class StepRun:
             "logs": [l.to_dict() for l in self.logs],
             "started_at": self.started_at,
             "finished_at": self.finished_at,
+            "graph_snapshot": self.graph_snapshot,
         }

@@ -99,7 +99,7 @@ def cmd_run(
     squad = compose_squad(request)
     task_plan = decompose_squad(squad)
     graph = build_graph(squad, task_plan)
-    step_run = run_graph_dry(graph)
+    step_run = run_graph_dry(graph, include_snapshot=True)
 
     # Persist to store
     run_dir = DEFAULT_STORE_ROOT / step_run.graph_run_id
@@ -155,6 +155,68 @@ def cmd_run_show(
                 log.get("status", ""), " "
             )
             console.print(f"    {icon} {log['message']}")
+
+
+@execution_graph_app.command(name="run-resume")
+def cmd_run_resume(
+    run_id: str = typer.Argument(..., help="Run ID to resume"),
+    json_out: bool = typer.Option(False, "--json"),
+) -> None:
+    """Retoma um graph run interrompido, pulando steps ja concluidos."""
+    from src.execution_graph.replay import resume_graph_run
+    from src.execution_graph.store import write_manifest, DEFAULT_STORE_ROOT
+
+    step_run = resume_graph_run(run_id)
+
+    if step_run is None:
+        console.print(f"[red]Cannot resume run: {run_id} (not found or no snapshot)[/red]")
+        return
+
+    # Persist resumed run
+    run_dir = DEFAULT_STORE_ROOT / step_run.graph_run_id
+    write_manifest(run_dir, step_run.to_dict())
+
+    if json_out:
+        console.print_json(json.dumps(step_run.to_dict(), ensure_ascii=False))
+        return
+
+    console.print(Panel(f"[bold]Graph Run (Resumed)[/bold] — {step_run.graph_run_id}", expand=False))
+    console.print(f"  original_run    : {run_id}")
+    console.print(f"  status          : [{_status_color(step_run.status)}]{step_run.status}[/{_status_color(step_run.status)}]")
+    console.print(f"  steps           : {len(step_run.step_states)}")
+
+
+@execution_graph_app.command(name="run-replay")
+def cmd_run_replay(
+    run_id: str = typer.Argument(..., help="Run ID to replay"),
+    json_out: bool = typer.Option(False, "--json"),
+) -> None:
+    """Re-executa um graph run do zero (replay completo)."""
+    from src.execution_graph.replay import replay_graph_run
+    from src.execution_graph.store import write_manifest, DEFAULT_STORE_ROOT
+
+    step_run = replay_graph_run(run_id)
+
+    if step_run is None:
+        console.print(f"[red]Cannot replay run: {run_id} (not found or no snapshot)[/red]")
+        return
+
+    # Persist replayed run
+    run_dir = DEFAULT_STORE_ROOT / step_run.graph_run_id
+    write_manifest(run_dir, step_run.to_dict())
+
+    if json_out:
+        console.print_json(json.dumps(step_run.to_dict(), ensure_ascii=False))
+        return
+
+    console.print(Panel(f"[bold]Graph Run (Replayed)[/bold] — {step_run.graph_run_id}", expand=False))
+    console.print(f"  original_run    : {run_id}")
+    console.print(f"  status          : [{_status_color(step_run.status)}]{step_run.status}[/{_status_color(step_run.status)}]")
+    console.print(f"  steps           : {len(step_run.step_states)}")
+
+
+def _status_color(status: str) -> str:
+    return {"done": "green", "failed": "red"}.get(status, "yellow")
 
 
 @execution_graph_app.command(name="run-list")
