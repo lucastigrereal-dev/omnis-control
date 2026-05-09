@@ -1,8 +1,8 @@
 """
-System Router — missões, ferramentas, métricas, publisher, pipeline.
+System Router — missões, ferramentas, métricas, publisher, pipeline, video.
 
 Registra: argos-drafts, creative, publisher, forge, pipeline,
-          missions, tools, metrics, oauth, post
+          missions, tools, metrics, oauth, post, video
 """
 
 import typer
@@ -19,6 +19,7 @@ def register(app: typer.Typer) -> None:
     from src.cli_commands.metrics_cmd import metrics_app
     from src.cli_commands.oauth_cmd import oauth_app
     from src.cli_commands.post_cmd import post_app
+    from src.cli_commands.video_production_cmd import video_production_app
 
     app.add_typer(argos_app)
     app.add_typer(creative_app)
@@ -30,3 +31,4 @@ def register(app: typer.Typer) -> None:
     app.add_typer(metrics_app)
     app.add_typer(oauth_app)
     app.add_typer(post_app)
+    app.add_typer(video_production_app)
