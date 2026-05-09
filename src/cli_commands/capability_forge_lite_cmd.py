@@ -191,3 +191,86 @@ def cmd_validate_spec(
     console.print(f"  no_secrets     : {result['no_secrets']}")
     if not result["valid"]:
         raise typer.Exit(1)
+
+
+@capability_forge_lite_app.command(name="request-approval")
+def cmd_request_approval(
+    proposal_id: str = typer.Argument(..., help="ID da proposal (prop_...)"),
+    json_out: bool = typer.Option(False, "--json"),
+) -> None:
+    """Cria pedido de aprovacao para uma proposal no Approval Center."""
+    import json as _json
+    from src.capability_forge_lite import store as store_mod
+    from src.approval_center import store as approval_store_mod
+    from src.capability_forge_lite.approval_bridge import request_proposal_approval
+    from src.capability_forge_lite.errors import ProposalNotFoundError
+
+    try:
+        request_id = request_proposal_approval(
+            proposal_id,
+            proposals_log=store_mod.DEFAULT_PROPOSALS_LOG,
+            approvals_log=approval_store_mod.DEFAULT_APPROVALS_LOG,
+        )
+    except ProposalNotFoundError as e:
+        console.print(f"[red]Erro: {e}[/red]")
+        raise typer.Exit(1)
+
+    if json_out:
+        console.print_json(_json.dumps({"request_id": request_id, "proposal_id": proposal_id}, ensure_ascii=False))
+        return
+
+    console.print(Panel("[bold]Approval Request Created[/bold]", expand=False))
+    console.print(f"  request_id  : {request_id}")
+    console.print(f"  proposal_id : {proposal_id}")
+    console.print(f"  next        : jarvis forge-lite mark-approved {proposal_id}")
+
+
+@capability_forge_lite_app.command(name="mark-approved")
+def cmd_mark_approved(
+    proposal_id: str = typer.Argument(..., help="ID da proposal (prop_...)"),
+    note: str = typer.Option("", "--note"),
+) -> None:
+    """Marca proposta como aprovada (resolve o pedido de aprovacao)."""
+    from src.capability_forge_lite import store as store_mod
+    from src.approval_center import store as approval_store_mod
+    from src.capability_forge_lite.approval_bridge import mark_proposal_approved
+    from src.capability_forge_lite.errors import ProposalNotFoundError, ProposalNotApprovedError
+
+    try:
+        mark_proposal_approved(
+            proposal_id,
+            note=note,
+            proposals_log=store_mod.DEFAULT_PROPOSALS_LOG,
+            approvals_log=approval_store_mod.DEFAULT_APPROVALS_LOG,
+        )
+    except (ProposalNotFoundError, ProposalNotApprovedError) as e:
+        console.print(f"[red]Erro: {e}[/red]")
+        raise typer.Exit(1)
+
+    console.print(f"[green]Proposal {proposal_id} aprovada.[/green]")
+    console.print(f"  next : jarvis forge-lite register {proposal_id}")
+
+
+@capability_forge_lite_app.command(name="mark-rejected")
+def cmd_mark_rejected(
+    proposal_id: str = typer.Argument(..., help="ID da proposal (prop_...)"),
+    note: str = typer.Option("", "--note"),
+) -> None:
+    """Marca proposta como rejeitada."""
+    from src.capability_forge_lite import store as store_mod
+    from src.approval_center import store as approval_store_mod
+    from src.capability_forge_lite.approval_bridge import mark_proposal_rejected
+    from src.capability_forge_lite.errors import ProposalNotFoundError, ProposalNotApprovedError
+
+    try:
+        mark_proposal_rejected(
+            proposal_id,
+            note=note,
+            proposals_log=store_mod.DEFAULT_PROPOSALS_LOG,
+            approvals_log=approval_store_mod.DEFAULT_APPROVALS_LOG,
+        )
+    except (ProposalNotFoundError, ProposalNotApprovedError) as e:
+        console.print(f"[red]Erro: {e}[/red]")
+        raise typer.Exit(1)
+
+    console.print(f"[yellow]Proposal {proposal_id} rejeitada.[/yellow]")
