@@ -21,6 +21,7 @@ def register(app: typer.Typer) -> None:
     from src.cli_commands.post_cmd import post_app
     from src.cli_commands.video_production_cmd import video_production_app
     from src.cli_commands.knowledge_cmd import knowledge_app
+    from src.cli_commands.mission_builder_cmd import mission_builder_app
 
     app.add_typer(argos_app)
     app.add_typer(creative_app)
@@ -34,3 +35,4 @@ def register(app: typer.Typer) -> None:
     app.add_typer(post_app)
     app.add_typer(video_production_app)
     app.add_typer(knowledge_app)
+    app.add_typer(mission_builder_app)

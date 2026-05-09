@@ -1,21 +1,29 @@
-# CURRENT HANDOFF — P2.4.1 completo
+# CURRENT HANDOFF — P3.0 (B6) completo
 
 **Data:** 2026-05-09 | **Operador:** Lucas
 
 ---
 
-## Bloco P2.0-P2.4 + Hygiene Gate entregue
+## B6 (P3.0) — Mission Builder entregue
 
-6 fases. 6 commits separados. 1114/1114 testes (suite completa).
+7 módulos Python + CLI + config YAML. 48/48 testes. Isolamento total de src/missions/.
 
-| Fase | Commit | Descricao |
-|---|---|---|
-| P2.0 | 1726209 | Render Engine HTML Preview |
-| P2.1 | 281cd46 | Visual Quality Layer (score 0-100) |
-| P2.2 | a8c87e2 | Campaign Package 10 Posts |
-| P2.3 | 01c2ce6 | Manual Publishing Tracker |
-| P2.4 | af858e0 | Client Delivery ZIP |
-| P2.4.1 | 82b1b5a | Full Suite Hygiene Gate (3 fixes) |
+| Módulo | Descricao |
+|---|---|
+| `config/intents.yaml` | Padrões deterministicos por intent |
+| `src/mission_builder/intent.py` | detect_intent() — sem LLM, sem rede |
+| `src/mission_builder/planner.py` | build_plan() — extrai conta, slots, etapas |
+| `src/mission_builder/package_exporter.py` | export_package() — 6 arquivos + manifest |
+| `src/mission_builder/executor.py` | run() — orquestra plan + export |
+| `src/cli_commands/mission_builder_cmd.py` | CLI: plan + run --dry-run |
+
+## Suite acumulada
+
+| Checkpoint | Testes |
+|---|---|
+| P2.4.1 baseline | 1114 passed |
+| CP1 (B0-B5) | 1179 passed |
+| B6 isolado | 48 passed |
 
 ---
 
@@ -101,10 +109,12 @@ CONGELADO. Precisam: 5 READY validados (atual: 1) ou override de Lucas.
 
 ---
 
-## Proxima fase
+## Próxima fase
 
-Lucas decide: P2.5 (video plan), P2.6 (dashboard CLI), ou retomar P1.6 (OAuth).
+B7 (P3.1) — Mission Report / Close.
+CP2 — suite completa pos-B7.
+B8 (P3.2) — Real Asset Inbox (requer gate humano de Lucas).
 
 ---
 
-**P2.0-P2.4.1 entregues. Suite limpa. Proxima decisao: Lucas.**
+**B0-B6 entregues. 1227 testes. Próxima: B7 Mission Report.**

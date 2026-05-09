@@ -1,0 +1,68 @@
+# Mission Builder — Intent Detection
+# Deterministic keyword matching. No LLM. No API calls.
+# Priority: first match wins (top to bottom).
+
+intents:
+  carousel:
+    patterns:
+      - "carrossel"
+      - "carousel"
+      - "slides"
+      - "galeria"
+      - "sequencia de imagens"
+      - "sequência de imagens"
+    deliverable: "carousel_package"
+    description: "Carrossel de imagens para feed"
+
+  reels:
+    patterns:
+      - "reels"
+      - "reel"
+      - "video curto"
+      - "vídeo curto"
+      - "shot list"
+      - "roteiro de video"
+      - "roteiro de vídeo"
+      - "short video"
+    deliverable: "reels_package"
+    description: "Reel / vídeo curto"
+
+  campaign:
+    patterns:
+      - "campanha"
+      - "campaign"
+      - "serie de posts"
+      - "série de posts"
+      - "calendario"
+      - "calendário"
+      - "10 posts"
+      - "20 posts"
+      - "30 posts"
+      - "multiplos posts"
+      - "múltiplos posts"
+    deliverable: "campaign_package"
+    description: "Campanha com múltiplos posts"
+
+  post:
+    patterns:
+      - "post simples"
+      - "post unico"
+      - "post único"
+      - "feed simples"
+      - "imagem unica"
+      - "imagem única"
+      - "single post"
+      - "post de feed"
+    deliverable: "single_post_package"
+    description: "Post simples de feed"
+
+  story:
+    patterns:
+      - "stories"
+      - "story"
+      - "stories de instagram"
+      - "15 segundos"
+    deliverable: "story_package"
+    description: "Stories do Instagram"
+
+fallback: "unknown"
