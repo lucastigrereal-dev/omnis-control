@@ -17,6 +17,11 @@ class StepStatus(str, Enum):
     SKIPPED = "skipped"
 
 
+RUN_STATUS_RUNNING = "running"
+RUN_STATUS_DONE = "done"
+RUN_STATUS_FAILED = "failed"
+
+
 def _make_graph_id() -> str:
     raw = os.urandom(8)
     return "graph_" + hashlib.sha256(raw).hexdigest()[:8]
@@ -25,6 +30,11 @@ def _make_graph_id() -> str:
 def _make_step_id() -> str:
     raw = os.urandom(4)
     return "step_" + hashlib.sha256(raw).hexdigest()[:6]
+
+
+def _make_run_id() -> str:
+    raw = os.urandom(8)
+    return "grun_" + hashlib.sha256(raw).hexdigest()[:8]
 
 
 @dataclass
@@ -80,4 +90,48 @@ class ExecutionGraph:
             "edges": [list(e) for e in self.edges],
             "topological_order": self.topological_order,
             "created_at": self.created_at,
+        }
+
+
+@dataclass
+class StepRunLog:
+    """A single event during step execution."""
+    step_id: str
+    role_id: str
+    status: str  # StepStatus value
+    message: str
+    timestamp: str
+
+    def to_dict(self) -> dict:
+        return {
+            "step_id": self.step_id,
+            "role_id": self.role_id,
+            "status": self.status,
+            "message": self.message,
+            "timestamp": self.timestamp,
+        }
+
+
+@dataclass
+class StepRun:
+    """Complete dry-run execution of a graph."""
+    graph_run_id: str
+    graph_id: str
+    request: str
+    status: str  # running | done | failed
+    step_states: dict[str, str]  # step_id → status
+    logs: list[StepRunLog]
+    started_at: str
+    finished_at: str
+
+    def to_dict(self) -> dict:
+        return {
+            "graph_run_id": self.graph_run_id,
+            "graph_id": self.graph_id,
+            "request": self.request,
+            "status": self.status,
+            "step_states": self.step_states,
+            "logs": [l.to_dict() for l in self.logs],
+            "started_at": self.started_at,
+            "finished_at": self.finished_at,
         }
