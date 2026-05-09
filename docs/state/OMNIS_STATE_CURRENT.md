@@ -1,4 +1,4 @@
-# OMNIS State — Atual (P6 completo)
+# OMNIS State — Atual (P7 iniciando)
 
 **Data:** 2026-05-09
 **Branch:** master
