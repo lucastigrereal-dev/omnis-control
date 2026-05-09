@@ -385,8 +385,14 @@ class TestQueueAssign:
 
     def test_assign_empty_video_registry(self, queue, accounts_reg):
         """Queue sem assets registrados deve falhar com mensagem clara."""
-        with pytest.raises(ValueError, match="Video Asset Registry não encontrado"):
-            queue.assign_asset("fake_id", "fake_asset")
+        import src.content_queue.queue as cq_mod
+        orig = cq_mod.VIDEO_ASSETS_PATH
+        cq_mod.VIDEO_ASSETS_PATH = "/tmp/nonexistent_video_assets_omnis_test_xyz.jsonl"
+        try:
+            with pytest.raises(ValueError, match="Video Asset Registry não encontrado"):
+                queue.assign_asset("fake_id", "fake_asset")
+        finally:
+            cq_mod.VIDEO_ASSETS_PATH = orig
 
 
 # ---------------------------------------------------------------------------

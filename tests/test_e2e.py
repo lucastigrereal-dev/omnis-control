@@ -346,6 +346,11 @@ class TestE2E7Seguranca:
 
     def test_no_docker_modification(self):
         """doctor não modifica containers — só lê status."""
+        import subprocess as _sp
+        docker_check = _sp.run(["docker", "ps"], capture_output=True)
+        if docker_check.returncode != 0:
+            pytest.skip("Docker not running — test requires Docker Desktop")
+
         proc = _run_cli(OMNIS_SHIM, "doctor", timeout=TIMEOUT_DOCTOR)
         data = json.loads(proc.stdout)
         docker_data = data.get("checks", {}).get("docker", {})
