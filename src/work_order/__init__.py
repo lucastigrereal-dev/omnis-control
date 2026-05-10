@@ -45,6 +45,14 @@ from src.work_order.approval_bridge import (
     reject_work_order,
     request_work_order_approval,
 )
+from src.work_order.graph_integration import (
+    build_and_persist_work_orders,
+    find_work_order_ids_for_run,
+    load_work_orders_for_run,
+    run_graph_with_work_orders,
+    sync_all_work_orders_from_run,
+    sync_work_order_status,
+)
 
 __all__ = [
     "WorkOrderStatus",
@@ -82,4 +90,10 @@ __all__ = [
     "GATE_BLOCKED",
     "GATE_NOT_REQUIRED",
     "GATE_REJECTED",
+    "run_graph_with_work_orders",
+    "sync_work_order_status",
+    "sync_all_work_orders_from_run",
+    "build_and_persist_work_orders",
+    "find_work_order_ids_for_run",
+    "load_work_orders_for_run",
 ]
