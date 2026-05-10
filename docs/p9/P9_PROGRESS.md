@@ -9,7 +9,7 @@
 | Bloco | Commit | Descricao | Testes | Status |
 |---|---|---|---|---|
 | P9.0 | — | Work Order Models + Builder | 61/10 | ✅ done |
-| P9.1 | — | Local Execution Contracts | —/10 | ⏳ pending |
+| P9.1 | — | Local Execution Contracts | 36/10 | ✅ done |
 | P9.2 | — | Output Collector | —/10 | ⏳ pending |
 | P9.3 | — | Approval-to-Execution Bridge | —/10 | ⏳ pending |
 | P9.4 | — | Execution Graph → Work Order Integration | —/10 | ⏳ pending |
@@ -23,7 +23,7 @@
 
 ```
 P9.0 work_order:             61/10 PASS
-P9.1 contracts:              —/10
+P9.1 contracts:              36/10 PASS
 P9.2 output_collector:       —/10
 P9.3 approval_bridge:        —/10
 P9.4 graph_integration:      —/10
@@ -31,5 +31,5 @@ P9.5 package_autofill:       —/10
 P9.6 e2e work order flow:    —/10
 P9.7 seal:                   —
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-TOTAL P9:                    61/10
+TOTAL P9:                    97/20
 ```
