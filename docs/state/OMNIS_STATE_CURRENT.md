@@ -1,10 +1,10 @@
-# OMNIS State — Atual (P9 iniciado)
+# OMNIS State — Atual (P9.6 concluido)
 
 **Data:** 2026-05-09
 **Branch:** master
 **Fase concluida:** P8 Execution Graph Lite — todos os blocos
-**Fase atual:** P9 Work Order System — Global Gate aberto
-**Testes P8:** 137/137 PASS
+**Fase atual:** P9 Work Order System — P9.6 E2E concluido, P9.7 Final Seal pendente
+**Testes P9:** 206/70 PASS (31 E2E + 175 unit)
 
 ---
 
@@ -72,5 +72,5 @@ src/work_order/          — [P9.0 — pending]
 | P9.3 | Approval-to-Execution Bridge | Media |
 | P9.4 | Execution Graph → Work Order Integration | Media |
 | P9.5 | Mission Package Auto-Fill | Media |
-| P9.6 | E2E Mission → Graph → Work Orders → Outputs | Media |
-| P9.7 | Final Seal | Baixa |
+| P9.6 | E2E Mission → Graph → Work Orders → Outputs | ✅ done |
+| P9.7 | Final Seal | Pendente |

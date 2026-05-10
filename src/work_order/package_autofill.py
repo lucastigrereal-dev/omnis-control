@@ -110,7 +110,7 @@ def auto_fill_mission_package(
         wo_dir = exports_root / wo.work_order_id
         for out in wo.outputs:
             output_count += 1
-            source = wo_dir / out.file_path
+            source = wo_dir / Path(out.file_path).name
 
             target_dir = pkg_dir / "04_outputs" / wo.role
             target = target_dir / Path(out.file_path).name

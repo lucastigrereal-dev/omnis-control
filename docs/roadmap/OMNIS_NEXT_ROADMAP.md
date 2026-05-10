@@ -1,9 +1,9 @@
-# OMNIS Próximo Roadmap — P8+
+# OMNIS Próximo Roadmap — P9.6 concluido
 
-**Data:** 2026-05-09 | **Base:** P7 completo, ~1,341 testes
+**Data:** 2026-05-09 | **Base:** P9.6 concluido, 206 testes P9 + 137 P8 + ~1,723 outros
 
-> P7 ENTREGUE: Role Registry, Squad Composer Lite, Task Decomposition, Squad Execution Plan, Squad E2E Flow.
-> Roadmap abaixo reflete P8+.
+> P8 ENTREGUE: Execution Graph Lite (137 testes). P9 ENTREGUE ate P9.6: Work Order System completo (206 testes).
+> P9.7 Final Seal pendente. Roadmap abaixo reflete P10+.
 
 ---
 
@@ -57,6 +57,24 @@
 
 - E2E test integrando P3 (missions) + P7 (squads) + P2 (packages)
 - Testes: 10 minimo
+
+---
+
+## P9 — Work Order System (CONCLUIDO ate P9.6)
+
+**Objetivo:** Transformar graph nodes em work orders rastreaveis com contracts, outputs e mission package auto-fill.
+
+| Bloco | Descricao | Testes | Status |
+|---|---|---|---|
+| P9.0 | Work Order Models + Builder | 61/10 | ✅ |
+| P9.1 | Local Execution Contracts | 36/10 | ✅ |
+| P9.2 | Output Collector | 23/10 | ✅ |
+| P9.3 | Approval-to-Execution Bridge | 22/10 | ✅ |
+| P9.4 | Graph → Work Order Integration | 17/10 | ✅ |
+| P9.5 | Mission Package Auto-Fill | 16/10 | ✅ |
+| P9.6 | E2E Work Order Flow | 31/10 | ✅ |
+| P9.7 | Final Seal | — | ⏳ |
+| **Total** | | **206/70** | |
 
 ---
 

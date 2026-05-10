@@ -1,36 +1,40 @@
-# CURRENT HANDOFF — P9 Work Order System iniciado
+# CURRENT HANDOFF — P9.6 E2E concluido, P9.7 Final Seal pendente
 
 **Data:** 2026-05-09 | **Operador:** Lucas
 
 ---
 
-## O que foi feito (P8 completo)
+## O que foi feito (P9 completo ate P9.6)
 
-### P8.0 — Execution Graph Models + Builder (16 testes)
-- `src/execution_graph/models.py` — StepNode, GraphRun, ExecutionGraph
-- `src/execution_graph/builder.py` — Builder com Kahn topological sort
-- CLI: `jarvis.py graph build "<request>"`
+### P9.0 — Work Order Models + Builder (61 testes)
+- `src/work_order/models.py` — WorkOrder, OutputContract, OutputEntry, 10 statuses, 9 output types
+- `src/work_order/builder.py` — Build work orders from execution graph
+- `src/work_order/validator.py` — Validate work order structure
 
-### P8.1 — Step Runner Dry-Run (21 testes)
-- `src/execution_graph/runner.py` — Dry-run com fail_at injection
-- Simula steps por role, sem agentes reais
+### P9.1 — Local Execution Contracts (36 testes)
+- `src/work_order/output_contract.py` — OutputContractSpec, ContentRule
+- `src/work_order/contract_validator.py` — Contract validation against spec
+- `src/work_order/output_registry.py` — Output registry
 
-### P8.2 — Replay / Resume Squad Run (15 testes)
-- `src/execution_graph/replay.py` — Resume e replay de graph runs
+### P9.2 — Output Collector (23 testes)
+- `src/work_order/output_collector.py` — collect_output, validate_output, reject_output
+- Persists to `exports/work_orders/<wo_id>/`
 
-### P8.3 — Approval-Integrated Graph Run (20 testes)
-- `src/execution_graph/approval_bridge.py` — Gate enforcement para medium/high risk
+### P9.3 — Approval-to-Execution Bridge (22 testes)
+- `src/work_order/approval_bridge.py` — Gate checks for work orders
+- Requires approval for high-risk squads
 
-### P8.4 — Event Log + Metrics (25 testes)
-- `src/execution_graph/events.py` — Append-only JSONL event log
-- `src/execution_graph/metrics.py` — Compute run metrics
+### P9.4 — Execution Graph → Work Order Integration (17 testes)
+- `src/work_order/graph_integration.py` — build_and_persist, sync_status, load/save
 
-### P8.5 — Mission → Squad → Graph Integration (26 testes)
-- `src/execution_graph/mission_bridge.py` — build_graph_from_orchestrator, run_full_pipeline
+### P9.5 — Mission Package Auto-Fill (16 testes)
+- `src/work_order/package_autofill.py` — AutoFillResult, auto_fill_mission_package, auto_fill_from_orchestrator_run
+- Copies outputs into `04_outputs/<role>/` subdirectories
 
-### P8.6 — E2E Mission → Squad → Graph → Approval (14 testes)
-- `tests/execution_graph/test_e2e_pipeline.py` — 14 cenarios E2E
-- Full lifecycle: request → block → approve → run → done
+### P9.6 — E2E Mission → Graph → Work Orders → Outputs → Report (31 testes)
+- `tests/e2e/test_p9_work_order_flow.py` — 4 classes, 31 testes
+- Full pipeline: orchestrator → graph → work orders → submit → validate → autofill → close
+- E2E Marketing Low Risk (11 tests), E2E App High Risk (8 tests), No External Actions (7 tests), Autofill Idempotent (4 tests)
 
 ---
 
@@ -63,13 +67,19 @@ request → intent → sector → squad → task plan → execution graph → st
 
 ---
 
-## Suite P8
+## Suite P9
 
 ```
-tests/execution_graph:    137/137 PASS
-tests/e2e (P8 flow):      14/14 PASS (inclusos nos 137)
+P9.0 work_order:             61/10 PASS
+P9.1 contracts:              36/10 PASS
+P9.2 output_collector:       23/10 PASS
+P9.3 approval_bridge:        22/10 PASS
+P9.4 graph_integration:      17/10 PASS
+P9.5 package_autofill:       16/10 PASS
+P9.6 e2e work order flow:    31/10 PASS
+P9.7 seal:                   —
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-TOTAL validado:          137/137 PASS
+TOTAL P9:                   206/70 PASS
 ```
 
 ---
@@ -82,8 +92,4 @@ CONGELADO. Precisam: 5 READY validados ou override de Lucas.
 
 ## Proximo bloco
 
-P9.0 Work Order Models + Builder — transforma graph nodes em work orders rastreaveis.
-- Criar `src/work_order/` (models.py, builder.py, validator.py, errors.py)
-- CLI: `jarvis.py work-order build "<request>"`
-- 10 testes minimo
-- 10 statuses, 9 output types, runtime em exports/work_orders/
+P9.7 Final Seal — criar `docs/p9/P9_FINAL_SEAL_REPORT.md`, atualizar state/handoff/roadmap, commit final do P9.

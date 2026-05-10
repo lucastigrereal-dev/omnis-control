@@ -14,7 +14,7 @@
 | P9.3 | — | Approval-to-Execution Bridge | 22/10 | ✅ done |
 | P9.4 | — | Execution Graph → Work Order Integration | 17/10 | ✅ done |
 | P9.5 | — | Mission Package Auto-Fill | 16/10 | ✅ done |
-| P9.6 | — | E2E Mission → Graph → Work Orders → Outputs | —/10 | ⏳ pending |
+| P9.6 | — | E2E Mission → Graph → Work Orders → Outputs | 31/10 | ✅ done |
 | P9.7 | — | Final Seal | — | ⏳ pending |
 
 ---
@@ -28,8 +28,8 @@ P9.2 output_collector:       23/10 PASS
 P9.3 approval_bridge:        22/10 PASS
 P9.4 graph_integration:      17/10 PASS
 P9.5 package_autofill:       16/10 PASS
-P9.6 e2e work order flow:    —/10
+P9.6 e2e work order flow:    31/10 PASS
 P9.7 seal:                   —
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-TOTAL P9:                   175/50
+TOTAL P9:                   206/70
 ```
