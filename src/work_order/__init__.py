@@ -53,6 +53,12 @@ from src.work_order.graph_integration import (
     sync_all_work_orders_from_run,
     sync_work_order_status,
 )
+from src.work_order.package_autofill import (
+    AutoFillEntry,
+    AutoFillResult,
+    auto_fill_from_orchestrator_run,
+    auto_fill_mission_package,
+)
 
 __all__ = [
     "WorkOrderStatus",
@@ -96,4 +102,8 @@ __all__ = [
     "build_and_persist_work_orders",
     "find_work_order_ids_for_run",
     "load_work_orders_for_run",
+    "auto_fill_mission_package",
+    "auto_fill_from_orchestrator_run",
+    "AutoFillResult",
+    "AutoFillEntry",
 ]
