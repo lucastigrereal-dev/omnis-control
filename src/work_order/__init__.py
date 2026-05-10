@@ -35,6 +35,16 @@ from src.work_order.output_collector import (
     reject_output,
     validate_output,
 )
+from src.work_order.approval_bridge import (
+    GATE_APPROVED,
+    GATE_BLOCKED,
+    GATE_NOT_REQUIRED,
+    GATE_REJECTED,
+    approve_work_order,
+    check_work_order_approval_gate,
+    reject_work_order,
+    request_work_order_approval,
+)
 
 __all__ = [
     "WorkOrderStatus",
@@ -64,4 +74,12 @@ __all__ = [
     "reject_output",
     "list_collected_outputs",
     "DEFAULT_EXPORTS_ROOT",
+    "check_work_order_approval_gate",
+    "request_work_order_approval",
+    "approve_work_order",
+    "reject_work_order",
+    "GATE_APPROVED",
+    "GATE_BLOCKED",
+    "GATE_NOT_REQUIRED",
+    "GATE_REJECTED",
 ]

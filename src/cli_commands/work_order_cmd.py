@@ -189,3 +189,113 @@ def cmd_list(
             wo.created_at[:19],
         )
     console.print(table)
+
+
+@work_order_app.command(name="request-approval")
+def cmd_request_approval(
+    work_order_id: str = typer.Argument(..., help="Work Order ID"),
+    risk_level: str = typer.Option("medium", "--risk", "-r", help="Risk level (low/medium/high)"),
+) -> None:
+    """Cria um approval request para a work order (READY -> BLOCKED)."""
+    from pathlib import Path
+    import glob as glob_mod
+
+    exports_root = Path("exports/work_orders")
+    wo_dir = None
+    for pattern in [str(exports_root / f"*{work_order_id}*" / "work_order.json")]:
+        matches = glob_mod.glob(pattern)
+        if matches:
+            wo_dir = Path(matches[0]).parent
+            break
+
+    if wo_dir is None:
+        console.print(f"[red]Work order {work_order_id} not found on disk. Build first.[/red]")
+        return
+
+    from src.work_order.models import WorkOrder
+    from src.work_order.approval_bridge import request_work_order_approval
+
+    wo = WorkOrder.from_dict(json.loads((wo_dir / "work_order.json").read_text(encoding="utf-8")))
+    req_id = request_work_order_approval(wo, risk_level=risk_level)
+
+    from src.work_order.output_collector import _persist_work_order
+    _persist_work_order(wo, wo_dir)
+
+    console.print(f"[green]Approval request {req_id} created for {wo.work_order_id}[/green]")
+    console.print(f"  status: {wo.status.value}")
+
+
+@work_order_app.command(name="approve")
+def cmd_approve(
+    work_order_id: str = typer.Argument(..., help="Work Order ID"),
+    note: str = typer.Option("", "--note", "-n", help="Resolution note"),
+) -> None:
+    """Aprova a work order (BLOCKED -> APPROVED)."""
+    from pathlib import Path
+    import glob as glob_mod
+
+    exports_root = Path("exports/work_orders")
+    wo_dir = None
+    for pattern in [str(exports_root / f"*{work_order_id}*" / "work_order.json")]:
+        matches = glob_mod.glob(pattern)
+        if matches:
+            wo_dir = Path(matches[0]).parent
+            break
+
+    if wo_dir is None:
+        console.print(f"[red]Work order {work_order_id} not found on disk. Build first.[/red]")
+        return
+
+    from src.work_order.models import WorkOrder
+    from src.work_order.approval_bridge import approve_work_order
+
+    wo = WorkOrder.from_dict(json.loads((wo_dir / "work_order.json").read_text(encoding="utf-8")))
+    try:
+        approve_work_order(wo, note=note)
+    except Exception as e:
+        console.print(f"[red]{e}[/red]")
+        return
+
+    from src.work_order.output_collector import _persist_work_order
+    _persist_work_order(wo, wo_dir)
+
+    console.print(f"[green]Work order {wo.work_order_id} approved[/green]")
+    console.print(f"  status: {wo.status.value}")
+
+
+@work_order_app.command(name="reject")
+def cmd_reject(
+    work_order_id: str = typer.Argument(..., help="Work Order ID"),
+    note: str = typer.Option("", "--note", "-n", help="Rejection reason"),
+) -> None:
+    """Rejeita a work order (BLOCKED -> REJECTED)."""
+    from pathlib import Path
+    import glob as glob_mod
+
+    exports_root = Path("exports/work_orders")
+    wo_dir = None
+    for pattern in [str(exports_root / f"*{work_order_id}*" / "work_order.json")]:
+        matches = glob_mod.glob(pattern)
+        if matches:
+            wo_dir = Path(matches[0]).parent
+            break
+
+    if wo_dir is None:
+        console.print(f"[red]Work order {work_order_id} not found on disk. Build first.[/red]")
+        return
+
+    from src.work_order.models import WorkOrder
+    from src.work_order.approval_bridge import reject_work_order
+
+    wo = WorkOrder.from_dict(json.loads((wo_dir / "work_order.json").read_text(encoding="utf-8")))
+    try:
+        reject_work_order(wo, note=note)
+    except Exception as e:
+        console.print(f"[red]{e}[/red]")
+        return
+
+    from src.work_order.output_collector import _persist_work_order
+    _persist_work_order(wo, wo_dir)
+
+    console.print(f"[yellow]Work order {wo.work_order_id} rejected[/yellow]")
+    console.print(f"  status: {wo.status.value}")
