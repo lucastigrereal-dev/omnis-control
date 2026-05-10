@@ -26,6 +26,15 @@ from src.work_order.contract_validator import (
     get_missing_contracts,
     validate_contracts_for_work_order,
 )
+from src.work_order.output_registry import OutputRegistry, OutputRegistryEntry
+from src.work_order.output_collector import (
+    DEFAULT_EXPORTS_ROOT,
+    collect_output,
+    collect_outputs_batch,
+    list_collected_outputs,
+    reject_output,
+    validate_output,
+)
 
 __all__ = [
     "WorkOrderStatus",
@@ -47,4 +56,12 @@ __all__ = [
     "all_contracts_satisfied",
     "get_missing_contracts",
     "get_contract_specs_for_role",
+    "OutputRegistry",
+    "OutputRegistryEntry",
+    "collect_output",
+    "collect_outputs_batch",
+    "validate_output",
+    "reject_output",
+    "list_collected_outputs",
+    "DEFAULT_EXPORTS_ROOT",
 ]
