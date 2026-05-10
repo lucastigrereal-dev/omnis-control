@@ -1,10 +1,10 @@
-# CURRENT HANDOFF — P9.6 E2E concluido, P9.7 Final Seal pendente
+# CURRENT HANDOFF — P9 Final Seal concluido
 
 **Data:** 2026-05-09 | **Operador:** Lucas
 
 ---
 
-## O que foi feito (P9 completo ate P9.6)
+## O que foi feito (P9 completo — Final Seal)
 
 ### P9.0 — Work Order Models + Builder (61 testes)
 - `src/work_order/models.py` — WorkOrder, OutputContract, OutputEntry, 10 statuses, 9 output types
@@ -36,9 +36,13 @@
 - Full pipeline: orchestrator → graph → work orders → submit → validate → autofill → close
 - E2E Marketing Low Risk (11 tests), E2E App High Risk (8 tests), No External Actions (7 tests), Autofill Idempotent (4 tests)
 
+### P9.7 — Final Seal
+- `docs/p9/P9_FINAL_SEAL_REPORT.md` — relatorio de selagem P9
+- Todos os artefatos documentados, 206/70 testes, pipeline completo validado
+
 ---
 
-## P9 Global Gate (ABERTO)
+## P9 Global Gate (FECHADO — SELADO)
 
 - Gate docs criados: `docs/p9/P9_GLOBAL_GATE.md`, `docs/p9/P9_PROGRESS.md`
 - State atualizado: `docs/state/OMNIS_STATE_CURRENT.md`
@@ -77,9 +81,9 @@ P9.3 approval_bridge:        22/10 PASS
 P9.4 graph_integration:      17/10 PASS
 P9.5 package_autofill:       16/10 PASS
 P9.6 e2e work order flow:    31/10 PASS
-P9.7 seal:                   —
+P9.7 seal:                   SELADO
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-TOTAL P9:                   206/70 PASS
+TOTAL P9:                   206/70 PASS ✅
 ```
 
 ---
@@ -92,4 +96,4 @@ CONGELADO. Precisam: 5 READY validados ou override de Lucas.
 
 ## Proximo bloco
 
-P9.7 Final Seal — criar `docs/p9/P9_FINAL_SEAL_REPORT.md`, atualizar state/handoff/roadmap, commit final do P9.
+P10 — Sandbox Package Factory + Multi-profile Content Pipeline.

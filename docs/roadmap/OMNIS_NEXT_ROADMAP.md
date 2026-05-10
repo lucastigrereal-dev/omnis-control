@@ -1,9 +1,9 @@
 # OMNIS Próximo Roadmap — P9.6 concluido
 
-**Data:** 2026-05-09 | **Base:** P9.6 concluido, 206 testes P9 + 137 P8 + ~1,723 outros
+**Data:** 2026-05-09 | **Base:** P9 Final Seal, 206 testes P9 + 137 P8 + ~1,723 outros
 
-> P8 ENTREGUE: Execution Graph Lite (137 testes). P9 ENTREGUE ate P9.6: Work Order System completo (206 testes).
-> P9.7 Final Seal pendente. Roadmap abaixo reflete P10+.
+> P8 ENTREGUE: Execution Graph Lite (137 testes). P9 ENTREGUE: Work Order System completo (206 testes, Final Seal).
+> Roadmap abaixo reflete P10+.
 
 ---
 
@@ -60,7 +60,7 @@
 
 ---
 
-## P9 — Work Order System (CONCLUIDO ate P9.6)
+## P9 — Work Order System (CONCLUIDO — Final Seal)
 
 **Objetivo:** Transformar graph nodes em work orders rastreaveis com contracts, outputs e mission package auto-fill.
 
@@ -73,7 +73,7 @@
 | P9.4 | Graph → Work Order Integration | 17/10 | ✅ |
 | P9.5 | Mission Package Auto-Fill | 16/10 | ✅ |
 | P9.6 | E2E Work Order Flow | 31/10 | ✅ |
-| P9.7 | Final Seal | — | ⏳ |
+| P9.7 | Final Seal | — | ✅ |
 | **Total** | | **206/70** | |
 
 ---

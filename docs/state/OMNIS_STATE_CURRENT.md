@@ -1,10 +1,10 @@
-# OMNIS State — Atual (P9.6 concluido)
+# OMNIS State — Atual (P9 Final Seal)
 
 **Data:** 2026-05-09
 **Branch:** master
 **Fase concluida:** P8 Execution Graph Lite — todos os blocos
-**Fase atual:** P9 Work Order System — P9.6 E2E concluido, P9.7 Final Seal pendente
-**Testes P9:** 206/70 PASS (31 E2E + 175 unit)
+**Fase concluida:** P9 Work Order System — Final Seal (206/70 testes)
+**Fase atual:** P10 — proxima fase
 
 ---
 
@@ -23,7 +23,7 @@ python jarvis.py graph build|run|run-gated|run-resume|run-replay|show|list
 
 ---
 
-## Pipeline P9 (em construcao)
+## Pipeline P9 (concluido)
 
 ```
 execution graph → work order → contract → approval bridge → output collector → mission package auto-fill → delivery report
@@ -49,7 +49,7 @@ src/squad_execution/     — SquadExecutionPlan, planner, exporter, approval gat
 src/execution_graph/     — GraphNode, GraphRun, builder (Kahn), runner, replay, approval_bridge, mission_bridge, events, metrics, store (P8)
 src/approval_center/     — ApprovalRequest, service, models, errors (P6)
 src/mission_orchestrator/ — OrchestratorRun, planner, executor, service, models, errors (P3)
-src/work_order/          — [P9.0 — pending]
+src/work_order/          — WorkOrder, OutputContract, OutputEntry, builder, validator, collector, approval_bridge, graph_integration, package_autofill (P9 — 206 testes)
 ```
 
 ---
@@ -66,11 +66,7 @@ src/work_order/          — [P9.0 — pending]
 
 | Fase | Descricao | Prioridade |
 |---|---|---|
-| P9.0 | Work Order Models + Builder | Alta |
-| P9.1 | Local Execution Contracts | Alta |
-| P9.2 | Output Collector | Media |
-| P9.3 | Approval-to-Execution Bridge | Media |
-| P9.4 | Execution Graph → Work Order Integration | Media |
-| P9.5 | Mission Package Auto-Fill | Media |
-| P9.6 | E2E Mission → Graph → Work Orders → Outputs | ✅ done |
-| P9.7 | Final Seal | Pendente |
+| P10 | Sandbox Package Factory | Alta |
+| P10.1 | Multi-profile Content Pipeline | Alta |
+| P10.2 | Calendar Auto-Scheduling | Media |
+| P10.3 | Analytics Dashboard Lite | Media |
