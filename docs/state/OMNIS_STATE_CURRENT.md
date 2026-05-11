@@ -1,10 +1,10 @@
-# OMNIS State — Atual (P9 Final Seal)
+# OMNIS State — Atual (P10 em andamento)
 
-**Data:** 2026-05-09
+**Data:** 2026-05-11
 **Branch:** master
 **Fase concluida:** P8 Execution Graph Lite — todos os blocos
 **Fase concluida:** P9 Work Order System — Final Seal (206/70 testes)
-**Fase atual:** P10 — proxima fase
+**Fase atual:** P10 — Output Generator Dry-Run (P10.0 em andamento)
 
 ---
 
