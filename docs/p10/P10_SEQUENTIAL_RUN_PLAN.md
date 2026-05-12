@@ -135,14 +135,38 @@
 |---|---|---|---|---|
 | P10.2 | ✅ done | 355db32 | 18/8 | 2026-05-12 |
 | P10.3 | ✅ done | c93d0a6 | 13/7 | 2026-05-12 |
-| P10.4 | ⏳ pending | — | —/8 | — |
-| P10.5 | ⏳ pending | — | —/7 | — |
-| P10.6 | ⏳ pending | — | —/8 | — |
-| P10.7 | ⏳ pending | — | —/7 | — |
-| P10.8 | ⏳ pending | — | —/8 | — |
-| P10.9 | ⏳ pending | — | —/8 | — |
-| P10.10 | ⏳ pending | — | —/5 | — |
-| P10.11 | ⏳ pending | — | — | — |
+| P10.4 | ✅ done | 6c750f8 | 11/8 | 2026-05-12 |
+| P10.5 | ✅ done | d016042 | 11/7 | 2026-05-12 |
+| P10.6 | ✅ done | 5b4614d | 12/8 | 2026-05-12 |
+| P10.7 | ✅ done | c672d7e | 7/7 | 2026-05-12 |
+| P10.8 | ✅ done | 064ef15 | 9/8 | 2026-05-12 |
+| P10.9 | ✅ done | 7ca8eef | 10/8 | 2026-05-12 |
+| P10.10 | ✅ done | 92589b2 | 6/5 | 2026-05-12 |
+| P10.11 | ✅ done | — | 2205/2205 | 2026-05-12 |
+
+---
+
+## P10 Final Seal — 2026-05-12
+
+**P10 Output Generator Dry-Run: COMPLETO**
+
+| Métrica | Planejado | Realizado |
+|---|---|---|
+| Blocos | 10 | 10 (100%) |
+| Testes mínimos | 66 | 97 (P10 específicos) |
+| Regressão total | — | **2205/2205 PASS** |
+| Commits P10 | — | 10 |
+| LLM | 0 | 0 |
+| Network | 0 | 0 |
+| Tempo total | — | ~6 horas |
+
+**Arquivos criados/modificados (P10):**
+- `src/output_generator/` — 13 arquivos (models, registry, selector, errors, writers ×4, builder, manifest, validator, approval_bridge, batch_runner, writer_service)
+- `src/cli_commands/output_generator_cmd.py` — 12 comandos CLI
+- `tests/output_generator/` — 11 arquivos de teste
+- `config/output_generators.yaml` — 6 generators
+- `docs/p10/` — 5 documentos
+- `docs/output_generator/` — documentação do módulo
 
 ---
 
