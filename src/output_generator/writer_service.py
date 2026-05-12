@@ -8,6 +8,7 @@ from src.output_generator.errors import GeneratorNotFoundError, NoGeneratorForTy
 from src.output_generator.markdown_writer import write_markdown_output
 from src.output_generator.csv_writer import write_csv_output
 from src.output_generator.json_writer import write_json_output, write_spec_output
+from src.output_generator.package_builder import build_package
 from src.output_generator.models import GeneratedOutput, GeneratedOutputStatus
 from src.output_generator.registry import OutputGeneratorRegistry
 from src.output_generator.selector import select_generator
@@ -229,6 +230,10 @@ class OutputWriterService:
             generator_id=gen_def.generator_id,
             table_type=table_type,
         )
+
+    def package(self, work_order_id: str) -> tuple[Path, list[GeneratedOutput], list[str]]:
+        wo = self._load_work_order(work_order_id)
+        return build_package(wo, self.outputs_root)
 
     def _load_work_order(self, work_order_id: str) -> WorkOrder:
         wo_dir = self.work_orders_root / work_order_id

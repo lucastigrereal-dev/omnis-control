@@ -117,3 +117,15 @@ def test_write_csv_missing_work_order():
     result = runner.invoke(output_generator_app, ["write-csv", "wo_nonexistent123"])
     assert result.exit_code == 1
     assert "not found" in result.stdout.lower() or "error" in result.stdout.lower()
+
+
+def test_package_in_help():
+    result = runner.invoke(output_generator_app, ["--help"])
+    assert result.exit_code == 0
+    assert "package" in result.stdout
+
+
+def test_package_missing_work_order():
+    result = runner.invoke(output_generator_app, ["package", "wo_nonexistent123"])
+    assert result.exit_code == 1
+    assert "not found" in result.stdout.lower() or "error" in result.stdout.lower()

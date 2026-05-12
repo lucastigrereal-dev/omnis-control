@@ -231,6 +231,42 @@ def cmd_write_csv(
     console.print(f"  [dim]next_action: package in P10.4[/dim]")
 
 
+@output_generator_app.command(name="package")
+def cmd_package(
+    work_order_id: str = typer.Argument(..., help="Work Order ID"),
+    json_output: bool = typer.Option(False, "--json", help="Output JSON"),
+) -> None:
+    """Gera pacote multi-file para um work order (md + json + csv + manifest)."""
+    try:
+        service = OutputWriterService()
+        pkg_dir, outputs, blockers = service.package(work_order_id)
+    except FileNotFoundError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(1)
+
+    if json_output:
+        result = {
+            "package_dir": str(pkg_dir),
+            "work_order_id": work_order_id,
+            "file_count": len(outputs),
+            "outputs": [o.to_dict() for o in outputs],
+            "blockers": blockers,
+        }
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return
+
+    console.print(f"[bold]Package[/bold] [green]GENERATED[/green]")
+    console.print(f"  package_dir:   {pkg_dir}")
+    console.print(f"  work_order_id: {work_order_id}")
+    console.print(f"  files:         {len(outputs)}")
+    for o in outputs:
+        status_icon = "[green]OK[/green]" if o.status.value == "generated" else f"[red]{o.status.value.upper()}[/red]"
+        console.print(f"    [{o.output_type}] {o.file_path} {status_icon}")
+    if blockers:
+        for b in blockers:
+            console.print(f"  [red]BLOCKED: {b}[/red]")
+
+
 @output_generator_app.command(name="write-spec")
 def cmd_write_spec(
     work_order_id: str = typer.Argument(..., help="Work Order ID"),
