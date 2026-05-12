@@ -9,6 +9,7 @@ from src.output_generator.markdown_writer import write_markdown_output
 from src.output_generator.csv_writer import write_csv_output
 from src.output_generator.json_writer import write_json_output, write_spec_output
 from src.output_generator.package_builder import build_package
+from src.output_generator.manifest_registry import ManifestRegistry
 from src.output_generator.models import GeneratedOutput, GeneratedOutputStatus
 from src.output_generator.registry import OutputGeneratorRegistry
 from src.output_generator.selector import select_generator
@@ -23,10 +24,12 @@ class OutputWriterService:
         work_orders_root: Path | None = None,
         outputs_root: Path | None = None,
         registry: OutputGeneratorRegistry | None = None,
+        manifest_registry: ManifestRegistry | None = None,
     ):
         self.work_orders_root = work_orders_root or Path("exports/work_orders")
         self.outputs_root = outputs_root or Path("exports/generated_outputs")
         self.registry = registry or OutputGeneratorRegistry()
+        self.manifest_registry = manifest_registry or ManifestRegistry()
 
     def write(self, work_order_id: str) -> GeneratedOutput:
         wo = self._load_work_order(work_order_id)
@@ -233,7 +236,58 @@ class OutputWriterService:
 
     def package(self, work_order_id: str) -> tuple[Path, list[GeneratedOutput], list[str]]:
         wo = self._load_work_order(work_order_id)
-        return build_package(wo, self.outputs_root)
+        pkg_dir, outputs, blockers = build_package(wo, self.outputs_root)
+
+        # Auto-register all generated outputs in manifest registry
+        for out in outputs:
+            if out.status == GeneratedOutputStatus.GENERATED:
+                self.manifest_registry.register(
+                    output_id=out.output_id,
+                    work_order_id=out.work_order_id,
+                    output_type=out.output_type,
+                    file_path=out.file_path,
+                    generator_id=out.generator_id,
+                    fingerprint=out.fingerprint,
+                )
+
+        return pkg_dir, outputs, blockers
+
+    def orchestrate(self, work_order_id: str) -> dict:
+        """Full orchestrator: WO → validate → writers → package → manifest → registry.
+
+        Returns a dict summarizing the entire pipeline result.
+        """
+        from src.output_generator.validator import validate_package
+
+        wo = self._load_work_order(work_order_id)
+        pkg_dir, outputs, blockers = build_package(wo, self.outputs_root)
+
+        registered = 0
+        for out in outputs:
+            if out.status == GeneratedOutputStatus.GENERATED:
+                self.manifest_registry.register(
+                    output_id=out.output_id,
+                    work_order_id=out.work_order_id,
+                    output_type=out.output_type,
+                    file_path=out.file_path,
+                    generator_id=out.generator_id,
+                    fingerprint=out.fingerprint,
+                )
+                registered += 1
+
+        validation = validate_package(work_order_id, registry=self.manifest_registry, output_root=self.outputs_root)
+
+        return {
+            "work_order_id": work_order_id,
+            "package_dir": str(pkg_dir),
+            "outputs": [o.to_dict() for o in outputs],
+            "blockers": blockers,
+            "registered": registered,
+            "valid": validation.valid,
+            "validation_checks": validation.checks,
+            "validation_issues": validation.issues,
+            "validation_warnings": validation.warnings,
+        }
 
     def _load_work_order(self, work_order_id: str) -> WorkOrder:
         wo_dir = self.work_orders_root / work_order_id

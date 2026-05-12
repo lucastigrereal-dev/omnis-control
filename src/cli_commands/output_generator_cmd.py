@@ -239,35 +239,34 @@ def cmd_package(
     work_order_id: str = typer.Argument(..., help="Work Order ID"),
     json_output: bool = typer.Option(False, "--json", help="Output JSON"),
 ) -> None:
-    """Gera pacote multi-file para um work order (md + json + csv + manifest)."""
+    """Gera pacote multi-file para um work order (md + json + csv + manifest) + auto-registry."""
     try:
         service = OutputWriterService()
-        pkg_dir, outputs, blockers = service.package(work_order_id)
+        result = service.orchestrate(work_order_id)
     except FileNotFoundError as exc:
         console.print(f"[red]{exc}[/red]")
         raise typer.Exit(1)
 
     if json_output:
-        result = {
-            "package_dir": str(pkg_dir),
-            "work_order_id": work_order_id,
-            "file_count": len(outputs),
-            "outputs": [o.to_dict() for o in outputs],
-            "blockers": blockers,
-        }
         print(json.dumps(result, indent=2, ensure_ascii=False))
         return
 
-    console.print(f"[bold]Package[/bold] [green]GENERATED[/green]")
-    console.print(f"  package_dir:   {pkg_dir}")
-    console.print(f"  work_order_id: {work_order_id}")
-    console.print(f"  files:         {len(outputs)}")
-    for o in outputs:
-        status_icon = "[green]OK[/green]" if o.status.value == "generated" else f"[red]{o.status.value.upper()}[/red]"
-        console.print(f"    [{o.output_type}] {o.file_path} {status_icon}")
-    if blockers:
-        for b in blockers:
+    status_icon = "[green]PASS[/green]" if result["valid"] else "[red]FAIL[/red]"
+    console.print(f"[bold]Package[/bold] [green]GENERATED[/green] + [cyan]REGISTERED[/cyan]")
+    console.print(f"  package_dir:   {result['package_dir']}")
+    console.print(f"  work_order_id: {result['work_order_id']}")
+    console.print(f"  files:         {len(result['outputs'])}")
+    console.print(f"  registered:    {result['registered']}")
+    console.print(f"  validated:     {status_icon}")
+    for o in result["outputs"]:
+        status_icon = "[green]OK[/green]" if o["status"] == "generated" else f"[red]{o['status'].upper()}[/red]"
+        console.print(f"    [{o['output_type']}] {o['file_path']} {status_icon}")
+    if result["blockers"]:
+        for b in result["blockers"]:
             console.print(f"  [red]BLOCKED: {b}[/red]")
+    if result["validation_issues"]:
+        for issue in result["validation_issues"]:
+            console.print(f"  [red]ISSUE: {issue}[/red]")
 
 
 @output_generator_app.command(name="registry")
