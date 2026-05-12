@@ -1,0 +1,71 @@
+"""P9 Commercial SDR — prospeccao B2B, scoring, sequencias de outreach e planos SDR."""
+from src.commercial_sdr.models import (
+    ProspectProfile,
+    LeadSource,
+    OutreachChannel,
+    StepAction,
+    ScoreTier,
+    SDRMessage,
+    OutreachStep,
+    OutreachSequence,
+    OpportunityScore,
+    SDRPlan,
+)
+from src.commercial_sdr.service import (
+    CommercialSDRPlanner,
+    score_prospect,
+    build_outreach_sequence,
+    generate_sdr_message,
+    build_batch_plan,
+    validate_sequence,
+)
+from src.commercial_sdr.errors import (
+    CommercialSDRError,
+    InvalidProspectError,
+    EmptyProspectListError,
+    ScoringError,
+    InvalidScoreParameterError,
+    SequenceBuildError,
+    InvalidChannelError,
+    MessageTemplateError,
+    ApprovalRequiredError,
+    RiskBlockedError,
+    DryRunViolationError,
+    ValidationError,
+    PlanFinalizedError,
+)
+
+__all__ = [
+    # Models
+    "ProspectProfile",
+    "LeadSource",
+    "OutreachChannel",
+    "StepAction",
+    "ScoreTier",
+    "SDRMessage",
+    "OutreachStep",
+    "OutreachSequence",
+    "OpportunityScore",
+    "SDRPlan",
+    # Service
+    "CommercialSDRPlanner",
+    "score_prospect",
+    "build_outreach_sequence",
+    "generate_sdr_message",
+    "build_batch_plan",
+    "validate_sequence",
+    # Errors
+    "CommercialSDRError",
+    "InvalidProspectError",
+    "EmptyProspectListError",
+    "ScoringError",
+    "InvalidScoreParameterError",
+    "SequenceBuildError",
+    "InvalidChannelError",
+    "MessageTemplateError",
+    "ApprovalRequiredError",
+    "RiskBlockedError",
+    "DryRunViolationError",
+    "ValidationError",
+    "PlanFinalizedError",
+]
