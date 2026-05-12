@@ -41,3 +41,4 @@ exports/orchestrator_runs/
 data/orchestrator_runs.jsonl
 exports/capability_specs/
 exports/squad_runs/
+exports/generated_outputs/

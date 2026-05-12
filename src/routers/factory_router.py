@@ -17,6 +17,7 @@ def register(app: typer.Typer) -> None:
     from src.cli_commands.delivery_cmd import delivery_app
     from src.cli_commands.dashboard_cmd import dashboard_app
     from src.cli_commands.asset_inbox_cmd import asset_inbox_app
+    from src.cli_commands.output_generator_cmd import output_generator_app
 
     app.add_typer(assets_app)
     app.add_typer(offline_app)
@@ -27,3 +28,4 @@ def register(app: typer.Typer) -> None:
     app.add_typer(delivery_app)
     app.add_typer(dashboard_app)
     app.add_typer(asset_inbox_app)
+    app.add_typer(output_generator_app)

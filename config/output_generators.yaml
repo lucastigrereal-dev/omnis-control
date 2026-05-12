@@ -1,0 +1,40 @@
+generators:
+  markdown_basic_writer:
+    name: Markdown Basic Writer
+    output_types: ["markdown", "mission_report", "delivery_package"]
+    mode: deterministic
+    risk_level: low
+    status: active
+    description: "Writes structured markdown outputs from work order contracts."
+
+  json_basic_writer:
+    name: JSON Basic Writer
+    output_types: ["json"]
+    mode: deterministic
+    risk_level: low
+    status: active
+    description: "Writes structured JSON outputs from work order contracts."
+
+  spec_basic_writer:
+    name: Spec Basic Writer
+    output_types: ["technical_spec", "app_spec", "data_model"]
+    mode: deterministic
+    risk_level: medium
+    status: active
+    description: "Writes deterministic specification documents."
+
+  html_preview_writer:
+    name: HTML Preview Writer
+    output_types: ["html_preview"]
+    mode: deterministic
+    risk_level: low
+    status: planned
+    description: "Future deterministic HTML preview writer."
+
+  zip_package_writer:
+    name: ZIP Package Writer
+    output_types: ["zip_package"]
+    mode: deterministic
+    risk_level: low
+    status: planned
+    description: "Future local package writer."
