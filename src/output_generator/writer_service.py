@@ -6,6 +6,7 @@ from pathlib import Path
 
 from src.output_generator.errors import GeneratorNotFoundError, NoGeneratorForTypeError
 from src.output_generator.markdown_writer import write_markdown_output
+from src.output_generator.json_writer import write_json_output, write_spec_output
 from src.output_generator.models import GeneratedOutput, GeneratedOutputStatus
 from src.output_generator.registry import OutputGeneratorRegistry
 from src.output_generator.selector import select_generator
@@ -70,6 +71,108 @@ class OutputWriterService:
             )
 
         return write_markdown_output(
+            wo,
+            self.outputs_root,
+            generator_id=gen_def.generator_id,
+        )
+
+    def write_json(self, work_order_id: str) -> GeneratedOutput:
+        wo = self._load_work_order(work_order_id)
+
+        json_contracts = [c for c in wo.contracts if c.output_type.value == "json"]
+        if not json_contracts:
+            return GeneratedOutput(
+                output_id="",
+                work_order_id=work_order_id,
+                output_type="json",
+                generator_id="",
+                file_path="",
+                status=GeneratedOutputStatus.UNSUPPORTED,
+                created_at="",
+                blockers=[f"Work order {work_order_id} has no json contract"],
+            )
+
+        selection = select_generator("json", registry=self.registry)
+        if selection.status.value not in ("selected",):
+            return GeneratedOutput(
+                output_id="",
+                work_order_id=work_order_id,
+                output_type="json",
+                generator_id=selection.selected_generator_id or "",
+                file_path="",
+                status=GeneratedOutputStatus.BLOCKED,
+                created_at="",
+                blockers=selection.blockers,
+                warnings=selection.warnings,
+            )
+
+        try:
+            gen_def = self.registry.get(selection.selected_generator_id)
+        except GeneratorNotFoundError:
+            return GeneratedOutput(
+                output_id="",
+                work_order_id=work_order_id,
+                output_type="json",
+                generator_id="",
+                file_path="",
+                status=GeneratedOutputStatus.FAILED,
+                created_at="",
+                blockers=["Generator not found after selection"],
+            )
+
+        return write_json_output(
+            wo,
+            self.outputs_root,
+            generator_id=gen_def.generator_id,
+        )
+
+    def write_spec(self, work_order_id: str) -> GeneratedOutput:
+        wo = self._load_work_order(work_order_id)
+
+        valid_spec_types = {"technical_spec", "app_spec", "data_model"}
+        spec_contracts = [c for c in wo.contracts if c.output_type.value in valid_spec_types]
+        if not spec_contracts:
+            return GeneratedOutput(
+                output_id="",
+                work_order_id=work_order_id,
+                output_type="technical_spec",
+                generator_id="",
+                file_path="",
+                status=GeneratedOutputStatus.UNSUPPORTED,
+                created_at="",
+                blockers=[f"Work order {work_order_id} has no spec contract"],
+            )
+
+        spec_type = spec_contracts[0].output_type.value
+        selection = select_generator(spec_type, registry=self.registry)
+        if selection.status.value not in ("selected",):
+            return GeneratedOutput(
+                output_id="",
+                work_order_id=work_order_id,
+                output_type=spec_type,
+                generator_id=selection.selected_generator_id or "",
+                file_path="",
+                status=GeneratedOutputStatus.BLOCKED,
+                created_at="",
+                blockers=selection.blockers,
+                warnings=selection.warnings,
+            )
+
+        try:
+            gen_def = self.registry.get(selection.selected_generator_id)
+        except GeneratorNotFoundError:
+            return GeneratedOutput(
+                output_id="",
+                work_order_id=work_order_id,
+                output_type=spec_type,
+                generator_id="",
+                file_path="",
+                status=GeneratedOutputStatus.FAILED,
+                created_at="",
+                blockers=["Generator not found after selection"],
+            )
+
+        return write_spec_output(
             wo,
             self.outputs_root,
             generator_id=gen_def.generator_id,

@@ -11,4 +11,5 @@ from .registry import OutputGeneratorRegistry
 from .selector import select_generator
 from .errors import OutputGeneratorError, GeneratorNotFoundError, NoGeneratorForTypeError
 from .markdown_writer import write_markdown_output
+from .json_writer import write_json_output, write_spec_output
 from .writer_service import OutputWriterService

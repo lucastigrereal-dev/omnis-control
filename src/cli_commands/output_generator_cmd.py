@@ -14,6 +14,7 @@ from src.output_generator import (
     select_generator,
 )
 from src.output_generator.errors import GeneratorNotFoundError
+from src.output_generator.json_writer import write_json_output, write_spec_output
 
 output_generator_app = typer.Typer(
     name="output-generator",
@@ -149,3 +150,81 @@ def cmd_write_markdown(
         for b in result.blockers:
             console.print(f"  [red]BLOCKED: {b}[/red]")
     console.print(f"  [dim]next_action: submit to work-order collector in P10.4[/dim]")
+
+
+@output_generator_app.command(name="write-json")
+def cmd_write_json(
+    work_order_id: str = typer.Argument(..., help="Work Order ID"),
+    json_output: bool = typer.Option(False, "--json", help="Output JSON"),
+) -> None:
+    """Gera output JSON deterministico para um work order."""
+    try:
+        service = OutputWriterService()
+        result = service.write_json(work_order_id)
+    except FileNotFoundError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(1)
+
+    status_map = {
+        "generated": "[green]GENERATED[/green]",
+        "blocked": "[red]BLOCKED[/red]",
+        "failed": "[red]FAILED[/red]",
+        "unsupported": "[yellow]UNSUPPORTED[/yellow]",
+    }
+
+    if json_output:
+        print(json.dumps(result.to_dict(), indent=2, ensure_ascii=False))
+        return
+
+    console.print(f"[bold]JSON output[/bold] {status_map.get(result.status, result.status)}")
+    console.print(f"  output_id:     {result.output_id}")
+    console.print(f"  work_order_id: {result.work_order_id}")
+    console.print(f"  generator_id:  {result.generator_id}")
+    console.print(f"  file_path:     {result.file_path}")
+    console.print(f"  fingerprint:   {result.fingerprint}")
+    if result.warnings:
+        for w in result.warnings:
+            console.print(f"  [yellow]WARN: {w}[/yellow]")
+    if result.blockers:
+        for b in result.blockers:
+            console.print(f"  [red]BLOCKED: {b}[/red]")
+    console.print(f"  [dim]next_action: package in P10.4[/dim]")
+
+
+@output_generator_app.command(name="write-spec")
+def cmd_write_spec(
+    work_order_id: str = typer.Argument(..., help="Work Order ID"),
+    json_output: bool = typer.Option(False, "--json", help="Output JSON"),
+) -> None:
+    """Gera output spec deterministico (technical_spec, app_spec, data_model)."""
+    try:
+        service = OutputWriterService()
+        result = service.write_spec(work_order_id)
+    except FileNotFoundError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(1)
+
+    status_map = {
+        "generated": "[green]GENERATED[/green]",
+        "blocked": "[red]BLOCKED[/red]",
+        "failed": "[red]FAILED[/red]",
+        "unsupported": "[yellow]UNSUPPORTED[/yellow]",
+    }
+
+    if json_output:
+        print(json.dumps(result.to_dict(), indent=2, ensure_ascii=False))
+        return
+
+    console.print(f"[bold]Spec output[/bold] {status_map.get(result.status, result.status)}")
+    console.print(f"  output_id:     {result.output_id}")
+    console.print(f"  work_order_id: {result.work_order_id}")
+    console.print(f"  generator_id:  {result.generator_id}")
+    console.print(f"  file_path:     {result.file_path}")
+    console.print(f"  fingerprint:   {result.fingerprint}")
+    if result.warnings:
+        for w in result.warnings:
+            console.print(f"  [yellow]WARN: {w}[/yellow]")
+    if result.blockers:
+        for b in result.blockers:
+            console.print(f"  [red]BLOCKED: {b}[/red]")
+    console.print(f"  [dim]next_action: package in P10.4[/dim]")
