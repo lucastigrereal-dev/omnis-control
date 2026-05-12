@@ -18,3 +18,4 @@ from .manifest_registry import ManifestRegistry
 from .writer_service import OutputWriterService
 from .validator import validate_package, ValidationResult
 from .approval_bridge import prepare_submission
+from .batch_runner import run_batch

@@ -18,6 +18,7 @@ from src.output_generator.json_writer import write_json_output, write_spec_outpu
 from src.output_generator.manifest_registry import ManifestRegistry
 from src.output_generator.validator import validate_package
 from src.output_generator.approval_bridge import prepare_submission
+from src.output_generator.batch_runner import run_batch
 
 output_generator_app = typer.Typer(
     name="output-generator",
@@ -417,3 +418,42 @@ def cmd_submit_approval(
 
     if not submission["valid"]:
         raise typer.Exit(1)
+
+
+@output_generator_app.command(name="batch")
+def cmd_batch(
+    status: str = typer.Option(None, "--status", "-s", help="Filtrar WOs por status (ex: approved, ready)"),
+    dry_run: bool = typer.Option(True, "--dry-run/--no-dry-run", help="Dry-run: valida sem gerar outputs (default: true)"),
+    limit: int = typer.Option(100, "--limit", "-l", help="Máximo de WOs a processar"),
+    json_output: bool = typer.Option(False, "--json", help="Output JSON"),
+) -> None:
+    """Processa múltiplos Work Orders em lote. Dry-run por padrão."""
+    result = run_batch(status_filter=status, dry_run=dry_run, limit=limit)
+
+    if json_output:
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+        return
+
+    mode = "[yellow]DRY-RUN[/yellow]" if result["dry_run"] else "[green]LIVE[/green]"
+    console.print(f"[bold]Batch Output Generator[/bold] {mode}")
+    console.print(f"  Candidates:  {result['total_candidates']}")
+    console.print(f"  Processed:   {result['processed']}")
+    console.print(f"  Registered:  {result['registered']}")
+    if result.get("status_filter"):
+        console.print(f"  Filter:      status={result['status_filter']}")
+    if result["failed"]:
+        console.print(f"  [red]Failed:     {result['failed']}[/red]")
+
+    for r in result["results"]:
+        icon = "[green]PASS[/green]" if r["valid"] else "[red]FAIL[/red]"
+        mode_icon = "[yellow]DRY[/yellow]" if r.get("dry_run") else "[green]OK[/green]"
+        console.print(f"  {icon} {r['work_order_id']} {mode_icon}")
+        if r.get("issues"):
+            for issue in r["issues"]:
+                console.print(f"    [red]{issue}[/red]")
+        if r.get("error"):
+            console.print(f"    [red]ERROR: {r['error']}[/red]")
+
+    if result.get("warnings"):
+        for w in result["warnings"]:
+            console.print(f"  [yellow]WARN: {w}[/yellow]")
