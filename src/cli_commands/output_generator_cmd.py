@@ -15,6 +15,7 @@ from src.output_generator import (
 )
 from src.output_generator.errors import GeneratorNotFoundError
 from src.output_generator.json_writer import write_json_output, write_spec_output
+from src.output_generator.manifest_registry import ManifestRegistry
 
 output_generator_app = typer.Typer(
     name="output-generator",
@@ -265,6 +266,44 @@ def cmd_package(
     if blockers:
         for b in blockers:
             console.print(f"  [red]BLOCKED: {b}[/red]")
+
+
+@output_generator_app.command(name="registry")
+def cmd_registry(
+    action: str = typer.Argument(..., help="Acao: list, show"),
+    output_id: str = typer.Argument(None, help="Output ID (para show)"),
+    json_output: bool = typer.Option(False, "--json", help="Output JSON"),
+) -> None:
+    """Gerencia o registry local de outputs (JSONL)."""
+    reg = ManifestRegistry()
+
+    if action == "list":
+        entries = reg.list_all()
+        if json_output:
+            print(json.dumps(entries, indent=2, ensure_ascii=False))
+            return
+        console.print(f"[bold]Output Registry[/bold] ({len(entries)} entries)")
+        for e in entries:
+            console.print(f"  {e['output_id']}  [{e['output_type']}]  {e['work_order_id']}  {e['registered_at']}")
+
+    elif action == "show":
+        if not output_id:
+            console.print("[red]output_id requerido para 'show'[/red]")
+            raise typer.Exit(1)
+        entry = reg.show(output_id)
+        if entry is None:
+            console.print(f"[red]Output '{output_id}' nao encontrado no registry.[/red]")
+            raise typer.Exit(1)
+        if json_output:
+            print(json.dumps(entry, indent=2, ensure_ascii=False))
+            return
+        console.print(f"[bold]Output:[/bold] {entry['output_id']}")
+        for k, v in entry.items():
+            console.print(f"  {k}: {v}")
+
+    else:
+        console.print(f"[red]Acao desconhecida: {action}. Use: list, show[/red]")
+        raise typer.Exit(1)
 
 
 @output_generator_app.command(name="write-spec")

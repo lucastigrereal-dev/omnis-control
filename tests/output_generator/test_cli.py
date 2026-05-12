@@ -129,3 +129,20 @@ def test_package_missing_work_order():
     result = runner.invoke(output_generator_app, ["package", "wo_nonexistent123"])
     assert result.exit_code == 1
     assert "not found" in result.stdout.lower() or "error" in result.stdout.lower()
+
+
+def test_registry_in_help():
+    result = runner.invoke(output_generator_app, ["--help"])
+    assert result.exit_code == 0
+    assert "registry" in result.stdout
+
+
+def test_registry_list_empty():
+    result = runner.invoke(output_generator_app, ["registry", "list"])
+    assert result.exit_code == 0
+    # May show 0 entries — should not crash
+
+
+def test_registry_show_missing():
+    result = runner.invoke(output_generator_app, ["registry", "show", "out_nonexistent"])
+    assert result.exit_code == 1
