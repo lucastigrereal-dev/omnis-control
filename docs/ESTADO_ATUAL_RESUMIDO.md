@@ -1,11 +1,12 @@
 # ESTADO ATUAL RESUMIDO — OMNIS / JARVIS CONTROL
 
-**Gerado em:** 2026-05-07T17:01:27Z
-**Session ID:** `bd5d9b3d-0e27-4576-94d8-1a207a0acd22`
+**Gerado em:** 2026-05-12T16:45:22Z
+**Session ID:** `c78a1436-8b52-471c-9126-8a3e08921010`
 
 ## 1. RISCOS IMEDIATOS
 
-- 🔴 **DISCO CRÍTICO**: C:\ — 8.7% livre (80.6 GB de 924.3 GB). Risco de falha em Docker, logs e builds. Não executar builds pesados antes de saneamento.
+- 🟡 **DISCO EM ALERTA**: C:\ — 15.3% livre (141.8 GB de 924.3 GB). Planejar saneamento antes da Fase 2.
+- 🟡 **DISCO EM ALERTA**: G:\ — 14.6% livre (134.7 GB de 924.3 GB). Planejar saneamento antes da Fase 2.
 
 - 🟡 **Containers unhealthy:** crm-tigre-backend, jarvis_frontend (2 de 11)
 
@@ -22,8 +23,8 @@ Sistema OMNIS operacional. 75 skills detectadas, 11 containers rodando, Publishe
 - **Publisher OS:** port_closed
 - **Qdrant:** falha
 - **Akasha:** ok
-- **Obsidian:** 7,833 .md files
-- **Disco:** critical
+- **Obsidian:** não encontrado .md files
+- **Disco:** warning
 
 ## 4. Skills
 
@@ -46,44 +47,29 @@ Sistema OMNIS operacional. 75 skills detectadas, 11 containers rodando, Publishe
 
 | Container | Status | Portas |
 |-----------|--------|-------|
-| ✅ publisher-os-publish-worker-1 | Up 20 hours |  |
-| ✅ open-webui | Up 20 hours (healthy) | 0.0.0.0:3100->8080/tcp, [::]:3100->8080/ |
-| ✅ akasha-postgres | Up 20 hours (healthy) | 0.0.0.0:5432->5432/tcp, [::]:5432->5432/ |
-| 🔴 crm-tigre-backend | Up 20 hours (unhealthy) | 0.0.0.0:4000->4000/tcp, [::]:4000->4000/ |
-| ✅ crm-tigre-frontend | Up 20 hours (healthy) | 0.0.0.0:3001->80/tcp, [::]:3001->80/tcp |
-| ✅ crm-tigre-redis | Up 20 hours (healthy) | 0.0.0.0:6380->6379/tcp, [::]:6380->6379/ |
-| ✅ crm-tigre-postgres | Up 20 hours (healthy) | 0.0.0.0:5433->5432/tcp, [::]:5433->5432/ |
-| ✅ aurora_redis | Up 20 hours | 0.0.0.0:6381->6379/tcp, [::]:6381->6379/ |
-| 🔴 jarvis_frontend | Up 20 hours (unhealthy) | 0.0.0.0:8080->80/tcp, [::]:8080->80/tcp |
-| ✅ jarvis_executor_api | Up 20 hours (healthy) | 0.0.0.0:3000->3000/tcp, [::]:3000->3000/ |
-| ✅ jarvis_postgres | Up 20 hours (healthy) | 5432/tcp |
+| ✅ publisher-os-publish-worker-1 | Up 3 hours |  |
+| ✅ open-webui | Up 3 hours (healthy) | 0.0.0.0:3100->8080/tcp, [::]:3100->8080/ |
+| ✅ akasha-postgres | Up 3 hours (healthy) | 0.0.0.0:5432->5432/tcp, [::]:5432->5432/ |
+| 🔴 crm-tigre-backend | Up 3 hours (unhealthy) | 0.0.0.0:4000->4000/tcp, [::]:4000->4000/ |
+| ✅ crm-tigre-frontend | Up 3 hours (healthy) | 0.0.0.0:3001->80/tcp, [::]:3001->80/tcp |
+| ✅ crm-tigre-redis | Up 3 hours (healthy) | 0.0.0.0:6380->6379/tcp, [::]:6380->6379/ |
+| ✅ crm-tigre-postgres | Up 3 hours (healthy) | 0.0.0.0:5433->5432/tcp, [::]:5433->5432/ |
+| ✅ aurora_redis | Up 3 hours | 0.0.0.0:6381->6379/tcp, [::]:6381->6379/ |
+| 🔴 jarvis_frontend | Up 3 hours (unhealthy) | 0.0.0.0:8080->80/tcp, [::]:8080->80/tcp |
+| ✅ jarvis_executor_api | Up 3 hours (healthy) | 0.0.0.0:3000->3000/tcp, [::]:3000->3000/ |
+| ✅ jarvis_postgres | Up 3 hours (healthy) | 5432/tcp |
 
 ## 7. Memória
 
 - **Qdrant (http://localhost:6333):** inacessível
 - **Akasha (container akasha-postgres):** encontrado
-  - Status: Up 20 hours (healthy)
+  - Status: Up 3 hours (healthy)
 
 ## 8. Obsidian
 
 - **Vault:** C:\Users\lucas\Desktop\ARQUIVOS_MANUS_CLAUDE\OBSIDIAN\ComandoCentral
-- **Arquivos .md:** 7833
+- **Arquivos .md:** timeout
 - **Pastas principais:**
-  - .obsidian
-  - 00_Contexto
-  - 01_SDR_Hoteis
-  - 02_Hub_Social
-  - 03_Apps
-  - 04_Templates
-  - 05_Leads_Qualificados
-  - 05_Skills
-  - 06_Midias
-  - 07_PDFs
-  - 08_Docs_Word
-  - 09_Planilhas
-  - 10_Textos
-  - 90_Output
-  - 91_Lixeira
 
 ## 9. Video Pipeline
 
@@ -94,7 +80,7 @@ Sistema OMNIS operacional. 75 skills detectadas, 11 containers rodando, Publishe
   - ❌ local_video_files_found
   - ❌ google_drive_code_found
   - ✅ video_ingestion_code_found
-  - ❌ video_asset_registry_found
+  - ✅ video_asset_registry_found
   - ❌ video_asset_schema_found
   - ✅ content_queue_found
   - ✅ daily_queue_found
@@ -108,11 +94,11 @@ Sistema OMNIS operacional. 75 skills detectadas, 11 containers rodando, Publishe
 **Counts:**
   - local_video_files: 0
   - keyword_hits: 0
-  - total_evidence: 88
-  - registry_assets: 0
+  - total_evidence: 89
+  - registry_assets: 1
   - registry_accounts: 2
   - queue_items: 42
-  - scan_duration_ms: 98
+  - scan_duration_ms: 88
   - scan_timed_out: False
 
 ## 10. Content Queue (Fase 2B)

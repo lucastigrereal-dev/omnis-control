@@ -143,6 +143,25 @@
 | P10.9 | ✅ done | 7ca8eef | 10/8 | 2026-05-12 |
 | P10.10 | ✅ done | 92589b2 | 6/5 | 2026-05-12 |
 | P10.11 | ✅ done | — | 2205/2205 | 2026-05-12 |
+| P10.12 | ✅ done | — | — (spec) | 2026-05-12 |
+
+---
+
+## P10.12 — Mission Adapter Spec — 2026-05-12
+
+**Entrega:** `docs/p10/P10_MISSION_ADAPTER_SPEC.md`
+
+Define a interface entre o P10 (selado) e o futuro Mission Package Builder (P11):
+- `MissionPackage` — modelo de dados do pacote completo de missão
+- `MissionPackageBuilder` — orquestrador que USA P10 (não reimplementa)
+- 5 fases: entrada → execução → validação → aprovação → relatório
+- 10 critérios de aceite
+- 9 testes planejados para P11
+- Schema de diretório do MissionPackage em disco
+- Diagrama de sequência completo: pedido do Lucas → missão finalizada
+- 8 restrições técnicas (zero alteração em P10, stdlib, dataclass, dry-run default)
+
+**Conclusão:** MissionPackageBuilder é o maestro. P10 é a orquestra. O maestro rege, não toca os instrumentos.
 
 ---
 
