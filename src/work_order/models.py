@@ -24,6 +24,7 @@ class WorkOrderStatus(str, Enum):
 class OutputType(str, Enum):
     MARKDOWN = "markdown"
     JSON = "json"
+    CSV = "csv"
     HTML_PREVIEW = "html_preview"
     ZIP_PACKAGE = "zip_package"
     IMAGE_ASSET = "image_asset"

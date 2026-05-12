@@ -133,7 +133,7 @@
 
 | Bloco | Status | Commit | Testes | Data |
 |---|---|---|---|---|
-| P10.2 | ⏳ pending | — | —/8 | — |
+| P10.2 | ✅ done | 355db32 | 18/8 | 2026-05-12 |
 | P10.3 | ⏳ pending | — | —/7 | — |
 | P10.4 | ⏳ pending | — | —/8 | — |
 | P10.5 | ⏳ pending | — | —/7 | — |

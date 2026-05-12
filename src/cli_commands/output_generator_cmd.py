@@ -191,6 +191,46 @@ def cmd_write_json(
     console.print(f"  [dim]next_action: package in P10.4[/dim]")
 
 
+@output_generator_app.command(name="write-csv")
+def cmd_write_csv(
+    work_order_id: str = typer.Argument(..., help="Work Order ID"),
+    table_type: str = typer.Option("list", "--type", "-t", help="Tipo de tabela: list, calendar, queue"),
+    json_output: bool = typer.Option(False, "--json", help="Output JSON"),
+) -> None:
+    """Gera output CSV deterministico para um work order."""
+    try:
+        service = OutputWriterService()
+        result = service.write_csv(work_order_id, table_type=table_type)
+    except FileNotFoundError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(1)
+
+    status_map = {
+        "generated": "[green]GENERATED[/green]",
+        "blocked": "[red]BLOCKED[/red]",
+        "failed": "[red]FAILED[/red]",
+        "unsupported": "[yellow]UNSUPPORTED[/yellow]",
+    }
+
+    if json_output:
+        print(json.dumps(result.to_dict(), indent=2, ensure_ascii=False))
+        return
+
+    console.print(f"[bold]CSV output ({table_type})[/bold] {status_map.get(result.status, result.status)}")
+    console.print(f"  output_id:     {result.output_id}")
+    console.print(f"  work_order_id: {result.work_order_id}")
+    console.print(f"  generator_id:  {result.generator_id}")
+    console.print(f"  file_path:     {result.file_path}")
+    console.print(f"  fingerprint:   {result.fingerprint}")
+    if result.warnings:
+        for w in result.warnings:
+            console.print(f"  [yellow]WARN: {w}[/yellow]")
+    if result.blockers:
+        for b in result.blockers:
+            console.print(f"  [red]BLOCKED: {b}[/red]")
+    console.print(f"  [dim]next_action: package in P10.4[/dim]")
+
+
 @output_generator_app.command(name="write-spec")
 def cmd_write_spec(
     work_order_id: str = typer.Argument(..., help="Work Order ID"),

@@ -105,3 +105,15 @@ def test_write_spec_missing_work_order():
     result = runner.invoke(output_generator_app, ["write-spec", "wo_nonexistent123"])
     assert result.exit_code == 1
     assert "not found" in result.stdout.lower() or "error" in result.stdout.lower()
+
+
+def test_write_csv_in_help():
+    result = runner.invoke(output_generator_app, ["--help"])
+    assert result.exit_code == 0
+    assert "write-csv" in result.stdout
+
+
+def test_write_csv_missing_work_order():
+    result = runner.invoke(output_generator_app, ["write-csv", "wo_nonexistent123"])
+    assert result.exit_code == 1
+    assert "not found" in result.stdout.lower() or "error" in result.stdout.lower()

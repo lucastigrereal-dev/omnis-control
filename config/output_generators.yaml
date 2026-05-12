@@ -7,6 +7,14 @@ generators:
     status: active
     description: "Writes structured markdown outputs from work order contracts."
 
+  csv_basic_writer:
+    name: CSV Basic Writer
+    output_types: ["csv"]
+    mode: deterministic
+    risk_level: low
+    status: active
+    description: "Writes structured CSV outputs (calendars, lists, queues) from work order contracts."
+
   json_basic_writer:
     name: JSON Basic Writer
     output_types: ["json"]

@@ -6,6 +6,7 @@ from pathlib import Path
 
 from src.output_generator.errors import GeneratorNotFoundError, NoGeneratorForTypeError
 from src.output_generator.markdown_writer import write_markdown_output
+from src.output_generator.csv_writer import write_csv_output
 from src.output_generator.json_writer import write_json_output, write_spec_output
 from src.output_generator.models import GeneratedOutput, GeneratedOutputStatus
 from src.output_generator.registry import OutputGeneratorRegistry
@@ -176,6 +177,57 @@ class OutputWriterService:
             wo,
             self.outputs_root,
             generator_id=gen_def.generator_id,
+        )
+
+    def write_csv(self, work_order_id: str, *, table_type: str = "list") -> GeneratedOutput:
+        wo = self._load_work_order(work_order_id)
+
+        csv_contracts = [c for c in wo.contracts if c.output_type.value == "csv"]
+        if not csv_contracts:
+            return GeneratedOutput(
+                output_id="",
+                work_order_id=work_order_id,
+                output_type="csv",
+                generator_id="",
+                file_path="",
+                status=GeneratedOutputStatus.UNSUPPORTED,
+                created_at="",
+                blockers=[f"Work order {work_order_id} has no csv contract"],
+            )
+
+        selection = select_generator("csv", registry=self.registry)
+        if selection.status.value not in ("selected",):
+            return GeneratedOutput(
+                output_id="",
+                work_order_id=work_order_id,
+                output_type="csv",
+                generator_id=selection.selected_generator_id or "",
+                file_path="",
+                status=GeneratedOutputStatus.BLOCKED,
+                created_at="",
+                blockers=selection.blockers,
+                warnings=selection.warnings,
+            )
+
+        try:
+            gen_def = self.registry.get(selection.selected_generator_id)
+        except GeneratorNotFoundError:
+            return GeneratedOutput(
+                output_id="",
+                work_order_id=work_order_id,
+                output_type="csv",
+                generator_id="",
+                file_path="",
+                status=GeneratedOutputStatus.FAILED,
+                created_at="",
+                blockers=["Generator not found after selection"],
+            )
+
+        return write_csv_output(
+            wo,
+            self.outputs_root,
+            generator_id=gen_def.generator_id,
+            table_type=table_type,
         )
 
     def _load_work_order(self, work_order_id: str) -> WorkOrder:

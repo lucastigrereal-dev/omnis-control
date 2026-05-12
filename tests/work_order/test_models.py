@@ -31,9 +31,9 @@ class TestWorkOrderStatus:
 
 class TestOutputType:
     def test_all_output_types_present(self):
-        """All 9 output types are defined."""
+        """All 10 output types are defined."""
         expected = {
-            "MARKDOWN", "JSON", "HTML_PREVIEW", "ZIP_PACKAGE",
+            "MARKDOWN", "JSON", "CSV", "HTML_PREVIEW", "ZIP_PACKAGE",
             "IMAGE_ASSET", "VIDEO_PLAN", "DELIVERY_PACKAGE",
             "MISSION_REPORT", "UNKNOWN",
         }
