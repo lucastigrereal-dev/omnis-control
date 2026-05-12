@@ -16,6 +16,7 @@ from src.output_generator import (
 from src.output_generator.errors import GeneratorNotFoundError
 from src.output_generator.json_writer import write_json_output, write_spec_output
 from src.output_generator.manifest_registry import ManifestRegistry
+from src.output_generator.validator import validate_package
 
 output_generator_app = typer.Typer(
     name="output-generator",
@@ -343,3 +344,37 @@ def cmd_write_spec(
         for b in result.blockers:
             console.print(f"  [red]BLOCKED: {b}[/red]")
     console.print(f"  [dim]next_action: package in P10.4[/dim]")
+
+
+@output_generator_app.command(name="validate")
+def cmd_validate(
+    work_order_id: str = typer.Argument(..., help="Work Order ID"),
+    json_output: bool = typer.Option(False, "--json", help="Output JSON"),
+) -> None:
+    """Valida integridade do pacote de output: schema, arquivos, fingerprints."""
+    result = validate_package(work_order_id)
+
+    if json_output:
+        print(json.dumps(result.to_dict(), indent=2, ensure_ascii=False))
+        if not result.valid:
+            raise typer.Exit(1)
+        return
+
+    if result.valid:
+        console.print(f"[bold]Validation[/bold] [green]PASS[/green] for {work_order_id}")
+    else:
+        console.print(f"[bold]Validation[/bold] [red]FAIL[/red] for {work_order_id}")
+
+    for check in result.checks:
+        icon = {"pass": "[green]PASS[/green]", "fail": "[red]FAIL[/red]", "warn": "[yellow]WARN[/yellow]"}.get(check["status"], "?")
+        console.print(f"  {icon} {check['name']}: {check['message']}")
+
+    if result.issues:
+        for issue in result.issues:
+            console.print(f"  [red]ISSUE: {issue}[/red]")
+    if result.warnings:
+        for warn in result.warnings:
+            console.print(f"  [yellow]WARN: {warn}[/yellow]")
+
+    if not result.valid:
+        raise typer.Exit(1)
