@@ -1,7 +1,7 @@
 # Output Generator — Deterministic Local Writers
 
 **Modulo:** `src/output_generator/` | **Config:** `config/output_generators.yaml`
-**Status:** P10.0 Registry implementado
+**Status:** P10.1 Markdown Writer implementado
 
 ---
 
@@ -41,22 +41,33 @@ Cada generator sabe escrever um tipo de output a partir de um contrato (OutputCo
 python -m src.cli output-generator list
 python -m src.cli output-generator show <id>
 python -m src.cli output-generator select <output_type>
+python -m src.cli output-generator write-markdown <work_order_id>
 ```
 
 Flags: `--json` para saida JSON.
 
 ---
 
+## Writers Ativos
+
+- **markdown_basic_writer** — `write_markdown_output(work_order, output_root)` → GeneratedOutput
+- **OutputWriterService** — carrega WO do disco, seleciona generator, chama writer
+
+---
+
 ## Runtime
 
 Outputs gerados vao para `exports/generated_outputs/<output_id>/` (gitignored).
+Cada output gera: `generated_output.md` + `output_manifest.json`.
 
 ---
 
 ## Testes
 
-28 testes em `tests/output_generator/`:
-- test_models.py (8) — enums, dataclasses
+46 testes em `tests/output_generator/`:
+- test_models.py (9) — enums, dataclasses, GeneratedOutput
 - test_registry.py (6) — load YAML, get, list, errors
 - test_selector.py (5) — active/planned/no_match selection
-- test_cli.py (8) — CLI list/show/select commands
+- test_cli.py (10) — CLI list/show/select/write-markdown
+- test_markdown_writer.py (12) — write_markdown_output deterministico
+- test_writer_service.py (4) — OutputWriterService orchestration

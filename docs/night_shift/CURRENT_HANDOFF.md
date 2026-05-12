@@ -1,10 +1,32 @@
-# CURRENT HANDOFF — P10 Output Generator Dry-Run iniciado
+# CURRENT HANDOFF — P10 Output Generator Dry-Run (P10.1 concluido)
 
-**Data:** 2026-05-11 | **Operador:** Lucas
+**Data:** 2026-05-12 | **Operador:** Lucas
 
 ---
 
-## O que foi feito (P9 completo — Final Seal)
+## O que foi feito (P10.0 — P10.1)
+
+### P10.0 — Output Generator Registry (28 testes)
+- `config/output_generators.yaml` — 5 generators (3 active, 2 planned)
+- `src/output_generator/models.py` — GeneratorStatus, SelectionStatus, OutputGeneratorDefinition, OutputGeneratorSelection
+- `src/output_generator/registry.py` — YAML loader
+- `src/output_generator/selector.py` — active > planned > none
+- `src/output_generator/errors.py` — GeneratorNotFoundError, NoGeneratorForTypeError
+- CLI: `output-generator list|show|select`
+- Commit: aeba916
+
+### P10.1 — Markdown Output Writer (18 novos testes, 46 total)
+- `src/output_generator/markdown_writer.py` — `write_markdown_output(wo, root)` deterministico
+- `src/output_generator/writer_service.py` — OutputWriterService (load WO → select gen → write)
+- `GeneratedOutput` + `GeneratedOutputStatus` models
+- CLI: `output-generator write-markdown <wo_id> [--json]`
+- Outputs: `exports/generated_outputs/<output_id>/generated_output.md` + `output_manifest.json`
+
+### O que NAO foi feito no P10.1
+- NAO submete ao collector
+- NAO valida output
+- NAO faz autofill
+- NAO chama LLM ou rede
 
 ### P9.0 — Work Order Models + Builder (61 testes)
 - `src/work_order/models.py` — WorkOrder, OutputContract, OutputEntry, 10 statuses, 9 output types

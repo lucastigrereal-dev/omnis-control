@@ -9,7 +9,7 @@
 | Bloco | Commit | Descricao | Testes | Status |
 |---|---|---|---|---|
 | P10.0 | — | Output Generator Registry | 28/10 | ✅ done |
-| P10.1 | — | Markdown Output Writer | —/10 | ⏳ pending |
+| P10.1 | — | Markdown Output Writer | 18/10 | ✅ done |
 | P10.2 | — | JSON / Spec Output Writers | —/10 | ⏳ pending |
 | P10.3 | — | Work Order Runner Lite | —/10 | ⏳ pending |
 | P10.4 | — | Auto-Submit + Validate | —/10 | ⏳ pending |
@@ -22,12 +22,12 @@
 
 ```
 P10.0 registry:               28/10 ✅
-P10.1 markdown_writer:        —/10
+P10.1 markdown_writer:        18/10 ✅
 P10.2 json_spec_writers:      —/10
 P10.3 runner_lite:            —/10
 P10.4 auto_submit_validate:   —/10
 P10.5 e2e generated flow:     —/8
 P10.6 seal:                   —
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-TOTAL P10:                    28/58
+TOTAL P10:                    46/58
 ```

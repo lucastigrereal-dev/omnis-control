@@ -2,10 +2,18 @@
 from __future__ import annotations
 
 import json
+import tempfile
 
 from typer.testing import CliRunner
 
 from src.cli_commands.output_generator_cmd import output_generator_app
+from src.work_order.models import (
+    OutputContract,
+    OutputType,
+    WorkOrder,
+    WorkOrderStatus,
+    make_work_order_id,
+)
 
 runner = CliRunner()
 
@@ -61,3 +69,15 @@ def test_select_no_generator_type():
     result = runner.invoke(output_generator_app, ["select", "video_plan"])
     assert result.exit_code == 0
     assert "NO_GENERATOR" in result.stdout or "no_generator" in result.stdout.lower()
+
+
+def test_write_markdown_missing_work_order():
+    result = runner.invoke(output_generator_app, ["write-markdown", "wo_nonexistent123"])
+    assert result.exit_code == 1
+    assert "not found" in result.stdout.lower() or "error" in result.stdout.lower()
+
+
+def test_write_markdown_in_help():
+    result = runner.invoke(output_generator_app, ["--help"])
+    assert result.exit_code == 0
+    assert "write-markdown" in result.stdout
