@@ -100,18 +100,26 @@ function Get-OmnisParallelStatus {
         }
     }
 
-    # Also scan C:\Users\lucas\omnis-* directories not in worktree list
+    # Also scan C:\Users\lucas\omnis-* directories not already found via worktree list
+    # Normalize paths to backslash for comparison (git uses forward slashes, FS uses backslashes)
     $omnisBase = "C:\Users\lucas"
     $potentialDirs = Get-ChildItem -Path $omnisBase -Directory -ErrorAction SilentlyContinue |
                      Where-Object { $_.Name -like "omnis-*" -and $_.Name -ne "omnis-control" }
 
+    $discoveredNormalized = $discovered | ForEach-Object { $_.Path -replace "/", "\" }
+
     foreach ($dir in $potentialDirs) {
-        $alreadyFound = $discovered | Where-Object { $_.Path -eq $dir.FullName }
-        if (-not $alreadyFound) {
+        $normalizedFull = $dir.FullName -replace "/", "\"
+        if ($discoveredNormalized -notcontains $normalizedFull) {
             $frontName = $dir.Name -replace "^omnis-", ""
-            $discovered += [PSCustomObject]@{
-                Path  = $dir.FullName
-                Front = $frontName
+            # Only include if it is a git worktree: .git is a FILE, not a directory
+            $gitEntry = Join-Path $dir.FullName ".git"
+            $isWorktree = (Test-Path $gitEntry) -and (-not (Test-Path $gitEntry -PathType Container))
+            if ($isWorktree) {
+                $discovered += [PSCustomObject]@{
+                    Path  = $dir.FullName
+                    Front = $frontName
+                }
             }
         }
     }
