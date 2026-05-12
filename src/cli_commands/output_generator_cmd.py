@@ -17,6 +17,7 @@ from src.output_generator.errors import GeneratorNotFoundError
 from src.output_generator.json_writer import write_json_output, write_spec_output
 from src.output_generator.manifest_registry import ManifestRegistry
 from src.output_generator.validator import validate_package
+from src.output_generator.approval_bridge import prepare_submission
 
 output_generator_app = typer.Typer(
     name="output-generator",
@@ -377,4 +378,43 @@ def cmd_validate(
             console.print(f"  [yellow]WARN: {warn}[/yellow]")
 
     if not result.valid:
+        raise typer.Exit(1)
+
+
+@output_generator_app.command(name="submit-approval")
+def cmd_submit_approval(
+    work_order_id: str = typer.Argument(..., help="Work Order ID"),
+    no_dry_run: bool = typer.Option(False, "--no-dry-run", help="Realmente submeter ao approval_center (default: dry-run)"),
+    json_output: bool = typer.Option(False, "--json", help="Output JSON"),
+) -> None:
+    """Prepara submissao do pacote para o approval_center (dry-run por default)."""
+    submission = prepare_submission(work_order_id, dry_run=not no_dry_run)
+
+    if json_output:
+        print(json.dumps(submission, indent=2, ensure_ascii=False))
+        return
+
+    mode = "[yellow]DRY-RUN[/yellow]" if submission["dry_run"] else "[green]SUBMITTED[/green]"
+    valid_icon = "[green]PASS[/green]" if submission["valid"] else "[red]FAIL[/red]"
+
+    console.print(f"[bold]Approval Submission[/bold] {mode}")
+    console.print(f"  Validation:   {valid_icon}")
+    console.print(f"  Work Order:   {submission['work_order_id']}")
+    console.print(f"  Files:        {submission['file_count']}")
+    console.print(f"  Output types: {', '.join(submission['output_types'])}")
+
+    if submission["approval_request"]:
+        ar = submission["approval_request"]
+        console.print(f"  Approval ID:  {ar['request_id']}")
+        console.print(f"  Status:       {ar['status']}")
+        console.print(f"  Requested at: {ar['requested_at']}")
+
+    if submission["issues"]:
+        for issue in submission["issues"]:
+            console.print(f"  [red]ISSUE: {issue}[/red]")
+    if submission["warnings"]:
+        for warn in submission["warnings"]:
+            console.print(f"  [yellow]WARN: {warn}[/yellow]")
+
+    if not submission["valid"]:
         raise typer.Exit(1)
