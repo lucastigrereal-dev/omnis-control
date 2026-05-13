@@ -111,6 +111,7 @@ def generate(save: bool = False) -> str:
     result = "\n".join(lines)
 
     if save:
+        LOGS.mkdir(parents=True, exist_ok=True)
         date_str = datetime.now().strftime("%Y-%m-%d")
         (LOGS / f"briefing_{date_str}.md").write_text(result, encoding="utf-8")
         with (LOGS / "health_scores.jsonl").open("a", encoding="utf-8") as f:
