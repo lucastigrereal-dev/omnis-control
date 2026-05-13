@@ -1,0 +1,73 @@
+"""P7 Video Studio — estúdio de video deterministico para roteiros, cortes, reels e legendas."""
+from src.video_studio.models import (
+    CaptionOverlaySpec,
+    CaptionPosition,
+    CaptionStyle,
+    CutInstruction,
+    CutPlan,
+    CutType,
+    HookCandidate,
+    HookStrength,
+    PackageStatus,
+    ReelFormat,
+    ReelScript,
+    ReelSegment,
+    TranscriptSegment,
+    VideoPackage,
+    VideoSource,
+    VideoSourceKind,
+)
+from src.video_studio.service import (
+    VideoStudioPlanner,
+    analyze_transcript_segments,
+    build_cut_plan,
+    build_reel_script,
+    build_video_package,
+    detect_hook_candidates,
+    validate_video_package,
+)
+from src.video_studio.errors import (
+    VideoStudioError,
+    InvalidVideoSourceError,
+    InvalidTranscriptError,
+    InvalidCutPlanError,
+    InvalidReelScriptError,
+    InvalidVideoPackageError,
+    ValidationError,
+)
+
+__all__ = [
+    # Models
+    "CaptionOverlaySpec",
+    "CaptionPosition",
+    "CaptionStyle",
+    "CutInstruction",
+    "CutPlan",
+    "CutType",
+    "HookCandidate",
+    "HookStrength",
+    "PackageStatus",
+    "ReelFormat",
+    "ReelScript",
+    "ReelSegment",
+    "TranscriptSegment",
+    "VideoPackage",
+    "VideoSource",
+    "VideoSourceKind",
+    # Service
+    "VideoStudioPlanner",
+    "analyze_transcript_segments",
+    "build_cut_plan",
+    "build_reel_script",
+    "build_video_package",
+    "detect_hook_candidates",
+    "validate_video_package",
+    # Errors
+    "VideoStudioError",
+    "InvalidVideoSourceError",
+    "InvalidTranscriptError",
+    "InvalidCutPlanError",
+    "InvalidReelScriptError",
+    "InvalidVideoPackageError",
+    "ValidationError",
+]
