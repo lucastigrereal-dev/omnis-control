@@ -1,7 +1,7 @@
 # OMNIS SUPREME 210 WAVES — Progress Tracking
 
 **Date:** 2026-05-15
-**Last update:** 2026-05-15 — Grupo 11 complete
+**Last update:** 2026-05-15 — Grupo 12 complete
 
 ---
 
@@ -13,11 +13,11 @@
 | Waves planned (detailed) | 10 |
 | Waves skeleton | 200 |
 | Waves in progress | 0 |
-| Waves complete | 110 |
+| Waves complete | 120 |
 | Waves blocked | 0 |
 | Total blocos | 2,100 |
-| Blocos executados | 1100 |
-| Commits | 20 |
+| Blocos executados | 1200 |
+| Commits | 30 |
 
 ## Progresso por grupo
 
@@ -34,7 +34,7 @@
 | 09 — Publisher/ARGOS | W081-W090 | 10 | 0 | 10 | 0 |
 | 10 — Content Factory | W091-W100 | 10 | 0 | 10 | 0 |
 | 11 — Video Studio | W101-W110 | 10 | 0 | 10 | 0 |
-| 12 — Sales/CRM | W111-W120 | 0 | 0 | 0 | 0 |
+| 12 — Sales/CRM | W111-W120 | 10 | 0 | 10 | 0 |
 | 13 — Commercial/SDR | W121-W130 | 0 | 0 | 0 | 0 |
 | 14 — App Factory | W131-W140 | 0 | 0 | 0 | 0 |
 | 15 — Automation/n8n | W141-W150 | 0 | 0 | 0 | 0 |
@@ -166,7 +166,17 @@
 | 2026-05-15 | W107 | 10/10 | COMPLETE | — | Cover brief builder |
 | 2026-05-15 | W108 | 10/10 | COMPLETE | — | Video-to-content package |
 | 2026-05-15 | W109 | 10/10 | COMPLETE | — | Video export queue |
-| 2026-05-15 | W110 | 10/10 | COMPLETE | pending | Video Studio E2E |
+| 2026-05-15 | W110 | 10/10 | COMPLETE | — | Video Studio E2E |
+| 2026-05-15 | W111 | 10/10 | COMPLETE | c349a4a | Lead model + registry |
+| 2026-05-15 | W112 | 10/10 | COMPLETE | d693b42 | Pipeline state machine |
+| 2026-05-15 | W113 | 10/10 | COMPLETE | b3b4355 | Deal model + registry |
+| 2026-05-15 | W114 | 10/10 | COMPLETE | 4e56782 | Contact timeline |
+| 2026-05-15 | W115 | 10/10 | COMPLETE | b6ea213 | Follow-up scheduler |
+| 2026-05-15 | W116 | 10/10 | COMPLETE | fbda383 | Proposal generator |
+| 2026-05-15 | W117 | 10/10 | COMPLETE | 9229a8f | Commission calculator |
+| 2026-05-15 | W118 | 10/10 | COMPLETE | e6d2dd3 | Sales dashboard |
+| 2026-05-15 | W119 | 10/10 | COMPLETE | a752b5b | CRM export |
+| 2026-05-15 | W120 | 10/10 | COMPLETE | f870b40 | E2E + safety audit |
 
 ---
 
