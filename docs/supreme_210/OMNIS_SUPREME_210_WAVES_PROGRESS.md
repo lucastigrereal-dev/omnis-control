@@ -1,7 +1,7 @@
 # OMNIS SUPREME 210 WAVES — Progress Tracking
 
 **Date:** 2026-05-15
-**Last update:** 2026-05-15 — Grupo 10 complete
+**Last update:** 2026-05-15 — Grupo 11 complete
 
 ---
 
@@ -13,11 +13,11 @@
 | Waves planned (detailed) | 10 |
 | Waves skeleton | 200 |
 | Waves in progress | 0 |
-| Waves complete | 100 |
+| Waves complete | 110 |
 | Waves blocked | 0 |
 | Total blocos | 2,100 |
-| Blocos executados | 1000 |
-| Commits | 19 |
+| Blocos executados | 1100 |
+| Commits | 20 |
 
 ## Progresso por grupo
 
@@ -33,7 +33,7 @@
 | 08 — Execution Graph | W071-W080 | 10 | 0 | 10 | 0 |
 | 09 — Publisher/ARGOS | W081-W090 | 10 | 0 | 10 | 0 |
 | 10 — Content Factory | W091-W100 | 10 | 0 | 10 | 0 |
-| 11 — Video Studio | W101-W110 | 0 | 0 | 0 | 0 |
+| 11 — Video Studio | W101-W110 | 10 | 0 | 10 | 0 |
 | 12 — Sales/CRM | W111-W120 | 0 | 0 | 0 | 0 |
 | 13 — Commercial/SDR | W121-W130 | 0 | 0 | 0 | 0 |
 | 14 — App Factory | W131-W140 | 0 | 0 | 0 | 0 |
@@ -157,6 +157,16 @@
 | 2026-05-15 | W098 | 10/10 | COMPLETE | — | Brand voice guard |
 | 2026-05-15 | W099 | 10/10 | COMPLETE | — | Approval flow |
 | 2026-05-15 | W100 | 10/10 | COMPLETE | pending | E2E Content Factory |
+| 2026-05-15 | W101 | 10/10 | COMPLETE | — | Video asset registry |
+| 2026-05-15 | W102 | 10/10 | COMPLETE | — | Video inbox scanner |
+| 2026-05-15 | W103 | 10/10 | COMPLETE | — | Mock transcription adapter |
+| 2026-05-15 | W104 | 10/10 | COMPLETE | — | Hook detector (6 criteria) |
+| 2026-05-15 | W105 | 10/10 | COMPLETE | — | Cut plan generator |
+| 2026-05-15 | W106 | 10/10 | COMPLETE | — | On-screen captions brief |
+| 2026-05-15 | W107 | 10/10 | COMPLETE | — | Cover brief builder |
+| 2026-05-15 | W108 | 10/10 | COMPLETE | — | Video-to-content package |
+| 2026-05-15 | W109 | 10/10 | COMPLETE | — | Video export queue |
+| 2026-05-15 | W110 | 10/10 | COMPLETE | pending | Video Studio E2E |
 
 ---
 
