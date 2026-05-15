@@ -13,11 +13,11 @@
 | Waves planned (detailed) | 10 |
 | Waves skeleton | 200 |
 | Waves in progress | 0 |
-| Waves complete | 50 |
+| Waves complete | 60 |
 | Waves blocked | 0 |
 | Total blocos | 2,100 |
-| Blocos executados | 500 |
-| Commits | 14 |
+| Blocos executados | 600 |
+| Commits | 15 |
 
 ## Progresso por grupo
 
@@ -28,7 +28,7 @@
 | 03 — Memory/Akasha | W021-W030 | 10 | 0 | 10 | 0 |
 | 04 — Observability | W031-W040 | 10 | 0 | 10 | 0 |
 | 05 — Skill Execution | W041-W050 | 10 | 0 | 10 | 0 |
-| 06 — Capability Forge | W051-W060 | 0 | 0 | 0 | 0 |
+| 06 — Capability Forge | W051-W060 | 10 | 0 | 10 | 0 |
 | 07 — Squad Composer | W061-W070 | 0 | 0 | 0 | 0 |
 | 08 — Execution Graph | W071-W080 | 0 | 0 | 0 | 0 |
 | 09 — Publisher/ARGOS | W081-W090 | 0 | 0 | 0 | 0 |
@@ -106,7 +106,17 @@
 | 2026-05-15 | W047 | 10/10 | COMPLETE | — | Audit events (verified) |
 | 2026-05-15 | W048 | 10/10 | COMPLETE | pending | Resource limits implemented |
 | 2026-05-15 | W049 | 10/10 | COMPLETE | pending | Test harness implemented |
-| 2026-05-15 | W050 | 10/10 | COMPLETE | pending | E2E dry-run test |
+| 2026-05-15 | W050 | 10/10 | COMPLETE | da643df | E2E dry-run test |
+| 2026-05-15 | W051 | 10/10 | COMPLETE | — | Gap detector (verified) |
+| 2026-05-15 | W052 | 10/10 | COMPLETE | — | Spec designer (verified) |
+| 2026-05-15 | W053 | 10/10 | COMPLETE | — | Blueprint architect (verified) |
+| 2026-05-15 | W054 | 10/10 | COMPLETE | — | Code builder dry-run (verified) |
+| 2026-05-15 | W055 | 10/10 | COMPLETE | — | Template system (verified) |
+| 2026-05-15 | W056 | 10/10 | COMPLETE | pending | Sandbox runner implemented |
+| 2026-05-15 | W057 | 10/10 | COMPLETE | pending | Evaluator scorecard implemented |
+| 2026-05-15 | W058 | 10/10 | COMPLETE | — | Policy engine (verified) |
+| 2026-05-15 | W059 | 10/10 | COMPLETE | — | Registry manager (verified) |
+| 2026-05-15 | W060 | 10/10 | COMPLETE | pending | Forge E2E (verified+enhanced) |
 | | | | | | |
 
 ---
