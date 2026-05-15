@@ -13,18 +13,18 @@
 | Waves planned (detailed) | 10 |
 | Waves skeleton | 200 |
 | Waves in progress | 0 |
-| Waves complete | 10 |
+| Waves complete | 20 |
 | Waves blocked | 0 |
 | Total blocos | 2,100 |
-| Blocos executados | 100 |
-| Commits | 2 |
+| Blocos executados | 200 |
+| Commits | 7 |
 
 ## Progresso por grupo
 
 | Grupo | Waves | Planejadas | Em progresso | Completas | Bloqueadas |
 |---|---|---|---|---|---|
 | 01 — Foundation | W001-W010 | 10 | 0 | 10 | 0 |
-| 02 — Mission OS | W011-W020 | 0 | 0 | 0 | 0 |
+| 02 — Mission OS | W011-W020 | 10 | 0 | 10 | 0 |
 | 03 — Memory/Akasha | W021-W030 | 0 | 0 | 0 | 0 |
 | 04 — Observability | W031-W040 | 0 | 0 | 0 | 0 |
 | 05 — Skill Execution | W041-W050 | 0 | 0 | 0 | 0 |
@@ -67,6 +67,16 @@
 | 2026-05-15 | W008 | 10/10 | COMPLETE | — | Progress tracking |
 | 2026-05-15 | W009 | 10/10 | COMPLETE | — | Recovery prompts |
 | 2026-05-15 | W010 | 10/10 | COMPLETE | f0dba49 | Governance final gate |
+| 2026-05-15 | W011 | 10/10 | COMPLETE | — | MissionContract Pydantic v2 (verified) |
+| 2026-05-15 | W012 | 10/10 | COMPLETE | — | Package builder (verified) |
+| 2026-05-15 | W013 | 10/10 | COMPLETE | — | State machine 7 states (verified) |
+| 2026-05-15 | W014 | 10/10 | COMPLETE | — | CLI 8 commands Typer (verified) |
+| 2026-05-15 | W015 | 10/10 | COMPLETE | — | Report generation (verified) |
+| 2026-05-15 | W016 | 10/10 | COMPLETE | 537f264 | Artifact registry implemented |
+| 2026-05-15 | W017 | 10/10 | COMPLETE | — | Approval folder (verified) |
+| 2026-05-15 | W018 | 10/10 | COMPLETE | bb95b7b | Learning writeback implemented |
+| 2026-05-15 | W019 | 10/10 | COMPLETE | — | Recovery/resume (verified) |
+| 2026-05-15 | W020 | 10/10 | COMPLETE | d7014e8 | E2E dry-run test implemented |
 | | | | | | |
 
 ---
