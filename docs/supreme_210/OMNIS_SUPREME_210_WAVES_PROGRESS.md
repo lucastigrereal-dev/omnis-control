@@ -13,11 +13,11 @@
 | Waves planned (detailed) | 10 |
 | Waves skeleton | 200 |
 | Waves in progress | 0 |
-| Waves complete | 40 |
+| Waves complete | 50 |
 | Waves blocked | 0 |
 | Total blocos | 2,100 |
-| Blocos executados | 400 |
-| Commits | 13 |
+| Blocos executados | 500 |
+| Commits | 14 |
 
 ## Progresso por grupo
 
@@ -27,7 +27,7 @@
 | 02 — Mission OS | W011-W020 | 10 | 0 | 10 | 0 |
 | 03 — Memory/Akasha | W021-W030 | 10 | 0 | 10 | 0 |
 | 04 — Observability | W031-W040 | 10 | 0 | 10 | 0 |
-| 05 — Skill Execution | W041-W050 | 0 | 0 | 0 | 0 |
+| 05 — Skill Execution | W041-W050 | 10 | 0 | 10 | 0 |
 | 06 — Capability Forge | W051-W060 | 0 | 0 | 0 | 0 |
 | 07 — Squad Composer | W061-W070 | 0 | 0 | 0 | 0 |
 | 08 — Execution Graph | W071-W080 | 0 | 0 | 0 | 0 |
@@ -96,7 +96,17 @@
 | 2026-05-15 | W037 | 10/10 | COMPLETE | — | Alert model (verified) |
 | 2026-05-15 | W038 | 10/10 | COMPLETE | — | Audit trail viewer (verified) |
 | 2026-05-15 | W039 | 10/10 | COMPLETE | — | Observability CLI (verified) |
-| 2026-05-15 | W040 | 10/10 | COMPLETE | pending | E2E dry-run test |
+| 2026-05-15 | W040 | 10/10 | COMPLETE | d4d690c | E2E dry-run test |
+| 2026-05-15 | W041 | 10/10 | COMPLETE | — | Skill registry audit (verified) |
+| 2026-05-15 | W042 | 10/10 | COMPLETE | — | Manifest schema (verified) |
+| 2026-05-15 | W043 | 10/10 | COMPLETE | — | Permission gate (verified) |
+| 2026-05-15 | W044 | 10/10 | COMPLETE | — | Dry-run executor (verified) |
+| 2026-05-15 | W045 | 10/10 | COMPLETE | — | Result schema (verified) |
+| 2026-05-15 | W046 | 10/10 | COMPLETE | — | Artifact registry (verified) |
+| 2026-05-15 | W047 | 10/10 | COMPLETE | — | Audit events (verified) |
+| 2026-05-15 | W048 | 10/10 | COMPLETE | pending | Resource limits implemented |
+| 2026-05-15 | W049 | 10/10 | COMPLETE | pending | Test harness implemented |
+| 2026-05-15 | W050 | 10/10 | COMPLETE | pending | E2E dry-run test |
 | | | | | | |
 
 ---
