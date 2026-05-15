@@ -13,11 +13,11 @@
 | Waves planned (detailed) | 10 |
 | Waves skeleton | 200 |
 | Waves in progress | 0 |
-| Waves complete | 80 |
+| Waves complete | 90 |
 | Waves blocked | 0 |
 | Total blocos | 2,100 |
-| Blocos executados | 800 |
-| Commits | 17 |
+| Blocos executados | 900 |
+| Commits | 18 |
 
 ## Progresso por grupo
 
@@ -31,7 +31,7 @@
 | 06 — Capability Forge | W051-W060 | 10 | 0 | 10 | 0 |
 | 07 — Squad Composer | W061-W070 | 10 | 0 | 10 | 0 |
 | 08 — Execution Graph | W071-W080 | 10 | 0 | 10 | 0 |
-| 09 — Publisher/ARGOS | W081-W090 | 0 | 0 | 0 | 0 |
+| 09 — Publisher/ARGOS | W081-W090 | 10 | 0 | 10 | 0 |
 | 10 — Content Factory | W091-W100 | 0 | 0 | 0 | 0 |
 | 11 — Video Studio | W101-W110 | 0 | 0 | 0 | 0 |
 | 12 — Sales/CRM | W111-W120 | 0 | 0 | 0 | 0 |
@@ -137,6 +137,16 @@
 | 2026-05-15 | W078 | 10/10 | COMPLETE | — | Checkpoint store (verified) |
 | 2026-05-15 | W079 | 10/10 | COMPLETE | — | Execution resume (verified) |
 | 2026-05-15 | W080 | 10/10 | COMPLETE | — | Graph E2E (verified) |
+| 2026-05-15 | W081 | 10/10 | COMPLETE | — | Content item contract (verified) |
+| 2026-05-15 | W082 | 10/10 | COMPLETE | — | Publish state machine (verified) |
+| 2026-05-15 | W083 | 10/10 | COMPLETE | — | Publisher queue + pipeline (verified) |
+| 2026-05-15 | W084 | 10/10 | COMPLETE | — | Argos export contract (verified) |
+| 2026-05-15 | W085 | 10/10 | COMPLETE | pending | Caption approval gate |
+| 2026-05-15 | W086 | 10/10 | COMPLETE | pending | Creative production bridge |
+| 2026-05-15 | W087 | 10/10 | COMPLETE | pending | Metrics placeholder |
+| 2026-05-15 | W088 | 10/10 | COMPLETE | pending | Publer/Metricool export |
+| 2026-05-15 | W089 | 10/10 | COMPLETE | pending | Publisher E2E + safety audit |
+| 2026-05-15 | W090 | 10/10 | COMPLETE | pending | Publisher safety audit |
 | | | | | | |
 
 ---
