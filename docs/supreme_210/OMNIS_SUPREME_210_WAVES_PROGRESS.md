@@ -13,11 +13,11 @@
 | Waves planned (detailed) | 10 |
 | Waves skeleton | 200 |
 | Waves in progress | 0 |
-| Waves complete | 70 |
+| Waves complete | 80 |
 | Waves blocked | 0 |
 | Total blocos | 2,100 |
-| Blocos executados | 700 |
-| Commits | 16 |
+| Blocos executados | 800 |
+| Commits | 17 |
 
 ## Progresso por grupo
 
@@ -30,7 +30,7 @@
 | 05 — Skill Execution | W041-W050 | 10 | 0 | 10 | 0 |
 | 06 — Capability Forge | W051-W060 | 10 | 0 | 10 | 0 |
 | 07 — Squad Composer | W061-W070 | 10 | 0 | 10 | 0 |
-| 08 — Execution Graph | W071-W080 | 0 | 0 | 0 | 0 |
+| 08 — Execution Graph | W071-W080 | 10 | 0 | 10 | 0 |
 | 09 — Publisher/ARGOS | W081-W090 | 0 | 0 | 0 | 0 |
 | 10 — Content Factory | W091-W100 | 0 | 0 | 0 | 0 |
 | 11 — Video Studio | W101-W110 | 0 | 0 | 0 | 0 |
@@ -127,6 +127,16 @@
 | 2026-05-15 | W068 | 10/10 | COMPLETE | pending | Security squad template + role |
 | 2026-05-15 | W069 | 10/10 | COMPLETE | — | Squad report (verified) |
 | 2026-05-15 | W070 | 10/10 | COMPLETE | pending | Squad E2E (verified+enhanced) |
+| 2026-05-15 | W071 | 10/10 | COMPLETE | — | Node model (verified) |
+| 2026-05-15 | W072 | 10/10 | COMPLETE | — | Edge model (verified) |
+| 2026-05-15 | W073 | 10/10 | COMPLETE | — | Graph builder Kahn's algorithm (verified) |
+| 2026-05-15 | W074 | 10/10 | COMPLETE | — | Stage runner (verified+enhanced) |
+| 2026-05-15 | W075 | 10/10 | COMPLETE | pending | Retry policy implemented |
+| 2026-05-15 | W076 | 10/10 | COMPLETE | pending | Circuit breaker implemented |
+| 2026-05-15 | W077 | 10/10 | COMPLETE | pending | Rollback plan implemented |
+| 2026-05-15 | W078 | 10/10 | COMPLETE | — | Checkpoint store (verified) |
+| 2026-05-15 | W079 | 10/10 | COMPLETE | — | Execution resume (verified) |
+| 2026-05-15 | W080 | 10/10 | COMPLETE | — | Graph E2E (verified) |
 | | | | | | |
 
 ---
