@@ -1,0 +1,66 @@
+{
+  "version": "0.1.0-draft",
+  "status": "PLANNING_ONLY",
+  "date": "2026-05-14",
+  "commands": {
+    "allowed": [
+      {
+        "command": "/status",
+        "description": "System health check",
+        "risk": "LOW",
+        "requires_approval": false,
+        "rate_limit_per_minute": 5
+      },
+      {
+        "command": "/briefing",
+        "description": "Daily Publisher OS briefing",
+        "risk": "LOW",
+        "requires_approval": false,
+        "rate_limit_per_minute": 3
+      },
+      {
+        "command": "/approve",
+        "description": "Approve a pending action by request_id",
+        "risk": "HIGH",
+        "requires_approval": true,
+        "rate_limit_per_minute": 5
+      },
+      {
+        "command": "/reject",
+        "description": "Reject a pending action with reason",
+        "risk": "HIGH",
+        "requires_approval": true,
+        "rate_limit_per_minute": 5
+      },
+      {
+        "command": "/pending",
+        "description": "List all pending approval requests",
+        "risk": "LOW",
+        "requires_approval": false,
+        "rate_limit_per_minute": 3
+      },
+      {
+        "command": "/run",
+        "description": "Execute a skill in dry-run mode",
+        "risk": "MEDIUM",
+        "requires_approval": true,
+        "rate_limit_per_minute": 3
+      }
+    ],
+    "forbidden": [
+      "/shell",
+      "/exec",
+      "/bash",
+      "/cmd",
+      "/delete",
+      "/rm",
+      "/push",
+      "/deploy"
+    ]
+  },
+  "chat_id_whitelist": {
+    "description": "Only these Telegram user IDs can command the bot",
+    "mode": "hardcoded",
+    "note": "Do NOT put real chat IDs here — this is a draft"
+  }
+}
