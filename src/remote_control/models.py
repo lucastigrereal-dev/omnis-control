@@ -70,7 +70,7 @@ class RemoteCommand:
         from datetime import datetime, timezone
         try:
             expiry = datetime.fromisoformat(self.approval_token_expires_at)
-            return datetime.now(timezone.utc) > expiry
+            return datetime.now(timezone.utc) >= expiry
         except (ValueError, TypeError):
             return True
 
