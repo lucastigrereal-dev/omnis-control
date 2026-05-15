@@ -13,11 +13,11 @@
 | Waves planned (detailed) | 10 |
 | Waves skeleton | 200 |
 | Waves in progress | 0 |
-| Waves complete | 30 |
+| Waves complete | 40 |
 | Waves blocked | 0 |
 | Total blocos | 2,100 |
-| Blocos executados | 300 |
-| Commits | 12 |
+| Blocos executados | 400 |
+| Commits | 13 |
 
 ## Progresso por grupo
 
@@ -26,7 +26,7 @@
 | 01 — Foundation | W001-W010 | 10 | 0 | 10 | 0 |
 | 02 — Mission OS | W011-W020 | 10 | 0 | 10 | 0 |
 | 03 — Memory/Akasha | W021-W030 | 10 | 0 | 10 | 0 |
-| 04 — Observability | W031-W040 | 0 | 0 | 0 | 0 |
+| 04 — Observability | W031-W040 | 10 | 0 | 10 | 0 |
 | 05 — Skill Execution | W041-W050 | 0 | 0 | 0 | 0 |
 | 06 — Capability Forge | W051-W060 | 0 | 0 | 0 | 0 |
 | 07 — Squad Composer | W061-W070 | 0 | 0 | 0 | 0 |
@@ -87,6 +87,16 @@
 | 2026-05-15 | W028 | 10/10 | COMPLETE | ec5602b | Context builder implemented |
 | 2026-05-15 | W029 | 10/10 | COMPLETE | 252c233 | Learning writeback implemented |
 | 2026-05-15 | W030 | 10/10 | COMPLETE | dd167f8 | Memory E2E dry-run |
+| 2026-05-15 | W031 | 10/10 | COMPLETE | — | Structured logging (verified) |
+| 2026-05-15 | W032 | 10/10 | COMPLETE | — | Trace/Correlation ID (verified) |
+| 2026-05-15 | W033 | 10/10 | COMPLETE | pending | Stage events implemented |
+| 2026-05-15 | W034 | 10/10 | COMPLETE | — | Health model (verified) |
+| 2026-05-15 | W035 | 10/10 | COMPLETE | — | Metrics registry (verified) |
+| 2026-05-15 | W036 | 10/10 | COMPLETE | pending | Error taxonomy implemented |
+| 2026-05-15 | W037 | 10/10 | COMPLETE | — | Alert model (verified) |
+| 2026-05-15 | W038 | 10/10 | COMPLETE | — | Audit trail viewer (verified) |
+| 2026-05-15 | W039 | 10/10 | COMPLETE | — | Observability CLI (verified) |
+| 2026-05-15 | W040 | 10/10 | COMPLETE | pending | E2E dry-run test |
 | | | | | | |
 
 ---
