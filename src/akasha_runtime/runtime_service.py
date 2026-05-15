@@ -47,13 +47,17 @@ class AkashaRuntimeService:
         if not self.config:
             return {"ok": False, "error": "not initialized"}
 
+        event_mapping: AkashaEventMapping | None = None
         target_collection = collection
         if not target_collection:
             mapped_collection, mapping = self.event_mapper.map_event(event_type)
             if mapped_collection:
                 target_collection = mapped_collection
+                event_mapping = mapping
             else:
                 target_collection = "default"
+        else:
+            _, event_mapping = self.event_mapper.map_event(event_type)
 
         doc = AkashaMemoryDocument(
             collection=target_collection,
@@ -68,7 +72,10 @@ class AkashaRuntimeService:
         if self.dedup_registry.is_duplicate(doc):
             return {"ok": False, "error": "duplicate content"}
 
-        require_approval = self.policy_enforcer.requires_approval(self.policy, doc)
+        require_approval = (
+            self.policy_enforcer.requires_approval(self.policy, doc)
+            or (event_mapping is not None and event_mapping.require_approval)
+        )
         if require_approval and self.dry_run:
             pass
 
