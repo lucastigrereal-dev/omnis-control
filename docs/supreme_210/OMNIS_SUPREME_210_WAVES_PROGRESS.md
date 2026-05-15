@@ -10,20 +10,20 @@
 | Metric | Count |
 |---|---|
 | Total waves | 210 |
-| Waves planned (detailed) | 0 |
-| Waves skeleton | 0 |
+| Waves planned (detailed) | 10 |
+| Waves skeleton | 200 |
 | Waves in progress | 0 |
-| Waves complete | 0 |
+| Waves complete | 10 |
 | Waves blocked | 0 |
 | Total blocos | 2,100 |
-| Blocos executados | 0 |
-| Commits | 0 |
+| Blocos executados | 100 |
+| Commits | 2 |
 
 ## Progresso por grupo
 
 | Grupo | Waves | Planejadas | Em progresso | Completas | Bloqueadas |
 |---|---|---|---|---|---|
-| 01 — Foundation | W001-W010 | 0 | 0 | 0 | 0 |
+| 01 — Foundation | W001-W010 | 10 | 0 | 10 | 0 |
 | 02 — Mission OS | W011-W020 | 0 | 0 | 0 | 0 |
 | 03 — Memory/Akasha | W021-W030 | 0 | 0 | 0 | 0 |
 | 04 — Observability | W031-W040 | 0 | 0 | 0 | 0 |
@@ -57,6 +57,16 @@
 
 | Data | Wave | Blocos | Resultado | Commit | Notas |
 |---|---|---|---|---|---|
+| 2026-05-15 | W001 | 10/10 | COMPLETE | c8c13ee | P46 + governance scaffold |
+| 2026-05-15 | W002 | 10/10 | COMPLETE | — | Branch/worktree audit |
+| 2026-05-15 | W003 | 10/10 | COMPLETE | — | Test readiness |
+| 2026-05-15 | W004 | 10/10 | COMPLETE | — | Merge plan only |
+| 2026-05-15 | W005 | 10/10 | COMPLETE | — | Governance scaffold |
+| 2026-05-15 | W006 | 10/10 | COMPLETE | — | Safety policies |
+| 2026-05-15 | W007 | 10/10 | COMPLETE | — | Roadmap generator |
+| 2026-05-15 | W008 | 10/10 | COMPLETE | — | Progress tracking |
+| 2026-05-15 | W009 | 10/10 | COMPLETE | — | Recovery prompts |
+| 2026-05-15 | W010 | 10/10 | COMPLETE | f0dba49 | Governance final gate |
 | | | | | | |
 
 ---
