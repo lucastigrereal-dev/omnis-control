@@ -13,11 +13,11 @@
 | Waves planned (detailed) | 10 |
 | Waves skeleton | 200 |
 | Waves in progress | 0 |
-| Waves complete | 20 |
+| Waves complete | 30 |
 | Waves blocked | 0 |
 | Total blocos | 2,100 |
-| Blocos executados | 200 |
-| Commits | 7 |
+| Blocos executados | 300 |
+| Commits | 12 |
 
 ## Progresso por grupo
 
@@ -25,7 +25,7 @@
 |---|---|---|---|---|---|
 | 01 — Foundation | W001-W010 | 10 | 0 | 10 | 0 |
 | 02 — Mission OS | W011-W020 | 10 | 0 | 10 | 0 |
-| 03 — Memory/Akasha | W021-W030 | 0 | 0 | 0 | 0 |
+| 03 — Memory/Akasha | W021-W030 | 10 | 0 | 10 | 0 |
 | 04 — Observability | W031-W040 | 0 | 0 | 0 | 0 |
 | 05 — Skill Execution | W041-W050 | 0 | 0 | 0 | 0 |
 | 06 — Capability Forge | W051-W060 | 0 | 0 | 0 | 0 |
@@ -77,6 +77,16 @@
 | 2026-05-15 | W018 | 10/10 | COMPLETE | bb95b7b | Learning writeback implemented |
 | 2026-05-15 | W019 | 10/10 | COMPLETE | — | Recovery/resume (verified) |
 | 2026-05-15 | W020 | 10/10 | COMPLETE | d7014e8 | E2E dry-run test implemented |
+| 2026-05-15 | W021 | 10/10 | COMPLETE | 5b1767e | Memory contracts verified |
+| 2026-05-15 | W022 | 10/10 | COMPLETE | — | File-backed adapter verified |
+| 2026-05-15 | W023 | 10/10 | COMPLETE | — | Real boundary verified |
+| 2026-05-15 | W024 | 10/10 | COMPLETE | — | Health check verified |
+| 2026-05-15 | W025 | 10/10 | COMPLETE | — | Write policy verified |
+| 2026-05-15 | W026 | 10/10 | COMPLETE | — | Dedup keys verified |
+| 2026-05-15 | W027 | 10/10 | COMPLETE | af10947 | Embedding strategy implemented |
+| 2026-05-15 | W028 | 10/10 | COMPLETE | ec5602b | Context builder implemented |
+| 2026-05-15 | W029 | 10/10 | COMPLETE | 252c233 | Learning writeback implemented |
+| 2026-05-15 | W030 | 10/10 | COMPLETE | dd167f8 | Memory E2E dry-run |
 | | | | | | |
 
 ---
