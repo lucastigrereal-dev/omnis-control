@@ -13,10 +13,10 @@
 | Waves planned (detailed) | 10 |
 | Waves skeleton | 200 |
 | Waves in progress | 0 |
-| Waves complete | 120 |
+| Waves complete | 121 |
 | Waves blocked | 0 |
 | Total blocos | 2,100 |
-| Blocos executados | 1200 |
+| Blocos executados | 1210 |
 | Commits | 30 |
 
 ## Progresso por grupo
@@ -35,7 +35,7 @@
 | 10 — Content Factory | W091-W100 | 10 | 0 | 10 | 0 |
 | 11 — Video Studio | W101-W110 | 10 | 0 | 10 | 0 |
 | 12 — Sales/CRM | W111-W120 | 10 | 0 | 10 | 0 |
-| 13 — Commercial/SDR | W121-W130 | 0 | 0 | 0 | 0 |
+| 13 — Commercial/SDR | W121-W130 | 1 | 0 | 1 | 0 |
 | 14 — App Factory | W131-W140 | 0 | 0 | 0 | 0 |
 | 15 — Automation/n8n | W141-W150 | 0 | 0 | 0 | 0 |
 | 16 — MCP/Plugin | W151-W160 | 0 | 0 | 0 | 0 |
@@ -177,6 +177,7 @@
 | 2026-05-15 | W118 | 10/10 | COMPLETE | e6d2dd3 | Sales dashboard |
 | 2026-05-15 | W119 | 10/10 | COMPLETE | a752b5b | CRM export |
 | 2026-05-15 | W120 | 10/10 | COMPLETE | f870b40 | E2E + safety audit |
+| 2026-05-15 | W121 | 10/10 | COMPLETE | pending | HotelLead model + registry |
 
 ---
 
