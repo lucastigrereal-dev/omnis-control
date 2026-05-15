@@ -84,6 +84,20 @@ roles:
       - blocker_report
     risk_level: low
 
+  security_auditor:
+    name: Security Auditor
+    sectors: ["operations", "apps"]
+    responsibilities:
+      - scans for secrets in code
+      - detects forbidden patterns
+      - audits path traversal risks
+      - validates policy compliance
+    outputs:
+      - security_report
+      - vulnerability_list
+      - remediation_plan
+    risk_level: high
+
   operations_manager:
     name: Operations Manager
     sectors: ["operations"]

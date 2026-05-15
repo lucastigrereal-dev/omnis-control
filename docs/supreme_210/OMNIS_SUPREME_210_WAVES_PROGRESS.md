@@ -13,11 +13,11 @@
 | Waves planned (detailed) | 10 |
 | Waves skeleton | 200 |
 | Waves in progress | 0 |
-| Waves complete | 60 |
+| Waves complete | 70 |
 | Waves blocked | 0 |
 | Total blocos | 2,100 |
-| Blocos executados | 600 |
-| Commits | 15 |
+| Blocos executados | 700 |
+| Commits | 16 |
 
 ## Progresso por grupo
 
@@ -29,7 +29,7 @@
 | 04 — Observability | W031-W040 | 10 | 0 | 10 | 0 |
 | 05 — Skill Execution | W041-W050 | 10 | 0 | 10 | 0 |
 | 06 — Capability Forge | W051-W060 | 10 | 0 | 10 | 0 |
-| 07 — Squad Composer | W061-W070 | 0 | 0 | 0 | 0 |
+| 07 — Squad Composer | W061-W070 | 10 | 0 | 10 | 0 |
 | 08 — Execution Graph | W071-W080 | 0 | 0 | 0 | 0 |
 | 09 — Publisher/ARGOS | W081-W090 | 0 | 0 | 0 | 0 |
 | 10 — Content Factory | W091-W100 | 0 | 0 | 0 | 0 |
@@ -116,7 +116,17 @@
 | 2026-05-15 | W057 | 10/10 | COMPLETE | pending | Evaluator scorecard implemented |
 | 2026-05-15 | W058 | 10/10 | COMPLETE | — | Policy engine (verified) |
 | 2026-05-15 | W059 | 10/10 | COMPLETE | — | Registry manager (verified) |
-| 2026-05-15 | W060 | 10/10 | COMPLETE | pending | Forge E2E (verified+enhanced) |
+| 2026-05-15 | W060 | 10/10 | COMPLETE | 391a3b3 | Forge E2E (verified+enhanced) |
+| 2026-05-15 | W061 | 10/10 | COMPLETE | — | Squad model (verified) |
+| 2026-05-15 | W062 | 10/10 | COMPLETE | — | Role registry (verified+enhanced) |
+| 2026-05-15 | W063 | 10/10 | COMPLETE | — | Squad composer (verified) |
+| 2026-05-15 | W064 | 10/10 | COMPLETE | pending | Marketing squad template |
+| 2026-05-15 | W065 | 10/10 | COMPLETE | pending | Sales squad template |
+| 2026-05-15 | W066 | 10/10 | COMPLETE | pending | App factory squad template |
+| 2026-05-15 | W067 | 10/10 | COMPLETE | pending | Ops squad template |
+| 2026-05-15 | W068 | 10/10 | COMPLETE | pending | Security squad template + role |
+| 2026-05-15 | W069 | 10/10 | COMPLETE | — | Squad report (verified) |
+| 2026-05-15 | W070 | 10/10 | COMPLETE | pending | Squad E2E (verified+enhanced) |
 | | | | | | |
 
 ---
