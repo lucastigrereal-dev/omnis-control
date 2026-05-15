@@ -1,28 +1,25 @@
 # ESTADO ATUAL RESUMIDO — OMNIS / JARVIS CONTROL
 
-**Gerado em:** 2026-05-12T16:45:22Z
-**Session ID:** `c78a1436-8b52-471c-9126-8a3e08921010`
+**Gerado em:** 2026-05-15T17:17:57Z
+**Session ID:** `2e117fac-9e9a-4b13-850a-e44eb1febad0`
 
 ## 1. RISCOS IMEDIATOS
 
-- 🟡 **DISCO EM ALERTA**: C:\ — 15.3% livre (141.8 GB de 924.3 GB). Planejar saneamento antes da Fase 2.
-- 🟡 **DISCO EM ALERTA**: G:\ — 14.6% livre (134.7 GB de 924.3 GB). Planejar saneamento antes da Fase 2.
-
-- 🟡 **Containers unhealthy:** crm-tigre-backend, jarvis_frontend (2 de 11)
+- 🟡 **DISCO EM ALERTA**: C:\ — 17.1% livre (157.8 GB de 924.3 GB). Planejar saneamento antes da Fase 2.
 
 ---
 
 ## 2. Resumo executivo
 
-Sistema OMNIS operacional. 75 skills detectadas, 11 containers rodando, Publisher OS não identificado na porta 8000. Memória: Qdrant inacessível, Akasha encontrado.
+Sistema OMNIS operacional. 75 skills detectadas, 0 containers rodando, Publisher OS não identificado na porta 8000. Memória: Qdrant inacessível, Akasha não encontrado.
 
 ## 3. Status geral
 
 - **Skills:** 75 (8 executáveis)
-- **Docker:** 11 rodando, 2 unhealthy
+- **Docker:** 0 rodando, 0 unhealthy
 - **Publisher OS:** port_closed
 - **Qdrant:** falha
-- **Akasha:** ok
+- **Akasha:** falha
 - **Obsidian:** não encontrado .md files
 - **Disco:** warning
 
@@ -42,28 +39,14 @@ Sistema OMNIS operacional. 75 skills detectadas, 11 containers rodando, Publishe
 
 ## 6. Docker
 
-- **Rodando:** 11
-- **Unhealthy:** 2
+- **Rodando:** 0
+- **Unhealthy:** 0
 
-| Container | Status | Portas |
-|-----------|--------|-------|
-| ✅ publisher-os-publish-worker-1 | Up 3 hours |  |
-| ✅ open-webui | Up 3 hours (healthy) | 0.0.0.0:3100->8080/tcp, [::]:3100->8080/ |
-| ✅ akasha-postgres | Up 3 hours (healthy) | 0.0.0.0:5432->5432/tcp, [::]:5432->5432/ |
-| 🔴 crm-tigre-backend | Up 3 hours (unhealthy) | 0.0.0.0:4000->4000/tcp, [::]:4000->4000/ |
-| ✅ crm-tigre-frontend | Up 3 hours (healthy) | 0.0.0.0:3001->80/tcp, [::]:3001->80/tcp |
-| ✅ crm-tigre-redis | Up 3 hours (healthy) | 0.0.0.0:6380->6379/tcp, [::]:6380->6379/ |
-| ✅ crm-tigre-postgres | Up 3 hours (healthy) | 0.0.0.0:5433->5432/tcp, [::]:5433->5432/ |
-| ✅ aurora_redis | Up 3 hours | 0.0.0.0:6381->6379/tcp, [::]:6381->6379/ |
-| 🔴 jarvis_frontend | Up 3 hours (unhealthy) | 0.0.0.0:8080->80/tcp, [::]:8080->80/tcp |
-| ✅ jarvis_executor_api | Up 3 hours (healthy) | 0.0.0.0:3000->3000/tcp, [::]:3000->3000/ |
-| ✅ jarvis_postgres | Up 3 hours (healthy) | 5432/tcp |
 
 ## 7. Memória
 
 - **Qdrant (http://localhost:6333):** inacessível
-- **Akasha (container akasha-postgres):** encontrado
-  - Status: Up 3 hours (healthy)
+- **Akasha (container akasha-postgres):** não encontrado
 
 ## 8. Obsidian
 
@@ -98,7 +81,7 @@ Sistema OMNIS operacional. 75 skills detectadas, 11 containers rodando, Publishe
   - registry_assets: 1
   - registry_accounts: 2
   - queue_items: 42
-  - scan_duration_ms: 88
+  - scan_duration_ms: 101
   - scan_timed_out: False
 
 ## 10. Content Queue (Fase 2B)

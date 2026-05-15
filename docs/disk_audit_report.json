@@ -1,25 +1,25 @@
 {
-  "generated_at": "2026-05-07T13:57:54.501223",
+  "generated_at": "2026-05-15T14:13:54.300217",
   "repo": "C:\\Users\\lucas\\omnis-control",
   "disk_summary": {
     "total_gb": 992.5,
-    "used_gb": 905.9,
-    "free_gb": 86.6,
-    "percent_free": 8.7
+    "used_gb": 822.8,
+    "free_gb": 169.7,
+    "percent_free": 17.1
   },
   "project_directories": [
     {
       "name": "omnis-control",
       "path": "C:\\Users\\lucas\\omnis-control",
-      "size_bytes": 138619083,
-      "size_human": "132.2 MB",
+      "size_bytes": 327671751,
+      "size_human": "312.5 MB",
       "exists": true,
       "accessible": true
     },
     {
       "name": "publisher-os",
       "path": "C:\\Users\\lucas\\publisher-os",
-      "size_bytes": 432843883,
+      "size_bytes": 432856681,
       "size_human": "412.8 MB",
       "exists": true,
       "accessible": true
@@ -59,18 +59,18 @@
     {
       "name": ".claude",
       "path": "C:\\Users\\lucas\\.claude",
-      "size_bytes": 2285772513,
-      "size_human": "2.1 GB",
+      "size_bytes": 2486986754,
+      "size_human": "2.3 GB",
       "exists": true,
       "accessible": true
     },
     {
       "name": "Downloads/instagram-publisher",
       "path": "C:\\Users\\lucas\\Downloads\\instagram-publisher",
-      "size_bytes": 852026595,
-      "size_human": "812.6 MB",
-      "exists": true,
-      "accessible": true
+      "size_bytes": 0,
+      "size_human": "0 B",
+      "exists": false,
+      "accessible": false
     }
   ],
   "node_modules": [],
