@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-05-15T14:13:54.300217",
+  "generated_at": "2026-05-16T11:52:45.419037",
   "repo": "C:\\Users\\lucas\\omnis-control",
   "disk_summary": {
     "total_gb": 992.5,
-    "used_gb": 822.8,
-    "free_gb": 169.7,
-    "percent_free": 17.1
+    "used_gb": 831.1,
+    "free_gb": 161.4,
+    "percent_free": 16.3
   },
   "project_directories": [
     {
       "name": "omnis-control",
       "path": "C:\\Users\\lucas\\omnis-control",
-      "size_bytes": 327671751,
-      "size_human": "312.5 MB",
+      "size_bytes": 344304327,
+      "size_human": "328.4 MB",
       "exists": true,
       "accessible": true
     },
@@ -59,8 +59,8 @@
     {
       "name": ".claude",
       "path": "C:\\Users\\lucas\\.claude",
-      "size_bytes": 2486986754,
-      "size_human": "2.3 GB",
+      "size_bytes": 2532227431,
+      "size_human": "2.4 GB",
       "exists": true,
       "accessible": true
     },
