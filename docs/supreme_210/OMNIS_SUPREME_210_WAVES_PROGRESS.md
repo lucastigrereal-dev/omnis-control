@@ -1,7 +1,7 @@
 # OMNIS SUPREME 210 WAVES — Progress Tracking
 
 **Date:** 2026-05-15
-**Last update:** 2026-05-15 — Grupo 12 complete
+**Last update:** 2026-05-15 — W130 complete (Grupo 13 FINALIZADO)
 
 ---
 
@@ -13,11 +13,11 @@
 | Waves planned (detailed) | 10 |
 | Waves skeleton | 200 |
 | Waves in progress | 0 |
-| Waves complete | 124 |
+| Waves complete | 130 |
 | Waves blocked | 0 |
 | Total blocos | 2,100 |
-| Blocos executados | 1240 |
-| Commits | 30 |
+| Blocos executados | 1300 |
+| Commits | 35 |
 
 ## Progresso por grupo
 
@@ -35,7 +35,7 @@
 | 10 — Content Factory | W091-W100 | 10 | 0 | 10 | 0 |
 | 11 — Video Studio | W101-W110 | 10 | 0 | 10 | 0 |
 | 12 — Sales/CRM | W111-W120 | 10 | 0 | 10 | 0 |
-| 13 — Commercial/SDR | W121-W130 | 4 | 0 | 4 | 0 |
+| 13 — Commercial/SDR | W121-W130 | 10 | 0 | 10 | 0 |
 | 14 — App Factory | W131-W140 | 0 | 0 | 0 | 0 |
 | 15 — Automation/n8n | W141-W150 | 0 | 0 | 0 | 0 |
 | 16 — MCP/Plugin | W151-W160 | 0 | 0 | 0 | 0 |
@@ -179,7 +179,11 @@
 | 2026-05-15 | W120 | 10/10 | COMPLETE | f870b40 | E2E + safety audit |
 | 2026-05-15 | W121 | 10/10 | COMPLETE | 8d37a39 | HotelLead model + registry |
 | 2026-05-15 | W122+W123 | 20/20 | COMPLETE | 477b48d | Prospect List + Outreach Sequencer |
-| 2026-05-15 | W124 | 10/10 | COMPLETE | pending | Lead Qualifier BANT |
+| 2026-05-15 | W124 | 10/10 | COMPLETE | c1c81fa | Lead Qualifier BANT |
+| 2026-05-15 | W125+W126 | 20/20 | COMPLETE | 245e81f | Package Matcher + Proposal Brief |
+| 2026-05-15 | W127 | 10/10 | COMPLETE | 1d45160 | Pipeline Sync Bridge |
+| 2026-05-15 | W128+W129 | 20/20 | COMPLETE | fcd5de0 | Follow-Up Schedule + SDR Metrics |
+| 2026-05-15 | W130 | 10/10 | COMPLETE | — | E2E + Safety Audit + Grupo 13 Summary |
 
 ---
 
