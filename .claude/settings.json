@@ -1,0 +1,78 @@
+﻿{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "OMNIS_CCOS_MODE": "safe",
+    "OMNIS_DRY_RUN_DEFAULT": "true",
+    "OMNIS_REQUIRE_LUCAS_APPROVAL": "true"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git branch:*)",
+      "Bash(git worktree list:*)",
+      "Bash(python -m pytest tests/*)",
+      "Bash(python -m pytest tests/ --import-mode=importlib -p no:warnings -q)",
+      "Bash(grep -r:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(cat:*)",
+      "Bash(pwd:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git clean -fd:*)",
+      "Bash(git push --force:*)",
+      "Bash(docker compose down:*)",
+      "Bash(Remove-Item -Recurse:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -ExecutionPolicy Bypass -File .claude/hooks/pre-tool-guard.ps1"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash|Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -ExecutionPolicy Bypass -File .claude/hooks/post-tool-log.ps1"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -ExecutionPolicy Bypass -File .claude/hooks/session-stop-report.ps1"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "powershell -ExecutionPolicy Bypass -File .claude/hooks/subagent-stop-report.ps1"
+          }
+        ]
+      }
+    ]
+  }
+}
