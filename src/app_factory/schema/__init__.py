@@ -1,0 +1,1 @@
+"""W132 — Schema Designer: entities → dataclasses."""

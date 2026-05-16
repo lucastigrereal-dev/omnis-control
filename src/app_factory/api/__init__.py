@@ -1,0 +1,1 @@
+"""W133 — API Scaffolder: contracts → endpoints mock."""

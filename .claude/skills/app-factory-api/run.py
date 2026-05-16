@@ -1,0 +1,1 @@
+"""app-factory-api — W133: schema → API endpoints mock."""

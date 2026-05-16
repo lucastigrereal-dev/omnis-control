@@ -1,0 +1,1 @@
+"""W136 — DB Migration Generator: schema → migration SQL."""

@@ -1,0 +1,1 @@
+"""W134 — Frontend Scaffolder: PRD → componentes base."""

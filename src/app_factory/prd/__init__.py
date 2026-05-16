@@ -1,0 +1,1 @@
+"""W131 — PRD Generator: briefing → PRD estruturado."""

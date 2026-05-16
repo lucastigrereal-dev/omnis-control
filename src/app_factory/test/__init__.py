@@ -1,0 +1,1 @@
+"""W138 — Test Scaffolder: PRD → test skeleton."""

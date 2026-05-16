@@ -1,0 +1,1 @@
+"""W137 — App Config Generator: PRD → config YAML."""

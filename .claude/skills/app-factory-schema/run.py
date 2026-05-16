@@ -1,0 +1,1 @@
+"""app-factory-schema — W132: PRD entities → dataclasses."""
