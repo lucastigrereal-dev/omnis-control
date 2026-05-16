@@ -2,7 +2,7 @@
 
 ## Identity
 App Factory generates complete application packages from structured briefings.
-It produces: PRD → schema → API → frontend → auth → migrations → config → tests → package.
+It produces: idea-intake → PRD → db-schema → API-contract → frontend-plan → test-plan → repo-scaffold → openhands-mock → package-export → E2E.
 
 ## Absolute rules
 1. **Never overwrite** existing app without explicit operator approval
@@ -16,22 +16,22 @@ It produces: PRD → schema → API → frontend → auth → migrations → con
 
 ## App Factory pipeline
 ```
-briefing → PRD (W131) → Schema (W132) → API (W133) → Frontend (W134)
-                            ↓
-              Auth (W135) → Migration (W136) → Config (W137) → Tests (W138) → Package (W139)
+idea-intake (W131) → PRD (W132) → DB Schema (W133) → API Contract (W134)
+                              ↓
+              Frontend Plan (W135) → Test Plan (W136) → Repo Scaffold (W137) → OpenHands Mock (W138) → Package Export (W139) → E2E (W140)
 ```
 
 ## Gates per wave
-1. PRD approved by operator
-2. Schema validates against PRD requirements
-3. API contracts match schema entities
-4. Frontend scaffolds match PRD pages
-5. Auth roles cover all API endpoints
-6. Migrations are reversible (up + down)
-7. Config is environment-agnostic (no hardcoded URLs)
-8. Tests cover all endpoints + edge cases
-9. Package is self-contained + deployable
-10. E2E passes full pipeline with mock adapters
+1. W131 — Idea intake captured with app name, domain, target users
+2. W132 — PRD generated and approved by operator
+3. W133 — DB schema validates against PRD entities
+4. W134 — API contracts match schema models
+5. W135 — Frontend plan matches PRD routes
+6. W136 — Test plan covers all endpoints + edge cases
+7. W137 — Repo scaffold includes all generated modules
+8. W138 — OpenHands mock adapter passes dry-run
+9. W139 — Package is self-contained + deployable
+10. W140 — E2E passes full pipeline with mock adapters
 
 ## No-touch
 - Never read .env or secrets during generation

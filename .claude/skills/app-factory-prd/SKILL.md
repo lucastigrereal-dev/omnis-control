@@ -2,7 +2,7 @@
 
 ## When to use
 - When operator says "gerar PRD", "create app spec", "briefing → PRD"
-- Part of W131 App Factory pipeline
+- Part of W132 App Factory pipeline (app-prd-generator)
 
 ## When NOT to use
 - For editing existing PRDs (use targeted edits)

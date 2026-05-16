@@ -10,7 +10,7 @@
 ## Objetivo
 
 Este prompt mestre prepara a transicao do OMNIS Supreme 210 para:
-- **G14 — App Factory (W131-W140):** PRD, schema, API, frontend
+- **G14 — App Factory (W131-W140):** app-idea-intake → app-prd-generator → app-db-schema-planner → app-api-contract → app-frontend-plan → app-test-plan → app-repo-scaffold → app-openhands-mock → app-package-export → app-factory-e2e
 - **G14 Content Intelligence (W211-W240):** Expansao futura alem das 210 waves originais
 
 ## Pre-execucao (OBRIGATORIO)
@@ -37,16 +37,16 @@ Antes de executar QUALQUER bloco deste prompt:
 ## Escopo — G14 App Factory (W131-W140)
 
 ```
-W131 — PRD Generator: briefing → PRD estruturado
-W132 — Schema Designer: entidades → dataclasses
-W133 — API Scaffolder: contratos → endpoints mock
-W134 — Frontend Scaffolder: PRD → componentes base
-W135 — Auth & Permissions: roles, gates, mock auth
-W136 — DB Migration Generator: schema → migration SQL
-W137 — App Config Generator: PRD → config YAML
-W138 — Test Scaffolder: PRD → test skeleton
-W139 — App Packager: assets → pacote zip deployavel
-W140 — App Factory E2E + Safety Audit
+W131 — app-idea-intake: Sistema de entrada de ideias
+W132 — app-prd-generator: Gerador de PRD automatizado
+W133 — app-db-schema-planner: Planejador de schema de banco
+W134 — app-api-contract: Construtor de contrato de API
+W135 — app-frontend-plan: Plano de frontend
+W136 — app-test-plan: Plano de testes
+W137 — app-repo-scaffold: Scaffold de repositório
+W138 — app-openhands-mock: Mock do adaptador OpenHands
+W139 — app-package-export: Export de pacote de app
+W140 — app-factory-e2e: E2E da fábrica de apps
 ```
 
 Cada wave = 10 blocos (B1-B10) conforme Master Plan.
