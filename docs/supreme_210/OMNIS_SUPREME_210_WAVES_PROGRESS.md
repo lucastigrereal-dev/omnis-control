@@ -17,7 +17,7 @@
 | Waves blocked | 0 |
 | Total blocos | 2,100 |
 | Blocos executados | 1300 |
-| Commits | 35 |
+| Commits | 36 |
 
 ## Progresso por grupo
 
@@ -183,7 +183,7 @@
 | 2026-05-15 | W125+W126 | 20/20 | COMPLETE | 245e81f | Package Matcher + Proposal Brief |
 | 2026-05-15 | W127 | 10/10 | COMPLETE | 1d45160 | Pipeline Sync Bridge |
 | 2026-05-15 | W128+W129 | 20/20 | COMPLETE | fcd5de0 | Follow-Up Schedule + SDR Metrics |
-| 2026-05-15 | W130 | 10/10 | COMPLETE | — | E2E + Safety Audit + Grupo 13 Summary |
+| 2026-05-15 | W130 | 10/10 | COMPLETE | cc149a0 | E2E + Safety Audit + Grupo 13 Summary |
 
 ---
 
