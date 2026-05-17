@@ -1,7 +1,7 @@
 # OMNIS SUPREME 210 WAVES — Progress Tracking
 
-**Date:** 2026-05-15
-**Last update:** 2026-05-16 — W140 complete (G14 App Factory finalizado no working tree)
+**Date:** 2026-05-17
+**Last update:** 2026-05-17 — W155 complete (G15+G16 core delivered, 30-wave autopilot sprint)
 
 ---
 
@@ -10,14 +10,14 @@
 | Metric | Count |
 |---|---|
 | Total waves | 210 |
-| Waves planned (detailed) | 10 |
-| Waves skeleton | 200 |
+| Waves planned (detailed) | 25 |
+| Waves skeleton | 185 |
 | Waves in progress | 0 |
-| Waves complete | 140 |
+| Waves complete | 155 |
 | Waves blocked | 0 |
 | Total blocos | 2,100 |
-| Blocos executados | 1400 |
-| Commits | 37 |
+| Blocos executados | 1550 |
+| Commits | 52 |
 
 ## Progresso por grupo
 
@@ -37,8 +37,8 @@
 | 12 — Sales/CRM | W111-W120 | 10 | 0 | 10 | 0 |
 | 13 — Commercial/SDR | W121-W130 | 10 | 0 | 10 | 0 |
 | 14 — App Factory | W131-W140 | 10 | 0 | 10 | 0 |
-| 15 — Automation/n8n | W141-W150 | 0 | 0 | 0 | 0 |
-| 16 — MCP/Plugin | W151-W160 | 0 | 0 | 0 | 0 |
+| 15 — Automation/n8n | W141-W150 | 10 | 0 | 10 | 0 |
+| 16 — MCP/Plugin | W151-W160 | 5 | 0 | 5 | 0 |
 | 17 — Remote Control | W161-W170 | 0 | 0 | 0 | 0 |
 | 18 — KRATOS Bridge | W171-W180 | 0 | 0 | 0 | 0 |
 | 19 — Production Hardening | W181-W190 | 0 | 0 | 0 | 0 |
