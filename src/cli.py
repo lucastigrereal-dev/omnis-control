@@ -41,6 +41,7 @@ from src.caption_approval import DraftsManager, ApprovalGate, TemplateLibrary
 from src.caption_approval.models import DraftStatus
 from src.caption_approval.drafts import STALE_DAYS
 from src.reports import briefing as briefing_mod
+from src.app_factory.idea_cli import idea_app
 
 app = typer.Typer(
     name="jarvis",
@@ -1984,11 +1985,11 @@ app.add_typer(captions_app)
 app.add_typer(approvals_app)
 app.add_typer(templates_app)
 app.add_typer(workflow_app)
+app.add_typer(idea_app)
 
 
 if __name__ == "__main__":
     app()
-
 
 
 

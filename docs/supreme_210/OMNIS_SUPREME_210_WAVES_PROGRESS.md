@@ -1,7 +1,7 @@
 # OMNIS SUPREME 210 WAVES — Progress Tracking
 
 **Date:** 2026-05-15
-**Last update:** 2026-05-15 — W130 complete (Grupo 13 FINALIZADO)
+**Last update:** 2026-05-16 — W140 complete (G14 App Factory finalizado no working tree)
 
 ---
 
@@ -13,11 +13,11 @@
 | Waves planned (detailed) | 10 |
 | Waves skeleton | 200 |
 | Waves in progress | 0 |
-| Waves complete | 130 |
+| Waves complete | 140 |
 | Waves blocked | 0 |
 | Total blocos | 2,100 |
-| Blocos executados | 1300 |
-| Commits | 36 |
+| Blocos executados | 1400 |
+| Commits | 37 |
 
 ## Progresso por grupo
 
@@ -36,7 +36,7 @@
 | 11 — Video Studio | W101-W110 | 10 | 0 | 10 | 0 |
 | 12 — Sales/CRM | W111-W120 | 10 | 0 | 10 | 0 |
 | 13 — Commercial/SDR | W121-W130 | 10 | 0 | 10 | 0 |
-| 14 — App Factory | W131-W140 | 0 | 0 | 0 | 0 |
+| 14 — App Factory | W131-W140 | 10 | 0 | 10 | 0 |
 | 15 — Automation/n8n | W141-W150 | 0 | 0 | 0 | 0 |
 | 16 — MCP/Plugin | W151-W160 | 0 | 0 | 0 | 0 |
 | 17 — Remote Control | W161-W170 | 0 | 0 | 0 | 0 |
@@ -184,6 +184,16 @@
 | 2026-05-15 | W127 | 10/10 | COMPLETE | 1d45160 | Pipeline Sync Bridge |
 | 2026-05-15 | W128+W129 | 20/20 | COMPLETE | fcd5de0 | Follow-Up Schedule + SDR Metrics |
 | 2026-05-15 | W130 | 10/10 | COMPLETE | cc149a0 | E2E + Safety Audit + Grupo 13 Summary |
+| 2026-05-16 | W131 | 10/10 | COMPLETE | pending-git-blocked | App Idea Intake - IdeaStore + CLI + 24 tests |
+| 2026-05-16 | W132 | 10/10 | COMPLETE | pending-git-blocked | Stored Idea PRD Generator + CLI plan |
+| 2026-05-16 | W133 | 10/10 | COMPLETE | pending-git-blocked | DB Schema Planner |
+| 2026-05-16 | W134 | 10/10 | COMPLETE | pending-git-blocked | API Contract Builder |
+| 2026-05-16 | W135 | 10/10 | COMPLETE | pending-git-blocked | Frontend Plan Generator |
+| 2026-05-16 | W136 | 10/10 | COMPLETE | pending-git-blocked | Test Plan Generator |
+| 2026-05-16 | W137 | 10/10 | COMPLETE | pending-git-blocked | Safe Repo Scaffold |
+| 2026-05-16 | W138 | 10/10 | COMPLETE | pending-git-blocked | OpenHands Mock Adapter |
+| 2026-05-16 | W139 | 10/10 | COMPLETE | pending-git-blocked | Package Export |
+| 2026-05-16 | W140 | 10/10 | COMPLETE | pending-git-blocked | G14 App Factory E2E |
 
 ---
 

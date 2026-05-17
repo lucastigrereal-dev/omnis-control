@@ -5,6 +5,10 @@ logs/*.jsonl
 logs/briefing_*.md
 diagnose*.json
 .pytest_cache/
+.test_tmp/
+.tmp_pytest/
+.tmp_pytest_base/
+.tmp_pytest_full/
 *.egg-info/
 .env
 .env.*
