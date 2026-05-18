@@ -58,11 +58,12 @@ class HealthReport:
     next_steps: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
+        # checks as dict keyed by name so consumers can do data["checks"]["disk"]
         return {
             "session_id": self.session_id,
             "timestamp": self.timestamp,
             "overall_status": self.overall_status.value,
-            "checks": [c.to_dict() for c in self.checks],
+            "checks": {c.name: c.to_dict() for c in self.checks},
             "risks": self.risks,
             "next_steps": self.next_steps,
         }
@@ -70,7 +71,9 @@ class HealthReport:
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> HealthReport:
         raw_checks = data.get("checks", [])
-        if isinstance(raw_checks, list) and raw_checks and isinstance(raw_checks[0], dict) and "name" in raw_checks[0]:
+        if isinstance(raw_checks, dict):
+            checks = [CheckResult.from_dict({"name": k, **v}) for k, v in raw_checks.items()]
+        elif isinstance(raw_checks, list) and raw_checks and isinstance(raw_checks[0], dict) and "name" in raw_checks[0]:
             checks = [CheckResult.from_dict(c) for c in raw_checks]
         else:
             checks = cls._normalize_legacy_checks(raw_checks)
