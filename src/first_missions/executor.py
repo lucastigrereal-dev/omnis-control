@@ -110,11 +110,12 @@ class MissionExecutor:
         try:
             if self.dry_run:
                 result_data = {"dry_run": True, "simulated": True, "mission_type": mission.mission_type.value}
+                mission.status = MissionStatus.DRY_RUN
             else:
                 result_data = handler(mission)
+                mission.status = MissionStatus.COMPLETED
 
             mission.result = result_data
-            mission.status = MissionStatus.COMPLETED
             mission.completed_at = _now_iso()
             ok = True
             error = ""

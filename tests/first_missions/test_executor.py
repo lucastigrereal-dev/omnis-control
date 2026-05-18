@@ -24,13 +24,13 @@ def test_execution_result_to_dict():
 # Dry-run execution
 # ---------------------------------------------------------------------------
 
-def test_dry_run_marks_completed():
+def test_dry_run_marks_dry_run():
     exe = _executor(dry_run=True)
     m = Mission.content_generation("lucastigrereal", "travel")
     result = exe.execute(m)
     assert result.ok
     assert result.dry_run is True
-    assert m.status == MissionStatus.COMPLETED
+    assert m.status == MissionStatus.DRY_RUN
 
 
 def test_dry_run_result_has_simulated_flag():

@@ -112,6 +112,25 @@ class MissionOrchestrator:
         self.executor.execute(mission)
         return self.result_store.save_mission(mission)
 
+    def preview(self, mission: Mission) -> dict:
+        """Return a preview of what would be executed — never changes state."""
+        handler_names = {
+            "CONTENT_GENERATION": "generate mock caption + hashtags",
+            "METRIC_REPORT": "generate mock metric delta",
+            "HEALTH_SNAPSHOT": "generate mock health status",
+        }
+        action = handler_names.get(mission.mission_type.value, "generic mock handler")
+        return {
+            "mission_id": mission.mission_id,
+            "name": mission.name,
+            "mission_type": mission.mission_type.value,
+            "priority": mission.priority.value,
+            "dry_run": True,
+            "would_execute": action,
+            "would_store": True,
+            "note": "This is a preview only — no state will be changed.",
+        }
+
     # -- Status -----------------------------------------------------------
 
     def status(self) -> dict:

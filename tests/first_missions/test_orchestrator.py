@@ -69,8 +69,7 @@ def test_run_one_executes_and_stores():
     assert stored.mission_id == m.mission_id
     assert stored.dry_run is True
     assert orch.result_store.get(stored.result_id) is stored
-    # Mission should be completed
-    assert m.status == MissionStatus.COMPLETED
+    assert m.status == MissionStatus.DRY_RUN
 
 
 def test_run_one_real():
@@ -165,6 +164,34 @@ def test_e2e_full_pipeline_real():
     assert "CONTENT_GENERATION" in types
     assert "METRIC_REPORT" in types
     assert "HEALTH_SNAPSHOT" in types
+
+
+# ---------------------------------------------------------------------------
+# Preview
+# ---------------------------------------------------------------------------
+
+def test_preview_does_not_change_state():
+    orch = _orch(dry_run=True)
+    m = Mission.content_generation("test", "topic")
+    orch.registry.register(m)
+    before = orch.registry.stats()["total"]
+
+    p = orch.preview(m)
+    assert p["dry_run"] is True
+    assert p["would_execute"] != ""
+    assert "no state will be changed" in p["note"]
+
+    # Registry should be unchanged
+    assert orch.registry.stats()["total"] == before
+    # Mission should not have been executed
+    assert m.status == MissionStatus.PENDING
+
+
+def test_preview_shows_action():
+    orch = _orch(dry_run=True)
+    m = Mission.health_snapshot()
+    p = orch.preview(m)
+    assert "mock health status" in p["would_execute"]
 
 
 # ---------------------------------------------------------------------------

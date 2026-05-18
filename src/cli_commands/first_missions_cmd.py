@@ -192,6 +192,44 @@ def fm_run(
 
 
 # ---------------------------------------------------------------------------
+# Preview
+# ---------------------------------------------------------------------------
+
+@first_missions_app.command(name="preview")
+def fm_preview(
+    mission_id: str = typer.Argument(..., help="Mission ID to preview"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Preview what a mission would do — never changes state."""
+    orch = _orch(dry_run=True)
+    _seed_demo(orch)
+
+    actual = _resolve_id(orch, mission_id)
+    if actual is None:
+        console.print(f"[red]Mission not found: {mission_id}[/red]")
+        raise typer.Exit(1)
+
+    m = orch.registry.get(actual)
+    if m is None:
+        console.print(f"[red]Mission not found: {mission_id}[/red]")
+        raise typer.Exit(1)
+
+    p = orch.preview(m)
+
+    if json_output:
+        print(json.dumps(p, indent=2, ensure_ascii=False))
+        return
+
+    console.print(f"[bold]Preview — {p['name']}[/bold]")
+    console.print(f"  Mission ID: [cyan]{p['mission_id']}[/cyan]")
+    console.print(f"  Type: {p['mission_type']}")
+    console.print(f"  Priority: {p['priority']}")
+    console.print(f"  Would execute: [yellow]{p['would_execute']}[/yellow]")
+    console.print(f"  Would store: {'[green]Yes[/green]' if p['would_store'] else '[red]No[/red]'}")
+    console.print(f"\n  [dim]{p['note']}[/dim]")
+
+
+# ---------------------------------------------------------------------------
 # Create
 # ---------------------------------------------------------------------------
 
