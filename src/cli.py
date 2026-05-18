@@ -2057,6 +2057,209 @@ def health_server_status():
 
 
 # ---------------------------------------------------------------------------
+# MISSION COMMANDS (OMNIS Supreme — Fase A)
+# ---------------------------------------------------------------------------
+
+
+mission_app = typer.Typer(
+    name="mission",
+    help="OMNIS Supreme — executa missões agentic",
+    add_completion=False,
+)
+
+
+@mission_app.command(name="run")
+def mission_run(
+    text: str = typer.Argument(..., help="Descrição da missão em texto livre"),
+    dry_run: bool = typer.Option(True, "--dry-run/--executar", help="Dry-run (padrão) ou executar de fato"),
+    setor: str = typer.Option("", "--setor", help="Forçar setor (vazio = auto-detectar)"),
+):
+    """Executa o pipeline completo de missão: intake → engine → mapper → report.
+
+    Exemplo: omnis mission run "cria campanha hotel nordeste 30 dias"
+    """
+    from src.agentic.mission_intake import MissionIntake
+    from src.agentic.mission_engine import MissionEngine
+    from src.agentic.deliverable_mapper import DeliverableMapper
+    from src.reports.report_generator import ReportGenerator
+
+    session_id = new_session_id()
+    start = time.time()
+
+    # Step 1 — Intake
+    intake = MissionIntake()
+    parsed = intake.parse(text)
+
+    if setor:
+        parsed.setor = setor
+
+    console.print(Panel.fit(
+        f"[bold]Objetivo:[/bold] {parsed.objetivo}\n"
+        f"[bold]Setor:[/bold] {parsed.setor}  |  "
+        f"[bold]Tipo:[/bold] {parsed.tipo}  |  "
+        f"[bold]Risco:[/bold] {parsed.risco}  |  "
+        f"[bold]Prazo:[/bold] {parsed.prazo or '—'}",
+        title="[bold cyan]Mission Intake[/bold cyan]",
+    ))
+
+    if parsed.warnings:
+        for w in parsed.warnings:
+            console.print(f"[yellow]⚠ {w}[/yellow]")
+
+    if dry_run:
+        console.print("\n[yellow][DRY-RUN] Missão analisada. Use --executar para criar.[/yellow]")
+        # Step 3 — Show what would be delivered
+        mapper = DeliverableMapper()
+        manifest = mapper.map(parsed)
+        if manifest.deliverables:
+            console.print("\n[bold]Entregáveis previstos:[/bold]")
+            for d in manifest.deliverables:
+                export_tag = " [dim](export)[/dim]" if d.target_subdir == "06_exports" else ""
+                req_tag = "" if d.required else " [dim](opcional)[/dim]"
+                console.print(f"  • `{d.filename}` — {d.description}{export_tag}{req_tag}")
+        dur = int((time.time() - start) * 1000)
+        log_mission(session_id, "mission-run", "dry_run", dur,
+                    summary=f"intake={parsed.setor}/{parsed.tipo}, risco={parsed.risco}")
+        return
+
+    # Step 2 — Engine: open mission
+    engine = MissionEngine()
+    contract = engine.open_mission(
+        objetivo=parsed.objetivo,
+        setor=parsed.setor,
+    )
+
+    console.print(f"\n[green]Missão aberta:[/green] {contract.mission_id}")
+    console.print(f"  Pasta: {contract.mission_path}")
+
+    # Step 3 — Deliverable Mapper
+    mapper = DeliverableMapper()
+    manifest = mapper.map(parsed)
+    manifest.mission_id = contract.mission_id
+
+    # Write deliverable manifest to mission folder
+    import json as _json
+    manifest_path = Path(contract.mission_path) / "deliverables_manifest.json"
+    manifest_path.write_text(
+        _json.dumps(manifest.to_dict(), ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+    # Step 4 — Report Generator
+    generator = ReportGenerator()
+    report = generator.generate(
+        contract=contract,
+        intake=parsed,
+        manifest=manifest,
+        next_action="Aguardando execução dos entregáveis.",
+    )
+
+    # Summary table
+    summary = Table(title=f"Missão {contract.mission_id}")
+    summary.add_column("Campo", style="cyan")
+    summary.add_column("Valor")
+    summary.add_row("Status", contract.status)
+    summary.add_row("Setor", contract.setor)
+    summary.add_row("Tipo", parsed.tipo)
+    summary.add_row("Risco", parsed.risco)
+    summary.add_row("Prazo", parsed.prazo or "—")
+    summary.add_row("Entregáveis", str(len(manifest.deliverables)))
+    summary.add_row("Relatório", str(Path(contract.mission_path) / "relatorio_final.md"))
+    console.print(summary)
+
+    dur = int((time.time() - start) * 1000)
+    log_mission(session_id, "mission-run", "success", dur,
+                summary=f"id={contract.mission_id}, setor={contract.setor}, deliverables={len(manifest.deliverables)}")
+
+
+@mission_app.command(name="list")
+def mission_list(
+    limit: int = typer.Option(10, "--limit", help="Número máximo de missões"),
+):
+    """Lista missões recentes."""
+    from src.agentic.mission_engine import MissionEngine
+    engine = MissionEngine()
+    missions_dir = engine.missions_root
+
+    if not missions_dir.exists():
+        console.print("Nenhuma missão encontrada.")
+        return
+
+    folders = sorted(missions_dir.glob("MIS-*"), reverse=True)[:limit]
+    if not folders:
+        console.print("Nenhuma missão encontrada.")
+        return
+
+    table = Table(title=f"Missões ({len(folders)})")
+    table.add_column("ID", style="cyan")
+    table.add_column("Status")
+    table.add_column("Objetivo")
+    table.add_column("Setor")
+
+    for folder in folders:
+        contract = engine.get_mission(folder.name)
+        if contract:
+            table.add_row(
+                contract.mission_id,
+                contract.status,
+                contract.objetivo[:50],
+                contract.setor,
+            )
+        else:
+            table.add_row(folder.name, "?", "—", "—")
+
+    console.print(table)
+
+
+@mission_app.command(name="show")
+def mission_show(
+    mission_id: str = typer.Argument(..., help="ID da missão (ex: MIS-20260518-001)"),
+):
+    """Mostra detalhes de uma missão."""
+    from src.agentic.mission_engine import MissionEngine
+    engine = MissionEngine()
+    contract = engine.get_mission(mission_id)
+
+    if not contract:
+        console.print(f"[red]Missão '{mission_id}' não encontrada.[/red]")
+        raise typer.Exit(1)
+
+    console.print(f"[bold]Missão:[/bold] {contract.mission_id}")
+    console.print(f"  Status: {contract.status}")
+    console.print(f"  Objetivo: {contract.objetivo}")
+    console.print(f"  Setor: {contract.setor}")
+    console.print(f"  Criado por: {contract.criado_por}")
+    console.print(f"  Aberto em: {contract.timestamp}")
+    console.print(f"  Fechado em: {contract.closed_at or '—'}")
+    console.print(f"  Pasta: {contract.mission_path}")
+
+    # Check if relatorio_final.md exists
+    if contract.mission_path:
+        report_path = Path(contract.mission_path) / "relatorio_final.md"
+        if report_path.exists():
+            console.print(f"\n[bold]Relatório:[/bold] {report_path}")
+            content = report_path.read_text(encoding="utf-8")
+            console.print(Panel(content[:2000], title="relatorio_final.md"))
+
+
+@mission_app.command(name="close")
+def mission_close(
+    mission_id: str = typer.Argument(..., help="ID da missão para fechar"),
+):
+    """Fecha uma missão (status=closed)."""
+    from src.agentic.mission_engine import MissionEngine
+    engine = MissionEngine()
+    contract = engine.close_mission(mission_id)
+
+    if not contract:
+        console.print(f"[red]Missão '{mission_id}' não encontrada.[/red]")
+        raise typer.Exit(1)
+
+    console.print(f"[green]Missão {mission_id} fechada.[/green]")
+    console.print(f"  Fechada em: {contract.closed_at}")
+
+
+# ---------------------------------------------------------------------------
 # REGISTRATION BLOCK — centralizado, ordem determinística
 # ---------------------------------------------------------------------------
 
@@ -2076,6 +2279,7 @@ app.add_typer(captions_app)
 app.add_typer(approvals_app)
 app.add_typer(templates_app)
 app.add_typer(workflow_app)
+app.add_typer(mission_app)
 app.add_typer(idea_app)
 app.add_typer(health_app)
 

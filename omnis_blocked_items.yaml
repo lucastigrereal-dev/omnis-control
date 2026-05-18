@@ -21,18 +21,32 @@ blocked_items:
 
   - id: health_bridge_to_archive
     severity: P1
-    status: open
+    status: resolved
+    resolution_date: "2026-05-18"
     title: "Archive superseded health_bridge code"
-    required_resolution:
-      - "Delete src/health_bridge/ and tests/health_bridge/"
-      - "Or keep as reference with clear SUPERSEDED marker"
+    resolution:
+      - "Deleted src/health_bridge/ and tests/health_bridge/ via git rm"
+      - "Updated fm health command in cli_commands/first_missions_cmd.py to use omnis_health"
+      - "Zero remaining imports of health_bridge in codebase"
 
   - id: reports_ccos_logs_not_ignored
     severity: P1
-    status: open
+    status: resolved
+    resolution_date: "2026-05-18"
     title: "reports/ccos/*.log not ignored"
+    resolution:
+      - ".gitignore already contains reports/ccos/*.log and reports/ccos/*.md"
+      - "All 52 auto-generated files in reports/ccos/ are properly ignored"
 
   - id: redundant_worktrees
     severity: P2
     status: open
-    title: "omnis-templates and omnis-runtime have 0 unique commits"
+    title: "6 worktrees are redundant (0 unique commits or skeleton-only)"
+    pending_approval:
+      - "omnis-templates — 0 unique commits"
+      - "omnis-runtime — 0 unique commits"
+      - ".claude/worktrees/p23-autonomous-execution — skeleton, merged"
+      - ".claude/worktrees/p24-live-cockpit — skeleton, merged"
+      - ".claude/worktrees/p25-p29-sequential-supreme — skeleton, merged"
+      - "omnis-p20-omnis-supreme — skeleton, merged"
+    note: "Aguardando autorização do Lucas para remover"

@@ -7,15 +7,19 @@ current_focus:
 
 p0_blockers: []
 
-p1_blockers:
+p1_blockers: []
+
+p1_resolved:
   - id: health_bridge_minimal_to_archive
-    status: open
+    status: resolved
     severity: P1
-    description: "src/health_bridge/ is superseded by src/omnis_health/ (canonical). Safe to archive after Lucas confirms omnis_health is the canonical health module."
+    resolution_date: "2026-05-18"
+    description: "src/health_bridge/ archived via git rm. fm health command migrated to omnis_health."
   - id: reports_ccos_logs_not_ignored
-    status: open
+    status: resolved
     severity: P1
-    description: "reports/ccos/*.log may appear as untracked and should be ignored or handled by policy."
+    resolution_date: "2026-05-18"
+    description: ".gitignore already covers reports/ccos/*.log and reports/ccos/*.md"
 
 known_completed:
   project_os:

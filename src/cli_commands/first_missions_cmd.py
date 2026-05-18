@@ -236,29 +236,91 @@ def fm_preview(
 
 @first_missions_app.command(name="health")
 def fm_health(
-    port: int = typer.Option(8999, "--port", help="Health server port"),
-    host: str = typer.Option("127.0.0.1", "--host", help="Health server host"),
     json_output: bool = typer.Option(False, "--json", help="Print health check as JSON"),
 ) -> None:
-    """Run a quick health check (read-only, no server)."""
-    from src.health_bridge.server import build_basic_checks
-    from src.health_bridge.models import HealthStatus
+    """Run a quick health check (read-only, uses canonical omnis_health)."""
+    from src.omnis_health.models import HealthStatus, CheckResult, HealthReport
+    from src.checkers import (
+        docker_check,
+        disk_check,
+        memory_check,
+        obsidian_check,
+        publisher_check,
+        skills_check,
+    )
+    from datetime import datetime, timezone
 
-    checks = build_basic_checks()
-    status = HealthStatus.from_checks(checks, source="first-missions-cli")
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    checks_data: list[tuple[str, dict]] = []
+    for name, mod in [
+        ("disk", disk_check),
+        ("docker", docker_check),
+        ("memory", memory_check),
+        ("obsidian", obsidian_check),
+        ("publisher", publisher_check),
+        ("skills", skills_check),
+    ]:
+        try:
+            checks_data.append((name, mod.check()))
+        except Exception as e:
+            checks_data.append((name, {"error": str(e)}))
+
+    results: list[CheckResult] = []
+    for name, data in checks_data:
+        if data.get("error"):
+            results.append(CheckResult(
+                name=name, status=HealthStatus.ERROR,
+                data=data, error=str(data["error"]), timestamp=ts,
+            ))
+        elif data.get("severity") == "critical":
+            results.append(CheckResult(
+                name=name, status=HealthStatus.CRITICAL, data=data, timestamp=ts,
+            ))
+        else:
+            results.append(CheckResult(
+                name=name, status=HealthStatus.OK, data=data, timestamp=ts,
+            ))
+
+    overall = HealthStatus.OK
+    for r in results:
+        if r.status in (HealthStatus.CRITICAL, HealthStatus.ERROR):
+            overall = HealthStatus.CRITICAL
+            break
+        if r.status == HealthStatus.WARNING:
+            overall = HealthStatus.WARNING
+
+    report = HealthReport(
+        session_id=f"fm-health-{ts}",
+        timestamp=ts,
+        overall_status=overall,
+        checks=results,
+    )
 
     if json_output:
-        print(json.dumps(status.to_dict(), indent=2, ensure_ascii=False))
+        print(json.dumps(report.to_dict(), indent=2, ensure_ascii=False))
         return
 
-    console.print(f"[bold]OMNIS Health Check[/bold] ({status.timestamp})")
-    for c in checks:
-        icon = {"ok": "[green]OK[/green]", "warn": "[yellow]WARN[/yellow]",
-                "error": "[red]ERR[/red]", "unknown": "[dim]???[/dim]"}
-        console.print(f"  {icon.get(c.level.value, '?')} {c.name}: {c.message}")
+    console.print(f"[bold]OMNIS Health Check[/bold] (canonical — omnis_health)")
+    for r in results:
+        icon = {HealthStatus.OK: "[green]OK[/green]", HealthStatus.WARNING: "[yellow]WARN[/yellow]",
+                HealthStatus.CRITICAL: "[red]CRIT[/red]", HealthStatus.ERROR: "[red]ERR[/red]",
+                HealthStatus.UNKNOWN: "[dim]???[/dim]"}
+        detail = ""
+        if r.data:
+            if r.name == "docker":
+                detail = f" — {r.data.get('containers_running', '?')} running"
+            elif r.name == "disk":
+                detail = f" — {r.data.get('severity', 'ok')}"
+            elif r.name == "skills":
+                detail = f" — {r.data.get('total', '?')} total"
+            elif r.name == "memory":
+                q = r.data.get("qdrant", {})
+                detail = f" — qdrant {'ok' if q.get('accessible') else 'off'}"
+        console.print(f"  {icon.get(r.status, '?')} {r.name}{detail}")
 
-    overall_color = {"ok": "green", "warn": "yellow", "error": "red", "unknown": "dim"}
-    o = status.status.value
+    overall_color = {"ok": "green", "warning": "yellow", "critical": "red", "error": "red", "unknown": "dim"}
+    o = overall.value
     console.print(f"\nOverall: [{overall_color.get(o, 'dim')}]{o.upper()}[/{overall_color.get(o, 'dim')}]")
 
 
