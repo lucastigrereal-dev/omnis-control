@@ -9,6 +9,7 @@ from rich.table import Table
 from src.app_factory.api_contract import build_api_contract
 from src.app_factory.artifact_registry import ArtifactRegistry, ArtifactRegistryEntry
 from src.app_factory.bundle_exporter import build_bundle
+from src.app_factory.diff_engine import diff_ideas, diff_schemas, diff_api_contracts
 from src.app_factory.docs_generator import build_generated_docs
 from src.app_factory.errors import InvalidAppIdeaError
 from src.app_factory.idea_store import IdeaStore
@@ -16,9 +17,24 @@ from src.app_factory.models import AppBlueprint, AppIdea, AppRequirement
 from src.app_factory.pipeline import build_planning_pipeline
 from src.app_factory.prd_service import StoredIdeaPRDGenerator
 from src.app_factory.quality_gate import validate_bundle
+from src.app_factory.quality_score import compute_quality_score
+from src.app_factory.recovery import (
+    PipelineState,
+    init_pipeline_state,
+    build_recovery_plan,
+    StageStatus,
+    STAGE_ORDER,
+)
 from src.app_factory.schema_planner import build_schema_plan
 from src.app_factory.scaffold_engine import run_scaffold
 from src.app_factory.scaffold_plan import build_scaffold_plan
+from src.app_factory.status_tracker import StatusTracker
+from src.app_factory.storage_safety import (
+    StorageSafetyPolicy,
+    audit_directory,
+    validate_command_safety,
+    validate_dry_run_enforcement,
+)
 from src.app_factory.task_plan import build_task_plan
 
 idea_app = typer.Typer(
@@ -280,6 +296,175 @@ def idea_build_plan(idea_id: str = typer.Argument(..., help="ID da ideia")) -> N
     console.print(f"  Docs: {len(result.docs.documents)}")
 
 
+@idea_app.command(name="safety")
+def idea_safety(
+    idea_id: str = typer.Option(None, "--idea-id", help="ID da ideia para auditar (opcional, audita dir)"),
+    target_dir: str = typer.Option(".", "--dir", help="Diretorio para auditar"),
+    scan: bool = typer.Option(True, "--scan/--no-scan", help="Escanear arquivos"),
+    check_cmd: str = typer.Option(None, "--check-cmd", help="Verificar seguranca de um comando shell"),
+) -> None:
+    """Audita seguranca de armazenamento — no-touch zones, comandos destrutivos."""
+    policy = StorageSafetyPolicy()
+
+    if check_cmd:
+        violations = validate_command_safety(check_cmd, policy)
+        if not violations:
+            console.print("[green]Comando seguro.[/green]")
+        else:
+            console.print("[red]Comando BLOQUEADO:[/red]")
+            for v in violations:
+                console.print(f"  {v.severity}: {v.detail}")
+            raise typer.Exit(1)
+        return
+
+    report = audit_directory(target_dir, policy, scan_files=scan)
+    status = "PASS" if report.passed else "FAIL"
+    console.print(f"[{'green' if report.passed else 'red'}]Storage Safety Audit:[/{'green' if report.passed else 'red'}] {status}")
+    console.print(f"  Diretorio: {report.target_path}")
+    console.print(f"  Arquivos escaneados: {report.scanned_files}")
+    console.print(f"  Violations: {report.critical_count}, Warnings: {report.warning_count}")
+    for v in report.violations:
+        console.print(f"  [red]BLOCKED:[/red] {v.get('path')} - {v.get('detail')}")
+    for w in report.warnings:
+        console.print(f"  [yellow]WARN:[/yellow] {w}")
+    if not report.passed:
+        raise typer.Exit(1)
+
+
+@idea_app.command(name="quality")
+def idea_quality(idea_id: str = typer.Argument(..., help="ID da ideia")) -> None:
+    """Calcula quality score do bundle planejado."""
+    bundle = _bundle_for_idea(idea_id)
+    score = compute_quality_score(
+        bundle.artifact_id,
+        bundle.prd_markdown,
+        [t.to_dict() for t in bundle.schema_plan.tables],
+        [e.to_dict() for e in bundle.api_contract.endpoints],
+        [t.to_dict() for t in bundle.task_plan.tasks],
+    )
+    console.print(f"[bold]Quality Score:[/bold] {score.overall.percentage}% ({score.overall.grade})")
+    console.print(f"  PRD:     {score.prd_score.percentage}% ({score.prd_score.grade})")
+    console.print(f"  Schema:  {score.schema_score.percentage}% ({score.schema_score.grade})")
+    console.print(f"  API:     {score.api_score.percentage}% ({score.api_score.grade})")
+    console.print(f"  Tasks:   {score.tasks_score.percentage}% ({score.tasks_score.grade})")
+    for note in score.overall.notes:
+        console.print(f"  [dim]{note}[/dim]")
+
+
+@idea_app.command(name="diff")
+def idea_diff(
+    idea_left: str = typer.Argument(..., help="ID da primeira ideia"),
+    idea_right: str = typer.Argument(..., help="ID da segunda ideia"),
+) -> None:
+    """Compara duas ideias mostrando diferencas estruturais."""
+    left = _blueprint_for_idea(idea_left)
+    right = _blueprint_for_idea(idea_right)
+    report = diff_ideas(
+        _load_idea_dict(idea_left),
+        _load_idea_dict(idea_right),
+        left_label=idea_left,
+        right_label=idea_right,
+    )
+    console.print(report.to_summary_text())
+
+    # Also diff schemas
+    left_schema = build_schema_plan(left, dry_run=True)
+    right_schema = build_schema_plan(right, dry_run=True)
+    schema_report = diff_schemas(
+        [t.__dict__ for t in left_schema.tables],
+        [t.__dict__ for t in right_schema.tables],
+        left_label=idea_left + "_schema",
+        right_label=idea_right + "_schema",
+    )
+    if schema_report.has_differences:
+        console.print(f"\n[yellow]Schema diffs ({schema_report.change_count}):[/yellow]")
+        for e in schema_report.entries:
+            if e.is_change:
+                console.print(f"  {e.kind}: {e.field}")
+
+
+@idea_app.command(name="recovery")
+def idea_recovery(
+    idea_id: str = typer.Argument(..., help="ID da ideia"),
+    force: bool = typer.Option(False, "--force", help="Forcar criacao de recovery plan mesmo sem falha"),
+) -> None:
+    """Mostra ou constroi plano de recuperacao para uma ideia."""
+    state = init_pipeline_state(idea_id)
+    state.mark_completed("validate_idea")
+    state.mark_failed("extract_requirements", "simulated: missing data")
+
+    plan = build_recovery_plan(state, force_retry=force)
+    if not plan.can_resume:
+        console.print("[yellow]Nenhum recovery necessario — pipeline sem falhas.[/yellow]")
+        return
+
+    console.print(f"[green]Recovery Plan:[/green]")
+    console.print(f"  Resume from: {plan.resume_from_stage}")
+    console.print(f"  Failed stages: {', '.join(plan.failed_stages)}")
+    console.print(f"  Progress before failure: {plan.state.progress_pct}%")
+    for stage in STAGE_ORDER:
+        if stage in plan.state.stages:
+            s = plan.state.stages[stage]
+            icon = {"completed": "[green]+[/green]", "failed": "[red]![/red]", "pending": "[dim]o[/dim]", "running": "[yellow]>[/yellow]", "skipped": "[dim]-[/dim]"}
+            console.print(f"  {icon.get(s.status.value, '?')} {stage}: {s.status.value}")
+
+
+@idea_app.command(name="status")
+def idea_status(
+    idea_id: str = typer.Option(None, "--idea-id", help="Status de uma ideia especifica"),
+    summary: bool = typer.Option(False, "--summary", help="Mostrar resumo agregado"),
+) -> None:
+    """Mostra status do pipeline para ideias registradas."""
+    tracker = StatusTracker()
+    store = IdeaStore(dry_run=True)
+    ideas = store.list_all()
+
+    for idea in ideas:
+        state = tracker.register_idea(idea.idea_id, idea.title)
+        state.mark_completed("validate_idea")
+
+    if summary:
+        s = tracker.summary()
+        console.print(f"[bold]Pipeline Summary:[/bold] {s.total} ideias")
+        console.print(f"  Completo: [green]{s.completed}[/green] | Pendente: [dim]{s.pending}[/dim] | Falhou: [red]{s.failed}[/red] | Running: [yellow]{s.running}[/yellow]")
+        console.print(f"  Progresso medio: {s.avg_progress_pct}%")
+        console.print(f"  Saudavel: {'[green]Sim[/green]' if s.healthy else '[red]Nao[/red]'}")
+        return
+
+    if idea_id:
+        status = tracker.get_status(idea_id)
+        if status is None:
+            console.print(f"[red]Ideia '{idea_id}' nao encontrada.[/red]")
+            raise typer.Exit(1)
+        console.print(f"[bold]{status.title}[/bold] ({status.idea_id})")
+        console.print(f"  Status: {status.overall_status}")
+        console.print(f"  Progresso: {status.progress_pct}%")
+        console.print(f"  Estagio atual: {status.current_stage}")
+        if status.failed_stage:
+            console.print(f"  [red]Falhou em: {status.failed_stage} — {status.error_message}[/red]")
+        return
+
+    all_statuses = tracker.list_all()
+    if not all_statuses:
+        console.print("Nenhuma ideia registrada para tracking.")
+        return
+
+    table = Table(title=f"Pipeline Status ({len(all_statuses)} ideias)")
+    table.add_column("ID", style="cyan")
+    table.add_column("Titulo")
+    table.add_column("Status")
+    table.add_column("Progresso")
+    table.add_column("Estagio")
+    for s in all_statuses:
+        color = {"completed": "green", "failed": "red", "running": "yellow"}.get(s.overall_status, "white")
+        table.add_row(
+            s.idea_id[:8], s.title[:30],
+            f"[{color}]{s.overall_status}[/{color}]",
+            f"{s.progress_pct}%", s.current_stage,
+        )
+    console.print(table)
+
+
 def _blueprint_for_idea(idea_id: str) -> AppBlueprint:
     store = IdeaStore(dry_run=True)
     idea = store.get(idea_id)
@@ -288,6 +473,15 @@ def _blueprint_for_idea(idea_id: str) -> AppBlueprint:
         raise typer.Exit(1)
     requirement = AppRequirement.from_idea(idea)
     return AppBlueprint.from_requirement(requirement)
+
+
+def _load_idea_dict(idea_id: str) -> dict:
+    store = IdeaStore(dry_run=True)
+    idea = store.get(idea_id)
+    if idea is None:
+        console.print(f"[red]Ideia '{idea_id}' nao encontrada.[/red]")
+        raise typer.Exit(1)
+    return idea.to_dict()
 
 
 def _bundle_for_idea(idea_id: str):
