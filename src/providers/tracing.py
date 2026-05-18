@@ -269,30 +269,32 @@ class LangfuseProvider(TracingProvider):
                 yield ctx
             return
 
-        lf_trace = self._client.trace(
-            id=trace_id or str(uuid.uuid4()),
-            name=name,
-            input=input,
-            metadata=metadata or {},
-        )
+        # Langfuse v4: OTel-based API via start_observation context manager
+        tid = trace_id or str(uuid.uuid4())
         ctx = SpanContext(
-            trace_id=lf_trace.id,
+            trace_id=tid,
             span_id=str(uuid.uuid4()),
             name=name,
             metadata=metadata or {},
             input=input,
         )
-        try:
-            yield ctx
-        except Exception as e:
-            ctx.set_error(str(e))
-            lf_trace.update(output={"error": str(e)}, metadata={**(metadata or {}), "error": str(e)})
-            raise
-        finally:
-            lf_trace.update(
-                output=ctx.output,
-                metadata={**(metadata or {}), "duration_ms": ctx.duration_ms()},
-            )
+        with self._client.start_as_current_observation(
+            name=name,
+            as_type="span",
+            input=input,
+            metadata={**(metadata or {}), "trace_id": tid},
+        ) as obs:
+            try:
+                yield ctx
+            except Exception as e:
+                ctx.set_error(str(e))
+                obs.update(output={"error": str(e)})
+                raise
+            finally:
+                obs.update(
+                    output=ctx.output,
+                    metadata={**(metadata or {}), "duration_ms": ctx.duration_ms()},
+                )
 
     def trace(
         self,
@@ -303,8 +305,16 @@ class LangfuseProvider(TracingProvider):
     ) -> str:
         if not self._available:
             return self._fallback.trace(name, input=input, output=output, metadata=metadata)
-        lf_trace = self._client.trace(name=name, input=input, output=output, metadata=metadata or {})
-        return lf_trace.id
+        tid = str(uuid.uuid4())
+        with self._client.start_as_current_observation(
+            name=name,
+            as_type="span",
+            input=input,
+            output=output,
+            metadata=metadata or {},
+        ):
+            pass
+        return tid
 
     def flush(self) -> None:
         if self._available:
