@@ -12,6 +12,7 @@ from src.mission_orchestrator.errors import RunNotFoundError
 from src.mission_orchestrator.execution_manifest import write_manifest
 from src.providers.registry import ProviderRegistry
 from src.providers.tracing import TracingProvider
+from src.providers.memory import MemoryProvider
 
 BASE = Path(__file__).resolve().parent.parent.parent
 DEFAULT_RUNS_ROOT = BASE / "exports" / "orchestrator_runs"
@@ -55,11 +56,16 @@ def run(
     """
     registry = _registry or ProviderRegistry.production()
     tracer: TracingProvider = registry.get("tracing")  # type: ignore[assignment]
+    memory: MemoryProvider = registry.get("memory")  # type: ignore[assignment]
 
     with tracer.span(
         "orchestrator.run",
         input={"request": request_text, "account": account_handle, "objective": objective, "dry_run": dry_run},
     ) as ctx:
+        # Retrieve similar past runs for context
+        past = memory.retrieve(request_text, k=3)
+        past_context = [r.content for r in past] if past else []
+
         orch_run = build_plan(
             request_text=request_text,
             account_handle=account_handle,
@@ -77,8 +83,15 @@ def run(
                 "steps": len(orch_run.steps),
             })
 
+        # Persist run summary to memory for future retrieval
+        memory.write(
+            f"run:{orch_run.run_id} request:{request_text} intent:{orch_run.intent} status:{orch_run.status} account:{account_handle}",
+            id=orch_run.run_id,
+            metadata={"run_id": orch_run.run_id, "intent": orch_run.intent, "status": orch_run.status, "account": account_handle},
+        )
+
         _persist(orch_run, runs_root, runs_log)
-        ctx.set_output({"run_id": orch_run.run_id, "status": orch_run.status})
+        ctx.set_output({"run_id": orch_run.run_id, "status": orch_run.status, "past_context": len(past_context)})
 
     return orch_run
 

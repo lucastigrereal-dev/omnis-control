@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import Optional
+
 from src.skills_bridge.models import SkillCall, SkillSelection, SkillIntent
 from src.skills_bridge.errors import SkillNotFoundError
 
@@ -50,9 +54,10 @@ MOCK_SKILLS = [
 
 class SkillSelector:
 
-    def __init__(self, dry_run: bool = True):
+    def __init__(self, dry_run: bool = True, embedding_provider=None):
         self.dry_run = dry_run
         self.skills = list(MOCK_SKILLS)
+        self._embedder = embedding_provider  # Optional EmbeddingProvider for semantic ranking
 
     def select(self, call: SkillCall) -> SkillSelection:
         if call.skill_id:
@@ -98,6 +103,34 @@ class SkillSelector:
         )
 
     def _select_by_tags(self, call: SkillCall) -> SkillSelection:
+        # Semantic ranking when embedder available
+        if self._embedder and call.tags:
+            query = " ".join(call.tags)
+            candidates = [" ".join(s.get("tags", [])) for s in self.skills]
+            ranked = self._embedder.rank(query, candidates, k=len(self.skills))
+            # Map back to skills by index
+            tag_strings = [" ".join(s.get("tags", [])) for s in self.skills]
+            best_skill = None
+            best_score = 0.0
+            for text, score in ranked:
+                if score < 0.2:
+                    break
+                idx = next((i for i, t in enumerate(tag_strings) if t == text), None)
+                if idx is not None and score > best_score:
+                    best_score = score
+                    best_skill = self.skills[idx]
+            if best_skill:
+                return SkillSelection(
+                    skill_id=best_skill["skill_id"],
+                    skill_name=best_skill["name"],
+                    intent=call.intent,
+                    confidence=round(best_score, 3),
+                    fallback_skill_id="manual-review",
+                    reason=f"Semantic match: score={best_score:.3f}",
+                    tags=best_skill.get("tags", []),
+                )
+
+        # Keyword overlap fallback
         best = None
         best_score = 0
         for skill in self.skills:
