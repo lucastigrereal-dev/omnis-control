@@ -157,3 +157,35 @@ class TestStatusTracker:
         s1 = tracker.get_status("a1")
         s2 = tracker.get_status("a2")
         assert s1.progress_pct > s2.progress_pct
+
+    def test_save_and_load(self, tmp_path):
+        tracker = StatusTracker()
+        tracker.register_idea("a1", "App1")
+        tracker.mark_stage("a1", "validate_idea", "completed")
+        tracker.mark_stage("a1", "extract_requirements", "completed")
+        tracker.mark_stage("a1", "design_blueprint", "failed", "test error")
+
+        filepath = tmp_path / "status.jsonl"
+        count = tracker.save(str(filepath))
+        assert count == 1
+
+        tracker2 = StatusTracker()
+        loaded = tracker2.load(str(filepath))
+        assert loaded == 1
+        status = tracker2.get_status("a1")
+        assert status is not None
+        assert status.title == "App1"
+        assert status.overall_status == "failed"
+
+    def test_load_empty_file(self, tmp_path):
+        tracker = StatusTracker()
+        filepath = tmp_path / "nonexistent.jsonl"
+        count = tracker.load(str(filepath))
+        assert count == 0
+
+    def test_idea_count(self):
+        tracker = StatusTracker()
+        assert tracker.idea_count == 0
+        tracker.register_idea("a1", "A1")
+        tracker.register_idea("a2", "A2")
+        assert tracker.idea_count == 2

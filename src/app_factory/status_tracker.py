@@ -1,8 +1,10 @@
 """Status tracker for App Factory — per-idea pipeline progress, summaries, reports."""
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Optional
 
 from src.app_factory.recovery import (
@@ -170,3 +172,45 @@ class StatusTracker:
             self._titles.pop(idea_id, None)
             return True
         return False
+
+    def save(self, filepath: str) -> int:
+        """Persist all tracked states to a JSONL file. Returns count of saved states."""
+        path = Path(filepath)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        count = 0
+        with open(path, "w", encoding="utf-8") as f:
+            for idea_id, state in self._states.items():
+                entry = {
+                    "idea_id": idea_id,
+                    "title": self._titles.get(idea_id, ""),
+                    "state": state.to_dict(),
+                }
+                f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+                count += 1
+        return count
+
+    def load(self, filepath: str) -> int:
+        """Load tracked states from a JSONL file. Returns count of loaded states."""
+        path = Path(filepath)
+        if not path.exists():
+            return 0
+        count = 0
+        with open(path, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    entry = json.loads(line)
+                    idea_id = entry.get("idea_id")
+                    if idea_id and "state" in entry:
+                        self._states[idea_id] = PipelineState.from_dict(entry["state"])
+                        self._titles[idea_id] = entry.get("title", "")
+                        count += 1
+                except (json.JSONDecodeError, KeyError):
+                    continue
+        return count
+
+    @property
+    def idea_count(self) -> int:
+        return len(self._states)
