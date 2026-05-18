@@ -5,6 +5,7 @@ import json
 import os
 import socket
 import threading
+import time
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from http.server import HTTPServer, BaseHTTPRequestHandler
@@ -63,14 +64,24 @@ def _pick_free_port() -> int:
         return s.getsockname()[1]
 
 
-def build_health_report() -> HealthReport:
-    """Run doctor checks and build a HealthReport. Replaces inline with mocks in tests."""
+def build_health_report(
+    per_check_timeout_s: float = 10.0,
+    total_timeout_s: float = 60.0,
+) -> HealthReport:
+    """Run doctor checks with timeouts and fallback.
+
+    Args:
+        per_check_timeout_s: Max seconds per individual check (default 10).
+        total_timeout_s: Max seconds for all checks combined (default 60).
+
+    Returns a HealthReport with degraded status on timeouts.
+    """
+    from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
+
     from src.checkers import disk_check, docker_check, publisher_check, memory_check, obsidian_check, skills_check, video_pipeline_check
+    from src.omnis_health.models import CheckResult
 
-    checks = {}
-    errors_list = []
-
-    for name, mod in [
+    check_modules = [
         ("disk", disk_check),
         ("docker", docker_check),
         ("publisher", publisher_check),
@@ -78,33 +89,98 @@ def build_health_report() -> HealthReport:
         ("obsidian", obsidian_check),
         ("skills", skills_check),
         ("video_pipeline", video_pipeline_check),
-    ]:
-        try:
-            checks[name] = mod.check()
-        except Exception as e:
-            checks[name] = {"error": str(e)}
-            errors_list.append(str(e))
+    ]
 
-    if errors_list:
+    results: dict[str, CheckResult] = {}
+    start_time = time.time()
+
+    def _run_one(name: str, mod) -> CheckResult:
+        check_start = time.time()
+        try:
+            data = mod.check()
+            dur = int((time.time() - check_start) * 1000)
+            return CheckResult(name=name, status=HealthStatus.OK, data=data, duration_ms=dur)
+        except Exception as e:
+            dur = int((time.time() - check_start) * 1000)
+            return CheckResult(name=name, status=HealthStatus.ERROR, data={}, error=str(e), duration_ms=dur)
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        future_map = {executor.submit(_run_one, name, mod): name for name, mod in check_modules}
+
+        deadline = start_time + total_timeout_s
+        pending = set(future_map.keys())
+
+        for future in pending.copy():
+            remaining = max(0.1, deadline - time.time())
+            try:
+                result = future.result(timeout=min(per_check_timeout_s, remaining))
+                results[result.name] = result
+                pending.discard(future)
+            except FutureTimeoutError:
+                name = future_map[future]
+                elapsed = int((time.time() - start_time) * 1000)
+                results[name] = CheckResult(
+                    name=name,
+                    status=HealthStatus.ERROR,
+                    data={},
+                    error=f"timeout after {per_check_timeout_s}s",
+                    duration_ms=elapsed,
+                )
+                pending.discard(future)
+
+    # Any checks that didn't even start (total timeout)
+    for future in pending:
+        name = future_map[future]
+        results[name] = CheckResult(
+            name=name,
+            status=HealthStatus.ERROR,
+            data={},
+            error="total timeout exceeded",
+            duration_ms=int(total_timeout_s * 1000),
+        )
+
+    normalized = [results[name] for name, _ in check_modules]
+
+    error_count = sum(1 for c in normalized if c.status == HealthStatus.ERROR)
+    if error_count == len(normalized):
         overall = HealthStatus.CRITICAL
+    elif error_count > 0:
+        overall = HealthStatus.WARNING
     else:
         overall = HealthStatus.OK
 
-    from src.omnis_health.models import CheckResult
-    normalized = []
-    for name, data in checks.items():
-        err = data.get("error") if isinstance(data, dict) else None
-        status = HealthStatus.ERROR if err else HealthStatus.OK
-        normalized.append(CheckResult(name=name, status=status, data=data, error=err))
-
+    total_dur = int((time.time() - start_time) * 1000)
     return HealthReport(
         session_id="health-server",
         timestamp=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         overall_status=overall,
         checks=normalized,
-        risks=[],
+        risks=_collect_risks(normalized),
         next_steps=[],
     )
+
+
+def _fallback_report(error_msg: str) -> HealthReport:
+    """Absolute fallback — returns a valid report even when everything fails."""
+    from src.omnis_health.models import CheckResult
+
+    return HealthReport(
+        session_id="health-server-fallback",
+        timestamp=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        overall_status=HealthStatus.CRITICAL,
+        checks=[CheckResult(name="health-server", status=HealthStatus.CRITICAL, error=error_msg, data={})],
+        risks=[error_msg],
+        next_steps=["Investigate health server failure"],
+    )
+
+
+def _collect_risks(checks: list) -> list[str]:
+    """Collect risk messages from error checks."""
+    risks = []
+    for c in checks:
+        if c.status == HealthStatus.ERROR:
+            risks.append(f"{c.name}: {c.error}")
+    return risks
 
 
 class HealthRequestHandler(BaseHTTPRequestHandler):
@@ -118,7 +194,11 @@ class HealthRequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(b'{"error":"not found"}')
             return
 
-        report = self.report_builder()
+        try:
+            report = self.report_builder()
+        except Exception as e:
+            report = _fallback_report(str(e))
+
         body = json.dumps(report.to_dict(), indent=2, ensure_ascii=False)
 
         if report.overall_status == HealthStatus.CRITICAL:
@@ -140,11 +220,25 @@ class HealthRequestHandler(BaseHTTPRequestHandler):
 class HealthServer:
     """Minimal HTTP server exposing GET /health."""
 
-    def __init__(self, port: int = 0, report_builder: Callable[[], HealthReport] | None = None):
+    def __init__(
+        self,
+        port: int = 0,
+        report_builder: Callable[[], HealthReport] | None = None,
+        per_check_timeout_s: float = 10.0,
+        total_timeout_s: float = 60.0,
+    ):
         self._port = port or _pick_free_port()
         self._httpd: HTTPServer | None = None
         self._thread: threading.Thread | None = None
-        self._report_builder = report_builder or build_health_report
+        self.per_check_timeout_s = per_check_timeout_s
+        self.total_timeout_s = total_timeout_s
+        if report_builder:
+            self._report_builder = report_builder
+        else:
+            self._report_builder = lambda: build_health_report(
+                per_check_timeout_s=self.per_check_timeout_s,
+                total_timeout_s=self.total_timeout_s,
+            )
 
     @property
     def port(self) -> int:

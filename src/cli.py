@@ -1987,14 +1987,17 @@ health_app = typer.Typer(
 
 
 @health_app.command(name="start")
-def health_server_start(port: int = typer.Option(0, help="Porta (0 = automatica)")):
+def health_server_start(
+    port: int = typer.Option(0, help="Porta (0 = automatica)"),
+    per_check_timeout: float = typer.Option(10.0, help="Timeout por check em segundos"),
+    total_timeout: float = typer.Option(60.0, help="Timeout total em segundos"),
+):
     """Inicia o health server em background."""
     from src.omnis_health.server import (
         HealthServer,
         ServerState,
         save_server_state,
         is_server_alive,
-        build_health_report,
     )
     from datetime import datetime, timezone
 
@@ -2003,7 +2006,7 @@ def health_server_start(port: int = typer.Option(0, help="Porta (0 = automatica)
         console.print(f"[yellow]Health server ja esta rodando na porta {state.port if state else '?'}[/yellow]")
         raise typer.Exit(1)
 
-    server = HealthServer(port=port, report_builder=build_health_report)
+    server = HealthServer(port=port, per_check_timeout_s=per_check_timeout, total_timeout_s=total_timeout)
     actual_port = server.start()
     state = ServerState(
         pid=os.getpid(),

@@ -61,7 +61,7 @@ class TestHealthServerCLIStart:
         started_ports = []
 
         class _FakeServer:
-            def __init__(self, port=0, report_builder=None):
+            def __init__(self, port=0, report_builder=None, per_check_timeout_s=10.0, total_timeout_s=60.0):
                 self._port = port or 9876
 
             @property
