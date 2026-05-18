@@ -35,6 +35,7 @@ def register(app: typer.Typer) -> None:
     from src.cli_commands.squad_execution_cmd import squad_execution_app
     from src.cli_commands.execution_graph_cmd import execution_graph_app
     from src.cli_commands.work_order_cmd import work_order_app
+    from src.cli_commands.first_missions_cmd import first_missions_app
 
     app.add_typer(argos_app)
     app.add_typer(creative_app)
@@ -62,3 +63,4 @@ def register(app: typer.Typer) -> None:
     app.add_typer(squad_execution_app)
     app.add_typer(execution_graph_app)
     app.add_typer(work_order_app)
+    app.add_typer(first_missions_app)
