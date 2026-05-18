@@ -17,6 +17,7 @@ from rich.console import Console
 from rich.panel import Panel
 
 from src.output_factory.factory import OutputFactory
+from src.computer_ops.disk_safety_audit import DiskSafetyAuditor
 
 app = typer.Typer(
     name="local",
@@ -257,6 +258,47 @@ def output_index(
             title="output-index",
         )
     )
+
+
+@app.command(name="disk-audit")
+def disk_audit(
+    root: str = typer.Option(".", help="Root directory to scan"),
+    dry_run: bool = typer.Option(True, help="Dry run — never deletes anything"),
+) -> None:
+    """[DRY RUN] Read-only disk safety audit — categorize paths, generate CSV + quarantine plan."""
+    root_path = Path(root).resolve()
+    reports_dir = Path(__file__).parent.parent / "reports"
+    reports_dir.mkdir(parents=True, exist_ok=True)
+
+    auditor = DiskSafetyAuditor()
+    result = auditor.scan(root_path, dry_run=dry_run)
+    candidates = result["candidates"]
+    summary = result["summary"]
+
+    csv_path = auditor.generate_csv(candidates, reports_dir / "disk_cleanup_candidates.csv")
+    plan_path = auditor.generate_quarantine_plan(candidates, reports_dir / "quarantine_plan.md")
+
+    def fmt(b: int) -> str:
+        if b >= 1_048_576:
+            return f"{b / 1_048_576:.1f} MB"
+        if b >= 1024:
+            return f"{b / 1024:.1f} KB"
+        return f"{b} B"
+
+    lines = [
+        f"[bold green]DRY RUN — disk audit complete[/bold green]",
+        f"Root      : {root_path}",
+        f"Total paths: {summary['total_paths']}",
+        "",
+    ]
+    for cat, info in summary["by_category"].items():
+        lines.append(f"  {cat:<22} {info['count']:>4} items  {fmt(info['total_bytes'])}")
+    lines += [
+        "",
+        f"CSV    : {csv_path}",
+        f"Plan   : {plan_path}",
+    ]
+    console.print(Panel("\n".join(lines), title="omnis local disk-audit"))
 
 
 @app.command()

@@ -1,0 +1,61 @@
+category,path,name,size_bytes,is_dir,reason
+safe_to_delete,C:\Users\lucas\omnis-control\.pytest_cache,.pytest_cache,753746,True,matches safe pattern: .pytest_cache
+safe_to_delete,C:\Users\lucas\omnis-control\scripts\__pycache__,__pycache__,55949,True,matches safe pattern: __pycache__
+needs_review,C:\Users\lucas\omnis-control\.gitignore,.gitignore,934,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\.test_tmp,.test_tmp,776425,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\.tmp_pytest,.tmp_pytest,7,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\.tmp_pytest_base,.tmp_pytest_base,0,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\.tmp_pytest_full,.tmp_pytest_full,537,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\.venv,.venv,135470446,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\AGENTS.md,AGENTS.md,3600,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\BLUEPRINT.md,BLUEPRINT.md,775,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\bootstrap-omnis-ccos.ps1,bootstrap-omnis-ccos.ps1,25091,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\bundles,bundles,2966917,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\cockpit,cockpit,56246,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\CUserslucasomnis-controldatamissionscontracts,CUserslucasomnis-controldatamissionscontracts,0,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\CUserslucasomnis-controldatamissionsevents,CUserslucasomnis-controldatamissionsevents,0,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\CUserslucasomnis-controldatapipeline_runs,CUserslucasomnis-controldatapipeline_runs,0,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\CUserslucasomnis-controldocsmissions,CUserslucasomnis-controldocsmissions,0,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\CUserslucasomnis-controldocspipeline,CUserslucasomnis-controldocspipeline,0,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\CUserslucasomnis-controlsrcmissions,CUserslucasomnis-controlsrcmissions,0,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\CUserslucasomnis-controltestsmissions,CUserslucasomnis-controltestsmissions,0,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\CUserslucasomnis-controltestspipeline,CUserslucasomnis-controltestspipeline,0,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\data,data,80609941,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\diagnose_e2e.json,diagnose_e2e.json,14874,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\diagnose_omnis.json,diagnose_omnis.json,14874,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\exports,exports,52764619,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\jarvis.py,jarvis.py,551,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\jarvis_control.egg-info,jarvis_control.egg-info,1384,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\logs,logs,2417273,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\migrations,migrations,2067,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\missions,missions,565048,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\omnis-control,omnis-control,0,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\omnis-skill-setup.sh,omnis-skill-setup.sh,9669,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\omnis.project.yaml,omnis.project.yaml,1244,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\omnis.py,omnis.py,514,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\omnis_agent_tasks.yaml,omnis_agent_tasks.yaml,1316,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\omnis_blocked_items.yaml,omnis_blocked_items.yaml,2118,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\omnis_guardrails.yaml,omnis_guardrails.yaml,942,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\omnis_state.yaml,omnis_state.yaml,2389,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\omnis_wave_registry.yaml,omnis_wave_registry.yaml,2797,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\omnis_worktrees.yaml,omnis_worktrees.yaml,1413,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\PROMPT_MESTRE_OMNIS_SUPREME.md,PROMPT_MESTRE_OMNIS_SUPREME.md,1104,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\pyproject.toml,pyproject.toml,672,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\README.md,README.md,2484,False,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\reports,reports,10876755,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\schemas,schemas,5619,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\scripts,scripts,174530,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\skill_reports,skill_reports,474,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\skills,skills,157890,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\srcexecutors,srcexecutors,0,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\testsexecutors,testsexecutors,0,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\testsreports,testsreports,0,True,no specific rule matched
+needs_review,C:\Users\lucas\omnis-control\workflows,workflows,3101,True,no specific rule matched
+do_not_touch,C:\Users\lucas\omnis-control\.claude,.claude,60342613,True,protected system path
+do_not_touch,C:\Users\lucas\omnis-control\.env,.env,186,False,protected system path
+do_not_touch,C:\Users\lucas\omnis-control\.git,.git,10969170,True,protected system path
+do_not_touch,C:\Users\lucas\omnis-control\CLAUDE.md,CLAUDE.md,1859,False,protected system path
+do_not_touch,C:\Users\lucas\omnis-control\config,config,31132,True,protected system path
+do_not_touch,C:\Users\lucas\omnis-control\docs,docs,2111965,True,protected system path
+do_not_touch,C:\Users\lucas\omnis-control\src,src,7996178,True,protected system path
+do_not_touch,C:\Users\lucas\omnis-control\tests,tests,17949769,True,protected system path
