@@ -81,6 +81,7 @@ class PipelineState:
             "started_at": self.started_at,
             "completed_at": self.completed_at,
             "overall_status": self.overall_status.value,
+            "progress_pct": self.progress_pct,
         }
 
     @classmethod

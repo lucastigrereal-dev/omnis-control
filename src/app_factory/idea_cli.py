@@ -286,13 +286,23 @@ def idea_docs(idea_id: str = typer.Argument(..., help="ID da ideia")) -> None:
 def idea_build_plan(idea_id: str = typer.Argument(..., help="ID da ideia")) -> None:
     """Roda pipeline PRD -> schema -> API -> tasks -> validate."""
     try:
-        result = build_planning_pipeline(idea_id, store=IdeaStore(dry_run=True), dry_run=True)
+        result = build_planning_pipeline(
+            idea_id, store=IdeaStore(dry_run=True), dry_run=True,
+            with_quality_score=True, with_recovery=True,
+        )
     except Exception as exc:
         console.print(f"[red]Pipeline falhou:[/red] {exc}")
         raise typer.Exit(1) from exc
     console.print(f"[green]Build plan dry-run:[/green] {result.idea_id}")
     console.print(f"  Bundle: {result.bundle.artifact_id}")
-    console.print(f"  Quality: {'PASS' if result.quality_report.passed else 'FAIL'}")
+    console.print(f"  Quality Gate: {'PASS' if result.quality_report.passed else 'FAIL'}")
+    if result.quality_score:
+        qs = result.quality_score
+        overall = qs.get("overall", {})
+        console.print(f"  Quality Score: {overall.get('percentage', '?')}% ({overall.get('grade', '?')})")
+    if result.pipeline_state:
+        ps = result.pipeline_state
+        console.print(f"  Pipeline Progress: {ps.get('progress_pct', '?')}% — {ps.get('overall_status', '?')}")
     console.print(f"  Docs: {len(result.docs.documents)}")
 
 
