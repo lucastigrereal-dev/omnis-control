@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Optional
 
 import typer
@@ -418,6 +419,56 @@ def fm_result_show(
         console.print(f"\n  [red]Error: {r.error}[/red]")
 
     console.print(f"\n  Stored at: {r.stored_at}")
+
+
+# ---------------------------------------------------------------------------
+# Export
+# ---------------------------------------------------------------------------
+
+@first_missions_app.command(name="export")
+def fm_export(
+    mission_id: str = typer.Argument(..., help="Mission ID to export"),
+    fmt: str = typer.Option("markdown", "--format", help="markdown | json"),
+    output: Optional[str] = typer.Option(None, "--output", help="Output file path"),
+    json_output: bool = typer.Option(False, "--json", help="Print JSON to stdout"),
+) -> None:
+    """Export a mission report as Markdown or JSON."""
+    orch = _orch(dry_run=True)
+    _seed_demo(orch)
+
+    actual = _resolve_id(orch, mission_id)
+    if actual is None:
+        console.print(f"[red]Mission not found: {mission_id}[/red]")
+        raise typer.Exit(1)
+
+    m = orch.registry.get(actual)
+    if m is None:
+        console.print(f"[red]Mission not found: {mission_id}[/red]")
+        raise typer.Exit(1)
+
+    from src.first_missions.report_export import (
+        export_mission_json,
+        export_mission_markdown,
+        write_export,
+    )
+
+    results = orch.result_store.by_mission(m.mission_id)
+
+    if fmt == "json" or json_output:
+        data = export_mission_json(m, results)
+        content = json.dumps(data, indent=2, ensure_ascii=False)
+        if output:
+            write_export(content, Path(output))
+            console.print(f"[green]Exported JSON to {output}[/green]")
+        else:
+            print(content)
+    else:
+        md = export_mission_markdown(m, results)
+        if output:
+            write_export(md, Path(output))
+            console.print(f"[green]Exported Markdown to {output}[/green]")
+        else:
+            console.print(md)
 
 
 # ---------------------------------------------------------------------------

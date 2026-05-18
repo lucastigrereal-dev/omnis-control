@@ -242,3 +242,18 @@ def test_cli_metrics_json():
     data = json.loads(result.stdout)
     assert "success_rate" in data
     assert "avg_duration_ms" in data
+
+
+# ---------------------------------------------------------------------------
+# Export command
+# ---------------------------------------------------------------------------
+
+
+def test_cli_export_nonexistent():
+    result = runner.invoke(first_missions_app, ["export", "nonexistent"])
+    assert result.exit_code == 1
+
+
+def test_cli_export_help():
+    result = runner.invoke(first_missions_app, ["export", "--help"])
+    assert result.exit_code == 0
