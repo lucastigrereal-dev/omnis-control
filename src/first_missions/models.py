@@ -177,3 +177,52 @@ class MissionRegistry:
             by_status[m.status.value] = by_status.get(m.status.value, 0) + 1
             by_type[m.mission_type.value] = by_type.get(m.mission_type.value, 0) + 1
         return {"total": total, "by_status": by_status, "by_type": by_type}
+
+    def validate(self) -> dict:
+        """Validate all registered missions. Returns report with issues."""
+        issues: list[dict] = []
+        seen_names: dict[str, str] = {}
+
+        for m in self._missions.values():
+            # Missing name
+            if not m.name.strip():
+                issues.append({
+                    "mission_id": m.mission_id,
+                    "severity": "error",
+                    "issue": "Mission has empty name",
+                })
+
+            # Duplicate name
+            if m.name and m.name in seen_names:
+                issues.append({
+                    "mission_id": m.mission_id,
+                    "severity": "warning",
+                    "issue": f"Duplicate name: '{m.name}' also used by {seen_names[m.name]}",
+                })
+            elif m.name:
+                seen_names[m.name] = m.mission_id
+
+            # Content missions must have profile in payload
+            if m.mission_type == MissionType.CONTENT_GENERATION:
+                if "profile" not in m.payload:
+                    issues.append({
+                        "mission_id": m.mission_id,
+                        "severity": "warning",
+                        "issue": "Content generation mission missing 'profile' in payload",
+                    })
+
+            # Metric missions must have metric name
+            if m.mission_type == MissionType.METRIC_REPORT:
+                if "metric" not in m.payload:
+                    issues.append({
+                        "mission_id": m.mission_id,
+                        "severity": "warning",
+                        "issue": "Metric report mission missing 'metric' in payload",
+                    })
+
+        return {
+            "total": len(self._missions),
+            "issues": len(issues),
+            "valid": len(issues) == 0,
+            "details": issues,
+        }

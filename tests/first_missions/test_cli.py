@@ -206,3 +206,21 @@ def test_cli_schedule_json():
 def test_cli_schedule_add_nonexistent():
     result = runner.invoke(first_missions_app, ["schedule-add", "nonexistent"])
     assert result.exit_code == 1
+
+
+# ---------------------------------------------------------------------------
+# Validate command
+# ---------------------------------------------------------------------------
+
+
+def test_cli_validate():
+    result = runner.invoke(first_missions_app, ["validate"])
+    assert result.exit_code == 0
+
+
+def test_cli_validate_json():
+    result = runner.invoke(first_missions_app, ["validate", "--json"])
+    assert result.exit_code == 0
+    data = json.loads(result.stdout)
+    assert "valid" in data
+    assert "issues" in data

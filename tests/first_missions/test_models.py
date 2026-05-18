@@ -179,3 +179,54 @@ def test_registry_limit():
     for _ in range(10):
         reg.register(Mission())
     assert len(reg.query(limit=3)) == 3
+
+
+# ---------------------------------------------------------------------------
+# Validation
+# ---------------------------------------------------------------------------
+
+
+def test_validate_empty_registry():
+    reg = MissionRegistry()
+    report = reg.validate()
+    assert report["valid"] is True
+    assert report["issues"] == 0
+
+
+def test_validate_empty_name():
+    reg = MissionRegistry()
+    reg.register(Mission(name=""))
+    report = reg.validate()
+    assert report["valid"] is False
+    assert any("empty name" in i["issue"] for i in report["details"])
+
+
+def test_validate_duplicate_name():
+    reg = MissionRegistry()
+    reg.register(Mission(name="dup"))
+    reg.register(Mission(name="dup"))
+    report = reg.validate()
+    assert any("Duplicate name" in i["issue"] for i in report["details"])
+
+
+def test_validate_content_missing_profile():
+    reg = MissionRegistry()
+    reg.register(Mission(name="content", mission_type=MissionType.CONTENT_GENERATION))
+    report = reg.validate()
+    assert any("profile" in i["issue"] for i in report["details"])
+
+
+def test_validate_metric_missing_metric():
+    reg = MissionRegistry()
+    reg.register(Mission(name="metric", mission_type=MissionType.METRIC_REPORT))
+    report = reg.validate()
+    assert any("metric" in i["issue"] for i in report["details"])
+
+
+def test_validate_all_good():
+    reg = MissionRegistry()
+    reg.register(Mission.content_generation("test", "topic"))
+    reg.register(Mission.metric_report("followers"))
+    reg.register(Mission.health_snapshot())
+    report = reg.validate()
+    assert report["valid"] is True

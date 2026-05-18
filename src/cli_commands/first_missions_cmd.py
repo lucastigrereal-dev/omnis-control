@@ -421,6 +421,32 @@ def fm_result_show(
 
 
 # ---------------------------------------------------------------------------
+# Validate
+# ---------------------------------------------------------------------------
+
+@first_missions_app.command(name="validate")
+def fm_validate(
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Validate all registered missions and report issues."""
+    orch = _orch(dry_run=True)
+    _seed_demo(orch)
+    report = orch.registry.validate()
+
+    if json_output:
+        print(json.dumps(report, indent=2, ensure_ascii=False))
+        return
+
+    if report["valid"]:
+        console.print(f"[green]All {report['total']} missions valid — no issues.[/green]")
+    else:
+        console.print(f"[yellow]{report['issues']} issue(s) found in {report['total']} missions:[/yellow]")
+        for d in report["details"]:
+            icon = "[red]ERROR[/red]" if d["severity"] == "error" else "[yellow]WARN[/yellow]"
+            console.print(f"  {icon} [{d['mission_id'][:12]}] {d['issue']}")
+
+
+# ---------------------------------------------------------------------------
 # Scheduler
 # ---------------------------------------------------------------------------
 
