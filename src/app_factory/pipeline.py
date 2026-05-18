@@ -110,8 +110,25 @@ def build_planning_pipeline(
         bundle = build_bundle(prd.artifact, schema, api, tasks, dry_run=dry_run)
         _complete("bundle_export")
 
+        # Quality score computed before gate
         _advance("quality_gate")
-        quality = validate_bundle(bundle, dry_run=dry_run)
+        quality_score_pct = None
+        if with_quality_score:
+            schema_tables = [
+                {"name": t.name, "fields": [f.__dict__ for f in t.fields],
+                 "relationships": t.relationships, "indexes": t.indexes}
+                for t in schema.tables
+            ]
+            qs_pre = compute_quality_score(
+                bundle.artifact_id,
+                bundle.prd_markdown,
+                schema_tables,
+                [e.__dict__ for e in api.endpoints],
+                [t.__dict__ for t in tasks.tasks],
+            )
+            quality_score_pct = qs_pre.overall.percentage
+
+        quality = validate_bundle(bundle, dry_run=dry_run, quality_score_pct=quality_score_pct)
         if not quality.passed:
             _fail("quality_gate", f"Quality gate failed: {quality.issues}")
             raise PRDGenerationError(f"App Factory quality gate failed: {quality.issues}")
