@@ -1,0 +1,29 @@
+{
+  "template_id": "automation_skill_argos-bridge",
+  "name": "argos-bridge",
+  "category": "automation",
+  "description": "Bridge entre Content Queue e ARGOS Drafts no Publisher OS",
+  "status": "active",
+  "version": 1,
+  "tags": [
+    "argos",
+    "bridge",
+    "publisher-os",
+    "draft",
+    "skill"
+  ],
+  "content": {
+    "version": "1.0.0",
+    "risk_level": "medium",
+    "mode": "external_action"
+  },
+  "source_mission_id": null,
+  "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\argos-bridge\\manifest.json",
+  "score": 7.5,
+  "usage_count": 0,
+  "files": [],
+  "dependencies": [],
+  "created_at": "2026-05-18T22:46:05.213084Z",
+  "updated_at": "2026-05-18T22:46:05.213084Z",
+  "deprecated_at": null
+}

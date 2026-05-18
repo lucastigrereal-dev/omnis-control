@@ -1,0 +1,29 @@
+{
+  "template_id": "automation_skill_video_to_content",
+  "name": "video_to_content",
+  "category": "automation",
+  "description": "Converte video bruto em formato publicavel com metadados",
+  "status": "active",
+  "version": 1,
+  "tags": [
+    "video",
+    "content",
+    "conversion",
+    "assets",
+    "skill"
+  ],
+  "content": {
+    "version": "1.0.0",
+    "risk_level": "medium",
+    "mode": "local_write"
+  },
+  "source_mission_id": null,
+  "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\video_to_content\\manifest.json",
+  "score": 7.5,
+  "usage_count": 0,
+  "files": [],
+  "dependencies": [],
+  "created_at": "2026-05-18T22:46:05.218084Z",
+  "updated_at": "2026-05-18T22:46:05.218084Z",
+  "deprecated_at": null
+}

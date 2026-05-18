@@ -1,0 +1,29 @@
+{
+  "template_id": "automation_skill_generate_seogram_caption",
+  "name": "generate_seogram_caption",
+  "category": "automation",
+  "description": "Gera legenda SEO-otimizada para Instagram com palavras-chave",
+  "status": "active",
+  "version": 1,
+  "tags": [
+    "caption",
+    "seo",
+    "instagram",
+    "content",
+    "skill"
+  ],
+  "content": {
+    "version": "1.0.0",
+    "risk_level": "low",
+    "mode": "draft_only"
+  },
+  "source_mission_id": null,
+  "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\generate_seogram_caption\\manifest.json",
+  "score": 7.5,
+  "usage_count": 0,
+  "files": [],
+  "dependencies": [],
+  "created_at": "2026-05-18T22:46:05.215084Z",
+  "updated_at": "2026-05-18T22:46:05.215084Z",
+  "deprecated_at": null
+}

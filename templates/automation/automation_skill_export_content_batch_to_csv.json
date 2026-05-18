@@ -1,0 +1,29 @@
+{
+  "template_id": "automation_skill_export_content_batch_to_csv",
+  "name": "export_content_batch_to_csv",
+  "category": "automation",
+  "description": "Exporta lote da Content Queue para CSV",
+  "status": "active",
+  "version": 1,
+  "tags": [
+    "export",
+    "csv",
+    "content-queue",
+    "batch",
+    "skill"
+  ],
+  "content": {
+    "version": "1.0.0",
+    "risk_level": "low",
+    "mode": "local_write"
+  },
+  "source_mission_id": null,
+  "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\export_content_batch_to_csv\\manifest.json",
+  "score": 7.5,
+  "usage_count": 0,
+  "files": [],
+  "dependencies": [],
+  "created_at": "2026-05-18T22:46:05.215084Z",
+  "updated_at": "2026-05-18T22:46:05.215084Z",
+  "deprecated_at": null
+}

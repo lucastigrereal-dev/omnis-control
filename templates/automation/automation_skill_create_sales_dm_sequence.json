@@ -1,0 +1,30 @@
+{
+  "template_id": "automation_skill_create_sales_dm_sequence",
+  "name": "create_sales_dm_sequence",
+  "category": "automation",
+  "description": "Gera sequencia de DM para prospeccao B2B de hoteis",
+  "status": "active",
+  "version": 1,
+  "tags": [
+    "sales",
+    "dm",
+    "b2b",
+    "hotels",
+    "prospecting",
+    "skill"
+  ],
+  "content": {
+    "version": "1.0.0",
+    "risk_level": "low",
+    "mode": "draft_only"
+  },
+  "source_mission_id": null,
+  "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\create_sales_dm_sequence\\manifest.json",
+  "score": 7.5,
+  "usage_count": 0,
+  "files": [],
+  "dependencies": [],
+  "created_at": "2026-05-18T22:46:05.214084Z",
+  "updated_at": "2026-05-18T22:46:05.214084Z",
+  "deprecated_at": null
+}

@@ -1,0 +1,30 @@
+{
+  "template_id": "squad_marketing",
+  "name": "Marketing Squad",
+  "category": "ops",
+  "description": "Squad especializada em campanhas de marketing, carrosséis, reels e stories",
+  "status": "active",
+  "version": 1,
+  "tags": [
+    "squad",
+    "orchestrator"
+  ],
+  "content": {
+    "roles": [
+      "estrategista",
+      "copywriter",
+      "designer",
+      "social_media"
+    ],
+    "risk_level": "medium"
+  },
+  "source_mission_id": null,
+  "source_output_path": null,
+  "score": 8.0,
+  "usage_count": 0,
+  "files": [],
+  "dependencies": [],
+  "created_at": "2026-05-18T22:46:05.213084Z",
+  "updated_at": "2026-05-18T22:46:05.213084Z",
+  "deprecated_at": null
+}

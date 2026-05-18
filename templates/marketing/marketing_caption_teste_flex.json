@@ -1,0 +1,32 @@
+{
+  "template_id": "marketing_caption_teste_flex",
+  "name": "Teste — Formato livre",
+  "category": "marketing",
+  "description": "Teste: novo formato, novo nicho, novo approach",
+  "status": "active",
+  "version": 1,
+  "tags": [
+    "caption",
+    "teste",
+    null
+  ],
+  "content": {
+    "hook_template": "[HOOK A REVISAR] — teste:",
+    "body_template": "[CORPO DA LEGENDA A REVISAR]",
+    "cta_template": "Me diz: funcionou pra você? Comenta aqui!",
+    "hashtag_suggestions": [
+      "#teste",
+      "#novidade",
+      "#experiencia"
+    ]
+  },
+  "source_mission_id": null,
+  "source_output_path": "C:\\Users\\lucas\\omnis-control\\data\\caption_templates.json",
+  "score": 7.0,
+  "usage_count": 0,
+  "files": [],
+  "dependencies": [],
+  "created_at": "2026-05-18T22:46:05.213084Z",
+  "updated_at": "2026-05-18T22:46:05.213084Z",
+  "deprecated_at": null
+}

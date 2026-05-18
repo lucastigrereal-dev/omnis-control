@@ -1,0 +1,32 @@
+{
+  "template_id": "marketing_caption_autoridade_feed",
+  "name": "Autoridade — Feed",
+  "category": "marketing",
+  "description": "Conteúdo de autoridade: dados, aprendizados, cases",
+  "status": "active",
+  "version": 1,
+  "tags": [
+    "caption",
+    "autoridade",
+    null
+  ],
+  "content": {
+    "hook_template": "[HOOK A REVISAR] — aqui está o que aprendi:",
+    "body_template": "[CORPO DA LEGENDA A REVISAR]\n\n📍 [LOCAL]",
+    "cta_template": "O que você acha disso? Conta aqui nos comentários! 👇",
+    "hashtag_suggestions": [
+      "#marketing",
+      "#crescimento",
+      "#estrategia"
+    ]
+  },
+  "source_mission_id": null,
+  "source_output_path": "C:\\Users\\lucas\\omnis-control\\data\\caption_templates.json",
+  "score": 7.0,
+  "usage_count": 0,
+  "files": [],
+  "dependencies": [],
+  "created_at": "2026-05-18T22:46:05.213084Z",
+  "updated_at": "2026-05-18T22:46:05.213084Z",
+  "deprecated_at": null
+}

@@ -1,0 +1,32 @@
+{
+  "template_id": "marketing_caption_alcance_carousel",
+  "name": "Alcance — Carrossel",
+  "category": "marketing",
+  "description": "Carrossel de alcance: primeira foto/chamada forte",
+  "status": "active",
+  "version": 1,
+  "tags": [
+    "caption",
+    "alcance",
+    "carousel"
+  ],
+  "content": {
+    "hook_template": "[HOOK A REVISAR] — desliza pro lado!",
+    "body_template": "[CORPO DA LEGENDA A REVISAR]\n\n📍 [LOCAL]",
+    "cta_template": "Compartilha com alguém que precisa ver isso! Salva pra consultar depois.",
+    "hashtag_suggestions": [
+      "#viagem",
+      "#turismo",
+      "#brasil"
+    ]
+  },
+  "source_mission_id": null,
+  "source_output_path": "C:\\Users\\lucas\\omnis-control\\data\\caption_templates.json",
+  "score": 7.0,
+  "usage_count": 0,
+  "files": [],
+  "dependencies": [],
+  "created_at": "2026-05-18T22:46:05.213084Z",
+  "updated_at": "2026-05-18T22:46:05.213084Z",
+  "deprecated_at": null
+}

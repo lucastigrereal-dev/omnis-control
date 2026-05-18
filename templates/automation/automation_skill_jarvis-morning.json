@@ -1,0 +1,29 @@
+{
+  "template_id": "automation_skill_jarvis-morning",
+  "name": "jarvis-morning",
+  "category": "automation",
+  "description": "Briefing matinal com health score, acoes e metricas do ecossistema",
+  "status": "active",
+  "version": 1,
+  "tags": [
+    "morning",
+    "briefing",
+    "daily",
+    "core",
+    "skill"
+  ],
+  "content": {
+    "version": "1.0.0",
+    "risk_level": "low",
+    "mode": "read_only"
+  },
+  "source_mission_id": null,
+  "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\jarvis-morning\\manifest.json",
+  "score": 7.5,
+  "usage_count": 0,
+  "files": [],
+  "dependencies": [],
+  "created_at": "2026-05-18T22:46:05.217083Z",
+  "updated_at": "2026-05-18T22:46:05.217083Z",
+  "deprecated_at": null
+}

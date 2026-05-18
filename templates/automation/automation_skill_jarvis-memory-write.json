@@ -1,0 +1,30 @@
+{
+  "template_id": "automation_skill_jarvis-memory-write",
+  "name": "jarvis-memory-write",
+  "category": "automation",
+  "description": "Persiste resultados de execucao em Akasha, Qdrant e git",
+  "status": "active",
+  "version": 1,
+  "tags": [
+    "memory",
+    "persist",
+    "akasha",
+    "git",
+    "core",
+    "skill"
+  ],
+  "content": {
+    "version": "1.0.0",
+    "risk_level": "medium",
+    "mode": "local_write"
+  },
+  "source_mission_id": null,
+  "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\jarvis-memory-write\\manifest.json",
+  "score": 7.5,
+  "usage_count": 0,
+  "files": [],
+  "dependencies": [],
+  "created_at": "2026-05-18T22:46:05.217083Z",
+  "updated_at": "2026-05-18T22:46:05.217083Z",
+  "deprecated_at": null
+}

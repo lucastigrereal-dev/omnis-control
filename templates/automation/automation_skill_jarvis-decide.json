@@ -1,0 +1,29 @@
+{
+  "template_id": "automation_skill_jarvis-decide",
+  "name": "jarvis-decide",
+  "category": "automation",
+  "description": "Decision Engine que prioriza acoes baseado em formula multi-fator",
+  "status": "active",
+  "version": 1,
+  "tags": [
+    "decide",
+    "prioritization",
+    "decision",
+    "core",
+    "skill"
+  ],
+  "content": {
+    "version": "1.0.0",
+    "risk_level": "low",
+    "mode": "read_only"
+  },
+  "source_mission_id": null,
+  "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\jarvis-decide\\manifest.json",
+  "score": 7.5,
+  "usage_count": 0,
+  "files": [],
+  "dependencies": [],
+  "created_at": "2026-05-18T22:46:05.216083Z",
+  "updated_at": "2026-05-18T22:46:05.216083Z",
+  "deprecated_at": null
+}

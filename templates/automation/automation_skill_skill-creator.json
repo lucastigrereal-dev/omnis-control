@@ -1,0 +1,29 @@
+{
+  "template_id": "automation_skill_skill-creator",
+  "name": "skill-creator",
+  "category": "automation",
+  "description": "Cria novas skills no padrao OMNIS com SKILL.md, manifest.json e run.py",
+  "status": "active",
+  "version": 1,
+  "tags": [
+    "skill",
+    "create",
+    "scaffold",
+    "core",
+    "skill"
+  ],
+  "content": {
+    "version": "1.0.0",
+    "risk_level": "high",
+    "mode": "external_action"
+  },
+  "source_mission_id": null,
+  "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\skill-creator\\manifest.json",
+  "score": 7.5,
+  "usage_count": 0,
+  "files": [],
+  "dependencies": [],
+  "created_at": "2026-05-18T22:46:05.218084Z",
+  "updated_at": "2026-05-18T22:46:05.218084Z",
+  "deprecated_at": null
+}

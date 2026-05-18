@@ -1,0 +1,29 @@
+{
+  "template_id": "squad_ops",
+  "name": "Ops Squad",
+  "category": "ops",
+  "description": "Squad de operações: auditoria, health check, relatórios",
+  "status": "active",
+  "version": 1,
+  "tags": [
+    "squad",
+    "orchestrator"
+  ],
+  "content": {
+    "roles": [
+      "auditor",
+      "devops",
+      "analyst"
+    ],
+    "risk_level": "low"
+  },
+  "source_mission_id": null,
+  "source_output_path": null,
+  "score": 8.0,
+  "usage_count": 0,
+  "files": [],
+  "dependencies": [],
+  "created_at": "2026-05-18T22:46:05.213084Z",
+  "updated_at": "2026-05-18T22:46:05.213084Z",
+  "deprecated_at": null
+}

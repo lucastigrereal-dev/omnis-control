@@ -1,0 +1,29 @@
+{
+  "template_id": "automation_skill_create_instagram_carousel",
+  "name": "create_instagram_carousel",
+  "category": "automation",
+  "description": "Gera roteiro de carrossel para Instagram com brief de design",
+  "status": "active",
+  "version": 1,
+  "tags": [
+    "carousel",
+    "instagram",
+    "content",
+    "design",
+    "skill"
+  ],
+  "content": {
+    "version": "1.0.0",
+    "risk_level": "low",
+    "mode": "draft_only"
+  },
+  "source_mission_id": null,
+  "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\create_instagram_carousel\\manifest.json",
+  "score": 7.5,
+  "usage_count": 0,
+  "files": [],
+  "dependencies": [],
+  "created_at": "2026-05-18T22:46:05.214084Z",
+  "updated_at": "2026-05-18T22:46:05.214084Z",
+  "deprecated_at": null
+}

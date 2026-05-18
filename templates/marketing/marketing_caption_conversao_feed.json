@@ -1,0 +1,32 @@
+{
+  "template_id": "marketing_caption_conversao_feed",
+  "name": "Conversão — Feed",
+  "category": "marketing",
+  "description": "Foco em conversão: desconto, oferta, CTA direto",
+  "status": "active",
+  "version": 1,
+  "tags": [
+    "caption",
+    "conversao",
+    null
+  ],
+  "content": {
+    "hook_template": "[HOOK A REVISAR] — e a melhor parte:",
+    "body_template": "[CORPO DA LEGENDA A REVISAR]\n\n📍 [LOCAL]\n\n👉 [NOME_DO_HOTEL]",
+    "cta_template": "Garanta seu desconto exclusivo no link da bio! 🔗",
+    "hashtag_suggestions": [
+      "#resort",
+      "#hospedagem",
+      "#viagem"
+    ]
+  },
+  "source_mission_id": null,
+  "source_output_path": "C:\\Users\\lucas\\omnis-control\\data\\caption_templates.json",
+  "score": 7.0,
+  "usage_count": 0,
+  "files": [],
+  "dependencies": [],
+  "created_at": "2026-05-18T22:46:05.213084Z",
+  "updated_at": "2026-05-18T22:46:05.213084Z",
+  "deprecated_at": null
+}

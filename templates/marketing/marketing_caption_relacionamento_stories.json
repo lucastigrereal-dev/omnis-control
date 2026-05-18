@@ -1,0 +1,32 @@
+{
+  "template_id": "marketing_caption_relacionamento_stories",
+  "name": "Relacionamento — Stories/Feed",
+  "category": "marketing",
+  "description": "Engajamento: perguntas, enquetes, opinião",
+  "status": "active",
+  "version": 1,
+  "tags": [
+    "caption",
+    "relacionamento",
+    null
+  ],
+  "content": {
+    "hook_template": "[HOOK A REVISAR] — me conta nos comentários:",
+    "body_template": "[CORPO DA LEGENDA A REVISAR]\n\n📍 [LOCAL]",
+    "cta_template": "Responde aqui: o que você faria no meu lugar? 👇",
+    "hashtag_suggestions": [
+      "#familia",
+      "#momento",
+      "#reflexao"
+    ]
+  },
+  "source_mission_id": null,
+  "source_output_path": "C:\\Users\\lucas\\omnis-control\\data\\caption_templates.json",
+  "score": 7.0,
+  "usage_count": 0,
+  "files": [],
+  "dependencies": [],
+  "created_at": "2026-05-18T22:46:05.213084Z",
+  "updated_at": "2026-05-18T22:46:05.213084Z",
+  "deprecated_at": null
+}

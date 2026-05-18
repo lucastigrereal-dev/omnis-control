@@ -1,0 +1,1293 @@
+{
+  "updated_at": "2026-05-18T22:46:05.242376Z",
+  "total": 39,
+  "templates": {
+    "marketing_caption_alcance_reels": {
+      "template_id": "marketing_caption_alcance_reels",
+      "name": "Alcance — Reels",
+      "category": "marketing",
+      "description": "Reels de alcance: hook forte nos primeiros 3 segundos",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "caption",
+        "alcance",
+        "reels"
+      ],
+      "content": {
+        "hook_template": "[HOOK A REVISAR] — você precisa ver isso!",
+        "body_template": "[CORPO DA LEGENDA A REVISAR]\n\n📍 [LOCAL]",
+        "cta_template": "Salva pra ver depois e compartilha com alguém que precisa saber disso! 💬",
+        "hashtag_suggestions": [
+          "#viagem",
+          "#turismo",
+          "#brasil"
+        ]
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\data\\caption_templates.json",
+      "score": 7.0,
+      "usage_count": 0,
+      "files": [
+        "marketing\\marketing_caption_alcance_reels.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.213084Z",
+      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "deprecated_at": null
+    },
+    "marketing_caption_alcance_carousel": {
+      "template_id": "marketing_caption_alcance_carousel",
+      "name": "Alcance — Carrossel",
+      "category": "marketing",
+      "description": "Carrossel de alcance: primeira foto/chamada forte",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "caption",
+        "alcance",
+        "carousel"
+      ],
+      "content": {
+        "hook_template": "[HOOK A REVISAR] — desliza pro lado!",
+        "body_template": "[CORPO DA LEGENDA A REVISAR]\n\n📍 [LOCAL]",
+        "cta_template": "Compartilha com alguém que precisa ver isso! Salva pra consultar depois.",
+        "hashtag_suggestions": [
+          "#viagem",
+          "#turismo",
+          "#brasil"
+        ]
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\data\\caption_templates.json",
+      "score": 7.0,
+      "usage_count": 0,
+      "files": [
+        "marketing\\marketing_caption_alcance_carousel.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.213084Z",
+      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "deprecated_at": null
+    },
+    "marketing_caption_autoridade_feed": {
+      "template_id": "marketing_caption_autoridade_feed",
+      "name": "Autoridade — Feed",
+      "category": "marketing",
+      "description": "Conteúdo de autoridade: dados, aprendizados, cases",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "caption",
+        "autoridade",
+        null
+      ],
+      "content": {
+        "hook_template": "[HOOK A REVISAR] — aqui está o que aprendi:",
+        "body_template": "[CORPO DA LEGENDA A REVISAR]\n\n📍 [LOCAL]",
+        "cta_template": "O que você acha disso? Conta aqui nos comentários! 👇",
+        "hashtag_suggestions": [
+          "#marketing",
+          "#crescimento",
+          "#estrategia"
+        ]
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\data\\caption_templates.json",
+      "score": 7.0,
+      "usage_count": 0,
+      "files": [
+        "marketing\\marketing_caption_autoridade_feed.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.213084Z",
+      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "deprecated_at": null
+    },
+    "marketing_caption_conversao_feed": {
+      "template_id": "marketing_caption_conversao_feed",
+      "name": "Conversão — Feed",
+      "category": "marketing",
+      "description": "Foco em conversão: desconto, oferta, CTA direto",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "caption",
+        "conversao",
+        null
+      ],
+      "content": {
+        "hook_template": "[HOOK A REVISAR] — e a melhor parte:",
+        "body_template": "[CORPO DA LEGENDA A REVISAR]\n\n📍 [LOCAL]\n\n👉 [NOME_DO_HOTEL]",
+        "cta_template": "Garanta seu desconto exclusivo no link da bio! 🔗",
+        "hashtag_suggestions": [
+          "#resort",
+          "#hospedagem",
+          "#viagem"
+        ]
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\data\\caption_templates.json",
+      "score": 7.0,
+      "usage_count": 0,
+      "files": [
+        "marketing\\marketing_caption_conversao_feed.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.213084Z",
+      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "deprecated_at": null
+    },
+    "marketing_caption_relacionamento_stories": {
+      "template_id": "marketing_caption_relacionamento_stories",
+      "name": "Relacionamento — Stories/Feed",
+      "category": "marketing",
+      "description": "Engajamento: perguntas, enquetes, opinião",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "caption",
+        "relacionamento",
+        null
+      ],
+      "content": {
+        "hook_template": "[HOOK A REVISAR] — me conta nos comentários:",
+        "body_template": "[CORPO DA LEGENDA A REVISAR]\n\n📍 [LOCAL]",
+        "cta_template": "Responde aqui: o que você faria no meu lugar? 👇",
+        "hashtag_suggestions": [
+          "#familia",
+          "#momento",
+          "#reflexao"
+        ]
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\data\\caption_templates.json",
+      "score": 7.0,
+      "usage_count": 0,
+      "files": [
+        "marketing\\marketing_caption_relacionamento_stories.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.213084Z",
+      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "deprecated_at": null
+    },
+    "marketing_caption_teste_flex": {
+      "template_id": "marketing_caption_teste_flex",
+      "name": "Teste — Formato livre",
+      "category": "marketing",
+      "description": "Teste: novo formato, novo nicho, novo approach",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "caption",
+        "teste",
+        null
+      ],
+      "content": {
+        "hook_template": "[HOOK A REVISAR] — teste:",
+        "body_template": "[CORPO DA LEGENDA A REVISAR]",
+        "cta_template": "Me diz: funcionou pra você? Comenta aqui!",
+        "hashtag_suggestions": [
+          "#teste",
+          "#novidade",
+          "#experiencia"
+        ]
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\data\\caption_templates.json",
+      "score": 7.0,
+      "usage_count": 0,
+      "files": [
+        "marketing\\marketing_caption_teste_flex.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.213084Z",
+      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "deprecated_at": null
+    },
+    "squad_marketing": {
+      "template_id": "squad_marketing",
+      "name": "Marketing Squad",
+      "category": "ops",
+      "description": "Squad especializada em campanhas de marketing, carrosséis, reels e stories",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "squad",
+        "orchestrator"
+      ],
+      "content": {
+        "roles": [
+          "estrategista",
+          "copywriter",
+          "designer",
+          "social_media"
+        ],
+        "risk_level": "medium"
+      },
+      "source_mission_id": null,
+      "source_output_path": null,
+      "score": 8.0,
+      "usage_count": 0,
+      "files": [
+        "ops\\squad_marketing.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.213084Z",
+      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "deprecated_at": null
+    },
+    "squad_sales": {
+      "template_id": "squad_sales",
+      "name": "Sales Squad",
+      "category": "ops",
+      "description": "Squad de prospecção, pitch comercial e follow-up",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "squad",
+        "orchestrator"
+      ],
+      "content": {
+        "roles": [
+          "sdr",
+          "closer",
+          "copywriter"
+        ],
+        "risk_level": "low"
+      },
+      "source_mission_id": null,
+      "source_output_path": null,
+      "score": 8.0,
+      "usage_count": 0,
+      "files": [
+        "ops\\squad_sales.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.213084Z",
+      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "deprecated_at": null
+    },
+    "squad_app_factory": {
+      "template_id": "squad_app_factory",
+      "name": "App Factory Squad",
+      "category": "ops",
+      "description": "Squad para geração de aplicações completas a partir de briefing",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "squad",
+        "orchestrator"
+      ],
+      "content": {
+        "roles": [
+          "architect",
+          "backend_dev",
+          "frontend_dev",
+          "qa"
+        ],
+        "risk_level": "medium"
+      },
+      "source_mission_id": null,
+      "source_output_path": null,
+      "score": 8.0,
+      "usage_count": 0,
+      "files": [
+        "ops\\squad_app_factory.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.213084Z",
+      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "deprecated_at": null
+    },
+    "squad_ops": {
+      "template_id": "squad_ops",
+      "name": "Ops Squad",
+      "category": "ops",
+      "description": "Squad de operações: auditoria, health check, relatórios",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "squad",
+        "orchestrator"
+      ],
+      "content": {
+        "roles": [
+          "auditor",
+          "devops",
+          "analyst"
+        ],
+        "risk_level": "low"
+      },
+      "source_mission_id": null,
+      "source_output_path": null,
+      "score": 8.0,
+      "usage_count": 0,
+      "files": [
+        "ops\\squad_ops.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.213084Z",
+      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "deprecated_at": null
+    },
+    "squad_security": {
+      "template_id": "squad_security",
+      "name": "Security Squad",
+      "category": "ops",
+      "description": "Squad de segurança: audit, scan, compliance",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "squad",
+        "orchestrator"
+      ],
+      "content": {
+        "roles": [
+          "security_engineer",
+          "auditor"
+        ],
+        "risk_level": "high"
+      },
+      "source_mission_id": null,
+      "source_output_path": null,
+      "score": 8.0,
+      "usage_count": 0,
+      "files": [
+        "ops\\squad_security.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.213084Z",
+      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "deprecated_at": null
+    },
+    "automation_skill_argos-bridge": {
+      "template_id": "automation_skill_argos-bridge",
+      "name": "argos-bridge",
+      "category": "automation",
+      "description": "Bridge entre Content Queue e ARGOS Drafts no Publisher OS",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "argos",
+        "bridge",
+        "publisher-os",
+        "draft",
+        "skill"
+      ],
+      "content": {
+        "version": "1.0.0",
+        "risk_level": "medium",
+        "mode": "external_action"
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\argos-bridge\\manifest.json",
+      "score": 7.5,
+      "usage_count": 0,
+      "files": [
+        "automation\\automation_skill_argos-bridge.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.213084Z",
+      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "deprecated_at": null
+    },
+    "automation_skill_create_30_day_content_calendar": {
+      "template_id": "automation_skill_create_30_day_content_calendar",
+      "name": "create_30_day_content_calendar",
+      "category": "automation",
+      "description": "Gera calendario editorial de 30 dias para um perfil Instagram",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "calendar",
+        "content",
+        "planning",
+        "instagram",
+        "skill"
+      ],
+      "content": {
+        "version": "1.0.0",
+        "risk_level": "low",
+        "mode": "draft_only"
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\create_30_day_content_calendar\\manifest.json",
+      "score": 7.5,
+      "usage_count": 0,
+      "files": [
+        "automation\\automation_skill_create_30_day_content_calendar.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.214084Z",
+      "updated_at": "2026-05-18T22:46:05.214084Z",
+      "deprecated_at": null
+    },
+    "automation_skill_create_instagram_carousel": {
+      "template_id": "automation_skill_create_instagram_carousel",
+      "name": "create_instagram_carousel",
+      "category": "automation",
+      "description": "Gera roteiro de carrossel para Instagram com brief de design",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "carousel",
+        "instagram",
+        "content",
+        "design",
+        "skill"
+      ],
+      "content": {
+        "version": "1.0.0",
+        "risk_level": "low",
+        "mode": "draft_only"
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\create_instagram_carousel\\manifest.json",
+      "score": 7.5,
+      "usage_count": 0,
+      "files": [
+        "automation\\automation_skill_create_instagram_carousel.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.214084Z",
+      "updated_at": "2026-05-18T22:46:05.214084Z",
+      "deprecated_at": null
+    },
+    "automation_skill_create_sales_dm_sequence": {
+      "template_id": "automation_skill_create_sales_dm_sequence",
+      "name": "create_sales_dm_sequence",
+      "category": "automation",
+      "description": "Gera sequencia de DM para prospeccao B2B de hoteis",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "sales",
+        "dm",
+        "b2b",
+        "hotels",
+        "prospecting",
+        "skill"
+      ],
+      "content": {
+        "version": "1.0.0",
+        "risk_level": "low",
+        "mode": "draft_only"
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\create_sales_dm_sequence\\manifest.json",
+      "score": 7.5,
+      "usage_count": 0,
+      "files": [
+        "automation\\automation_skill_create_sales_dm_sequence.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.214084Z",
+      "updated_at": "2026-05-18T22:46:05.214084Z",
+      "deprecated_at": null
+    },
+    "automation_skill_crm-pipeline": {
+      "template_id": "automation_skill_crm-pipeline",
+      "name": "crm-pipeline",
+      "category": "automation",
+      "description": "Pipeline de CRM local para vendas B2B com 6 modos",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "crm",
+        "sales",
+        "pipeline",
+        "b2b",
+        "sqlite",
+        "skill"
+      ],
+      "content": {
+        "version": "1.0.0",
+        "risk_level": "medium",
+        "mode": "local_write"
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\crm-pipeline\\manifest.json",
+      "score": 7.5,
+      "usage_count": 0,
+      "files": [
+        "automation\\automation_skill_crm-pipeline.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.215084Z",
+      "updated_at": "2026-05-18T22:46:05.215084Z",
+      "deprecated_at": null
+    },
+    "automation_skill_export_content_batch_to_csv": {
+      "template_id": "automation_skill_export_content_batch_to_csv",
+      "name": "export_content_batch_to_csv",
+      "category": "automation",
+      "description": "Exporta lote da Content Queue para CSV",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "export",
+        "csv",
+        "content-queue",
+        "batch",
+        "skill"
+      ],
+      "content": {
+        "version": "1.0.0",
+        "risk_level": "low",
+        "mode": "local_write"
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\export_content_batch_to_csv\\manifest.json",
+      "score": 7.5,
+      "usage_count": 0,
+      "files": [
+        "automation\\automation_skill_export_content_batch_to_csv.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.215084Z",
+      "updated_at": "2026-05-18T22:46:05.215084Z",
+      "deprecated_at": null
+    },
+    "automation_skill_generate_seogram_caption": {
+      "template_id": "automation_skill_generate_seogram_caption",
+      "name": "generate_seogram_caption",
+      "category": "automation",
+      "description": "Gera legenda SEO-otimizada para Instagram com palavras-chave",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "caption",
+        "seo",
+        "instagram",
+        "content",
+        "skill"
+      ],
+      "content": {
+        "version": "1.0.0",
+        "risk_level": "low",
+        "mode": "draft_only"
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\generate_seogram_caption\\manifest.json",
+      "score": 7.5,
+      "usage_count": 0,
+      "files": [
+        "automation\\automation_skill_generate_seogram_caption.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.215084Z",
+      "updated_at": "2026-05-18T22:46:05.215084Z",
+      "deprecated_at": null
+    },
+    "automation_skill_jarvis-brain": {
+      "template_id": "automation_skill_jarvis-brain",
+      "name": "jarvis-brain",
+      "category": "automation",
+      "description": "Busca contexto multi-fonte (Akasha, Qdrant, Obsidian)",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "brain",
+        "context",
+        "search",
+        "memory",
+        "core",
+        "skill"
+      ],
+      "content": {
+        "version": "1.0.0",
+        "risk_level": "low",
+        "mode": "read_only"
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\jarvis-brain\\manifest.json",
+      "score": 7.5,
+      "usage_count": 0,
+      "files": [
+        "automation\\automation_skill_jarvis-brain.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.216083Z",
+      "updated_at": "2026-05-18T22:46:05.216083Z",
+      "deprecated_at": null
+    },
+    "automation_skill_jarvis-decide": {
+      "template_id": "automation_skill_jarvis-decide",
+      "name": "jarvis-decide",
+      "category": "automation",
+      "description": "Decision Engine que prioriza acoes baseado em formula multi-fator",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "decide",
+        "prioritization",
+        "decision",
+        "core",
+        "skill"
+      ],
+      "content": {
+        "version": "1.0.0",
+        "risk_level": "low",
+        "mode": "read_only"
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\jarvis-decide\\manifest.json",
+      "score": 7.5,
+      "usage_count": 0,
+      "files": [
+        "automation\\automation_skill_jarvis-decide.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.216083Z",
+      "updated_at": "2026-05-18T22:46:05.216083Z",
+      "deprecated_at": null
+    },
+    "automation_skill_jarvis-delegate": {
+      "template_id": "automation_skill_jarvis-delegate",
+      "name": "jarvis-delegate",
+      "category": "automation",
+      "description": "Roteia requisicao para a skill mais adequada baseado no registry",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "delegate",
+        "router",
+        "skills",
+        "core",
+        "skill"
+      ],
+      "content": {
+        "version": "1.0.0",
+        "risk_level": "medium",
+        "mode": "local_write"
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\jarvis-delegate\\manifest.json",
+      "score": 7.5,
+      "usage_count": 0,
+      "files": [
+        "automation\\automation_skill_jarvis-delegate.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.217083Z",
+      "updated_at": "2026-05-18T22:46:05.217083Z",
+      "deprecated_at": null
+    },
+    "automation_skill_jarvis-guardrails": {
+      "template_id": "automation_skill_jarvis-guardrails",
+      "name": "jarvis-guardrails",
+      "category": "automation",
+      "description": "Valida acoes contra regras de seguranca antes de executar",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "guardrails",
+        "security",
+        "validation",
+        "core",
+        "skill"
+      ],
+      "content": {
+        "version": "1.0.0",
+        "risk_level": "low",
+        "mode": "read_only"
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\jarvis-guardrails\\manifest.json",
+      "score": 7.5,
+      "usage_count": 0,
+      "files": [
+        "automation\\automation_skill_jarvis-guardrails.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.217083Z",
+      "updated_at": "2026-05-18T22:46:05.217083Z",
+      "deprecated_at": null
+    },
+    "automation_skill_jarvis-memory-write": {
+      "template_id": "automation_skill_jarvis-memory-write",
+      "name": "jarvis-memory-write",
+      "category": "automation",
+      "description": "Persiste resultados de execucao em Akasha, Qdrant e git",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "memory",
+        "persist",
+        "akasha",
+        "git",
+        "core",
+        "skill"
+      ],
+      "content": {
+        "version": "1.0.0",
+        "risk_level": "medium",
+        "mode": "local_write"
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\jarvis-memory-write\\manifest.json",
+      "score": 7.5,
+      "usage_count": 0,
+      "files": [
+        "automation\\automation_skill_jarvis-memory-write.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.217083Z",
+      "updated_at": "2026-05-18T22:46:05.217083Z",
+      "deprecated_at": null
+    },
+    "automation_skill_jarvis-morning": {
+      "template_id": "automation_skill_jarvis-morning",
+      "name": "jarvis-morning",
+      "category": "automation",
+      "description": "Briefing matinal com health score, acoes e metricas do ecossistema",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "morning",
+        "briefing",
+        "daily",
+        "core",
+        "skill"
+      ],
+      "content": {
+        "version": "1.0.0",
+        "risk_level": "low",
+        "mode": "read_only"
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\jarvis-morning\\manifest.json",
+      "score": 7.5,
+      "usage_count": 0,
+      "files": [
+        "automation\\automation_skill_jarvis-morning.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.217083Z",
+      "updated_at": "2026-05-18T22:46:05.217083Z",
+      "deprecated_at": null
+    },
+    "automation_skill_jarvis-router": {
+      "template_id": "automation_skill_jarvis-router",
+      "name": "jarvis-router",
+      "category": "automation",
+      "description": "Classifica intencao do operador e roteia para o setor correto",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "router",
+        "intent",
+        "classification",
+        "core",
+        "skill"
+      ],
+      "content": {
+        "version": "1.0.0",
+        "risk_level": "low",
+        "mode": "read_only"
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\jarvis-router\\manifest.json",
+      "score": 7.5,
+      "usage_count": 0,
+      "files": [
+        "automation\\automation_skill_jarvis-router.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.217083Z",
+      "updated_at": "2026-05-18T22:46:05.217083Z",
+      "deprecated_at": null
+    },
+    "automation_skill_revenue-tracker": {
+      "template_id": "automation_skill_revenue-tracker",
+      "name": "revenue-tracker",
+      "category": "automation",
+      "description": "Rastreia receita de collabs e vendas com 4 modos (SQLite)",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "revenue",
+        "finance",
+        "tracker",
+        "sqlite",
+        "skill"
+      ],
+      "content": {
+        "version": "1.0.0",
+        "risk_level": "medium",
+        "mode": "local_write"
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\revenue-tracker\\manifest.json",
+      "score": 7.5,
+      "usage_count": 0,
+      "files": [
+        "automation\\automation_skill_revenue-tracker.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.218084Z",
+      "updated_at": "2026-05-18T22:46:05.218084Z",
+      "deprecated_at": null
+    },
+    "automation_skill_skill-creator": {
+      "template_id": "automation_skill_skill-creator",
+      "name": "skill-creator",
+      "category": "automation",
+      "description": "Cria novas skills no padrao OMNIS com SKILL.md, manifest.json e run.py",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "skill",
+        "create",
+        "scaffold",
+        "core",
+        "skill"
+      ],
+      "content": {
+        "version": "1.0.0",
+        "risk_level": "high",
+        "mode": "external_action"
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\skill-creator\\manifest.json",
+      "score": 7.5,
+      "usage_count": 0,
+      "files": [
+        "automation\\automation_skill_skill-creator.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.218084Z",
+      "updated_at": "2026-05-18T22:46:05.218084Z",
+      "deprecated_at": null
+    },
+    "automation_skill_video_to_content": {
+      "template_id": "automation_skill_video_to_content",
+      "name": "video_to_content",
+      "category": "automation",
+      "description": "Converte video bruto em formato publicavel com metadados",
+      "status": "active",
+      "version": 1,
+      "tags": [
+        "video",
+        "content",
+        "conversion",
+        "assets",
+        "skill"
+      ],
+      "content": {
+        "version": "1.0.0",
+        "risk_level": "medium",
+        "mode": "local_write"
+      },
+      "source_mission_id": null,
+      "source_output_path": "C:\\Users\\lucas\\omnis-control\\skills\\video_to_content\\manifest.json",
+      "score": 7.5,
+      "usage_count": 0,
+      "files": [
+        "automation\\automation_skill_video_to_content.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.218084Z",
+      "updated_at": "2026-05-18T22:46:05.218084Z",
+      "deprecated_at": null
+    },
+    "mission_MIS-20260518-001": {
+      "template_id": "mission_MIS-20260518-001",
+      "name": "Mission: unknown",
+      "category": "ops",
+      "description": "Mission output — type: unknown, target: unknown",
+      "status": "approved",
+      "version": 1,
+      "tags": [
+        "mission",
+        "unknown",
+        "unknown"
+      ],
+      "content": {
+        "contract": {
+          "mission_id": "MIS-20260518-001",
+          "timestamp": "2026-05-18T17:54:38Z",
+          "status": "open",
+          "setor": "marketing",
+          "objetivo": "campanha 30 dias hotel nordeste",
+          "criado_por": "test",
+          "closed_at": null,
+          "mission_path": "C:\\Users\\lucas\\omnis-control\\missions\\MIS-20260518-001"
+        }
+      },
+      "source_mission_id": "MIS-20260518-001",
+      "source_output_path": null,
+      "score": 6.0,
+      "usage_count": 0,
+      "files": [
+        "ops\\mission_MIS-20260518-001.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.219084Z",
+      "updated_at": "2026-05-18T22:46:05.219084Z",
+      "deprecated_at": null
+    },
+    "mission_MIS-20260518-002": {
+      "template_id": "mission_MIS-20260518-002",
+      "name": "Mission: unknown",
+      "category": "ops",
+      "description": "Mission output — type: unknown, target: unknown",
+      "status": "approved",
+      "version": 1,
+      "tags": [
+        "mission",
+        "unknown",
+        "unknown"
+      ],
+      "content": {
+        "contract": {
+          "mission_id": "MIS-20260518-002",
+          "timestamp": "2026-05-18T19:17:26Z",
+          "status": "open",
+          "setor": "marketing",
+          "objetivo": "Crie uma campanha de 30 dias para vender publis da A Gente Viaja Brasil para hotéis de Águas de São Pedro, São Pedro e Brotas.",
+          "criado_por": "AcceptanceTest",
+          "closed_at": null,
+          "mission_path": "C:\\Users\\lucas\\omnis-control\\missions\\MIS-20260518-002"
+        }
+      },
+      "source_mission_id": "MIS-20260518-002",
+      "source_output_path": null,
+      "score": 6.0,
+      "usage_count": 0,
+      "files": [
+        "ops\\mission_MIS-20260518-002.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.219084Z",
+      "updated_at": "2026-05-18T22:46:05.219084Z",
+      "deprecated_at": null
+    },
+    "mission_MIS-20260518-003": {
+      "template_id": "mission_MIS-20260518-003",
+      "name": "Mission: unknown",
+      "category": "ops",
+      "description": "Mission output — type: unknown, target: unknown",
+      "status": "approved",
+      "version": 1,
+      "tags": [
+        "mission",
+        "unknown",
+        "unknown"
+      ],
+      "content": {
+        "contract": {
+          "mission_id": "MIS-20260518-003",
+          "timestamp": "2026-05-18T19:17:26Z",
+          "status": "open",
+          "setor": "marketing",
+          "objetivo": "Crie um carrossel premium sobre por que hotéis precisam de Instagram para vender mais reservas diretas.",
+          "criado_por": "AcceptanceTest",
+          "closed_at": null,
+          "mission_path": "C:\\Users\\lucas\\omnis-control\\missions\\MIS-20260518-003"
+        }
+      },
+      "source_mission_id": "MIS-20260518-003",
+      "source_output_path": null,
+      "score": 6.0,
+      "usage_count": 0,
+      "files": [
+        "ops\\mission_MIS-20260518-003.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.219084Z",
+      "updated_at": "2026-05-18T22:46:05.219084Z",
+      "deprecated_at": null
+    },
+    "mission_MIS-20260518-004": {
+      "template_id": "mission_MIS-20260518-004",
+      "name": "Mission: unknown",
+      "category": "ops",
+      "description": "Mission output — type: unknown, target: unknown",
+      "status": "approved",
+      "version": 1,
+      "tags": [
+        "mission",
+        "unknown",
+        "unknown"
+      ],
+      "content": {
+        "contract": {
+          "mission_id": "MIS-20260518-004",
+          "timestamp": "2026-05-18T19:17:26Z",
+          "status": "open",
+          "setor": "marketing",
+          "objetivo": "Crie 10 roteiros de Reels para vender publi regional de turismo.",
+          "criado_por": "AcceptanceTest",
+          "closed_at": null,
+          "mission_path": "C:\\Users\\lucas\\omnis-control\\missions\\MIS-20260518-004"
+        }
+      },
+      "source_mission_id": "MIS-20260518-004",
+      "source_output_path": null,
+      "score": 6.0,
+      "usage_count": 0,
+      "files": [
+        "ops\\mission_MIS-20260518-004.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.219084Z",
+      "updated_at": "2026-05-18T22:46:05.219084Z",
+      "deprecated_at": null
+    },
+    "mission_MIS-20260518-005": {
+      "template_id": "mission_MIS-20260518-005",
+      "name": "Mission: unknown",
+      "category": "ops",
+      "description": "Mission output — type: unknown, target: unknown",
+      "status": "approved",
+      "version": 1,
+      "tags": [
+        "mission",
+        "unknown",
+        "unknown"
+      ],
+      "content": {
+        "contract": {
+          "mission_id": "MIS-20260518-005",
+          "timestamp": "2026-05-18T19:17:26Z",
+          "status": "open",
+          "setor": "app_factory",
+          "objetivo": "Crie o blueprint técnico de um mini app para precificar publis de Instagram.",
+          "criado_por": "AcceptanceTest",
+          "closed_at": null,
+          "mission_path": "C:\\Users\\lucas\\omnis-control\\missions\\MIS-20260518-005"
+        }
+      },
+      "source_mission_id": "MIS-20260518-005",
+      "source_output_path": null,
+      "score": 6.0,
+      "usage_count": 0,
+      "files": [
+        "ops\\mission_MIS-20260518-005.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.219084Z",
+      "updated_at": "2026-05-18T22:46:05.219084Z",
+      "deprecated_at": null
+    },
+    "mission_MIS-20260518-006": {
+      "template_id": "mission_MIS-20260518-006",
+      "name": "Mission: unknown",
+      "category": "ops",
+      "description": "Mission output — type: unknown, target: unknown",
+      "status": "approved",
+      "version": 1,
+      "tags": [
+        "mission",
+        "unknown",
+        "unknown"
+      ],
+      "content": {
+        "contract": {
+          "mission_id": "MIS-20260518-006",
+          "timestamp": "2026-05-18T19:17:26Z",
+          "status": "open",
+          "setor": "app_factory",
+          "objetivo": "Crie uma skill nova para gerar uma calculadora de preço de publi baseada em alcance, nicho, collab e pacote mensal.",
+          "criado_por": "AcceptanceTest",
+          "closed_at": null,
+          "mission_path": "C:\\Users\\lucas\\omnis-control\\missions\\MIS-20260518-006"
+        }
+      },
+      "source_mission_id": "MIS-20260518-006",
+      "source_output_path": null,
+      "score": 6.0,
+      "usage_count": 0,
+      "files": [
+        "ops\\mission_MIS-20260518-006.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.220084Z",
+      "updated_at": "2026-05-18T22:46:05.220084Z",
+      "deprecated_at": null
+    },
+    "mission_MIS-20260518-007": {
+      "template_id": "mission_MIS-20260518-007",
+      "name": "Mission: unknown",
+      "category": "ops",
+      "description": "Mission output — type: unknown, target: unknown",
+      "status": "approved",
+      "version": 1,
+      "tags": [
+        "mission",
+        "unknown",
+        "unknown"
+      ],
+      "content": {
+        "contract": {
+          "mission_id": "MIS-20260518-007",
+          "timestamp": "2026-05-18T19:23:13Z",
+          "status": "open",
+          "setor": "marketing",
+          "objetivo": "Crie uma campanha de 30 dias para vender publis de viagem para hotéis",
+          "criado_por": "LearningTest-A",
+          "closed_at": null,
+          "mission_path": "C:\\Users\\lucas\\omnis-control\\missions\\MIS-20260518-007"
+        }
+      },
+      "source_mission_id": "MIS-20260518-007",
+      "source_output_path": null,
+      "score": 6.0,
+      "usage_count": 0,
+      "files": [
+        "ops\\mission_MIS-20260518-007.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.220084Z",
+      "updated_at": "2026-05-18T22:46:05.220084Z",
+      "deprecated_at": null
+    },
+    "mission_MIS-20260518-008": {
+      "template_id": "mission_MIS-20260518-008",
+      "name": "Mission: unknown",
+      "category": "ops",
+      "description": "Mission output — type: unknown, target: unknown",
+      "status": "approved",
+      "version": 1,
+      "tags": [
+        "mission",
+        "unknown",
+        "unknown"
+      ],
+      "content": {
+        "contract": {
+          "mission_id": "MIS-20260518-008",
+          "timestamp": "2026-05-18T19:23:13Z",
+          "status": "open",
+          "setor": "sales",
+          "objetivo": "Crie proposta comercial para hotel resort no litoral",
+          "criado_por": "LearningTest-B",
+          "closed_at": null,
+          "mission_path": "C:\\Users\\lucas\\omnis-control\\missions\\MIS-20260518-008"
+        }
+      },
+      "source_mission_id": "MIS-20260518-008",
+      "source_output_path": null,
+      "score": 6.0,
+      "usage_count": 0,
+      "files": [
+        "ops\\mission_MIS-20260518-008.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.220084Z",
+      "updated_at": "2026-05-18T22:46:05.220084Z",
+      "deprecated_at": null
+    },
+    "mission_MIS-20260518-009": {
+      "template_id": "mission_MIS-20260518-009",
+      "name": "Mission: unknown",
+      "category": "ops",
+      "description": "Mission output — type: unknown, target: unknown",
+      "status": "approved",
+      "version": 1,
+      "tags": [
+        "mission",
+        "unknown",
+        "unknown"
+      ],
+      "content": {
+        "contract": {
+          "mission_id": "MIS-20260518-009",
+          "timestamp": "2026-05-18T19:23:13Z",
+          "status": "open",
+          "setor": "marketing",
+          "objetivo": "campanha de publis para hotéis fazenda no interior SP",
+          "criado_por": "LearningTest-C",
+          "closed_at": null,
+          "mission_path": "C:\\Users\\lucas\\omnis-control\\missions\\MIS-20260518-009"
+        }
+      },
+      "source_mission_id": "MIS-20260518-009",
+      "source_output_path": null,
+      "score": 6.0,
+      "usage_count": 0,
+      "files": [
+        "ops\\mission_MIS-20260518-009.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.221084Z",
+      "updated_at": "2026-05-18T22:46:05.221084Z",
+      "deprecated_at": null
+    },
+    "mission_MIS-20260518-010": {
+      "template_id": "mission_MIS-20260518-010",
+      "name": "Mission: unknown",
+      "category": "ops",
+      "description": "Mission output — type: unknown, target: unknown",
+      "status": "approved",
+      "version": 1,
+      "tags": [
+        "mission",
+        "unknown",
+        "unknown"
+      ],
+      "content": {
+        "contract": {
+          "mission_id": "MIS-20260518-010",
+          "timestamp": "2026-05-18T19:23:13Z",
+          "status": "open",
+          "setor": "marketing",
+          "objetivo": "carrossel premium sobre ROI de Instagram para restaurantes",
+          "criado_por": "LearningTest-D",
+          "closed_at": null,
+          "mission_path": "C:\\Users\\lucas\\omnis-control\\missions\\MIS-20260518-010"
+        }
+      },
+      "source_mission_id": "MIS-20260518-010",
+      "source_output_path": null,
+      "score": 6.0,
+      "usage_count": 0,
+      "files": [
+        "ops\\mission_MIS-20260518-010.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.221084Z",
+      "updated_at": "2026-05-18T22:46:05.221084Z",
+      "deprecated_at": null
+    },
+    "mission_MIS-20260518-011": {
+      "template_id": "mission_MIS-20260518-011",
+      "name": "Mission: unknown",
+      "category": "ops",
+      "description": "Mission output — type: unknown, target: unknown",
+      "status": "approved",
+      "version": 1,
+      "tags": [
+        "mission",
+        "unknown",
+        "unknown"
+      ],
+      "content": {
+        "contract": {
+          "mission_id": "MIS-20260518-011",
+          "timestamp": "2026-05-18T19:23:13Z",
+          "status": "open",
+          "setor": "marketing",
+          "objetivo": "10 roteiros de Reels para vender publi de turismo em Natal",
+          "criado_por": "LearningTest-E",
+          "closed_at": null,
+          "mission_path": "C:\\Users\\lucas\\omnis-control\\missions\\MIS-20260518-011"
+        }
+      },
+      "source_mission_id": "MIS-20260518-011",
+      "source_output_path": null,
+      "score": 6.0,
+      "usage_count": 0,
+      "files": [
+        "ops\\mission_MIS-20260518-011.json"
+      ],
+      "dependencies": [],
+      "created_at": "2026-05-18T22:46:05.221084Z",
+      "updated_at": "2026-05-18T22:46:05.221084Z",
+      "deprecated_at": null
+    }
+  }
+}
