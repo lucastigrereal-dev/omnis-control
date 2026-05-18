@@ -1,0 +1,16 @@
+{
+  "current_sprint": {
+    "group": "G14",
+    "name": "App Factory",
+    "status": "DONE",
+    "waves": ["W131", "W132", "W133", "W134", "W135", "W136", "W137", "W138", "W139", "W140"],
+    "completed_date": "2026-05-17"
+  },
+  "history": [
+    {"group": "G13", "name": "Supreme 210 Previous", "status": "DONE"},
+    {"group": "G19", "name": "Production Hardening", "status": "DONE"},
+    {"group": "G23", "name": "Health", "status": "MERGED"},
+    {"group": "G24", "name": "Maintenance", "status": "MERGED"}
+  ],
+  "next_potential": null
+}

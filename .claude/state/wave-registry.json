@@ -1,0 +1,29 @@
+{
+  "waves": [
+    {"id": "W131", "group": "G14", "name": "app-idea-intake", "status": "DONE"},
+    {"id": "W132", "group": "G14", "name": "app-prd-generator", "status": "DONE"},
+    {"id": "W133", "group": "G14", "name": "app-db-schema-planner", "status": "DONE"},
+    {"id": "W134", "group": "G14", "name": "app-api-contract", "status": "DONE"},
+    {"id": "W135", "group": "G14", "name": "app-frontend-plan", "status": "DONE"},
+    {"id": "W136", "group": "G14", "name": "app-test-plan", "status": "DONE"},
+    {"id": "W137", "group": "G14", "name": "app-repo-scaffold", "status": "DONE"},
+    {"id": "W138", "group": "G14", "name": "app-openhands-mock", "status": "DONE"},
+    {"id": "W139", "group": "G14", "name": "app-package-export", "status": "DONE"},
+    {"id": "W140", "group": "G14", "name": "app-factory-e2e", "status": "DONE"},
+    {"id": "W133-W162", "group": "G14", "name": "app-factory-advanced", "status": "DONE"},
+    {"id": "W176", "group": "G19", "name": "metrics-collector", "status": "DONE"},
+    {"id": "W177", "group": "G19", "name": "config-validator", "status": "DONE"},
+    {"id": "W178", "group": "G19", "name": "dependency-checker", "status": "DONE"},
+    {"id": "W179", "group": "G19", "name": "graceful-shutdown-manager", "status": "DONE"},
+    {"id": "W180", "group": "G19", "name": "production-hardening-e2e", "status": "DONE"},
+    {"id": "W196-W200", "group": "G23", "name": "omnis-health-canonical", "status": "MERGED"},
+    {"id": "W201-W205", "group": "G24", "name": "maintenance", "status": "MERGED"},
+    {"id": "P37-P42", "group": "CCOS", "name": "runtime-bridge", "status": "VERIFY"}
+  ],
+  "summary": {
+    "total": 19,
+    "done": 16,
+    "merged": 2,
+    "verify": 1
+  }
+}
