@@ -6,80 +6,45 @@ worktrees:
     status: CONSOLIDATED
     scope:
       - Runtime (DONE)
-      - Health bridge minimal (DONE)
+      - Health canonical — omnis_health (MERGED)
+      - Health minimal — health_bridge (SUPERSEDED)
       - Project OS (DONE)
-      - Maintenance merged (DONE)
+      - Maintenance (MERGED)
     rules:
       - "Do not push."
-      - "No new features — merge gate only."
+      - "Merge gate complete."
 
   - id: omnis-maintenance
     path: "C:/Users/lucas/omnis-maintenance"
     branch: "feature/omnis-maintenance-w201-w205"
-    role: "maintenance_audit"
     status: MERGED_ARCHIVE
-    scope:
-      - W201-W205
-    rules:
-      - "Already merged into principal. Archive worktree."
 
   - id: omnis-health
     path: "C:/Users/lucas/omnis-health"
     branch: "feature/omnis-health-w196-w200"
-    role: "health_bridge_complete"
-    status: VALUE_ADDED
-    scope:
-      - W196-W200
-    rules:
-      - "More complete than principal's health_bridge."
-      - "Namespace conflict: src/omnis_health/ vs src/health_bridge/."
-      - "Lucas decides resolution before merge."
+    status: MERGED_CANONICAL
 
   - id: omnis-appfactory
     path: "C:/Users/lucas/omnis-appfactory"
     branch: "master"
-    role: "app_factory_advanced"
     status: DONE_ON_MASTER
-    scope:
-      - W133-W162
-    rules:
-      - "Already on master at 06caa49. Worktree clean."
 
   - id: omnis-templates
     path: "C:/Users/lucas/omnis-templates"
     branch: "feature/omnis-templates-w206-w215"
-    role: "templates_qa"
     status: REDUNDANT
-    scope: []
-    rules:
-      - "0 unique commits. Same as principal at 233cdf4. Archive."
 
   - id: omnis-runtime
     path: "C:/Users/lucas/omnis-runtime"
     branch: "feature/omnis-runtime-w186-w195"
-    role: "runtime_parallel"
     status: REDUNDANT
-    scope: []
-    rules:
-      - "0 unique commits. Same as principal at 233cdf4. Archive."
 
   - id: omnis-p20-supreme
     path: "C:/Users/lucas/omnis-p20-omnis-supreme"
     branch: "parallel/p20-omnis-supreme"
-    role: "p20_experiment"
     status: ARCHIVE_RECOMMENDED
-    scope:
-      - P20 Supreme Activation
-    rules:
-      - "0 ahead of master. Experiment completed. Can archive."
 
   - id: omnis-runtime-bridge
     path: "C:/Users/lucas/omnis-runtime-bridge"
     branch: "feature/omnis-g14-app-factory"
-    role: "app_factory_dev"
     status: ACTIVE_DEV
-    scope:
-      - W131-W134+
-    rules:
-      - "Active app factory development. 13 commits ahead."
-      - "Do not touch from principal."

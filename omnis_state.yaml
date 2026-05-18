@@ -2,16 +2,16 @@ last_updated_by: "claude_code"
 phase: "consolidated"
 consolidation_date: "2026-05-18"
 current_focus:
-  - "Principal consolidated — merge gate for all completed worktrees"
-  - "Health namespace conflict needs Lucas decision"
+  - "Principal fully consolidated — all mergeable branches merged"
+  - "health_bridge minimal can be archived (superseded by omnis_health)"
 
 p0_blockers: []
 
 p1_blockers:
-  - id: health_namespace_conflict
+  - id: health_bridge_minimal_to_archive
     status: open
     severity: P1
-    description: "omnis-health branch has src/omnis_health/ (more complete: doctor, checkers, 269-line server, 17 files, ~1988 LOC). Principal has src/health_bridge/ (minimal: 2 checks, 82-line server, 2 files). Both implement /health. Lucas must decide: merge omnis_health as canonical (preferred) and archive health_bridge, or keep both with clear purpose separation."
+    description: "src/health_bridge/ is superseded by src/omnis_health/ (canonical). Safe to archive after Lucas confirms omnis_health is the canonical health module."
   - id: reports_ccos_logs_not_ignored
     status: open
     severity: P1
@@ -34,33 +34,34 @@ known_completed:
     - W193
     - W194-W195
   health_bridge:
-    - G23 (principal, minimal)
-  health_omnis:
-    - "W196-W200 (omnis-health branch, complete — not yet merged)"
+    - "G23 minimal (ed594dd) — superseded by omnis_health"
+  health_canonical:
+    - "W196-W200 omnis_health merged as canonical (255 tests: 86 omnis_health + 169 first_missions/health_bridge)"
   maintenance:
     - "W201-W205 merged into principal (6df8db8)"
 
 worktrees_resolved:
-  merged:
+  merged_into_principal:
     - "omnis-maintenance → principal (6df8db8)"
-  redundant:
-    - "omnis-templates — 0 unique commits, same as 233cdf4"
-    - "omnis-runtime — 0 unique commits, same as 233cdf4"
+    - "omnis-health → principal (canonical)"
+  redundant_zero_commits:
+    - "omnis-templates — 0 unique commits"
+    - "omnis-runtime — 0 unique commits"
   already_on_master:
     - "omnis-appfactory — at master 06caa49, W133-W162 complete"
-  needs_decision:
-    - "omnis-health — more complete than health_bridge, namespace conflict"
+  to_archive_in_code:
+    - "src/health_bridge/ — superseded by src/omnis_health/"
 
 next_safe_actions:
   - id: recommend_key_rotation
     priority: P0
     description: "Lucas deve rotacionar/revogar a chave LiteLLM exposta."
-  - id: resolve_health_namespace
+  - id: archive_old_health_bridge
     priority: P1
-    description: "Lucas decide: merge omnis_health como canônico e arquivar health_bridge, ou outra resolução."
+    description: "Remover src/health_bridge/ e tests/health_bridge/ — superseded by omnis_health."
   - id: archive_redundant_worktrees
     priority: P1
-    description: "Remover worktrees omnis-templates e omnis-runtime (0 commits únicos)."
+    description: "Remover worktrees omnis-templates, omnis-runtime, omnis-maintenance, omnis-health."
   - id: clean_out_of_scope_files
     priority: P2
     description: "Resolver config/paths.yaml, docs/ESTADO_ATUAL_RESUMIDO.md, docs/disk_audit_report.json, reports/."

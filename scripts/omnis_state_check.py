@@ -72,8 +72,12 @@ def check_p0_blockers():
         return []
     content = blocked_path.read_text(encoding="utf-8")
     p0s = []
-    if "severity: P0" in content and "status: open" in content:
-        p0s.append("Open P0 blocker exists — check omnis_blocked_items.yaml")
+    # Check per-block to avoid false positives
+    blocks = content.split("\n  - id: ")
+    for block in blocks:
+        if "severity: P0" in block and "status: open" in block:
+            p0s.append("Open P0 blocker exists — check omnis_blocked_items.yaml")
+            break
     return p0s
 
 

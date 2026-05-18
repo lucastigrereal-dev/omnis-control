@@ -4,35 +4,35 @@ blocked_items:
     status: resolved
     resolution_date: "2026-05-18"
     title: "Possible LiteLLM API key exposed"
-    file: "config/connectors.yaml"
-    line: 82
-    do_not_print_value: true
     resolution:
       - "Replaced real value with env var placeholder ${LITELLM_MASTER_KEY}"
       - "Created config/connectors.example.yaml with safe placeholders"
       - "Lucas must rotate/revoke key externally"
-    blocks: []
 
   - id: health_namespace_conflict
     severity: P1
+    status: resolved
+    resolution_date: "2026-05-18"
+    title: "Two health modules — resolved by promoting omnis_health as canonical"
+    resolution:
+      - "omnis_health (W196-W200) merged as canonical health implementation"
+      - "health_bridge (G23) marked as SUPERSEDED — can be archived"
+      - "Both coexist in separate namespaces (no file conflicts)"
+
+  - id: health_bridge_to_archive
+    severity: P1
     status: open
-    title: "Two health modules with overlapping purpose"
-    description: "omnis_health (complete) vs health_bridge (minimal). Lucas must decide."
+    title: "Archive superseded health_bridge code"
     required_resolution:
-      - "Option A: Merge omnis_health as canonical, archive health_bridge"
-      - "Option B: Keep both with clear purpose separation"
-      - "Option C: Port omnis_health improvements into health_bridge"
+      - "Delete src/health_bridge/ and tests/health_bridge/"
+      - "Or keep as reference with clear SUPERSEDED marker"
 
   - id: reports_ccos_logs_not_ignored
     severity: P1
     status: open
     title: "reports/ccos/*.log not ignored"
-    required_resolution:
-      - "Update .gitignore or document as intentional."
 
   - id: redundant_worktrees
     severity: P2
     status: open
     title: "omnis-templates and omnis-runtime have 0 unique commits"
-    required_resolution:
-      - "Run git worktree remove on both."

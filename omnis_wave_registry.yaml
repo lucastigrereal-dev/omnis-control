@@ -7,7 +7,9 @@ status_legend:
   BLOCKED: "Blocked by risk/error/secret"
   FUTURE: "Future vision"
   MERGED: "Merged into principal"
+  CANONICAL: "Canonical implementation — supersedes alternatives"
   REDUNDANT: "No unique work — archive recommended"
+  SUPERSEDED: "Replaced by canonical implementation"
 
 waves:
   - id: W131
@@ -15,32 +17,14 @@ waves:
     name: Idea Intake
     status: DONE
     branch: null
-    worktree: null
     commit: null
-    modules:
-      - IdeaStore
-      - AppIdea
-      - validation
-      - dry_run
-    tests: []
-    next_action: "Keep as base"
-    blockers: []
     risk: low
 
   - id: W132
     group: AppFactory
     name: PRD Generator
     status: DONE
-    branch: null
-    worktree: null
     commit: "d6f61e6"
-    modules:
-      - PRD generator
-      - omnis idea plan
-    tests:
-      - "App Factory tests known: 109 after W132"
-    next_action: "Keep as base"
-    blockers: []
     risk: low
 
   - id: W133-W162
@@ -48,160 +32,77 @@ waves:
     name: AppFactory Advanced
     status: DONE
     branch: "master"
-    worktree: "C:/Users/lucas/omnis-appfactory"
     commit: "06caa49"
-    modules:
-      - schema_planner
-      - api_contract_planner
-      - implementation_tasks
-      - bundle_exporter
-      - validation_gate
-      - artifact_registry
-      - scaffold_dry_run
-      - docs_generator
-      - pipeline
-    tests: []
-    next_action: "Complete. Worktree on master. No further action."
-    blockers: []
+    next_action: "Complete. On master. No further action."
     risk: low
 
   - id: W181-W185
     group: Runtime
     name: First Real Missions
     status: DONE
-    branch: null
-    worktree: "C:/Users/lucas/omnis-control"
     commit: "5dd22c9"
-    modules:
-      - models
-      - executor
-      - scheduler
-      - result_store
-      - orchestrator
-    tests:
-      - "first_missions 87/87 initially"
-    next_action: "Base runtime"
-    blockers: []
     risk: medium
 
   - id: W191
     group: Runtime
     name: Mission Event Bus
     status: DONE
-    branch: "feature/omnis-5waves-runtime-supreme"
-    worktree: "C:/Users/lucas/omnis-control"
     commit: "f397eca"
-    modules:
-      - event_emitter
-      - orchestrator
-    tests:
-      - first_missions
-    next_action: "Keep"
-    blockers: []
     risk: medium
 
   - id: W192
     group: Runtime
     name: Mission Logs
     status: DONE
-    branch: "feature/omnis-5waves-runtime-supreme"
-    worktree: "C:/Users/lucas/omnis-control"
     commit: "b539c3f"
-    modules:
-      - logger
-      - orchestrator
-    tests:
-      - first_missions
-    next_action: "Keep"
-    blockers: []
     risk: medium
 
   - id: W193
     group: Runtime
     name: Mission Metrics Summary
     status: DONE
-    branch: "feature/omnis-5waves-runtime-supreme"
-    worktree: "C:/Users/lucas/omnis-control"
     commit: "18e234f"
-    modules:
-      - result_store
-      - first_missions_cli
-    tests:
-      - first_missions
-    next_action: "Keep"
-    blockers: []
     risk: medium
 
   - id: W194-W195
     group: Runtime
     name: Failure Taxonomy + Mission Report Export
     status: DONE
-    branch: "feature/omnis-5waves-runtime-supreme"
-    worktree: "C:/Users/lucas/omnis-control"
     commit: "8f48bbb"
-    modules:
-      - FailureCategory
-      - report_export
-      - first_missions_cli
-    tests:
-      - first_missions
-    next_action: "Keep"
-    blockers: []
     risk: medium
 
   - id: G23
     group: Health
     name: Health Bridge (minimal)
-    status: DONE
-    branch: "feature/omnis-5waves-runtime-supreme"
-    worktree: "C:/Users/lucas/omnis-control"
+    status: SUPERSEDED
     commit: "ed594dd"
-    modules:
-      - health_bridge
-      - HTTP server (82 lines)
-      - CLI integration
-    tests:
-      - "first_missions + health_bridge 169 passed"
-    next_action: "Keep unless superseded by omnis_health (W196-W200)."
-    blockers: []
+    next_action: "Archive — replaced by omnis_health (W196-W200) as canonical."
     risk: low
 
   - id: W196-W200
     group: Health
-    name: Health Bridge (complete — omnis_health)
-    status: REVIEW
+    name: Health Bridge (canonical — omnis_health)
+    status: CANONICAL
     branch: "feature/omnis-health-w196-w200"
-    worktree: "C:/Users/lucas/omnis-health"
     commit: "190520a"
     modules:
       - omnis_health (models, 269-line server)
-      - doctor command
+      - doctor normalization
       - checkers (disk, docker, memory, obsidian, publisher, skills)
       - timeout + fallback
-      - CLI start/stop/status
+      - health-server CLI (start/stop/status)
     tests:
-      - "omnis_health + checkers — extensive test suite"
-    next_action: "Lucas decides: merge as canonical health (archive health_bridge) or reconcile namespaces."
-    blockers:
-      - health_namespace_conflict
-    risk: medium
+      - "86 omnis_health + 169 first_missions/health_bridge = 255 passed"
+    next_action: "Canonical. Merged into principal."
+    risk: low
 
   - id: W201-W205
     group: Maintenance
     name: Maintenance Audit
     status: MERGED
     branch: "feature/omnis-maintenance-w201-w205"
-    worktree: "C:/Users/lucas/omnis-maintenance"
     commit: "e882432"
-    modules:
-      - runtime_paths_audit
-      - temp_cleanup_plan
-      - config_paths_safety
-      - reports_hygiene
-      - skill_reports_index
-    tests: []
     next_action: "Merged into principal (6df8db8). Worktree can be archived."
-    blockers: []
     risk: low
 
   - id: W206-W215
@@ -209,10 +110,6 @@ waves:
     name: Mission Templates + QA
     status: REDUNDANT
     branch: "feature/omnis-templates-w206-w215"
-    worktree: "C:/Users/lucas/omnis-templates"
     commit: "233cdf4"
-    modules: []
-    tests: []
-    next_action: "Archive worktree. 0 unique commits. Same as principal at 233cdf4."
-    blockers: []
+    next_action: "Archive worktree. 0 unique commits."
     risk: low

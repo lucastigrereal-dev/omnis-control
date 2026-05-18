@@ -17,8 +17,12 @@ def check_blocked_items():
         return [("WARNING", "omnis_blocked_items.yaml not found")]
     content = blocked_path.read_text(encoding="utf-8")
     issues = []
-    if "severity: P0" in content and "status: open" in content:
-        issues.append(("P0", "Open P0 blocker found in omnis_blocked_items.yaml"))
+    # Check per-block to avoid false positives (P0 resolved + P1 open = false alarm)
+    blocks = content.split("\n  - id: ")
+    for block in blocks:
+        if "severity: P0" in block and "status: open" in block:
+            issues.append(("P0", "Open P0 blocker found in omnis_blocked_items.yaml"))
+            break
     return issues
 
 
