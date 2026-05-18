@@ -61,3 +61,20 @@ python -m pytest tests/ --import-mode=importlib -p no:warnings -q
 python scripts/omnis_state_check.py
 python scripts/omnis_guard_check.py
 ```
+
+## OMNIS SKILL SYSTEM v1.0
+
+Skills em: .claude/skills/ | Orquestrador: .claude/waves/orchestrator.md
+
+### Waves do Pipeline
+- Wave 0: sdd-brainstorm + tree-of-thoughts (Blueprint Analysis)
+- Wave 1: sdd-plan + context-engineering (Planning)
+- Wave 2: software-architecture + multi-agent-patterns (Architecture)
+- Wave 3: do-in-parallel + sdd-implement + subagent-driven-development (Execution)
+- Wave 4: write-tests + fix-tests (Testing)
+- Wave 5: review-local-changes + do-and-judge + reflect (Review)
+- Wave 6: codebase-documenter + git-commit-neolab + git-create-pr (Delivery)
+
+### Como usar
+1. Preencha BLUEPRINT.md
+2. Execute: claude "execute o blueprint em BLUEPRINT.md"
