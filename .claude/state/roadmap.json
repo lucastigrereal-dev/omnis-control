@@ -1,0 +1,14 @@
+{
+  "green": [
+    {"group": "G01-G13", "name": "Supreme 210 Foundation", "waves": "W001-W130", "status": "DONE"},
+    {"group": "G14", "name": "App Factory", "waves": "W131-W140", "status": "DONE"},
+    {"group": "G19", "name": "Production Hardening", "waves": "W176-W180", "status": "DONE"},
+    {"group": "G23", "name": "Health (canonical)", "waves": "W196-W200", "status": "MERGED"},
+    {"group": "G24", "name": "Maintenance", "waves": "W201-W205", "status": "MERGED"}
+  ],
+  "yellow": [],
+  "red": [
+    {"group": "CCOS", "name": "Runtime Bridge", "waves": "P37-P42", "reason": "Awaiting Lucas decision"},
+    {"group": "G20", "name": "Runtime Missions", "waves": "TBD", "reason": "Not authorized yet"}
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "worktrees": [
+    {
+      "path": "C:\\Users\\lucas\\omnis-appfactory",
+      "branch": "omnis-appfactory",
+      "status": "DONE_ON_MASTER",
+      "recommendation": "ARCHIVE"
+    },
+    {
+      "path": "C:\\Users\\lucas\\omnis-templates",
+      "branch": "omnis-templates",
+      "status": "REDUNDANT",
+      "recommendation": "ARCHIVE"
+    },
+    {
+      "path": "C:\\Users\\lucas\\omnis-runtime",
+      "branch": "omnis-runtime",
+      "status": "REDUNDANT",
+      "recommendation": "ARCHIVE"
+    },
+    {
+      "path": "C:\\Users\\lucas\\omnis-maintenance",
+      "branch": "omnis-maintenance",
+      "status": "MERGED",
+      "recommendation": "ARCHIVE"
+    },
+    {
+      "path": "C:\\Users\\lucas\\omnis-health",
+      "branch": "omnis-health",
+      "status": "MERGED_CANONICAL",
+      "recommendation": "ARCHIVE"
+    },
+    {
+      "path": "C:\\Users\\lucas\\omnis-control",
+      "branch": "feature/omnis-5waves-runtime-supreme",
+      "status": "ACTIVE_DEV",
+      "recommendation": "KEEP"
+    }
+  ],
+  "total": 6,
+  "archivable": 5
+}

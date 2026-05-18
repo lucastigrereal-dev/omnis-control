@@ -1,0 +1,115 @@
+status_legend:
+  DONE: "Concluded and committed"
+  REVIEW: "Concluded but needs review before merge"
+  ACTIVE: "Currently in progress"
+  PAUSED: "Paused to avoid conflict"
+  PENDING: "Not started"
+  BLOCKED: "Blocked by risk/error/secret"
+  FUTURE: "Future vision"
+  MERGED: "Merged into principal"
+  CANONICAL: "Canonical implementation — supersedes alternatives"
+  REDUNDANT: "No unique work — archive recommended"
+  SUPERSEDED: "Replaced by canonical implementation"
+
+waves:
+  - id: W131
+    group: AppFactory
+    name: Idea Intake
+    status: DONE
+    branch: null
+    commit: null
+    risk: low
+
+  - id: W132
+    group: AppFactory
+    name: PRD Generator
+    status: DONE
+    commit: "d6f61e6"
+    risk: low
+
+  - id: W133-W162
+    group: AppFactory
+    name: AppFactory Advanced
+    status: DONE
+    branch: "master"
+    commit: "06caa49"
+    next_action: "Complete. On master. No further action."
+    risk: low
+
+  - id: W181-W185
+    group: Runtime
+    name: First Real Missions
+    status: DONE
+    commit: "5dd22c9"
+    risk: medium
+
+  - id: W191
+    group: Runtime
+    name: Mission Event Bus
+    status: DONE
+    commit: "f397eca"
+    risk: medium
+
+  - id: W192
+    group: Runtime
+    name: Mission Logs
+    status: DONE
+    commit: "b539c3f"
+    risk: medium
+
+  - id: W193
+    group: Runtime
+    name: Mission Metrics Summary
+    status: DONE
+    commit: "18e234f"
+    risk: medium
+
+  - id: W194-W195
+    group: Runtime
+    name: Failure Taxonomy + Mission Report Export
+    status: DONE
+    commit: "8f48bbb"
+    risk: medium
+
+  - id: G23
+    group: Health
+    name: Health Bridge (minimal)
+    status: SUPERSEDED
+    commit: "ed594dd"
+    next_action: "Archive — replaced by omnis_health (W196-W200) as canonical."
+    risk: low
+
+  - id: W196-W200
+    group: Health
+    name: Health Bridge (canonical — omnis_health)
+    status: CANONICAL
+    branch: "feature/omnis-health-w196-w200"
+    commit: "190520a"
+    modules:
+      - omnis_health (models, 269-line server)
+      - doctor normalization
+      - checkers (disk, docker, memory, obsidian, publisher, skills)
+      - timeout + fallback
+      - health-server CLI (start/stop/status)
+    tests:
+      - "86 omnis_health + 169 first_missions/health_bridge = 255 passed"
+    next_action: "Canonical. Merged into principal."
+    risk: low
+
+  - id: W201-W205
+    group: Maintenance
+    name: Maintenance Audit
+    status: MERGED
+    branch: "feature/omnis-maintenance-w201-w205"
+    commit: "e882432"
+    next_action: "Merged into principal (6df8db8). Worktree can be archived."
+    risk: low
+
+  - id: W206-W215
+    group: Templates
+    name: Mission Templates + QA
+    status: REDUNDANT
+    branch: "feature/omnis-templates-w206-w215"
+    commit: "233cdf4"
+    next_action: "Archive worktree. 0 unique commits."
+    risk: low

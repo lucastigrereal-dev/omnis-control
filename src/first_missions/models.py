@@ -42,6 +42,15 @@ class MissionPriority(str, Enum):
     CRITICAL = "CRITICAL"
 
 
+class FailureCategory(str, Enum):
+    NONE = "NONE"
+    VALIDATION = "VALIDATION"
+    RUNTIME = "RUNTIME"
+    STORAGE = "STORAGE"
+    TIMEOUT = "TIMEOUT"
+    UNKNOWN = "UNKNOWN"
+
+
 # ---------------------------------------------------------------------------
 # Mission
 # ---------------------------------------------------------------------------

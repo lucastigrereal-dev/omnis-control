@@ -79,7 +79,7 @@ connectors:
     port: 4002
     status: available
     auth: api_key
-    notes: "Master key: sk-pub-os-UwN4DEcTMMzB6SxxSaJpaj"
+    notes: "Master key: ${LITELLM_MASTER_KEY}"
     next_step: "Criar key dedicada OMNIS"
 
   - id: supabase_local

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Optional
 
 import typer
@@ -230,6 +231,38 @@ def fm_preview(
 
 
 # ---------------------------------------------------------------------------
+# Health
+# ---------------------------------------------------------------------------
+
+@first_missions_app.command(name="health")
+def fm_health(
+    port: int = typer.Option(8999, "--port", help="Health server port"),
+    host: str = typer.Option("127.0.0.1", "--host", help="Health server host"),
+    json_output: bool = typer.Option(False, "--json", help="Print health check as JSON"),
+) -> None:
+    """Run a quick health check (read-only, no server)."""
+    from src.health_bridge.server import build_basic_checks
+    from src.health_bridge.models import HealthStatus
+
+    checks = build_basic_checks()
+    status = HealthStatus.from_checks(checks, source="first-missions-cli")
+
+    if json_output:
+        print(json.dumps(status.to_dict(), indent=2, ensure_ascii=False))
+        return
+
+    console.print(f"[bold]OMNIS Health Check[/bold] ({status.timestamp})")
+    for c in checks:
+        icon = {"ok": "[green]OK[/green]", "warn": "[yellow]WARN[/yellow]",
+                "error": "[red]ERR[/red]", "unknown": "[dim]???[/dim]"}
+        console.print(f"  {icon.get(c.level.value, '?')} {c.name}: {c.message}")
+
+    overall_color = {"ok": "green", "warn": "yellow", "error": "red", "unknown": "dim"}
+    o = status.status.value
+    console.print(f"\nOverall: [{overall_color.get(o, 'dim')}]{o.upper()}[/{overall_color.get(o, 'dim')}]")
+
+
+# ---------------------------------------------------------------------------
 # Create
 # ---------------------------------------------------------------------------
 
@@ -418,6 +451,85 @@ def fm_result_show(
         console.print(f"\n  [red]Error: {r.error}[/red]")
 
     console.print(f"\n  Stored at: {r.stored_at}")
+
+
+# ---------------------------------------------------------------------------
+# Export
+# ---------------------------------------------------------------------------
+
+@first_missions_app.command(name="export")
+def fm_export(
+    mission_id: str = typer.Argument(..., help="Mission ID to export"),
+    fmt: str = typer.Option("markdown", "--format", help="markdown | json"),
+    output: Optional[str] = typer.Option(None, "--output", help="Output file path"),
+    json_output: bool = typer.Option(False, "--json", help="Print JSON to stdout"),
+) -> None:
+    """Export a mission report as Markdown or JSON."""
+    orch = _orch(dry_run=True)
+    _seed_demo(orch)
+
+    actual = _resolve_id(orch, mission_id)
+    if actual is None:
+        console.print(f"[red]Mission not found: {mission_id}[/red]")
+        raise typer.Exit(1)
+
+    m = orch.registry.get(actual)
+    if m is None:
+        console.print(f"[red]Mission not found: {mission_id}[/red]")
+        raise typer.Exit(1)
+
+    from src.first_missions.report_export import (
+        export_mission_json,
+        export_mission_markdown,
+        write_export,
+    )
+
+    results = orch.result_store.by_mission(m.mission_id)
+
+    if fmt == "json" or json_output:
+        data = export_mission_json(m, results)
+        content = json.dumps(data, indent=2, ensure_ascii=False)
+        if output:
+            write_export(content, Path(output))
+            console.print(f"[green]Exported JSON to {output}[/green]")
+        else:
+            print(content)
+    else:
+        md = export_mission_markdown(m, results)
+        if output:
+            write_export(md, Path(output))
+            console.print(f"[green]Exported Markdown to {output}[/green]")
+        else:
+            console.print(md)
+
+
+# ---------------------------------------------------------------------------
+# Metrics
+# ---------------------------------------------------------------------------
+
+@first_missions_app.command(name="metrics")
+def fm_metrics(
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Show mission execution metrics summary."""
+    orch = _orch(dry_run=True)
+    s = orch.result_store.summary()
+
+    if json_output:
+        print(json.dumps(s, indent=2, ensure_ascii=False))
+        return
+
+    if s["total"] == 0:
+        console.print("No results stored — metrics unavailable.")
+        return
+
+    console.print("[bold]Mission Metrics Summary[/bold]\n")
+    console.print(f"  Total executions: {s['total']}")
+    console.print(f"  Successful: [green]{s['successful']}[/green]")
+    console.print(f"  Failed: [red]{s['failed']}[/red]")
+    console.print(f"  Dry-run: [blue]{s['dry_run']}[/blue]")
+    console.print(f"  Success rate: {s['success_rate']:.1%}")
+    console.print(f"  Avg duration: {s['avg_duration_ms']:.1f}ms")
 
 
 # ---------------------------------------------------------------------------

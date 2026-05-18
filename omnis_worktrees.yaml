@@ -1,0 +1,50 @@
+worktrees:
+  - id: omnis-control
+    path: "C:/Users/lucas/omnis-control"
+    branch: "feature/omnis-5waves-runtime-supreme"
+    role: "principal_orchestrator"
+    status: CONSOLIDATED
+    scope:
+      - Runtime (DONE)
+      - Health canonical — omnis_health (MERGED)
+      - Health minimal — health_bridge (SUPERSEDED)
+      - Project OS (DONE)
+      - Maintenance (MERGED)
+    rules:
+      - "Do not push."
+      - "Merge gate complete."
+
+  - id: omnis-maintenance
+    path: "C:/Users/lucas/omnis-maintenance"
+    branch: "feature/omnis-maintenance-w201-w205"
+    status: MERGED_ARCHIVE
+
+  - id: omnis-health
+    path: "C:/Users/lucas/omnis-health"
+    branch: "feature/omnis-health-w196-w200"
+    status: MERGED_CANONICAL
+
+  - id: omnis-appfactory
+    path: "C:/Users/lucas/omnis-appfactory"
+    branch: "master"
+    status: DONE_ON_MASTER
+
+  - id: omnis-templates
+    path: "C:/Users/lucas/omnis-templates"
+    branch: "feature/omnis-templates-w206-w215"
+    status: REDUNDANT
+
+  - id: omnis-runtime
+    path: "C:/Users/lucas/omnis-runtime"
+    branch: "feature/omnis-runtime-w186-w195"
+    status: REDUNDANT
+
+  - id: omnis-p20-supreme
+    path: "C:/Users/lucas/omnis-p20-omnis-supreme"
+    branch: "parallel/p20-omnis-supreme"
+    status: ARCHIVE_RECOMMENDED
+
+  - id: omnis-runtime-bridge
+    path: "C:/Users/lucas/omnis-runtime-bridge"
+    branch: "feature/omnis-g14-app-factory"
+    status: ACTIVE_DEV

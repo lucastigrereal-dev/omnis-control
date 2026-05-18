@@ -1,0 +1,45 @@
+agent_tasks:
+  - id: handle_litellm_secret
+    priority: P0
+    domain: maintenance
+    status: pending
+    recommended_skill: secret_handler
+    description: "Externalize possible LiteLLM key from config/connectors.yaml without printing it."
+    allowed_actions:
+      - read_structure_only
+      - replace_with_env_var
+      - create_example_config
+      - update_gitignore_if_needed
+      - commit_security_fix
+    forbidden_actions:
+      - print_secret
+      - push
+      - delete_files
+
+  - id: freeze_main_from_g24
+    priority: P0
+    domain: runtime
+    status: pending
+    recommended_skill: git_guardian
+    description: "Prevent principal branch from duplicating Maintenance W201-W205."
+
+  - id: compare_health_branch
+    priority: P1
+    domain: health
+    status: pending
+    recommended_skill: merge_gate
+    description: "Compare health worktree with ed594dd and decide whether branch is redundant."
+
+  - id: continue_appfactory
+    priority: P2
+    domain: app_factory
+    status: pending
+    recommended_skill: app_factory_planner
+    description: "Continue W133-W162 only in appfactory worktree."
+
+  - id: pause_templates
+    priority: P2
+    domain: templates
+    status: pending
+    recommended_skill: runtime_auditor
+    description: "Keep templates paused until Runtime/Health consolidation."
