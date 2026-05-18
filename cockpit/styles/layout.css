@@ -1,0 +1,145 @@
+/* OMNIS Cockpit — Layout */
+@import './variables.css';
+
+/* Top Navigation */
+.topnav {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; gap: 0.3rem;
+  padding: 0.4rem 1rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+  flex-wrap: wrap;
+}
+.topnav a, .topnav button.nav-btn {
+  display: inline-flex; align-items: center; gap: 0.35rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--radius-sm);
+  color: var(--text-dim);
+  font-weight: 600;
+  font-size: 0.82rem;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+  white-space: nowrap;
+}
+.topnav a:hover, .topnav button.nav-btn:hover {
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+.topnav a.active, .topnav button.nav-btn.active {
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+.topnav .brand {
+  margin-left: auto;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 0.05em;
+  font-size: 0.9rem;
+}
+.topnav .nav-icon { font-size: 1rem; width: 1.1rem; text-align: center; }
+
+/* Main Container */
+.container { max-width: 1200px; margin: 1.5rem auto; padding: 0 1rem; }
+
+/* KPI Grid */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-md);
+  box-shadow: var(--shadow-card);
+  transition: border-color 0.2s;
+}
+.kpi-card:hover { border-color: var(--accent); }
+.kpi-card .kpi-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1.2;
+}
+.kpi-card .kpi-label {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 0.3rem;
+}
+.kpi-card .kpi-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+.kpi-card.warn .kpi-value { color: var(--warning); }
+.kpi-card.danger .kpi-value { color: var(--danger); }
+.kpi-card.success .kpi-value { color: var(--success); }
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+  box-shadow: var(--shadow-card);
+}
+
+/* Two-column grid */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+@media (max-width: 768px) {
+  .grid-2 { grid-template-columns: 1fr; }
+  .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  .topnav { gap: 0.15rem; padding: 0.3rem 0.5rem; }
+  .topnav a, .topnav button.nav-btn { padding: 0.3rem 0.5rem; font-size: 0.75rem; }
+}
+
+/* Activity List */
+.activity-list { list-style: none; }
+.activity-list li {
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.88rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.activity-list li:last-child { border-bottom: none; }
+.activity-list .activity-time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  margin-left: var(--space-md);
+}
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 1.2rem;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+/* Section header */
+.section-header {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: var(--space-md);
+}

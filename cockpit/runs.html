@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Runs — OMNIS Cockpit</title>
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html"><span class="nav-icon">&#9632;</span> Dashboard</a>
+  <a href="missions.html"><span class="nav-icon">&#9776;</span> Missions</a>
+  <a href="backlog.html"><span class="nav-icon">&#9776;</span> Backlog</a>
+  <a href="quality.html"><span class="nav-icon">&#9733;</span> Quality</a>
+  <a href="templates.html"><span class="nav-icon">&#9636;</span> Templates</a>
+  <a href="runs.html" class="active"><span class="nav-icon">&#9881;</span> Runs</a>
+  <a href="search.html"><span class="nav-icon">&#8981;</span> Search</a>
+  <a href="system.html"><span class="nav-icon">&#9880;</span> System</a>
+  <span class="brand">OMNIS Cockpit</span>
+</nav>
+
+<main class="container">
+  <h1>Parallel Runs</h1>
+
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <table class="data-table">
+    <thead>
+      <tr><th>Batch ID</th><th>Status</th><th>Tasks</th><th>Succeeded</th><th>Failed</th><th>Duration</th><th>Created</th></tr>
+    </thead>
+    <tbody id="runs-tbody"><tr><td colspan="7" class="empty-row">Loading...</td></tr></tbody>
+  </table>
+</main>
+
+<footer class="footer">
+  <span>OMNIS Control v1.0.0</span>
+  <span id="gen-time">—</span>
+</footer>
+
+<script>
+(function(){
+  fetch('data/runs.json')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      document.getElementById('gen-time').textContent = 'Data: ' + (data.generated_at||'—');
+      var s = data.summary || {};
+      document.getElementById('kpi-grid').innerHTML =
+        '<div class="kpi-card"><div class="kpi-value">' + (s.total_batches||0) + '</div><div class="kpi-label">Total Batches</div></div>' +
+        '<div class="kpi-card success"><div class="kpi-value">' + (s.total_succeeded||0) + '</div><div class="kpi-label">Succeeded</div></div>' +
+        '<div class="kpi-card danger"><div class="kpi-value">' + (s.total_failed||0) + '</div><div class="kpi-label">Failed</div></div>' +
+        '<div class="kpi-card"><div class="kpi-value">' + ((s.success_rate||0)*100).toFixed(0) + '%</div><div class="kpi-label">Success Rate</div></div>';
+
+      var batches = data.batches || [];
+      var tbody = document.getElementById('runs-tbody');
+      if (!data.available) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-row">No run data. Execute tasks via <code>ParallelRunner</code> to populate.</td></tr>';
+      } else if (!batches.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-row">No runs executed yet.</td></tr>';
+      } else {
+        tbody.innerHTML = batches.map(function(b){
+          var statusCls = b.status === 'success' ? 'badge-success' : (b.status === 'failed' ? 'badge-blocked' : 'badge-running');
+          return '<tr>' +
+            '<td>' + (b.batch_id||'—') + '</td>' +
+            '<td><span class="badge ' + statusCls + '">' + (b.status||'—') + '</span></td>' +
+            '<td>' + (b.task_count||0) + '</td>' +
+            '<td>' + (b.succeeded||0) + '</td>' +
+            '<td>' + (b.failed||0) + '</td>' +
+            '<td>' + (b.total_duration||0).toFixed(2) + 's</td>' +
+            '<td>' + (b.created_at||'').substring(0,10) + '</td>' +
+            '</tr>';
+        }).join('');
+      }
+    })
+    .catch(function(){
+      document.getElementById('runs-tbody').innerHTML = '<tr><td colspan="7" class="empty-row">Failed to load run data.</td></tr>';
+    });
+})();
+</script>
+</body>
+</html>

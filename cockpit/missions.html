@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Missions — OMNIS Cockpit</title>
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html"><span class="nav-icon">&#9632;</span> Dashboard</a>
+  <a href="missions.html" class="active"><span class="nav-icon">&#9776;</span> Missions</a>
+  <a href="backlog.html"><span class="nav-icon">&#9776;</span> Backlog</a>
+  <a href="quality.html"><span class="nav-icon">&#9733;</span> Quality</a>
+  <a href="templates.html"><span class="nav-icon">&#9636;</span> Templates</a>
+  <a href="runs.html"><span class="nav-icon">&#9881;</span> Runs</a>
+  <a href="search.html"><span class="nav-icon">&#8981;</span> Search</a>
+  <a href="system.html"><span class="nav-icon">&#9880;</span> System</a>
+  <span class="brand">OMNIS Cockpit</span>
+</nav>
+
+<main class="container">
+  <h1>Missions</h1>
+
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <div class="filter-bar">
+    <input type="text" id="search-input" placeholder="Search missions...">
+    <select id="status-filter">
+      <option value="">All Status</option>
+      <option value="open">Open</option>
+      <option value="closed">Closed</option>
+    </select>
+    <select id="sector-filter">
+      <option value="">All Sectors</option>
+    </select>
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th data-sort="mission_id">ID <span class="sort-arrow">&#9650;</span></th>
+        <th data-sort="status">Status</th>
+        <th data-sort="setor">Sector</th>
+        <th data-sort="objetivo">Objective</th>
+        <th data-sort="outputs_count">Outputs</th>
+        <th data-sort="timestamp">Date</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="missions-tbody"><tr><td colspan="7" class="empty-row">Loading...</td></tr></tbody>
+  </table>
+</main>
+
+<footer class="footer">
+  <span>OMNIS Control v1.0.0</span>
+  <span id="gen-time">—</span>
+</footer>
+
+<script>
+(function(){
+  var allMissions = [];
+  var sortBy = 'mission_id';
+  var sortDir = 1;
+
+  function render() {
+    var search = (document.getElementById('search-input').value||'').toLowerCase();
+    var statusF = document.getElementById('status-filter').value;
+    var sectorF = document.getElementById('sector-filter').value;
+
+    var filtered = allMissions.filter(function(m){
+      if (statusF && m.status !== statusF) return false;
+      if (sectorF && m.setor !== sectorF) return false;
+      if (search) {
+        var hay = (m.mission_id + ' ' + m.objetivo + ' ' + m.setor).toLowerCase();
+        if (hay.indexOf(search) === -1) return false;
+      }
+      return true;
+    });
+
+    filtered.sort(function(a,b){
+      var va = a[sortBy] || '', vb = b[sortBy] || '';
+      if (typeof va === 'number') return (va - vb) * sortDir;
+      return String(va).localeCompare(String(vb)) * sortDir;
+    });
+
+    var tbody = document.getElementById('missions-tbody');
+    if (!filtered.length) {
+      tbody.innerHTML = '<tr><td colspan="7" class="empty-row">No missions match the filters.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = filtered.map(function(m){
+      return '<tr>' +
+        '<td><a href="mission-detail.html?id=' + m.mission_id + '">' + m.mission_id + '</a></td>' +
+        '<td><span class="badge badge-' + m.status + '">' + m.status + '</span></td>' +
+        '<td>' + m.setor + '</td>' +
+        '<td class="obj">' + (m.objetivo||'—') + '</td>' +
+        '<td>' + m.outputs_count + '</td>' +
+        '<td>' + (m.timestamp||'').substring(0,10) + '</td>' +
+        '<td><a href="mission-detail.html?id=' + m.mission_id + '">View</a></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  fetch('data/missions.json')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      allMissions = data.missions || [];
+      document.getElementById('gen-time').textContent = 'Data: ' + (data.generated_at||'—');
+
+      var s = data.stats || {};
+      document.getElementById('kpi-grid').innerHTML =
+        '<div class="kpi-card"><div class="kpi-value">' + s.total + '</div><div class="kpi-label">Total</div></div>' +
+        '<div class="kpi-card success"><div class="kpi-value">' + s.open + '</div><div class="kpi-label">Open</div></div>' +
+        '<div class="kpi-card"><div class="kpi-value">' + s.closed + '</div><div class="kpi-label">Closed</div></div>' +
+        '<div class="kpi-card warn"><div class="kpi-value">' + s.pending_approval + '</div><div class="kpi-label">Pending Approval</div></div>';
+
+      // Populate sector filter
+      var sectors = new Set();
+      allMissions.forEach(function(m){ if(m.setor) sectors.add(m.setor); });
+      var sel = document.getElementById('sector-filter');
+      sectors.forEach(function(s){ sel.innerHTML += '<option value="' + s + '">' + s + '</option>'; });
+
+      render();
+    })
+    .catch(function(){
+      document.getElementById('missions-tbody').innerHTML = '<tr><td colspan="7" class="empty-row">Failed to load data. Run: <code>python -m src.reports.cockpit_data_all</code></td></tr>';
+    });
+
+  document.getElementById('search-input').addEventListener('input', render);
+  document.getElementById('status-filter').addEventListener('change', render);
+  document.getElementById('sector-filter').addEventListener('change', render);
+
+  document.querySelectorAll('.data-table th[data-sort]').forEach(function(th){
+    th.addEventListener('click', function(){
+      var col = this.dataset.sort;
+      if (sortBy === col) sortDir = -sortDir;
+      else { sortBy = col; sortDir = 1; }
+      document.querySelectorAll('.data-table th').forEach(function(t){ t.classList.remove('sorted'); });
+      this.classList.add('sorted');
+      render();
+    });
+  });
+})();
+</script>
+</body>
+</html>

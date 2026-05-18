@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System — OMNIS Cockpit</title>
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html"><span class="nav-icon">&#9632;</span> Dashboard</a>
+  <a href="missions.html"><span class="nav-icon">&#9776;</span> Missions</a>
+  <a href="backlog.html"><span class="nav-icon">&#9776;</span> Backlog</a>
+  <a href="quality.html"><span class="nav-icon">&#9733;</span> Quality</a>
+  <a href="templates.html"><span class="nav-icon">&#9636;</span> Templates</a>
+  <a href="runs.html"><span class="nav-icon">&#9881;</span> Runs</a>
+  <a href="search.html"><span class="nav-icon">&#8981;</span> Search</a>
+  <a href="system.html" class="active"><span class="nav-icon">&#9880;</span> System</a>
+  <span class="brand">OMNIS Cockpit</span>
+</nav>
+
+<main class="container">
+  <h1>System Health</h1>
+
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <!-- Disk -->
+  <div class="card" id="disk-card" style="margin-bottom:1.5rem;">
+    <h2>Disk</h2>
+    <div id="disk-detail" style="font-size:0.88rem;"></div>
+    <div class="health-bar-bg" style="margin-top:0.5rem;">
+      <div class="health-bar-fill" id="disk-bar" style="width:0%;"></div>
+    </div>
+  </div>
+
+  <!-- Modules -->
+  <div class="card">
+    <h2>Modules</h2>
+    <table class="data-table">
+      <thead>
+        <tr><th>Module</th><th>Namespace</th><th>Status</th><th>Import</th></tr>
+      </thead>
+      <tbody id="modules-tbody"><tr><td colspan="4" class="empty-row">Loading...</td></tr></tbody>
+    </table>
+  </div>
+</main>
+
+<footer class="footer">
+  <span>OMNIS Control v1.0.0</span>
+  <span id="gen-time">—</span>
+</footer>
+
+<script>
+(function(){
+  fetch('data/system.json')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      document.getElementById('gen-time').textContent = 'Data: ' + (data.generated_at||'—');
+      var d = data.disk || {};
+      var diskPct = d.percent_free || 0;
+      var diskCls = diskPct < 10 ? 'danger' : (diskPct < 20 ? 'warn' : 'success');
+      var barCls = diskPct < 10 ? 'health-bad' : (diskPct < 20 ? 'health-warn' : 'health-good');
+
+      document.getElementById('kpi-grid').innerHTML =
+        '<div class="kpi-card ' + diskCls + '"><div class="kpi-value">' + diskPct + '%</div><div class="kpi-label">Disk Free</div><div class="kpi-sub">' + (d.free_gb||0) + ' GB of ' + (d.total_gb||0) + ' GB</div></div>' +
+        '<div class="kpi-card success"><div class="kpi-value">' + (data.modules_healthy||0) + '/' + (data.modules_total||0) + '</div><div class="kpi-label">Modules Healthy</div></div>';
+
+      document.getElementById('disk-detail').innerHTML =
+        'Total: ' + (d.total_gb||0) + ' GB | Used: ' + (d.used_gb||0) + ' GB | Free: ' + (d.free_gb||0) + ' GB';
+      var bar = document.getElementById('disk-bar');
+      bar.style.width = diskPct + '%';
+      bar.className = 'health-bar-fill ' + barCls;
+
+      // Modules table
+      var mods = data.modules || [];
+      var tbody = document.getElementById('modules-tbody');
+      if (!mods.length) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-row">No module data available.</td></tr>';
+      } else {
+        tbody.innerHTML = mods.map(function(m){
+          var statusCls = m.status === 'healthy' ? 'badge-success' : 'badge-blocked';
+          return '<tr>' +
+            '<td>' + m.name + '</td>' +
+            '<td><code>' + m.namespace + '</code></td>' +
+            '<td><span class="badge ' + statusCls + '">' + m.status + '</span></td>' +
+            '<td>' + (m.imports_ok ? '<span class="ready-dot yes"></span> OK' : '<span class="ready-dot no"></span> FAIL') + '</td>' +
+            '</tr>';
+        }).join('');
+      }
+    })
+    .catch(function(){
+      document.getElementById('modules-tbody').innerHTML = '<tr><td colspan="4" class="empty-row">Failed to load system data. Run: <code>python -m src.reports.cockpit_data_all</code></td></tr>';
+    });
+})();
+</script>
+</body>
+</html>

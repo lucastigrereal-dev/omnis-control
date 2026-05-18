@@ -3,38 +3,140 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Missões — OMNIS Cockpit</title>
-<link rel="stylesheet" href="styles.css">
+<title>Dashboard — OMNIS Cockpit</title>
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
 </head>
 <body>
 <nav class="topnav">
-  <a href="index.html">Missões</a>
-  <a href="approvals.html">Aprovações</a>
-  <a href="outputs.html">Outputs</a>
+  <a href="index.html" class="active"><span class="nav-icon">&#9632;</span> Dashboard</a>
+  <a href="missions.html"><span class="nav-icon">&#9776;</span> Missions</a>
+  <a href="backlog.html"><span class="nav-icon">&#9776;</span> Backlog</a>
+  <a href="quality.html"><span class="nav-icon">&#9733;</span> Quality</a>
+  <a href="templates.html"><span class="nav-icon">&#9636;</span> Templates</a>
+  <a href="runs.html"><span class="nav-icon">&#9881;</span> Runs</a>
+  <a href="search.html"><span class="nav-icon">&#8981;</span> Search</a>
+  <a href="system.html"><span class="nav-icon">&#9880;</span> System</a>
   <span class="brand">OMNIS Cockpit</span>
 </nav>
-<main class="container">
 
-<h1>Missões</h1>
-<div class="stats">
-  <div class="stat"><span class="stat-num">1</span><span class="stat-label">Total</span></div>
-  <div class="stat"><span class="stat-num">1</span><span class="stat-label">Abertas</span></div>
-  <div class="stat"><span class="stat-num">0</span><span class="stat-label">Fechadas</span></div>
-  <div class="stat"><span class="stat-num">0</span><span class="stat-label">Pendentes</span></div>
-</div>
-<table class="mission-table">
-  <thead>
-    <tr><th>ID</th><th>Status</th><th>Setor</th><th>Objetivo</th><th>Outputs</th><th>Exports</th><th>Aprov.</th><th>Relatório</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><a href="mission.html?mission=MIS-20260518-001">MIS-20260518-001</a></td><td><span class="badge status-open">open</span></td><td>marketing</td><td class="objetivo">campanha 30 dias hotel nordeste</td><td>0</td><td>0</td><td>—</td><td>—</td></tr>
-  </tbody>
-</table>
+<main class="container">
+  <h1>Dashboard</h1>
+
+  <div class="kpi-grid" id="kpi-grid">
+    <div class="kpi-card"><div class="kpi-value">—</div><div class="kpi-label">Active Missions</div></div>
+    <div class="kpi-card"><div class="kpi-value">—</div><div class="kpi-label">Backlog Pending</div></div>
+    <div class="kpi-card"><div class="kpi-value">—</div><div class="kpi-label">Quality Avg</div></div>
+    <div class="kpi-card"><div class="kpi-value">—</div><div class="kpi-label">Templates</div></div>
+    <div class="kpi-card"><div class="kpi-value">—</div><div class="kpi-label">Disk Free</div></div>
+    <div class="kpi-card"><div class="kpi-value">—</div><div class="kpi-label">Modules Healthy</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="section-header"><h2>Recent Missions</h2><a href="missions.html">View all</a></div>
+      <ul class="activity-list" id="recent-missions"><li>Loading...</li></ul>
+    </div>
+
+    <div class="card">
+      <div class="section-header"><h2>Recent Quality Scores</h2><a href="quality.html">View all</a></div>
+      <ul class="activity-list" id="recent-quality"><li>Loading...</li></ul>
+    </div>
+  </div>
+
+  <div id="alerts-section" style="display:none;">
+    <h2>Alerts</h2>
+    <div id="alerts-container"></div>
+  </div>
 </main>
+
 <footer class="footer">
-  <span>OMNIS Control</span>
+  <span>OMNIS Control v1.0.0</span>
   <span id="gen-time">—</span>
 </footer>
-<script src="missions_data.js"></script>
+
+<script>
+(function(){
+  function api(path) { return fetch('data/' + path).then(function(r){ return r.json(); }).catch(function(){ return null; }); }
+
+  function gradeClass(g) {
+    if (g === 'A') return 'grade-A'; if (g === 'B') return 'grade-B';
+    if (g === 'C') return 'grade-C'; if (g === 'D') return 'grade-D';
+    return 'grade-F';
+  }
+
+  function kpi(cls, val, label, sub) {
+    return '<div class="kpi-card ' + (cls||'') + '"><div class="kpi-value">' + val + '</div><div class="kpi-label">' + label + '</div>' + (sub ? '<div class="kpi-sub">' + sub + '</div>' : '') + '</div>';
+  }
+
+  Promise.all([api('missions.json'), api('backlog.json'), api('quality.json'), api('templates.json'), api('system.json')])
+    .then(function(data) {
+      var missions = data[0], backlog = data[1], quality = data[2], templates = data[3], system = data[4];
+
+      var mStats = missions ? missions.stats : {total:0, open:0};
+      var qSummary = quality && quality.available ? quality.summary : {avg_score:'N/A', total:0};
+      var bCounts = backlog && backlog.available ? backlog.counts : {pending:0, total:0};
+      var tTotal = templates && templates.available ? templates.total : 0;
+
+      var diskPct = system ? system.disk.percent_free : 0;
+      var diskCls = diskPct < 10 ? 'danger' : (diskPct < 20 ? 'warn' : 'success');
+      var modHealth = system ? system.modules_healthy + '/' + system.modules_total : '-/-';
+
+      var kpiHtml = '';
+      kpiHtml += kpi('', mStats.open, 'Active Missions', mStats.total + ' total');
+      kpiHtml += kpi('', bCounts.pending, 'Backlog Pending', bCounts.total + ' total');
+      kpiHtml += kpi('', qSummary.avg_score, 'Quality Avg', qSummary.total + ' scored');
+      kpiHtml += kpi('', tTotal, 'Templates', '');
+      kpiHtml += kpi(diskCls, diskPct + '%', 'Disk Free', '');
+      kpiHtml += kpi('success', modHealth, 'Modules Healthy', '');
+      document.getElementById('kpi-grid').innerHTML = kpiHtml;
+
+      var mList = missions ? (missions.missions||[]).slice(-6).reverse() : [];
+      var mhtml = '';
+      mList.forEach(function(m){
+        mhtml += '<li><span><a href="mission-detail.html?id=' + m.mission_id + '">' + m.mission_id + '</a> <span class="badge badge-' + m.status + '">' + m.status + '</span></span><span class="activity-time">' + (m.timestamp||'').substring(0,10) + '</span></li>';
+      });
+      if (!mhtml) mhtml = '<li>No missions yet. Run <code>omnis mission</code> to create one.</li>';
+      document.getElementById('recent-missions').innerHTML = mhtml;
+
+      var qScores = quality && quality.available ? (quality.scores||[]).slice(-6).reverse() : [];
+      var qhtml = '';
+      qScores.forEach(function(s){
+        var g = s.grade || 'N/A';
+        qhtml += '<li><span><span class="grade ' + gradeClass(g) + '">' + g + '</span> ' + (s.output_id||'') + '</span><span class="activity-time">' + (s.generated_at||'').substring(0,10) + '</span></li>';
+      });
+      if (!qhtml) qhtml = '<li>No quality scores yet.</li>';
+      document.getElementById('recent-quality').innerHTML = qhtml;
+
+      var alerts = [];
+      if (backlog && backlog.available && bCounts.blocked > 0) {
+        alerts.push({sev:'warning', msg: bCounts.blocked + ' blocked backlog items require attention.'});
+      }
+      if (diskPct > 0 && diskPct < 15) {
+        alerts.push({sev:'critical', msg: 'Disk free space critically low: ' + diskPct + '%'});
+      } else if (diskPct > 0 && diskPct < 20) {
+        alerts.push({sev:'warning', msg: 'Disk free space below 20%: ' + diskPct + '%'});
+      }
+      if (alerts.length) {
+        var aSec = document.getElementById('alerts-section');
+        aSec.style.display = 'block';
+        var ahtml = '';
+        alerts.forEach(function(a){
+          ahtml += '<div class="alert-banner alert-' + a.sev + '">' + a.msg + '</div>';
+        });
+        document.getElementById('alerts-container').innerHTML = ahtml;
+      }
+
+      var times = [missions, backlog, quality, templates, system].map(function(d){
+        return d && d.generated_at ? d.generated_at : '';
+      }).filter(Boolean);
+      document.getElementById('gen-time').textContent = 'Data: ' + (times[0]||'—');
+    })
+    .catch(function(){
+      document.getElementById('kpi-grid').innerHTML = '<div class="card" style="grid-column:1/-1">Failed to load data. Run: <code>python -m src.reports.cockpit_data_all</code></div>';
+    });
+})();
+</script>
 </body>
 </html>

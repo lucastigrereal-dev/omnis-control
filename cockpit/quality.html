@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quality — OMNIS Cockpit</title>
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html"><span class="nav-icon">&#9632;</span> Dashboard</a>
+  <a href="missions.html"><span class="nav-icon">&#9776;</span> Missions</a>
+  <a href="backlog.html"><span class="nav-icon">&#9776;</span> Backlog</a>
+  <a href="quality.html" class="active"><span class="nav-icon">&#9733;</span> Quality</a>
+  <a href="templates.html"><span class="nav-icon">&#9636;</span> Templates</a>
+  <a href="runs.html"><span class="nav-icon">&#9881;</span> Runs</a>
+  <a href="search.html"><span class="nav-icon">&#8981;</span> Search</a>
+  <a href="system.html"><span class="nav-icon">&#9880;</span> System</a>
+  <span class="brand">OMNIS Cockpit</span>
+</nav>
+
+<main class="container">
+  <h1>Quality Scores</h1>
+
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <div class="card" id="grade-dist" style="margin-bottom:1.5rem;">
+    <h2>Grade Distribution</h2>
+    <div id="grade-bars" style="display:flex;gap:1rem;align-items:flex-end;height:80px;padding-top:0.5rem;"></div>
+  </div>
+
+  <div class="filter-bar">
+    <select id="type-filter">
+      <option value="">All Types</option>
+      <option value="caption">Caption</option>
+      <option value="carrossel">Carrossel</option>
+      <option value="reel">Reel</option>
+      <option value="dm">DM</option>
+      <option value="app">App</option>
+    </select>
+    <select id="grade-filter">
+      <option value="">All Grades</option>
+      <option value="A">A</option><option value="B">B</option><option value="C">C</option>
+      <option value="D">D</option><option value="F">F</option>
+    </select>
+  </div>
+
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Output ID</th><th>Type</th><th>Score</th><th>Grade</th><th>Ready</th><th>Dimensions</th>
+      </tr>
+    </thead>
+    <tbody id="quality-tbody"><tr><td colspan="6" class="empty-row">Loading...</td></tr></tbody>
+  </table>
+</main>
+
+<footer class="footer">
+  <span>OMNIS Control v1.0.0</span>
+  <span id="gen-time">—</span>
+</footer>
+
+<script>
+(function(){
+  var allScores = [];
+
+  function gradeClass(g) {
+    if (g==='A') return 'grade-A'; if (g==='B') return 'grade-B';
+    if (g==='C') return 'grade-C'; if (g==='D') return 'grade-D';
+    return 'grade-F';
+  }
+
+  function render() {
+    var typeF = document.getElementById('type-filter').value;
+    var gradeF = document.getElementById('grade-filter').value;
+    var filtered = allScores.filter(function(s){
+      if (typeF && s.output_type !== typeF) return false;
+      if (gradeF && s.grade !== gradeF) return false;
+      return true;
+    });
+
+    var tbody = document.getElementById('quality-tbody');
+    if (!filtered.length) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-row">No scores match the filters.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = filtered.map(function(s){
+      var dims = '';
+      if (s.dimensions) {
+        dims = Object.entries(s.dimensions).map(function(e){ return '<span style="font-size:0.72rem;color:var(--text-muted)">'+e[0]+':'+e[1]+'</span>'; }).join(' ');
+      }
+      var ready = s.ready ? '<span class="ready-dot yes" title="Ready"></span>' : '<span class="ready-dot no" title="Not ready"></span>';
+      return '<tr>' +
+        '<td>' + (s.output_id||'—') + '</td>' +
+        '<td>' + (s.output_type||'—') + '</td>' +
+        '<td>' + (s.overall||s.score||'—') + '</td>' +
+        '<td><span class="grade ' + gradeClass(s.grade) + '">' + (s.grade||'N/A') + '</span></td>' +
+        '<td>' + ready + '</td>' +
+        '<td>' + dims + '</td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  fetch('data/quality.json')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      allScores = data.scores || [];
+      document.getElementById('gen-time').textContent = 'Data: ' + (data.generated_at||'—');
+      var s = data.summary || {};
+      document.getElementById('kpi-grid').innerHTML =
+        '<div class="kpi-card"><div class="kpi-value">' + (s.total||0) + '</div><div class="kpi-label">Total Scored</div></div>' +
+        '<div class="kpi-card"><div class="kpi-value">' + (s.avg_score||'N/A') + '</div><div class="kpi-label">Average Score</div></div>' +
+        '<div class="kpi-card success"><div class="kpi-value">' + (s.ready_count||0) + '</div><div class="kpi-label">Ready</div></div>';
+
+      // Grade distribution bars
+      var dist = s.grade_distribution || {};
+      var bars = document.getElementById('grade-bars');
+      var maxCount = Math.max.apply(null, Object.values(dist).concat([1]));
+      bars.innerHTML = '';
+      ['A','B','C','D','F'].forEach(function(g){
+        var count = dist[g] || 0;
+        var h = Math.max(4, (count/maxCount)*70);
+        bars.innerHTML += '<div style="text-align:center;flex:1">' +
+          '<div style="height:'+h+'px;background:var(--'+(g==='A'?'success':g==='B'?'info':g==='C'?'warning':'danger')+');border-radius:3px 3px 0 0;margin-bottom:0.25rem;"></div>' +
+          '<div style="font-size:0.75rem;font-weight:700;">' + g + '</div>' +
+          '<div style="font-size:0.7rem;color:var(--text-dim)">' + count + '</div>' +
+          '</div>';
+      });
+
+      render();
+    })
+    .catch(function(){
+      document.getElementById('quality-tbody').innerHTML = '<tr><td colspan="6" class="empty-row">Failed to load quality data.</td></tr>';
+    });
+
+  document.getElementById('type-filter').addEventListener('change', render);
+  document.getElementById('grade-filter').addEventListener('change', render);
+})();
+</script>
+</body>
+</html>

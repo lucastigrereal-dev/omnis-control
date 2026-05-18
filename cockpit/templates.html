@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Templates — OMNIS Cockpit</title>
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html"><span class="nav-icon">&#9632;</span> Dashboard</a>
+  <a href="missions.html"><span class="nav-icon">&#9776;</span> Missions</a>
+  <a href="backlog.html"><span class="nav-icon">&#9776;</span> Backlog</a>
+  <a href="quality.html"><span class="nav-icon">&#9733;</span> Quality</a>
+  <a href="templates.html" class="active"><span class="nav-icon">&#9636;</span> Templates</a>
+  <a href="runs.html"><span class="nav-icon">&#9881;</span> Runs</a>
+  <a href="search.html"><span class="nav-icon">&#8981;</span> Search</a>
+  <a href="system.html"><span class="nav-icon">&#9880;</span> System</a>
+  <span class="brand">OMNIS Cockpit</span>
+</nav>
+
+<main class="container">
+  <h1>Templates</h1>
+
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <div class="filter-bar" id="cat-tabs">
+    <button class="nav-btn active" data-cat="">All</button>
+  </div>
+
+  <div class="filter-bar">
+    <input type="text" id="search" placeholder="Search templates...">
+  </div>
+
+  <div class="template-grid" id="template-grid"><div class="card" style="text-align:center;padding:2rem;">Loading...</div></div>
+</main>
+
+<footer class="footer">
+  <span>OMNIS Control v1.0.0</span>
+  <span id="gen-time">—</span>
+</footer>
+
+<script>
+(function(){
+  var allTemplates = [];
+  var activeCat = '';
+
+  function render() {
+    var search = (document.getElementById('search').value||'').toLowerCase();
+    var filtered = allTemplates.filter(function(t){
+      if (activeCat && t.category !== activeCat) return false;
+      if (search) {
+        var hay = (t.name + ' ' + (t.description||'') + ' ' + (t.tags||[]).join(' ')).toLowerCase();
+        if (hay.indexOf(search) === -1) return false;
+      }
+      return true;
+    });
+
+    var grid = document.getElementById('template-grid');
+    if (!filtered.length) {
+      grid.innerHTML = '<div class="card" style="text-align:center;padding:2rem;grid-column:1/-1">No templates match.</div>';
+      return;
+    }
+    grid.innerHTML = filtered.map(function(t){
+      var tags = (t.tags||[]).map(function(tg){ return '<span class="tag">'+tg+'</span>'; }).join('');
+      return '<div class="template-card">' +
+        '<div class="template-name">' + (t.name||t.template_id||'Untitled') + '</div>' +
+        '<div class="template-desc">' + (t.description||'') + '</div>' +
+        '<div class="template-meta">' +
+          '<span class="badge badge-' + (t.status||'draft') + '">' + (t.status||'draft') + '</span>' +
+          '<span style="font-size:0.72rem;color:var(--text-muted)">v' + (t.version||'1.0') + '</span>' +
+          '<span style="font-size:0.72rem;color:var(--text-muted)">' + (t.category||'') + '</span>' +
+        '</div>' +
+        '<div class="template-tags">' + tags + '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  fetch('data/templates.json')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      allTemplates = data.templates || [];
+      document.getElementById('gen-time').textContent = 'Data: ' + (data.generated_at||'—');
+
+      document.getElementById('kpi-grid').innerHTML =
+        '<div class="kpi-card"><div class="kpi-value">' + (data.total||0) + '</div><div class="kpi-label">Total Templates</div></div>' +
+        Object.entries(data.categories||{}).map(function(e){
+          return '<div class="kpi-card"><div class="kpi-value">' + e[1] + '</div><div class="kpi-label">' + e[0] + '</div></div>';
+        }).join('');
+
+      // Category tabs
+      var tabs = document.getElementById('cat-tabs');
+      var seen = new Set();
+      allTemplates.forEach(function(t){ if(t.category) seen.add(t.category); });
+      seen.forEach(function(cat){
+        var btn = document.createElement('button');
+        btn.className = 'nav-btn'; btn.textContent = cat; btn.dataset.cat = cat;
+        btn.addEventListener('click', function(){
+          activeCat = cat;
+          tabs.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+          btn.classList.add('active');
+          render();
+        });
+        tabs.appendChild(btn);
+      });
+      tabs.querySelector('button[data-cat=""]').addEventListener('click', function(){
+        activeCat = '';
+        tabs.querySelectorAll('button').forEach(function(b){ b.classList.remove('active'); });
+        this.classList.add('active');
+        render();
+      });
+
+      render();
+    })
+    .catch(function(){
+      document.getElementById('template-grid').innerHTML = '<div class="card" style="text-align:center;padding:2rem;grid-column:1/-1">Failed to load templates.</div>';
+    });
+
+  document.getElementById('search').addEventListener('input', render);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backlog — OMNIS Cockpit</title>
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html"><span class="nav-icon">&#9632;</span> Dashboard</a>
+  <a href="missions.html"><span class="nav-icon">&#9776;</span> Missions</a>
+  <a href="backlog.html" class="active"><span class="nav-icon">&#9776;</span> Backlog</a>
+  <a href="quality.html"><span class="nav-icon">&#9733;</span> Quality</a>
+  <a href="templates.html"><span class="nav-icon">&#9636;</span> Templates</a>
+  <a href="runs.html"><span class="nav-icon">&#9881;</span> Runs</a>
+  <a href="search.html"><span class="nav-icon">&#8981;</span> Search</a>
+  <a href="system.html"><span class="nav-icon">&#9880;</span> System</a>
+  <span class="brand">OMNIS Cockpit</span>
+</nav>
+
+<main class="container">
+  <h1>Backlog</h1>
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <div class="kanban" id="kanban">
+    <div class="kanban-column" id="col-pending">
+      <div class="kanban-column-header"><span>Pending</span><span class="count" id="cnt-pending">0</span></div>
+      <div class="kanban-column-body" id="body-pending"></div>
+    </div>
+    <div class="kanban-column" id="col-in_progress">
+      <div class="kanban-column-header"><span>In Progress</span><span class="count" id="cnt-in_progress">0</span></div>
+      <div class="kanban-column-body" id="body-in_progress"></div>
+    </div>
+    <div class="kanban-column" id="col-blocked">
+      <div class="kanban-column-header"><span>Blocked</span><span class="count" id="cnt-blocked">0</span></div>
+      <div class="kanban-column-body" id="body-blocked"></div>
+    </div>
+    <div class="kanban-column" id="col-completed">
+      <div class="kanban-column-header"><span>Completed</span><span class="count" id="cnt-completed">0</span></div>
+      <div class="kanban-column-body" id="body-completed"></div>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <span>OMNIS Control v1.0.0</span>
+  <span id="gen-time">—</span>
+</footer>
+
+<script>
+(function(){
+  fetch('data/backlog.json')
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      document.getElementById('gen-time').textContent = 'Data: ' + (data.generated_at||'—');
+      var c = data.counts || {};
+      document.getElementById('kpi-grid').innerHTML =
+        '<div class="kpi-card"><div class="kpi-value">' + (c.total||0) + '</div><div class="kpi-label">Total</div></div>' +
+        '<div class="kpi-card success"><div class="kpi-value">' + (c.pending||0) + '</div><div class="kpi-label">Pending</div></div>' +
+        '<div class="kpi-card"><div class="kpi-value">' + (c.in_progress||0) + '</div><div class="kpi-label">In Progress</div></div>' +
+        '<div class="kpi-card danger"><div class="kpi-value">' + (c.blocked||0) + '</div><div class="kpi-label">Blocked</div></div>' +
+        '<div class="kpi-card"><div class="kpi-value">' + (c.completed||0) + '</div><div class="kpi-label">Completed</div></div>';
+
+      if (!data.available) {
+        document.getElementById('kanban').innerHTML = '<div class="card" style="grid-column:1/-1;text-align:center;padding:2rem;">No backlog data. Queue items using <code>python -m src.backlog.cli add</code></div>';
+        return;
+      }
+
+      var cols = {pending:[], in_progress:[], blocked:[], completed:[], cancelled:[]};
+      (data.items||[]).forEach(function(item){
+        var s = item.status || 'pending';
+        if (cols[s]) cols[s].push(item);
+      });
+
+      function priDots(p) { p = p || 3; var d=''; for(var i=1;i<=5;i++) d+='<span class="dot'+(i<=p?' active':'')+'"></span>'; return '<span class="priority">'+d+'</span>'; }
+
+      function renderCol(status) {
+        var items = cols[status] || [];
+        document.getElementById('cnt-' + status).textContent = items.length;
+        var html = '';
+        items.forEach(function(item){
+          html += '<div class="kanban-card">' +
+            '<div class="kanban-card-type">' + (item.item_type||'') + '</div>' +
+            '<div class="kanban-card-title">' + (item.title||'Untitled') + '</div>' +
+            '<div class="kanban-card-meta">' +
+              priDots(item.priority) +
+              '<span>' + (item.item_id||'') + '</span>' +
+            '</div>';
+          if (item.description) {
+            html += '<div style="font-size:0.75rem;color:var(--text-dim);margin-top:0.2rem;">' + item.description.substring(0,80) + '</div>';
+          }
+          html += '</div>';
+        });
+        if (!html) html = '<div style="text-align:center;color:var(--text-muted);padding:1rem;font-size:0.82rem;">No items</div>';
+        document.getElementById('body-' + status).innerHTML = html;
+      }
+
+      renderCol('pending');
+      renderCol('in_progress');
+      renderCol('blocked');
+      renderCol('completed');
+    })
+    .catch(function(){
+      document.getElementById('kanban').innerHTML = '<div class="card" style="grid-column:1/-1;text-align:center;padding:2rem;">Failed to load backlog data.</div>';
+    });
+})();
+</script>
+</body>
+</html>

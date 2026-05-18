@@ -1,0 +1,162 @@
+{
+  "scores": [
+    {
+      "package_id": "carousel_full_test",
+      "score": 100,
+      "grade": "ready_for_human_review",
+      "checks_passed": [
+        "Manifest.json presente",
+        "Manifest.json valido (JSON)",
+        "Manifest tem package_id",
+        "Manifest tem status",
+        "caption.md presente",
+        "caption.md nao vazio",
+        "publishing_checklist.md presente",
+        "Nenhum secret nos arquivos",
+        "Status do pacote consistente",
+        "preview.html renderizado",
+        "Asset referenciado ou aviso presente"
+      ],
+      "checks_failed": [],
+      "warnings": [],
+      "scored_at": "2026-05-09T15:13:13Z"
+    },
+    {
+      "package_id": "carousel_full_test",
+      "score": 100,
+      "grade": "ready_for_human_review",
+      "checks_passed": [
+        "Manifest.json presente",
+        "Manifest.json valido (JSON)",
+        "Manifest tem package_id",
+        "Manifest tem status",
+        "caption.md presente",
+        "caption.md nao vazio",
+        "publishing_checklist.md presente",
+        "Nenhum secret nos arquivos",
+        "Status do pacote consistente",
+        "preview.html renderizado",
+        "Asset referenciado ou aviso presente"
+      ],
+      "checks_failed": [],
+      "warnings": [],
+      "scored_at": "2026-05-09T15:13:13Z"
+    },
+    {
+      "package_id": "carousel_full_test",
+      "score": 100,
+      "grade": "ready_for_human_review",
+      "checks_passed": [
+        "Manifest.json presente",
+        "Manifest.json valido (JSON)",
+        "Manifest tem package_id",
+        "Manifest tem status",
+        "caption.md presente",
+        "caption.md nao vazio",
+        "publishing_checklist.md presente",
+        "Nenhum secret nos arquivos",
+        "Status do pacote consistente",
+        "preview.html renderizado",
+        "Asset referenciado ou aviso presente"
+      ],
+      "checks_failed": [],
+      "warnings": [],
+      "scored_at": "2026-05-09T15:13:13Z"
+    },
+    {
+      "package_id": "carousel_full_test",
+      "score": 100,
+      "grade": "ready_for_human_review",
+      "checks_passed": [
+        "Manifest.json presente",
+        "Manifest.json valido (JSON)",
+        "Manifest tem package_id",
+        "Manifest tem status",
+        "caption.md presente",
+        "caption.md nao vazio",
+        "publishing_checklist.md presente",
+        "Nenhum secret nos arquivos",
+        "Status do pacote consistente",
+        "preview.html renderizado",
+        "Asset referenciado ou aviso presente"
+      ],
+      "checks_failed": [],
+      "warnings": [],
+      "scored_at": "2026-05-09T15:13:13Z"
+    },
+    {
+      "package_id": "carousel_full_test",
+      "score": 100,
+      "grade": "ready_for_human_review",
+      "checks_passed": [
+        "Manifest.json presente",
+        "Manifest.json valido (JSON)",
+        "Manifest tem package_id",
+        "Manifest tem status",
+        "caption.md presente",
+        "caption.md nao vazio",
+        "publishing_checklist.md presente",
+        "Nenhum secret nos arquivos",
+        "Status do pacote consistente",
+        "preview.html renderizado",
+        "Asset referenciado ou aviso presente"
+      ],
+      "checks_failed": [],
+      "warnings": [],
+      "scored_at": "2026-05-09T15:13:13Z"
+    },
+    {
+      "package_id": "carousel_full_test",
+      "score": 100,
+      "grade": "ready_for_human_review",
+      "checks_passed": [
+        "Manifest.json presente",
+        "Manifest.json valido (JSON)",
+        "Manifest tem package_id",
+        "Manifest tem status",
+        "caption.md presente",
+        "caption.md nao vazio",
+        "publishing_checklist.md presente",
+        "Nenhum secret nos arquivos",
+        "Status do pacote consistente",
+        "preview.html renderizado",
+        "Asset referenciado ou aviso presente"
+      ],
+      "checks_failed": [],
+      "warnings": [],
+      "scored_at": "2026-05-09T15:13:14Z"
+    },
+    {
+      "package_id": "carousel_full_test",
+      "score": 100,
+      "grade": "ready_for_human_review",
+      "checks_passed": [
+        "Manifest.json presente",
+        "Manifest.json valido (JSON)",
+        "Manifest tem package_id",
+        "Manifest tem status",
+        "caption.md presente",
+        "caption.md nao vazio",
+        "publishing_checklist.md presente",
+        "Nenhum secret nos arquivos",
+        "Status do pacote consistente",
+        "preview.html renderizado",
+        "Asset referenciado ou aviso presente"
+      ],
+      "checks_failed": [],
+      "warnings": [],
+      "scored_at": "2026-05-09T15:13:14Z"
+    }
+  ],
+  "summary": {
+    "total": 7,
+    "avg_score": 100.0,
+    "grade_distribution": {
+      "ready_for_human_review": 7
+    },
+    "ready_count": 0,
+    "last_scored": ""
+  },
+  "generated_at": "2026-05-18T23:25:01Z",
+  "available": true
+}

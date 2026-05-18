@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Search — OMNIS Cockpit</title>
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/components.css">
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html"><span class="nav-icon">&#9632;</span> Dashboard</a>
+  <a href="missions.html"><span class="nav-icon">&#9776;</span> Missions</a>
+  <a href="backlog.html"><span class="nav-icon">&#9776;</span> Backlog</a>
+  <a href="quality.html"><span class="nav-icon">&#9733;</span> Quality</a>
+  <a href="templates.html"><span class="nav-icon">&#9636;</span> Templates</a>
+  <a href="runs.html"><span class="nav-icon">&#9881;</span> Runs</a>
+  <a href="search.html" class="active"><span class="nav-icon">&#8981;</span> Search</a>
+  <a href="system.html"><span class="nav-icon">&#9880;</span> System</a>
+  <span class="brand">OMNIS Cockpit</span>
+</nav>
+
+<main class="container">
+  <div class="search-hero">
+    <h1>Search</h1>
+    <input type="text" id="search-input" placeholder="Search across missions, templates, backlog..." autofocus>
+    <div style="margin-top:0.5rem;font-size:0.8rem;color:var(--text-dim);" id="result-count"></div>
+  </div>
+
+  <div class="card" id="results-container" style="display:none;">
+    <div id="results-list"></div>
+  </div>
+
+  <div class="card" id="empty-state" style="text-align:center;padding:2rem;">
+    <p style="color:var(--text-dim)">Search across all local content: missions, templates, backlog items, and system modules.</p>
+    <p style="color:var(--text-muted);margin-top:0.5rem;">Type to search or run the full-text engine: <code>python -m src.local_search.cli "query"</code></p>
+  </div>
+</main>
+
+<footer class="footer">
+  <span>OMNIS Control v1.0.0</span>
+  <span id="gen-time">—</span>
+</footer>
+
+<script>
+(function(){
+  var allIndex = [];
+
+  // Build search index from available data
+  Promise.all([
+    fetch('data/missions.json').then(function(r){ return r.json(); }).catch(function(){ return {missions:[]}; }),
+    fetch('data/templates.json').then(function(r){ return r.json(); }).catch(function(){ return {templates:[]}; }),
+    fetch('data/backlog.json').then(function(r){ return r.json(); }).catch(function(){ return {items:[]}; }),
+    fetch('data/system.json').then(function(r){ return r.json(); }).catch(function(){ return {modules:[]}; }),
+  ]).then(function(datas){
+    var missions = datas[0], templates = datas[1], backlog = datas[2], system = datas[3];
+
+    (missions.missions||[]).forEach(function(m){
+      allIndex.push({type:'mission', title:m.mission_id, text:(m.objetivo||'') + ' ' + (m.setor||''), link:'mission-detail.html?id=' + m.mission_id});
+    });
+    (templates.templates||[]).forEach(function(t){
+      allIndex.push({type:'template', title:t.name||t.template_id, text:(t.description||'') + ' ' + (t.tags||[]).join(' '), link:'templates.html'});
+    });
+    (backlog.items||[]).forEach(function(i){
+      allIndex.push({type:'backlog', title:i.title||i.item_id, text:(i.description||'') + ' ' + (i.item_type||''), link:'backlog.html'});
+    });
+    (system.modules||[]).forEach(function(m){
+      allIndex.push({type:'module', title:m.name, text:m.namespace, link:'system.html'});
+    });
+
+    document.getElementById('gen-time').textContent = 'Index: ' + allIndex.length + ' items';
+    document.getElementById('result-count').textContent = allIndex.length + ' items indexed';
+  });
+
+  function search(query) {
+    var q = query.toLowerCase().trim();
+    if (!q) {
+      document.getElementById('results-container').style.display = 'none';
+      document.getElementById('empty-state').style.display = 'block';
+      document.getElementById('result-count').textContent = allIndex.length + ' items indexed';
+      return;
+    }
+    var terms = q.split(/\s+/);
+    var scored = [];
+    allIndex.forEach(function(item){
+      var hay = (item.title + ' ' + item.text).toLowerCase();
+      var score = 0;
+      terms.forEach(function(t){
+        var re = new RegExp(t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        var matches = hay.match(re);
+        if (matches) {
+          score += matches.length;
+          if (item.title.toLowerCase().indexOf(t) === 0) score += 2;
+        }
+      });
+      if (score > 0) scored.push({item:item, score:score});
+    });
+    scored.sort(function(a,b){ return b.score - a.score; });
+    scored = scored.slice(0, 30);
+
+    document.getElementById('result-count').textContent = scored.length + ' results for "' + query + '"';
+    document.getElementById('results-container').style.display = 'block';
+    document.getElementById('empty-state').style.display = 'none';
+
+    var list = document.getElementById('results-list');
+    if (!scored.length) {
+      list.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:1rem;">No results found.</div>';
+      return;
+    }
+    list.innerHTML = scored.map(function(s){
+      var snippet = (s.item.text||'').substring(0,120);
+      return '<div class="search-result-item"' + (s.item.link?' onclick="window.location.href=\'' + s.item.link + '\'"':'') + '>' +
+        '<div class="result-title">' + s.item.title + ' <span class="badge badge-' + s.item.type + '" style="font-size:0.65rem;">' + s.item.type + '</span></div>' +
+        '<div class="result-snippet">' + snippet + '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  var timer;
+  document.getElementById('search-input').addEventListener('input', function(){
+    clearTimeout(timer);
+    var q = this.value;
+    timer = setTimeout(function(){ search(q); }, 150);
+  });
+})();
+</script>
+</body>
+</html>

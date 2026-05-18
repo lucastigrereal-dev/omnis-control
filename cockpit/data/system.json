@@ -1,0 +1,73 @@
+{
+  "disk": {
+    "total_gb": 924.3,
+    "used_gb": 783.6,
+    "free_gb": 140.7,
+    "percent_free": 15.2
+  },
+  "modules": [
+    {
+      "name": "live_cockpit",
+      "namespace": "src.live_cockpit",
+      "status": "healthy",
+      "imports_ok": true
+    },
+    {
+      "name": "offline_dashboard",
+      "namespace": "src.offline_dashboard",
+      "status": "healthy",
+      "imports_ok": true
+    },
+    {
+      "name": "template_registry",
+      "namespace": "src.template_registry",
+      "status": "healthy",
+      "imports_ok": true
+    },
+    {
+      "name": "local_search",
+      "namespace": "src.local_search",
+      "status": "healthy",
+      "imports_ok": true
+    },
+    {
+      "name": "backlog",
+      "namespace": "src.backlog",
+      "status": "healthy",
+      "imports_ok": true
+    },
+    {
+      "name": "parallel_runner",
+      "namespace": "src.parallel_runner",
+      "status": "healthy",
+      "imports_ok": true
+    },
+    {
+      "name": "quality_gate",
+      "namespace": "src.quality_gate",
+      "status": "healthy",
+      "imports_ok": true
+    },
+    {
+      "name": "app_factory_exec",
+      "namespace": "src.app_factory_exec",
+      "status": "healthy",
+      "imports_ok": true
+    },
+    {
+      "name": "mission_replay",
+      "namespace": "src.mission_replay",
+      "status": "healthy",
+      "imports_ok": true
+    },
+    {
+      "name": "output_versioning",
+      "namespace": "src.output_versioning",
+      "status": "healthy",
+      "imports_ok": true
+    }
+  ],
+  "modules_healthy": 10,
+  "modules_total": 10,
+  "generated_at": "2026-05-18T23:25:01Z"
+}
