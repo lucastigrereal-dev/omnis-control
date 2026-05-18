@@ -2,7 +2,7 @@
 
 **Gerado em:** 2026-05-18
 **Branch:** master
-**Status:** Provider Layer implementada e testada (74/74 testes)
+**Status:** Provider Layer COMPLETA — 165/165 testes passando
 
 ---
 
@@ -39,12 +39,18 @@
 |---|---|---|---|
 | `TracingProvider` | `LocalJSONLProvider` | `LangfuseProvider` | 15 |
 | `MemoryProvider` | `LocalMemoryProvider` | `HybridMemoryProvider` | 17 |
-| `WorkflowProvider` | `SequentialWorkflowProvider` | LangGraphProvider (futuro) | 9 |
-| `MCPProvider` | `LocalToolRegistryProvider` | FastMCPProvider (futuro) | 10 |
+| `WorkflowProvider` | `SequentialWorkflowProvider` | `LangGraphProvider` | 9+6 |
+| `MCPProvider` | `LocalToolRegistryProvider` | `FastMCPProvider` | 10+11 |
 | `RuntimeProvider` | `MockRuntimeProvider` | `SubprocessRuntimeProvider` | 14 |
+| `EmbeddingProvider` | `TFIDFEmbeddingProvider` | `SentenceTransformerProvider` | 14 |
+| `ModelRouterProvider` | `MockModelProvider` | `ClaudeProvider`, `OpenRouterProvider` | 14 |
+| `GuardrailProvider` | `RuleBasedGuardrailProvider` | NeMoProvider (futuro) | 14 |
+| `SemanticMemoryProvider` | in-process vector index | — | 8 |
+| `AkashaProvider` | pgvector (opcional) | — | 9 |
+| `Mem0Provider` | mem0 cloud (opcional) | — | — |
 | `ProviderRegistry` | `registry.default()` | `registry.production()` | 9 |
 
-**Total:** 74/74 testes passando
+**Total:** 165/165 testes passando
 
 ---
 
@@ -113,15 +119,24 @@ GUARDRAILS:       NeMo (experimental)        → avaliar antes de adotar
 
 ## 9. Roadmap incremental
 
-### Fase 1 (DONE — esta sprint)
+### Fase 1 (DONE ✅)
 - [x] Provider base protocol
 - [x] TracingProvider (Local + Langfuse fallback)
 - [x] MemoryProvider (Local + Hybrid)
-- [x] WorkflowProvider (Sequential)
-- [x] MCPProvider (LocalRegistry)
+- [x] WorkflowProvider (Sequential + LangGraphProvider fallback)
+- [x] MCPProvider (LocalRegistry + FastMCPProvider fallback)
 - [x] RuntimeProvider (Mock + Subprocess)
-- [x] ProviderRegistry (default + production)
-- [x] 74 testes
+- [x] EmbeddingProvider (TF-IDF built-in + SentenceTransformers lazy)
+- [x] ModelRouterProvider (Mock + Claude + OpenRouter)
+- [x] GuardrailProvider (RuleBased: injection/destructive/secrets/commands)
+- [x] SemanticMemoryProvider (in-process vector index)
+- [x] AkashaProvider (pgvector, optional)
+- [x] Mem0Provider (cloud memory, optional)
+- [x] ProviderRegistry (default + production, env-driven)
+- [x] 165/165 testes — providers + mission_orchestrator
+- [x] mission_orchestrator instrumentado com TracingProvider
+- [x] Lazy loading (sem HF download no startup)
+- [x] Anti-lock-in validado: core nunca importa framework diretamente
 
 ### Fase 2 — Langfuse real (1 dia)
 - [ ] Configurar LANGFUSE_PUBLIC_KEY + LANGFUSE_SECRET_KEY
