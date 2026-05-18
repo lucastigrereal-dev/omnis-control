@@ -1,0 +1,16 @@
+{
+  "01_mission_brief.md": "a185de3727270213ac3e4912f6daf7d8449ccf4ef007f86827bc02b19330c226",
+  "02_context_used.md": "c9da9fb50c9112025f1d28699ddc0c8ef3918de589bebc5787c937293cf145cd",
+  "03_execution_plan.md": "537e653df8bd5bc5aaa88a8d84277606d2403c72f08f053fc7f9767412a7e4f6",
+  "04_squad_assigned.md": "fae28404de33b681dfa3f43b20f55c0e71bed442e1358fc8d1a6f8581570108c",
+  "mission_contract.json": "493f667af102f2e82a392ce9c77dad80f723e0cc30da00bb4b993d78a898a62e",
+  "relatorio_final.md": "2bb6b01ebe59522b6ac7cb63d58ed770d59d233684e5ad7641943ed08491bbfd",
+  "05_outputs/PRD.md": "b8209c78447d619f97257d7d080e3387c3c62628abe8cda4d62ac8b374733c88",
+  "05_outputs/README.md": "7268e013606d8f854f5290f4a0ffa518c9203476d1d99365e08c560b00ce598b",
+  "05_outputs/api_contract.md": "a5fa9735609d987980a7834bd3cbdff7a90125020e3741503261e6c935cbf380",
+  "05_outputs/frontend_spec.md": "5cea33480a1a5834b4f1c7aaed67c858ee9e72cbd7c9f60f129e1aedd8f80677",
+  "05_outputs/schema_banco.sql": "ea3118b5f6ecb7da882cae2e93a75782a3c3692e371a7c7503a00c88fc138ebe",
+  "05_outputs/test_plan.md": "24cd6f456a15d734397afab462cb6c5697182c8542007761c778f0a67ed9a20e",
+  "05_outputs/user_stories.md": "8d18c53291b35cb99a76fa97ee527e5837b8a079338953f760f18491d79ad223",
+  "06_exports/package_manifest.json": "bc89835dfd2343f88bc45932e46bb79bc06d566a9a5c3d10b35cafa8af1de943"
+}

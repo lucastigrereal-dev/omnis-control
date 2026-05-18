@@ -1,0 +1,68 @@
+{
+  "mission_id": "MIS-20260518-006",
+  "generated_at": "2026-05-18T20:44:59.228410+00:00",
+  "files": [
+    {
+      "path": "01_mission_brief.md",
+      "size_bytes": 268,
+      "ext": ".md"
+    },
+    {
+      "path": "02_context_used.md",
+      "size_bytes": 222,
+      "ext": ".md"
+    },
+    {
+      "path": "03_execution_plan.md",
+      "size_bytes": 330,
+      "ext": ".md"
+    },
+    {
+      "path": "04_squad_assigned.md",
+      "size_bytes": 129,
+      "ext": ".md"
+    },
+    {
+      "path": "mission_contract.json",
+      "size_bytes": 402,
+      "ext": ".json"
+    },
+    {
+      "path": "relatorio_final.md",
+      "size_bytes": 1012,
+      "ext": ".md"
+    },
+    {
+      "path": "05_outputs/SKILL.md",
+      "size_bytes": 6118,
+      "ext": ".md"
+    },
+    {
+      "path": "05_outputs/manifest.json",
+      "size_bytes": 4909,
+      "ext": ".json"
+    },
+    {
+      "path": "05_outputs/run.py",
+      "size_bytes": 21691,
+      "ext": ".py"
+    },
+    {
+      "path": "05_outputs/sample_payload.json",
+      "size_bytes": 3566,
+      "ext": ".json"
+    },
+    {
+      "path": "05_outputs/skill_report.md",
+      "size_bytes": 6833,
+      "ext": ".md"
+    },
+    {
+      "path": "06_exports/package_manifest.json",
+      "size_bytes": 165,
+      "ext": ".json"
+    }
+  ],
+  "total_files": 12,
+  "total_bytes": 45645
+}

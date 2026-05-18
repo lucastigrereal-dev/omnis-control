@@ -1,0 +1,78 @@
+{
+  "mission_id": "MIS-20260518-005",
+  "generated_at": "2026-05-18T20:44:59.214354+00:00",
+  "files": [
+    {
+      "path": "01_mission_brief.md",
+      "size_bytes": 225,
+      "ext": ".md"
+    },
+    {
+      "path": "02_context_used.md",
+      "size_bytes": 222,
+      "ext": ".md"
+    },
+    {
+      "path": "03_execution_plan.md",
+      "size_bytes": 330,
+      "ext": ".md"
+    },
+    {
+      "path": "04_squad_assigned.md",
+      "size_bytes": 129,
+      "ext": ".md"
+    },
+    {
+      "path": "mission_contract.json",
+      "size_bytes": 363,
+      "ext": ".json"
+    },
+    {
+      "path": "relatorio_final.md",
+      "size_bytes": 969,
+      "ext": ".md"
+    },
+    {
+      "path": "05_outputs/PRD.md",
+      "size_bytes": 6686,
+      "ext": ".md"
+    },
+    {
+      "path": "05_outputs/README.md",
+      "size_bytes": 7569,
+      "ext": ".md"
+    },
+    {
+      "path": "05_outputs/api_contract.md",
+      "size_bytes": 10119,
+      "ext": ".md"
+    },
+    {
+      "path": "05_outputs/frontend_spec.md",
+      "size_bytes": 20159,
+      "ext": ".md"
+    },
+    {
+      "path": "05_outputs/schema_banco.sql",
+      "size_bytes": 11970,
+      "ext": ".sql"
+    },
+    {
+      "path": "05_outputs/test_plan.md",
+      "size_bytes": 10857,
+      "ext": ".md"
+    },
+    {
+      "path": "05_outputs/user_stories.md",
+      "size_bytes": 9531,
+      "ext": ".md"
+    },
+    {
+      "path": "06_exports/package_manifest.json",
+      "size_bytes": 211,
+      "ext": ".json"
+    }
+  ],
+  "total_files": 14,
+  "total_bytes": 79340
+}

@@ -1,0 +1,14 @@
+{
+  "01_mission_brief.md": "2f3de1b629468ed61c639d36c0c6c763d0e104369a47a94cdd09599f537f567d",
+  "02_context_used.md": "61853a1a2837c794a0b7efc96edfbe4ecc2f0d3678d5747b48ecf414d7c4fe46",
+  "03_execution_plan.md": "da89881f2b0ab3a759920bebf9f54d46baff318f96a13440ff7590f3d49849b5",
+  "04_squad_assigned.md": "1a75537d2f54b6476b8771b65f060fdf64eaff6bfa4fdc0d212e007636008f10",
+  "mission_contract.json": "5fba980ac6df6fe0647bbd6763b0e753315a6a4def1942a7ec5545cfc212b1ff",
+  "relatorio_final.md": "3ffe25db69778972bb5973dddba3553979df96668acb5bdcb3958e480c18bda9",
+  "05_outputs/SKILL.md": "00330ac5627dd2b8bbfab79f7653cf57efd5042a93553c4014391518532f76d7",
+  "05_outputs/manifest.json": "9ed6f058e5948475573caefb1252e6744a6410ea3295cc623c9e6ba5d4c8e7db",
+  "05_outputs/run.py": "cd4fc895581103b9438a51f3f579ada7e2374d5cf7c7616519faa40a819f839d",
+  "05_outputs/sample_payload.json": "6730d9a0bb0149e83fc2b99cbfe8d2681f25a1cdcc8737f6b3f07870394addc4",
+  "05_outputs/skill_report.md": "16389b1da40546288f3d5c761e37d695078c2bd4b55416e96947153855f006cc",
+  "06_exports/package_manifest.json": "5b5635c989412a638be84080524a5dc7866368adf90b10592f5338f459802b69"
+}

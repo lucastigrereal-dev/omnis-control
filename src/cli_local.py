@@ -16,6 +16,8 @@ import typer
 from rich.console import Console
 from rich.panel import Panel
 
+from src.output_factory.factory import OutputFactory
+
 app = typer.Typer(
     name="local",
     help="Local OMNIS commands — dry_run=True, no external calls",
@@ -234,3 +236,47 @@ def status():
             lines.append(f"  [cyan]{m.name}[/cyan]  (no contract)")
 
     console.print(Panel("\n".join(lines), title="omnis local status — missions/"))
+
+
+@app.command()
+def output_index(
+    mission: str = typer.Option(..., help="Mission dir name or path"),
+) -> None:
+    """Generate output factory package for a mission (files_index.md + manifest)."""
+    base = Path("missions")
+    mission_dir = Path(mission) if Path(mission).is_absolute() else base / mission
+    if not mission_dir.exists():
+        console.print(f"[red]Mission not found: {mission_dir}[/red]")
+        raise typer.Exit(1)
+
+    result = OutputFactory(dry_run=False).run(mission_dir)
+    console.print(
+        Panel(
+            f"[green]Output index generated for {result['mission_id']}[/green]\n"
+            + "\n".join(f"  - {p}" for p in result["outputs_written"]),
+            title="output-index",
+        )
+    )
+
+
+@app.command()
+def package(
+    mission: str = typer.Option(..., help="Mission dir name"),
+) -> None:
+    """Run full Output Factory on a mission (manifest + checksums + zip + report)."""
+    base = Path("missions")
+    mission_dir = Path(mission) if Path(mission).is_absolute() else base / mission
+    if not mission_dir.exists():
+        console.print(f"[red]Mission not found: {mission_dir}[/red]")
+        raise typer.Exit(1)
+
+    result = OutputFactory(dry_run=False).run(mission_dir)
+    v = result["validation"]
+    status = "[green]VALID[/green]" if v["valid"] else f"[yellow]MISSING {v['missing']}[/yellow]"
+    console.print(
+        Panel(
+            f"[bold]{result['mission_id']}[/bold] — {status}\n"
+            + "\n".join(f"  - {p}" for p in result["outputs_written"]),
+            title="package",
+        )
+    )
