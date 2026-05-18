@@ -58,6 +58,8 @@ class MissionOrchestrator:
         # Lazy-init emitter
         from src.first_missions.event_emitter import MissionEventEmitter
         self.emitter = MissionEventEmitter(dry_run=dry_run, bus=event_bus)  # type: ignore[arg-type]
+        from src.first_missions.logger import MissionLogger
+        self.log = MissionLogger(dry_run=dry_run)
 
     # -- Submit -----------------------------------------------------------
 
@@ -93,6 +95,10 @@ class MissionOrchestrator:
             mission = self.registry.get(ex.mission_id)
             if mission:
                 self.emitter.emit_for(mission)
+                if ex.ok:
+                    self.log.log_complete(mission, duration_ms=ex.duration_ms)
+                else:
+                    self.log.log_fail(mission, duration_ms=ex.duration_ms)
                 sr = self.result_store.save_mission(mission, duration_ms=ex.duration_ms)
                 stored.append(sr)
             if ex.ok:
@@ -116,9 +122,15 @@ class MissionOrchestrator:
         self.submit(mission)
         self.scheduler.dispatch_ready()
         self.emitter.mission_started(mission)
-        self.executor.execute(mission)
+        self.log.log_start(mission)
+        ex_result = self.executor.execute(mission)
+        dur = ex_result.duration_ms
+        if mission.status == MissionStatus.FAILED:
+            self.log.log_fail(mission, duration_ms=dur)
+        else:
+            self.log.log_complete(mission, duration_ms=dur)
         self.emitter.emit_for(mission)
-        return self.result_store.save_mission(mission)
+        return self.result_store.save_mission(mission, duration_ms=dur)
 
     def preview(self, mission: Mission) -> dict:
         """Return a preview of what would be executed — never changes state."""
