@@ -1,0 +1,12 @@
+{
+  "mission_id": "MIS-20260518-005",
+  "files": [
+    "PRD.md",
+    "user_stories.md",
+    "schema_banco.sql",
+    "api_contract.md",
+    "frontend_spec.md",
+    "test_plan.md",
+    "README.md"
+  ]
+}

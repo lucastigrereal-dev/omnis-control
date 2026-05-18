@@ -1,0 +1,10 @@
+{
+  "mission_id": "MIS-20260518-006",
+  "files": [
+    "SKILL.md",
+    "manifest.json",
+    "run.py",
+    "sample_payload.json",
+    "skill_report.md"
+  ]
+}

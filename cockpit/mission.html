@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detalhes da Missão — OMNIS Cockpit</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html">Missões</a>
+  <a href="approvals.html">Aprovações</a>
+  <a href="outputs.html">Outputs</a>
+  <span class="brand">OMNIS Cockpit</span>
+</nav>
+<main class="container">
+
+<h1 id="m-title">Missão</h1>
+<div class="mission-card" id="m-card">
+  <div class="grid-2">
+    <div><strong>ID:</strong> <span id="m-id">—</span></div>
+    <div><strong>Status:</strong> <span id="m-status">—</span></div>
+    <div><strong>Setor:</strong> <span id="m-setor">—</span></div>
+    <div><strong>Criado por:</strong> <span id="m-criado">—</span></div>
+    <div><strong>Aberto:</strong> <span id="m-aberto">—</span></div>
+    <div><strong>Fechado:</strong> <span id="m-fechado">—</span></div>
+  </div>
+  <div class="block"><strong>Objetivo:</strong> <span id="m-objetivo">—</span></div>
+</div>
+
+<h2>Arquivos</h2>
+<ul id="m-files" class="file-list"><li>Carregando…</li></ul>
+</main>
+<footer class="footer">
+  <span>OMNIS Control</span>
+  <span id="gen-time">—</span>
+</footer>
+<script src="missions_data.js"></script>
+
+<script>
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('mission');
+  if (!id) { document.getElementById('m-title').textContent = 'Nenhuma missão especificada'; return; }
+  document.getElementById('m-title').textContent = id;
+  const data = window.MISSIONS_DATA || {missions:[]};
+  const m = data.missions.find(x => x.mission_id === id);
+  if (!m) { document.getElementById('m-title').textContent = 'Missão não encontrada: ' + id; return; }
+  document.getElementById('m-id').textContent = m.mission_id;
+  document.getElementById('m-status').textContent = m.status;
+  document.getElementById('m-status').className = 'badge ' + (m.status === 'open' ? 'status-open' : 'status-closed');
+  document.getElementById('m-setor').textContent = m.setor;
+  document.getElementById('m-criado').textContent = m.criado_por;
+  document.getElementById('m-aberto').textContent = m.timestamp || '—';
+  document.getElementById('m-fechado').textContent = m.closed_at || '—';
+  document.getElementById('m-objetivo').textContent = m.objetivo;
+  const filesUl = document.getElementById('m-files');
+  filesUl.innerHTML = '';
+  const base = '../' + m.path + '/';
+  const entries = [
+    ['mission_contract.json', base + 'mission_contract.json'],
+    ['01_mission_brief.md', base + '01_mission_brief.md'],
+    ['02_context_used.md', base + '02_context_used.md'],
+    ['03_execution_plan.md', base + '03_execution_plan.md'],
+    ['04_squad_assigned.md', base + '04_squad_assigned.md'],
+    ['09_next_action.md', base + '09_next_action.md'],
+    ['10_learnings.md', base + '10_learnings.md'],
+    ['relatorio_final.md', base + 'relatorio_final.md'],
+  ];
+  entries.forEach(([label, url]) => {
+    const li = document.createElement('li');
+    li.innerHTML = '<a href="' + url + '" target="_blank">' + label + '</a>';
+    filesUl.appendChild(li);
+  });
+  ['05_outputs','06_exports','07_approval','08_logs'].forEach(dir => {
+    const li = document.createElement('li');
+    li.innerHTML = '<strong>' + dir + '/</strong> — ' + (m[dir.replace('0','').replace('_count','').replace('5','outputs').replace('6','exports').replace('7','').replace('8','logs')] || '0') + ' arquivos';
+    filesUl.appendChild(li);
+  });
+})();
+</script>
+
+</body>
+</html>

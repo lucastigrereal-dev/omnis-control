@@ -1,0 +1,142 @@
+{
+  "name": "pricing-calculator",
+  "version": "1.0.0",
+  "tier": "core",
+  "sector": "finance",
+  "description": "Calculadora inteligente de preco de publi para Instagram baseada em alcance, nicho, formato e pacote",
+  "author": "OMNIS Forge",
+  "created": "2026-05-18",
+  "language": "pt-BR",
+  "runtime": "python",
+  "entrypoint": "run.py",
+  "main_class": "PubliPriceCalculator",
+
+  "input_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "PricingCalculatorInput",
+    "type": "object",
+    "required": ["seguidores", "alcance_medio", "engagement_rate", "nicho", "formato", "pacote"],
+    "properties": {
+      "seguidores": {
+        "type": "integer",
+        "minimum": 1000,
+        "description": "Numero total de seguidores do perfil"
+      },
+      "alcance_medio": {
+        "type": "integer",
+        "minimum": 100,
+        "description": "Alcance medio por post (impressoes)"
+      },
+      "engagement_rate": {
+        "type": "number",
+        "minimum": 0.1,
+        "maximum": 50.0,
+        "description": "Taxa de engajamento em % (ex: 4.2 para 4.2%)"
+      },
+      "nicho": {
+        "type": "string",
+        "enum": ["turismo", "gastronomia", "familia"],
+        "description": "Nicho do perfil"
+      },
+      "formato": {
+        "type": "string",
+        "enum": ["reel", "carrossel", "collab", "story"],
+        "description": "Formato do conteudo a ser produzido"
+      },
+      "pacote": {
+        "type": "string",
+        "enum": ["starter", "growth", "premium"],
+        "description": "Pacote de venda contratado"
+      },
+      "num_collabs": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 20,
+        "default": null,
+        "description": "Numero de collabs no pacote. Se nao informado, usa o padrao do pacote (starter=1, growth=3, premium=4)"
+      },
+      "meta_cpm": {
+        "type": "number",
+        "minimum": 1.0,
+        "maximum": 100.0,
+        "default": 15.0,
+        "description": "CPM de referencia Meta Ads em R$ (padrao: R$ 15,00)"
+      }
+    }
+  },
+
+  "output_schema": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "title": "PricingCalculatorOutput",
+    "type": "object",
+    "required": ["input", "pricing", "cpm_comparison", "proposta"],
+    "properties": {
+      "input": {
+        "type": "object",
+        "description": "Parametros de entrada utilizados no calculo"
+      },
+      "pricing": {
+        "type": "object",
+        "required": ["preco_base", "multiplicador_nicho", "multiplicador_formato", "multiplicador_pacote", "preco_unitario", "preco_total", "preco_por_collab"],
+        "properties": {
+          "preco_base": { "type": "number", "description": "Preco base calculado antes dos multiplicadores" },
+          "multiplicador_nicho": { "type": "number", "description": "Multiplicador aplicado pelo nicho" },
+          "multiplicador_formato": { "type": "number", "description": "Multiplicador aplicado pelo formato" },
+          "multiplicador_pacote": { "type": "number", "description": "Multiplicador (desconto) aplicado pelo pacote" },
+          "preco_unitario": { "type": "number", "description": "Preco final por collab apos todos os multiplicadores" },
+          "preco_total": { "type": "number", "description": "Preco total do pacote = preco_unitario * num_collabs" },
+          "preco_por_collab": { "type": "number", "description": "Alias para preco_unitario" }
+        }
+      },
+      "cpm_comparison": {
+        "type": "object",
+        "required": ["cpm_omnis", "cpm_meta", "economia_pct", "alcance_total_estimado"],
+        "properties": {
+          "cpm_omnis": { "type": "number", "description": "CPM efetivo do anuncio via OMNIS" },
+          "cpm_meta": { "type": "number", "description": "CPM de referencia Meta Ads" },
+          "economia_pct": { "type": "number", "description": "Percentual de economia vs Meta Ads" },
+          "alcance_total_estimado": { "type": "integer", "description": "Alcance total estimado para todas as collabs" }
+        }
+      },
+      "proposta": {
+        "type": "string",
+        "description": "Texto formatado da proposta comercial pronta para envio"
+      }
+    }
+  },
+
+  "dependencies": {
+    "python": ">=3.12",
+    "packages": [],
+    "omnis_modules": [
+      "src/finance/models (opcional, para integracao FinancePlanner)"
+    ]
+  },
+
+  "permissions": {
+    "network": false,
+    "filesystem": false,
+    "database": false,
+    "llm": false,
+    "reads_secrets": false
+  },
+
+  "triggers": [
+    "calcular preco",
+    "precificar publi",
+    "quanto cobrar",
+    "cotacao publi",
+    "precificacao",
+    "proposta comercial",
+    "comparar pacotes"
+  ],
+
+  "version_history": [
+    {
+      "version": "1.0.0",
+      "date": "2026-05-18",
+      "changes": "Lancamento inicial. Algoritmo deterministico de precificacao com CPM comparison.",
+      "author": "OMNIS Forge"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Missões — OMNIS Cockpit</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<nav class="topnav">
+  <a href="index.html">Missões</a>
+  <a href="approvals.html">Aprovações</a>
+  <a href="outputs.html">Outputs</a>
+  <span class="brand">OMNIS Cockpit</span>
+</nav>
+<main class="container">
+
+<h1>Missões</h1>
+<div class="stats">
+  <div class="stat"><span class="stat-num">1</span><span class="stat-label">Total</span></div>
+  <div class="stat"><span class="stat-num">1</span><span class="stat-label">Abertas</span></div>
+  <div class="stat"><span class="stat-num">0</span><span class="stat-label">Fechadas</span></div>
+  <div class="stat"><span class="stat-num">0</span><span class="stat-label">Pendentes</span></div>
+</div>
+<table class="mission-table">
+  <thead>
+    <tr><th>ID</th><th>Status</th><th>Setor</th><th>Objetivo</th><th>Outputs</th><th>Exports</th><th>Aprov.</th><th>Relatório</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><a href="mission.html?mission=MIS-20260518-001">MIS-20260518-001</a></td><td><span class="badge status-open">open</span></td><td>marketing</td><td class="objetivo">campanha 30 dias hotel nordeste</td><td>0</td><td>0</td><td>—</td><td>—</td></tr>
+  </tbody>
+</table>
+</main>
+<footer class="footer">
+  <span>OMNIS Control</span>
+  <span id="gen-time">—</span>
+</footer>
+<script src="missions_data.js"></script>
+</body>
+</html>

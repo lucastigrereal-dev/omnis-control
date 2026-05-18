@@ -1,0 +1,10 @@
+{
+  "mission_id": "MIS-20260518-006",
+  "timestamp": "2026-05-18T19:17:26Z",
+  "status": "open",
+  "setor": "app_factory",
+  "objetivo": "Crie uma skill nova para gerar uma calculadora de preço de publi baseada em alcance, nicho, collab e pacote mensal.",
+  "criado_por": "AcceptanceTest",
+  "closed_at": null,
+  "mission_path": "C:\\Users\\lucas\\omnis-control\\missions\\MIS-20260518-006"
+}

@@ -24,6 +24,16 @@
 | W201-W205 | G24 | Maintenance Audit | MERGED | supreme | e882432 | — |
 | W206-W215 | G25-G26 | Templates + QA | REDUNDANT_ARCHIVE_RECOMMENDED | templates | 233cdf4 | 0 unique |
 | P37-P42 | CCOS | RuntimeBridge | DONE | supreme | 28881f9 | 26 |
+| W-F1 | G27 | Cockpit Index HTML | DONE | supreme | — | 17 |
+| W-F2 | G27 | Cockpit Mission Viewer | DONE | supreme | — | — |
+| W-F3 | G27 | Cockpit Approvals Panel | DONE | supreme | — | — |
+| W-F4 | G27 | Cockpit Outputs Viewer | DONE | supreme | — | — |
+| W-F5 | G27 | Cockpit HTML Generator | DONE | supreme | — | 17 |
+| W-A1-A5 | G28 | Mission Engine + Intake + Report | DONE | supreme | — | — |
+| W-B1-B5 | G29 | Task Dispatcher + Skill Runner + Learning | DONE | supreme | — | — |
+| W-C1-C5 | G30 | Approval Gate + Guardrails + Autonomy | DONE | supreme | — | — |
+| W-D1-D5 | G31 | Squad Selector + Squads Especializados | DONE | supreme | — | — |
+| W-E1-E4 | G32 | Gap Detector + Forge Orchestrator | DONE | supreme | — | — |
 
 ## Legenda
 - DONE: concluído e commitado
