@@ -29,7 +29,7 @@ class AkashaProvider(MemoryProvider):
     def __init__(
         self,
         db_url: Optional[str] = None,
-        table: str = "memory_chunks",
+        table: str = "omnis_memories",
         fallback: Optional[MemoryProvider] = None,
     ) -> None:
         self._db_url = db_url or os.environ.get("AKASHA_DB_URL", "")
