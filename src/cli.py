@@ -1976,6 +1976,84 @@ def wf_list(
 
 
 # ---------------------------------------------------------------------------
+# HEALTH SERVER COMMANDS
+# ---------------------------------------------------------------------------
+
+health_app = typer.Typer(
+    name="health-server",
+    help="OMNIS Health HTTP server — start/stop/status",
+    add_completion=False,
+)
+
+
+@health_app.command(name="start")
+def health_server_start(port: int = typer.Option(0, help="Porta (0 = automatica)")):
+    """Inicia o health server em background."""
+    from src.omnis_health.server import (
+        HealthServer,
+        ServerState,
+        save_server_state,
+        is_server_alive,
+        build_health_report,
+    )
+    from datetime import datetime, timezone
+
+    if is_server_alive():
+        state = __import__("src.omnis_health.server", fromlist=["load_server_state"]).load_server_state()
+        console.print(f"[yellow]Health server ja esta rodando na porta {state.port if state else '?'}[/yellow]")
+        raise typer.Exit(1)
+
+    server = HealthServer(port=port, report_builder=build_health_report)
+    actual_port = server.start()
+    state = ServerState(
+        pid=os.getpid(),
+        port=actual_port,
+        started_at=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    )
+    save_server_state(state)
+    console.print(f"[green]Health server iniciado em http://127.0.0.1:{actual_port}/health[/green]")
+
+
+@health_app.command(name="stop")
+def health_server_stop():
+    """Para o health server."""
+    from src.omnis_health.server import load_server_state, clear_server_state, is_server_alive
+    import signal
+
+    if not is_server_alive():
+        console.print("[yellow]Health server nao esta rodando.[/yellow]")
+        clear_server_state()
+        raise typer.Exit(0)
+
+    state = load_server_state()
+    if state:
+        try:
+            os.kill(state.pid, signal.SIGTERM)
+        except OSError:
+            pass
+        clear_server_state()
+        console.print(f"[green]Health server na porta {state.port} parado.[/green]")
+    else:
+        console.print("[yellow]Estado do server nao encontrado.[/yellow]")
+
+
+@health_app.command(name="status")
+def health_server_status():
+    """Mostra status do health server."""
+    from src.omnis_health.server import load_server_state, is_server_alive
+
+    if is_server_alive():
+        state = load_server_state()
+        if state:
+            console.print(f"[green]Health server rodando[/green]")
+            console.print(f"  URL: http://127.0.0.1:{state.port}/health")
+            console.print(f"  PID: {state.pid}")
+            console.print(f"  Iniciado: {state.started_at}")
+    else:
+        console.print("[yellow]Health server parado.[/yellow]")
+
+
+# ---------------------------------------------------------------------------
 # REGISTRATION BLOCK — centralizado, ordem determinística
 # ---------------------------------------------------------------------------
 
@@ -1996,6 +2074,7 @@ app.add_typer(approvals_app)
 app.add_typer(templates_app)
 app.add_typer(workflow_app)
 app.add_typer(idea_app)
+app.add_typer(health_app)
 
 
 if __name__ == "__main__":

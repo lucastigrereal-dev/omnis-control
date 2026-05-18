@@ -2,13 +2,59 @@
 from __future__ import annotations
 
 import json
+import os
 import socket
 import threading
+from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from typing import Callable
 
 from src.omnis_health.models import HealthReport, HealthStatus
+
+STATE_FILE = os.path.expanduser("~/.claude/health_server_state.json")
+
+
+@dataclass
+class ServerState:
+    pid: int
+    port: int
+    started_at: str = ""
+
+
+def save_server_state(state: ServerState) -> None:
+    os.makedirs(os.path.dirname(STATE_FILE), exist_ok=True)
+    with open(STATE_FILE, "w", encoding="utf-8") as f:
+        json.dump(asdict(state), f)
+
+
+def load_server_state() -> ServerState | None:
+    if not os.path.isfile(STATE_FILE):
+        return None
+    try:
+        with open(STATE_FILE, encoding="utf-8") as f:
+            data = json.load(f)
+        return ServerState(**data)
+    except (json.JSONDecodeError, TypeError, KeyError):
+        return None
+
+
+def clear_server_state() -> None:
+    if os.path.isfile(STATE_FILE):
+        os.remove(STATE_FILE)
+
+
+def is_server_alive() -> bool:
+    """Check if a health server is running by reading state file and trying to connect."""
+    state = load_server_state()
+    if state is None:
+        return False
+    try:
+        with socket.create_connection(("127.0.0.1", state.port), timeout=2):
+            return True
+    except (socket.timeout, ConnectionRefusedError, OSError):
+        clear_server_state()
+        return False
 
 
 def _pick_free_port() -> int:
