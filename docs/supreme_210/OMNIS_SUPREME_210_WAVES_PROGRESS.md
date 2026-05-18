@@ -1,7 +1,7 @@
 # OMNIS SUPREME 210 WAVES — Progress Tracking
 
 **Date:** 2026-05-17
-**Last update:** 2026-05-17 — W155 complete (G15+G16 core delivered, 30-wave autopilot sprint)
+**Last update:** 2026-05-17 — W162 complete (App Factory advanced pipeline G14 extended W133-W162)
 
 ---
 
@@ -13,11 +13,11 @@
 | Waves planned (detailed) | 25 |
 | Waves skeleton | 185 |
 | Waves in progress | 0 |
-| Waves complete | 155 |
+| Waves complete | 162 |
 | Waves blocked | 0 |
 | Total blocos | 2,100 |
-| Blocos executados | 1550 |
-| Commits | 52 |
+| Blocos executados | 1620 |
+| Commits | 65 |
 
 ## Progresso por grupo
 
@@ -36,7 +36,7 @@
 | 11 — Video Studio | W101-W110 | 10 | 0 | 10 | 0 |
 | 12 — Sales/CRM | W111-W120 | 10 | 0 | 10 | 0 |
 | 13 — Commercial/SDR | W121-W130 | 10 | 0 | 10 | 0 |
-| 14 — App Factory | W131-W140 | 10 | 0 | 10 | 0 |
+| 14 — App Factory | W131-W162 | 32 | 0 | 32 | 0 |
 | 15 — Automation/n8n | W141-W150 | 10 | 0 | 10 | 0 |
 | 16 — MCP/Plugin | W151-W160 | 5 | 0 | 5 | 0 |
 | 17 — Remote Control | W161-W170 | 0 | 0 | 0 | 0 |
@@ -194,6 +194,28 @@
 | 2026-05-16 | W138 | 10/10 | COMPLETE | pending-git-blocked | OpenHands Mock Adapter |
 | 2026-05-16 | W139 | 10/10 | COMPLETE | pending-git-blocked | Package Export |
 | 2026-05-16 | W140 | 10/10 | COMPLETE | pending-git-blocked | G14 App Factory E2E |
+| 2026-05-17 | W141 | 10/10 | COMPLETE | — | Documentation Generator (pre-existing) |
+| 2026-05-17 | W142 | 10/10 | COMPLETE | — | E2E Planning Pipeline (pre-existing) |
+| 2026-05-17 | W143 | 10/10 | COMPLETE | 49a8cc6 | Storage Safety module |
+| 2026-05-17 | W144 | 10/10 | COMPLETE | b0c7360 | Quality Score module |
+| 2026-05-17 | W145 | 10/10 | COMPLETE | e8c2579 | Diff Engine module |
+| 2026-05-17 | W146 | 10/10 | COMPLETE | 204ee0f | Pipeline Recovery module |
+| 2026-05-17 | W147 | 10/10 | COMPLETE | f7dff6f | Status Tracker module |
+| 2026-05-17 | W148 | 10/10 | COMPLETE | c17d432 | CLI integration for new modules |
+| 2026-05-17 | W149 | 10/10 | COMPLETE | 6efd109 | CLI integration tests + fixes |
+| 2026-05-17 | W150 | 10/10 | COMPLETE | f643729 | Pipeline resilience hardening |
+| 2026-05-17 | W151 | 10/10 | COMPLETE | d2ac30a | Quality score pipeline integration |
+| 2026-05-17 | W152 | 10/10 | COMPLETE | 26150c2 | Storage safety pipeline integration |
+| 2026-05-17 | W153 | 10/10 | COMPLETE | c7c7b32 | Recovery integration hardening |
+| 2026-05-17 | W154 | 10/10 | COMPLETE | a3c7bef | Status tracker persistence |
+| 2026-05-17 | W155 | 10/10 | COMPLETE | 3e96942 | Pipeline integration tests |
+| 2026-05-17 | W156 | 10/10 | COMPLETE | cae69cf | Edge case hardening |
+| 2026-05-17 | W157 | 10/10 | COMPLETE | f90debf | Code polish — __all__ exports |
+| 2026-05-17 | W158 | 10/10 | COMPLETE | b991c8f | Documentation update |
+| 2026-05-17 | W159 | 10/10 | COMPLETE | 52c230e | Quality gate hardening |
+| 2026-05-17 | W160 | 10/10 | COMPLETE | 8070b0a | Storage safety scaffold integration |
+| 2026-05-17 | W161 | 10/10 | COMPLETE | d7fd561 | E2E stress tests |
+| 2026-05-17 | W162 | 10/10 | COMPLETE | — | Final summary + progress update |
 
 ---
 
