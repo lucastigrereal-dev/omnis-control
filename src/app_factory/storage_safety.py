@@ -1,6 +1,19 @@
 """Storage safety validation for App Factory — no-touch zones, path guards, dry-run enforcement."""
 from __future__ import annotations
 
+__all__ = [
+    "StorageSafetyPolicy",
+    "SafetyViolation",
+    "StorageSafetyReport",
+    "NO_TOUCH_PATTERNS",
+    "DESTRUCTIVE_PATTERNS",
+    "matches_blocked_pattern",
+    "validate_path_safety",
+    "validate_command_safety",
+    "validate_dry_run_enforcement",
+    "audit_directory",
+]
+
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path

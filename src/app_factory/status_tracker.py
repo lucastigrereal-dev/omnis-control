@@ -1,6 +1,12 @@
 """Status tracker for App Factory — per-idea pipeline progress, summaries, reports."""
 from __future__ import annotations
 
+__all__ = [
+    "IdeaStatus",
+    "PipelineSummary",
+    "StatusTracker",
+]
+
 import json
 from dataclasses import dataclass, field
 from datetime import datetime, timezone

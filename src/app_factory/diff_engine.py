@@ -1,6 +1,15 @@
 """Diff engine for App Factory — compare ideas, blueprints, schemas, and API contracts."""
 from __future__ import annotations
 
+__all__ = [
+    "DiffEntry",
+    "DiffReport",
+    "diff_ideas",
+    "diff_schemas",
+    "diff_api_contracts",
+    "diff_blueprints",
+]
+
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 

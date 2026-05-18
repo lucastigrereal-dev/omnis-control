@@ -1,6 +1,18 @@
 """Pipeline recovery for App Factory — state tracking, resume, rollback."""
 from __future__ import annotations
 
+__all__ = [
+    "StageStatus",
+    "StageResult",
+    "PipelineState",
+    "RecoveryPlan",
+    "STAGE_ORDER",
+    "STAGE_INDEX",
+    "init_pipeline_state",
+    "build_recovery_plan",
+    "rollback_to_stage",
+]
+
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum

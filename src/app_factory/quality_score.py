@@ -1,6 +1,16 @@
 """Quality scoring for App Factory artifacts — PRD, schema, API, tasks, composite."""
 from __future__ import annotations
 
+__all__ = [
+    "DimensionScore",
+    "QualityScore",
+    "score_prd",
+    "score_schema",
+    "score_api_contract",
+    "score_task_plan",
+    "compute_quality_score",
+]
+
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
