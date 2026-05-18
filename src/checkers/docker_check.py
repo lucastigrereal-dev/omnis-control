@@ -75,7 +75,7 @@ def _try_docker_sdk(result: dict) -> dict:
             result["containers_running"] += 1
             if is_unhealthy:
                 result["containers_unhealthy"] += 1
-        result["error"] = None
+        # preserve CLI error as warning even when SDK succeeds
     except Exception as e:
         if not result["error"]:
             result["error"] = f"Docker SDK falhou: {e}"
