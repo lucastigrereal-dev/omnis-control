@@ -42,6 +42,7 @@ from src.caption_approval.models import DraftStatus
 from src.caption_approval.drafts import STALE_DAYS
 from src.reports import briefing as briefing_mod
 from src.app_factory.idea_cli import idea_app
+from src.cli_local import app as local_app
 
 app = typer.Typer(
     name="jarvis",
@@ -2282,6 +2283,7 @@ app.add_typer(workflow_app)
 app.add_typer(mission_app)
 app.add_typer(idea_app)
 app.add_typer(health_app)
+app.add_typer(local_app, name="local")
 
 
 if __name__ == "__main__":
