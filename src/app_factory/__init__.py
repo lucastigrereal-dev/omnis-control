@@ -1,4 +1,6 @@
-"""OMNIS App Factory — G14 W131-W140.
+"""OMNIS App Factory — G14 W131-W162.
 
-Pipeline: PRD → Schema → API → Frontend → Auth → Migration → Config → Tests → Package → E2E.
+Pipeline: Idea → PRD → Schema → API → Frontend → Tests → Tasks →
+Bundle → Quality Gate → Quality Score → Storage Safety →
+Diff → Recovery → Status → Scaffold → Package → E2E.
 """
