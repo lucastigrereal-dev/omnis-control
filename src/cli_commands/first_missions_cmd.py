@@ -231,6 +231,38 @@ def fm_preview(
 
 
 # ---------------------------------------------------------------------------
+# Health
+# ---------------------------------------------------------------------------
+
+@first_missions_app.command(name="health")
+def fm_health(
+    port: int = typer.Option(8999, "--port", help="Health server port"),
+    host: str = typer.Option("127.0.0.1", "--host", help="Health server host"),
+    json_output: bool = typer.Option(False, "--json", help="Print health check as JSON"),
+) -> None:
+    """Run a quick health check (read-only, no server)."""
+    from src.health_bridge.server import build_basic_checks
+    from src.health_bridge.models import HealthStatus
+
+    checks = build_basic_checks()
+    status = HealthStatus.from_checks(checks, source="first-missions-cli")
+
+    if json_output:
+        print(json.dumps(status.to_dict(), indent=2, ensure_ascii=False))
+        return
+
+    console.print(f"[bold]OMNIS Health Check[/bold] ({status.timestamp})")
+    for c in checks:
+        icon = {"ok": "[green]OK[/green]", "warn": "[yellow]WARN[/yellow]",
+                "error": "[red]ERR[/red]", "unknown": "[dim]???[/dim]"}
+        console.print(f"  {icon.get(c.level.value, '?')} {c.name}: {c.message}")
+
+    overall_color = {"ok": "green", "warn": "yellow", "error": "red", "unknown": "dim"}
+    o = status.status.value
+    console.print(f"\nOverall: [{overall_color.get(o, 'dim')}]{o.upper()}[/{overall_color.get(o, 'dim')}]")
+
+
+# ---------------------------------------------------------------------------
 # Create
 # ---------------------------------------------------------------------------
 
