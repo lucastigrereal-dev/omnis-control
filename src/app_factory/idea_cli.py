@@ -335,12 +335,21 @@ def idea_safety(
 def idea_quality(idea_id: str = typer.Argument(..., help="ID da ideia")) -> None:
     """Calcula quality score do bundle planejado."""
     bundle = _bundle_for_idea(idea_id)
+    schema_tables = [
+        {
+            "name": t.name,
+            "fields": [f.__dict__ for f in t.fields],
+            "relationships": t.relationships,
+            "indexes": t.indexes,
+        }
+        for t in bundle.schema_plan.tables
+    ]
     score = compute_quality_score(
         bundle.artifact_id,
         bundle.prd_markdown,
-        [t.to_dict() for t in bundle.schema_plan.tables],
-        [e.to_dict() for e in bundle.api_contract.endpoints],
-        [t.to_dict() for t in bundle.task_plan.tasks],
+        schema_tables,
+        [e.__dict__ for e in bundle.api_contract.endpoints],
+        [t.__dict__ for t in bundle.task_plan.tasks],
     )
     console.print(f"[bold]Quality Score:[/bold] {score.overall.percentage}% ({score.overall.grade})")
     console.print(f"  PRD:     {score.prd_score.percentage}% ({score.prd_score.grade})")
@@ -371,8 +380,8 @@ def idea_diff(
     left_schema = build_schema_plan(left, dry_run=True)
     right_schema = build_schema_plan(right, dry_run=True)
     schema_report = diff_schemas(
-        [t.__dict__ for t in left_schema.tables],
-        [t.__dict__ for t in right_schema.tables],
+        [_schema_table_to_dict(t) for t in left_schema.tables],
+        [_schema_table_to_dict(t) for t in right_schema.tables],
         left_label=idea_left + "_schema",
         right_label=idea_right + "_schema",
     )
@@ -482,6 +491,15 @@ def _load_idea_dict(idea_id: str) -> dict:
         console.print(f"[red]Ideia '{idea_id}' nao encontrada.[/red]")
         raise typer.Exit(1)
     return idea.to_dict()
+
+
+def _schema_table_to_dict(table) -> dict:
+    return {
+        "name": table.name,
+        "fields": [f.__dict__ for f in table.fields],
+        "relationships": table.relationships,
+        "indexes": table.indexes,
+    }
 
 
 def _bundle_for_idea(idea_id: str):

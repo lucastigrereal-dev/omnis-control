@@ -203,7 +203,7 @@ def score_api_contract(endpoints: list[dict]) -> DimensionScore:
         score -= 10
 
     # Error code documentation
-    endpoints_with_errors = sum(1 for e in endpoints if e.get("error_codes"))
+    endpoints_with_errors = sum(1 for e in endpoints if e.get("error_codes") or e.get("errors"))
     if endpoints_with_errors < len(endpoints):
         notes.append(f"Only {endpoints_with_errors}/{len(endpoints)} endpoints document error codes")
 
