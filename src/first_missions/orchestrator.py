@@ -47,12 +47,17 @@ class MissionOrchestrator:
     All operations respect dry_run — no real actions fire without approval.
     """
 
-    def __init__(self, dry_run: bool = True, result_path: Optional[Path] = None) -> None:
+    def __init__(self, dry_run: bool = True, result_path: Optional[Path] = None,
+                 event_bus: Optional[object] = None) -> None:
         self.dry_run = dry_run
         self.registry = MissionRegistry()
         self.scheduler = MissionScheduler(dry_run=dry_run)
         self.executor = MissionExecutor(dry_run=dry_run)
         self.result_store = MissionResultStore(path=result_path, dry_run=dry_run)
+        self._bus = event_bus
+        # Lazy-init emitter
+        from src.first_missions.event_emitter import MissionEventEmitter
+        self.emitter = MissionEventEmitter(dry_run=dry_run, bus=event_bus)  # type: ignore[arg-type]
 
     # -- Submit -----------------------------------------------------------
 
@@ -87,6 +92,7 @@ class MissionOrchestrator:
         for ex in exec_results:
             mission = self.registry.get(ex.mission_id)
             if mission:
+                self.emitter.emit_for(mission)
                 sr = self.result_store.save_mission(mission, duration_ms=ex.duration_ms)
                 stored.append(sr)
             if ex.ok:
@@ -109,7 +115,9 @@ class MissionOrchestrator:
         """Submit + execute + store a single mission immediately."""
         self.submit(mission)
         self.scheduler.dispatch_ready()
+        self.emitter.mission_started(mission)
         self.executor.execute(mission)
+        self.emitter.emit_for(mission)
         return self.result_store.save_mission(mission)
 
     def preview(self, mission: Mission) -> dict:
