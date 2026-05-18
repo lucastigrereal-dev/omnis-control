@@ -42,3 +42,5 @@ data/asset_inbox_registry.jsonl
 data/orchestrator_runs.jsonl
 bundles/
 .claude/worktrees/
+reports/ccos/*.log
+reports/ccos/*.md

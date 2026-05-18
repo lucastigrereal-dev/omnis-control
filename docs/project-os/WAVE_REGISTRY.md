@@ -22,13 +22,19 @@
 | G23 | G23 | Health Bridge (minimal) | SUPERSEDED | supreme | ed594dd | — |
 | W196-W200 | G23 | Health canonical (omnis_health) | CANONICAL | supreme | 190520a | 86 |
 | W201-W205 | G24 | Maintenance Audit | MERGED | supreme | e882432 | — |
-| W206-W215 | G25-G26 | Templates + QA | REDUNDANT | templates | 233cdf4 | 0 unique |
-| P37-P42 | CCOS | RuntimeBridge | VERIFY | — | — | — |
+| W206-W215 | G25-G26 | Templates + QA | REDUNDANT_ARCHIVE_RECOMMENDED | templates | 233cdf4 | 0 unique |
+| P37-P42 | CCOS | RuntimeBridge | DONE | supreme | 28881f9 | 26 |
 
 ## Legenda
 - DONE: concluído e commitado
 - CANONICAL: implementação canônica (supersede alternativas)
 - SUPERSEDED: substituído por implementação canônica
 - MERGED: mergeado na principal
-- REDUNDANT: zero commits únicos
+- REDUNDANT_ARCHIVE_RECOMMENDED: zero commits únicos — remover worktree quando autorizado
 - VERIFY: precisa confirmação de estado
+
+## Nota RuntimeBridge P37-P42
+- `src/runtime_bridge/` implementado: bridge.py, models.py, errors.py
+- Conecta ExecutionGraph → ExecutionQueue com dry_run=True por padrão
+- 26/26 testes em tests/runtime_bridge/test_bridge.py
+- Verificado em 2026-05-18 — sprint de finalização
