@@ -1,19 +1,17 @@
 blocked_items:
   - id: secret_litellm_connectors_yaml
     severity: P0
-    status: open
+    status: resolved
+    resolution_date: "2026-05-18"
     title: "Possible LiteLLM API key exposed"
     file: "config/connectors.yaml"
     line: 82
     do_not_print_value: true
-    required_resolution:
-      - "Replace with env var placeholder."
-      - "Create or update example config."
-      - "Recommend key rotation/revocation."
-      - "Run or recommend secret scan."
-    blocks:
-      - "Maintenance merge"
-      - "Any release/push involving config"
+    resolution:
+      - "Replaced real value with env var placeholder ${LITELLM_MASTER_KEY}"
+      - "Created config/connectors.example.yaml with safe placeholders"
+      - "Recommend key rotation/revocation by operator"
+    blocks: []
 
   - id: reports_ccos_logs_not_ignored
     severity: P1

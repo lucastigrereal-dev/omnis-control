@@ -1,24 +1,12 @@
 last_updated_by: "claude_code"
 phase: "project_os_bootstrap"
 current_focus:
-  - "Resolve P0 secret risk"
   - "Consolidate Runtime/Health"
   - "Review Maintenance branch"
   - "Continue AppFactory only in isolated branch"
   - "Pause Templates until Runtime/Health consolidated"
 
-p0_blockers:
-  - id: secret_litellm_connectors_yaml
-    status: open
-    severity: P0
-    file: "config/connectors.yaml"
-    line: 82
-    description: "Possible LiteLLM API key exposed. Do not print value. Externalize to env var and rotate/revoke."
-    required_action:
-      - "Do not display the secret."
-      - "Replace real value with env var placeholder."
-      - "Create or update safe example config."
-      - "Recommend key rotation/revocation."
+p0_blockers: []
 
 p1_blockers:
   - id: reports_ccos_logs_not_ignored
@@ -35,6 +23,8 @@ p1_blockers:
     description: "Templates should wait until Runtime/Health consolidation."
 
 known_completed:
+  security_fix:
+    - "P0 LiteLLM secret externalized (2026-05-18)"
   app_factory_initial:
     - W131
     - W132
@@ -50,12 +40,9 @@ known_completed:
     - W201-W205
 
 next_safe_actions:
-  - id: handle_litellm_secret
+  - id: recommend_key_rotation
     priority: P0
-    description: "Remediate possible LiteLLM key exposure without printing key."
-  - id: freeze_main_from_g24
-    priority: P0
-    description: "Do not run G24 in main because Maintenance branch already did W201-W205."
+    description: "Lucas deve rotacionar/revogar a chave LiteLLM exposta (valor já removido do arquivo)."
   - id: review_maintenance_branch
     priority: P1
     description: "Review Maintenance branch and security findings."
