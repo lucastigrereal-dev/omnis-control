@@ -521,26 +521,36 @@ def doctor():
     else:
         overall = "ok"
 
-    result = {
-        "session_id": session_id,
-        "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "overall_status": overall,
-        "checks": checks,
-        "risks": [],
-        "next_steps": [
+    # Build unified HealthReport model
+    from src.omnis_health.models import HealthStatus, CheckResult, HealthReport
+
+    normalized_checks = []
+    for name, data in checks.items():
+        if isinstance(data, dict) and "error" in data and data["error"]:
+            status = HealthStatus.ERROR
+        else:
+            status = HealthStatus.OK
+        normalized_checks.append(CheckResult(name=name, status=status, data=data))
+
+    report = HealthReport(
+        session_id=session_id,
+        timestamp=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        overall_status=HealthStatus(overall),
+        checks=normalized_checks,
+        risks=[],
+        next_steps=[
             "Fase 3: OAuth Meta + Publisher OS — configurar META_APP_SECRET, rodar OAuth, conectar fila",
             "Fase 4: Memória conectada — Obsidian read-only -> Qdrant search -> Akasha discovery",
             "Fase 5: Saneamento Docker — limpeza de imagens e volumes não utilizados",
         ],
-    }
+    )
 
     log_mission(session_id, "doctor", overall, total_dur, summary=f"healthy={healthy}, warnings={warnings_count}, errors={len(errors)}")
 
     if hasattr(sys.stdout, 'reconfigure'):
         sys.stdout.reconfigure(encoding='utf-8')
 
-    # Only print to stderr so stdout is pure JSON
-    print(json.dumps(result, indent=2, ensure_ascii=False))
+    print(json.dumps(report.to_dict(), indent=2, ensure_ascii=False))
 
 
 @app.command()

@@ -118,7 +118,8 @@ class TestDoctorCommand:
         data = json.loads(result.stdout)
         assert data["overall_status"] == "critical"
         # The failing check should have an error entry
-        assert "error" in data["checks"]["disk"]
+        disk_check = next(c for c in data["checks"] if c["name"] == "disk")
+        assert "error" in disk_check
 
     def test_doctor_includes_all_check_names(self, runner, monkeypatch):
         """doctor output includes all expected check names."""
@@ -146,8 +147,9 @@ class TestDoctorCommand:
             "disk", "docker", "publisher", "memory", "obsidian",
             "skills", "video_pipeline",
         ]
+        check_names = {c["name"] for c in data["checks"]}
         for check_name in expected_checks:
-            assert check_name in data["checks"], f"Missing check: {check_name}"
+            assert check_name in check_names, f"Missing check: {check_name}"
 
     def test_doctor_safe_stderr_not_in_stdout(self, runner, monkeypatch):
         """Doctor only outputs JSON to stdout — stderr content doesn't leak to stdout."""
