@@ -3,15 +3,16 @@ worktrees:
     path: "C:/Users/lucas/omnis-control"
     branch: "feature/omnis-5waves-runtime-supreme"
     role: "principal_orchestrator"
-    status: ACTIVE
+    status: ORCHESTRATOR_READY
     scope:
-      - Runtime
-      - Health review
-      - Project OS bootstrap
+      - Runtime (DONE)
+      - Health review (DONE)
+      - Project OS bootstrap (DONE)
     rules:
       - "Do not run G24 Maintenance here."
       - "Do not duplicate W201-W205."
       - "Do not push."
+      - "No new features — merge gate only."
 
   - id: omnis-maintenance
     path: "C:/Users/lucas/omnis-maintenance"

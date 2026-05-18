@@ -2,33 +2,27 @@
 
 **Fonte machine-readable:** `omnis_state.yaml` → `next_safe_actions`
 
-## P0 — Fazer Agora
+## P0 — Ação Manual do Lucas
 
-1. **Tratar segredo LiteLLM** (`config/connectors.yaml:82`)
-   - Substituir valor real por placeholder de env var
-   - Criar/atualizar config exemplo seguro
-   - Recomendar rotação/revogação da chave
-   - **NUNCA exibir o valor da chave**
+1. **Rotacionar/revogar chave LiteLLM** — o valor foi removido do código em `1b278ad`, mas a chave real pode ainda ser válida. Lucas deve gerar nova chave e invalidar a exposta.
 
-2. **Impedir G24 duplicado na branch principal**
-   - Maintenance W201-W205 já foi concluído em worktree separado
-   - Não executar G24 na principal
+## P1 — Próximo Worktree a Receber Comando
 
-## P1 — Fazer em Seguida
+2. **Maintenance (omnis-maintenance)** — W201-W205
+   - P0 de código resolvido, risco reduzido de HIGH para MEDIUM
+   - Revisar commits, diffs, qualidade
+   - Preparar para merge após aprovação
 
-3. **Revisar Maintenance branch**
-   - Verificar commits, arquivos alterados, qualidade
-   - Resolver P0 de segredo antes de merge
+3. **Health (omnis-health)** — W196-W200
+   - Comparar com `ed594dd` na principal
+   - Se redundante: marcar como REDUNDANT, descartar ou arquivar
+   - Se tiver valor adicional: documentar diferença e preparar merge incremental
 
-4. **Comparar Health branch separada com ed594dd**
-   - Verificar se health worktree tem valor adicional
-   - Se redundante: marcar como REDUNDANT no registry
+## P2 — Depois da Consolidação
 
-5. **Consolidar Runtime/Health na principal**
-   - Garantir que todos os testes passam
-   - Preparar para merge
+4. **AppFactory (omnis-appfactory)** — W133-W162
+   - Continuar isolado, sem tocar em Runtime/Health
+   - Dry-run para scaffold
 
-## P2 — Depois
-
-6. **Continuar AppFactory W133-W162** no worktree isolado
-7. **Templates W206-W215** somente após Runtime/Health consolidado
+5. **Templates (omnis-templates)** — W206-W215
+   - SÓ depois que Runtime/Health estiver mergeado ou declarado canônico

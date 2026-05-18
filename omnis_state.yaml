@@ -1,8 +1,9 @@
 last_updated_by: "claude_code"
-phase: "project_os_bootstrap"
+phase: "orchestrator_ready"
 current_focus:
-  - "Consolidate Runtime/Health"
-  - "Review Maintenance branch"
+  - "Orchestrator ready — aguardando revisão dos outros worktrees"
+  - "Review Maintenance branch (W201-W205)"
+  - "Compare Health worktree com ed594dd"
   - "Continue AppFactory only in isolated branch"
   - "Pause Templates until Runtime/Health consolidated"
 
@@ -23,8 +24,10 @@ p1_blockers:
     description: "Templates should wait until Runtime/Health consolidation."
 
 known_completed:
+  project_os:
+    - "Governance layer created (ff85a77)"
   security_fix:
-    - "P0 LiteLLM secret externalized (2026-05-18)"
+    - "P0 LiteLLM secret externalized (1b278ad, 2026-05-18)"
   app_factory_initial:
     - W131
     - W132

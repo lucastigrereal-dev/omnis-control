@@ -178,10 +178,9 @@ waves:
       - reports_hygiene
       - skill_reports_index
     tests: []
-    next_action: "Resolve P0 secret before merge."
-    blockers:
-      - secret_litellm_connectors_yaml
-    risk: high
+    next_action: "Ready for review. P0 code fix done (1b278ad). Operator must rotate key."
+    blockers: []
+    risk: medium
 
   - id: W206-W215
     group: Templates
