@@ -333,6 +333,94 @@ def fm_stats(
 
 
 # ---------------------------------------------------------------------------
+# Results
+# ---------------------------------------------------------------------------
+
+@first_missions_app.command(name="results")
+def fm_results(
+    status: Optional[str] = typer.Option(None, "--status", help="Filter by status"),
+    mission_type: Optional[str] = typer.Option(None, "--type", help="Filter by mission type"),
+    limit: int = typer.Option(20, "--limit", help="Max results"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """List stored mission results with optional filters."""
+    orch = _orch(dry_run=True)
+    results = orch.result_store.query(
+        status=status,
+        mission_type=mission_type,
+        limit=limit,
+    )
+
+    if json_output:
+        print(json.dumps([r.to_dict() for r in results], indent=2, ensure_ascii=False))
+        return
+
+    if not results:
+        console.print("No results stored. Run a mission first.")
+        return
+
+    table = Table(title=f"Mission Results ({len(results)})")
+    table.add_column("Result ID", style="cyan", no_wrap=True)
+    table.add_column("Mission")
+    table.add_column("Type")
+    table.add_column("Status")
+    table.add_column("Duration")
+    table.add_column("Stored")
+
+    status_style = {
+        "COMPLETED": "[green]DONE[/green]",
+        "FAILED": "[red]FAIL[/red]",
+        "DRY_RUN": "[blue]DRY[/blue]",
+    }
+
+    for r in results:
+        icon = status_style.get(r.status, r.status)
+        table.add_row(
+            r.result_id[:12],
+            r.mission_name[:25],
+            r.mission_type[:20],
+            f"{icon}",
+            f"{r.duration_ms:.0f}ms",
+            r.stored_at[:16] if r.stored_at else "-",
+        )
+    console.print(table)
+
+
+@first_missions_app.command(name="result-show")
+def fm_result_show(
+    result_id: str = typer.Argument(..., help="Result ID to show"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Show full details of a stored result."""
+    orch = _orch(dry_run=True)
+    r = orch.result_store.get(result_id)
+    if r is None:
+        console.print(f"[red]Result not found: {result_id}[/red]")
+        raise typer.Exit(1)
+
+    if json_output:
+        print(json.dumps(r.to_dict(), indent=2, ensure_ascii=False))
+        return
+
+    console.print(f"[bold]Result: {r.result_id}[/bold]")
+    console.print(f"  Mission ID: [cyan]{r.mission_id}[/cyan]")
+    console.print(f"  Mission Name: {r.mission_name}")
+    console.print(f"  Type: {r.mission_type}")
+    console.print(f"  Status: {r.status}")
+    console.print(f"  Duration: {r.duration_ms}ms")
+    console.print(f"  Dry-run: {'[blue]Yes[/blue]' if r.dry_run else '[red]No (LIVE)[/red]'}")
+
+    if r.result:
+        console.print(f"\n  Result Data:")
+        console.print(Panel(json.dumps(r.result, indent=2), title="result"))
+
+    if r.error:
+        console.print(f"\n  [red]Error: {r.error}[/red]")
+
+    console.print(f"\n  Stored at: {r.stored_at}")
+
+
+# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 

@@ -134,3 +134,52 @@ def test_cli_stats_json():
     assert "scheduler" in data
     assert "executor" in data
     assert "result_store" in data
+
+
+# ---------------------------------------------------------------------------
+# Results commands
+# ---------------------------------------------------------------------------
+
+
+def test_cli_results_empty():
+    """Should not error on empty store."""
+    from src.first_missions.result_store import MissionResultStore
+    result = runner.invoke(first_missions_app, ["results"])
+    assert result.exit_code == 0
+
+
+def test_cli_results_json():
+    result = runner.invoke(first_missions_app, ["results", "--json"])
+    assert result.exit_code == 0
+    data = json.loads(result.stdout)
+    assert isinstance(data, list)
+
+
+def test_cli_results_with_filters():
+    result = runner.invoke(first_missions_app, [
+        "results", "--status", "COMPLETED", "--limit", "5",
+    ])
+    assert result.exit_code == 0
+
+
+def test_cli_result_show_nonexistent():
+    result = runner.invoke(first_missions_app, ["result-show", "nonexistent"])
+    assert result.exit_code == 1
+    assert "not found" in result.stdout.lower()
+
+
+# ---------------------------------------------------------------------------
+# Preview command
+# ---------------------------------------------------------------------------
+
+
+def test_cli_preview_nonexistent():
+    result = runner.invoke(first_missions_app, ["preview", "nonexistent"])
+    assert result.exit_code == 1
+
+
+def test_cli_preview_help():
+    """Verify preview command is registered."""
+    result = runner.invoke(first_missions_app, ["preview", "--help"])
+    assert result.exit_code == 0
+    assert "preview" in result.stdout.lower()
