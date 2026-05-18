@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carousel Preview — 10 slides</title>
+<style>
+  /* ---- reset ---- */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+         background: #111; color: #f0f0f0; min-height: 100vh; }
+
+  /* ---- header ---- */
+  header { padding: 16px 24px; background: #1a1a1a; border-bottom: 1px solid #333;
+            display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  header h1 { font-size: 1rem; color: #ccc; flex: 1; }
+  .counter { font-size: 0.9rem; color: #aaa; white-space: nowrap; }
+
+  /* ---- viewer ---- */
+  .viewer { display: flex; align-items: center; justify-content: center;
+             padding: 32px 16px; gap: 16px; }
+  .nav-btn { background: #2a2a2a; border: 1px solid #444; color: #fff;
+              width: 48px; height: 48px; border-radius: 50%; font-size: 1.4rem;
+              cursor: pointer; flex-shrink: 0; transition: background 0.2s; }
+  .nav-btn:hover { background: #444; }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+  /* ---- slides ---- */
+  .slides-container { position: relative; width: min(480px, 100%); }
+  .slide { display: none; background: #1e1e2e; border-radius: 16px;
+            padding: 32px; min-height: 360px; border: 1px solid #333;
+            animation: fadeIn 0.25s ease; }
+  .slide.active { display: block; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(6px); }
+                        to   { opacity:1; transform: translateY(0); } }
+
+  .slide-number { font-size: 0.75rem; color: #888; margin-bottom: 8px; }
+  .slide-title { font-size: 1.25rem; font-weight: 700; color: #e0d0ff;
+                  margin-bottom: 20px; line-height: 1.3; }
+  .slide-body { font-size: 0.85rem; line-height: 1.7; color: #ccc;
+                 white-space: pre-wrap; word-break: break-word; }
+  .slide-notes { margin-top: 20px; padding-top: 16px; border-top: 1px solid #333;
+                  font-size: 0.75rem; color: #888; white-space: pre-wrap; }
+
+  /* ---- dots ---- */
+  .dots { display: flex; justify-content: center; gap: 8px; padding: 12px 0 24px; flex-wrap: wrap; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #444; cursor: pointer;
+          transition: background 0.2s, transform 0.2s; border: none; }
+  .dot.active { background: #a78bfa; transform: scale(1.3); }
+
+  /* ---- progress bar ---- */
+  .progress { height: 3px; background: #333; position: fixed; top: 0; left: 0; right: 0; z-index: 99; }
+  .progress-fill { height: 100%; background: #a78bfa; transition: width 0.3s ease; }
+
+  /* ---- print ---- */
+  @media print {
+    body { background: #fff; color: #000; }
+    header, .nav-btn, .dots, .progress { display: none !important; }
+    .slides-container { width: 100%; }
+    .slide { display: block !important; break-inside: avoid; page-break-after: always;
+              background: #fff; color: #000; border: 1px solid #ccc; margin-bottom: 24px; }
+    .slide-title { color: #3a1a8f; }
+    .slide-body, .slide-notes { color: #333; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+
+<header>
+  <h1>Carousel Preview</h1>
+  <span class="counter" id="counterLabel">1 / 10</span>
+</header>
+
+<div class="viewer">
+  <button class="nav-btn" id="prevBtn" onclick="navigate(-1)" disabled>&#8592;</button>
+  <div class="slides-container">
+  <div class="slide active">
+    <div class="slide-number">Slide 1</div>
+    <div class="slide-title">CAPA (HOOK MATADOR)</div>
+    <div class="slide-body">Campo: Especificação
+Tipo: Capa / Hook
+Layout sugerido: Foto de hotel boutique em meia-luz com overlay escuro (60% opacidade gradiente: preto para transparente de baixo para cima). Texto centralizado em branco com palavra-chave em amarelo (#F5A623). Moldura interna sutil de 12px na cor bege (#D4C5B2).
+Objetivo: Parar o scroll instantaneamente. Gerar desconforto produtivo. Fazer o hoteleiro pensar "isso é sobre mim". Taxa de retenção alvo: &gt; 78% passam pro slide 2.
+Texto principal: "Seu hotel está dando 30% do faturamento pra Booking e você nem percebeu."
+Subtítulo (canto inferior): (Arraste pro lado →)
+Elemento visual extra: Pequeno ícone de gráfico descendente no canto superior direito, quase imperceptível, sugerindo "perda financeira" subconscientemente.</div>
+    <div class="slide-notes">Tempo de leitura: 1-2 segundos (escaneamento)
+Emoção alvo: Inquietação / Curiosidade</div>
+  </div>
+  <div class="slide">
+    <div class="slide-number">Slide 2</div>
+    <div class="slide-title">O PROBLEMA REAL</div>
+    <div class="slide-body">Campo: Especificação
+Tipo: Problema / Identificação da Dor
+Layout sugerido: Fundo cinza escuro (#1E1E1E). Ícone de corrente quebrada estilizada (libertando-se) no centro superior, tamanho 30% da altura. Texto em bullets verticais, alternando entre branco puro e cinza claro (#B0B0B0). Espaçamento generoso entre linhas (1.8x).
+Objetivo: Nomear a dor que todo hoteleiro sente mas nunca articulou em voz alta. Criar identificação imediata e visceral.
+Texto principal: "O ciclo vicioso das OTAs"
+Bullets: • Você depende da Booking.com pra ter ocupação / • Comissão de 15% a 30% por cada reserva / • O hóspede não volta direto — volta pela OTA de novo / • Você não constrói audiência própria / • Resultado: margem espremida e zero previsibilidade</div>
+    <div class="slide-notes">Tempo de leitura: 4-5 segundos
+Emoção alvo: Reconhecimento / Frustração contida</div>
+  </div>
+  <div class="slide">
+    <div class="slide-number">Slide 3</div>
+    <div class="slide-title">DADO DE IMPACTO FINANCEIRO</div>
+    <div class="slide-body">Campo: Especificação
+Tipo: Dados / Estatística de Choque
+Layout sugerido: Fundo azul escuro profundo (#0D1B2A). Número gigante centralizado ("R$ 18.750") em fonte bold 120pt na cor amarelo vibrante (#F5A623). Linha de apoio abaixo em branco corpo 18pt. Gráfico de barras simplificado na metade inferior: 2 barras comparativas (OTA = vermelho apagado #C0392B / DIRETO = verde #27AE60).
+Objetivo: Provocar o choque financeiro. O número precisa GRUDAR na mente do hoteleiro. É o slide mais compartilhado do carrossel.
+Texto principal: "R$ 18.750"
+Linha de apoio: "É quanto um hotel de 25 quartos perde POR MÊS em comissões de OTAs.*"</div>
+    <div class="slide-notes">Fonte dos dados: `*Diária média R$ 250 / 25 UHs / 30% OTA / 30 diárias = R$ 18.750/mês — Fonte: ABIH Nacional, Relatório de Hotelaria 2025; FOHB, Panorama da Hotelaria 2025`
+Tempo de leitura: 3-4 segundos
+Emoção alvo: Choque financeiro / Urgência "preciso resolver isso"</div>
+  </div>
+  <div class="slide">
+    <div class="slide-number">Slide 4</div>
+    <div class="slide-title">COMPORTAMENTO DO NOVO HÓSPEDE</div>
+    <div class="slide-body">Campo: Especificação
+Tipo: Dados Comportamentais / Social Proof
+Layout sugerido: Fundo bege claro (#F5F0E8). Mockup de celular no centro mostrando feed do Instagram com grid de fotos de hotel. 3 ícones circulares com dados ao redor do celular, conectados por linhas pontilhadas suaves. Ícones: lupa (laranja), coração (rosa suave), balão de mensagem (azul).
+Objetivo: Mostrar que o comportamento do consumidor MUDOU estruturalmente. Instagram não é vaidade — é infraestrutura de vendas.
+Texto principal: "Antes de reservar, o hóspede moderno faz ISSO:"
+Dados: 🧠 83% pesquisam o hotel no Instagram antes de fechar a reserva (Google Travel Insights 2025) / 📱 67% dizem que o conteúdo visual foi o fator decisivo na escolha (Meta for Business, 2025) / 💬 41% já mandaram DM pra tirar dúvida antes de reservar (Phocuswright, 2025)</div>
+    <div class="slide-notes">Tempo de leitura: 5-6 segundos
+Emoção alvo: Surpresa / "Não sabia que era tanto"</div>
+  </div>
+  <div class="slide">
+    <div class="slide-number">Slide 5</div>
+    <div class="slide-title">A VIRADA (INSTAGRAM COMO SOLUÇÃO)</div>
+    <div class="slide-body">Campo: Especificação
+Tipo: Solução / Virada de Chave
+Layout sugerido: Fundo branco limpo (#FFFFFF). Split visual horizontal: lado esquerdo = ícone OTA (cifrão saindo) em tom vermelho apagado com texto "COMISSÃO ETERNA". Lado direito = ícone Instagram (conexão) em verde vibrante (#27AE60) com texto "VENDA DIRETA". Seta de transformação no centro, ampla e confiante.
+Objetivo: Ressignificar o Instagram na cabeça do hoteleiro. Não é rede social de foto bonita — é CANAL DE VENDA DIRETA com margem cheia.
+Texto principal: "Instagram não é vitrine. É canal de venda direta."
+Comparação visual: OTA: comissão eterna + zero relacionamento + concorrência lado a lado na mesma tela / Instagram: tráfego direto + audiência fidelizada + reserva sem intermediário + margem 100% sua</div>
+    <div class="slide-notes">Tempo de leitura: 4-5 segundos
+Emoção alvo: Esperança / Empoderamento / "Faz sentido"</div>
+  </div>
+  <div class="slide">
+    <div class="slide-number">Slide 6</div>
+    <div class="slide-title">CASE REAL COM NÚMEROS</div>
+    <div class="slide-body">Campo: Especificação
+Tipo: Case Study / Prova Social
+Layout sugerido: Fundo verde escuro elegante (#1B4332). Foto da pousada à esquerda em moldura circular com borda branca de 4px. Dados do resultado à direita em 4 cards brancos empilhados com texto escuro. Selo "CASE REAL" no canto superior direito em badge laranja.
+Objetivo: Provar com números REAIS que funciona. Sair da teoria e mostrar dinheiro entrando na conta do hoteleiro. Slide que gera confiança pra avançar.
+Texto principal: "Pousada Villa do Sol: 42% mais reservas diretas em 4 meses"
+Dados do case: 📍 Tiradentes-MG (20 UHs) / 📊 +42% em reservas diretas / 💰 Economia de R$ 12.400/mês em comissões / 📱 3 posts/semana + Stories diários / ⏱️ Resultado consistente em 4 meses</div>
+    <div class="slide-notes">Tempo de leitura: 6-7 segundos
+Emoção alvo: Confiança / "Funciona de verdade, tem prova"
+Nota legal: *Resultado real documentado. Nome e dados autorizados pela administração da pousada. Seu resultado pode variar conforme nicho, localização e consistência de execução.</div>
+  </div>
+  <div class="slide">
+    <div class="slide-number">Slide 7</div>
+    <div class="slide-title">OS 3 PILARES DA ESTRATÉGIA</div>
+    <div class="slide-body">Campo: Especificação
+Tipo: Framework / Checklist Executável
+Layout sugerido: Fundo branco (#FFFFFF). 3 faixas horizontais com ícones grandes à esquerda. Cada faixa com cor de destaque diferente: azul (#2C3E50), verde (#27AE60), laranja (#E67E22). Linhas finas conectando os pilares.
+Objetivo: Simplificar o complexo. Mostrar que a estratégia tem 3 pernas e qualquer hotel pode aplicar. Remover a objeção de "é muito complicado".
+Texto principal: "A fórmula das 3 pernas (qualquer hotel aplica a partir de amanhã):"
+Pilar 1 — CONTEÚDO DE CONFIANÇA: 📸 Fotos reais do dia a dia. Nada de banco de imagem genérico. Mostre o café da manhã montado, o quarto arrumado com luz natural, o por do sol da varanda. Conteúdo real vende 7x mais que foto posada.
+Pilar 2 — ATENDIMENTO VIA DM: 📲 Responda em menos de 15 minutos. Tenha um cardápio de respostas salvas. Treine a equipe da recepção pra virar equipe de vendas no digital. Quem responde rápido, fecha 3x mais.
+Pilar 3 — TRÁFEGO LOCAL: 🎯 Use geolocalização em todo post. Marque fornecedores e pontos turísticos locais. Colabore com perfis da cidade. O algoritmo entrega o conteúdo pra quem está perto do seu hotel.</div>
+    <div class="slide-notes">Tempo de leitura: 7-8 segundos
+Emoção alvo: Clareza / "Dá pra fazer, é simples"</div>
+  </div>
+  <div class="slide">
+    <div class="slide-number">Slide 8</div>
+    <div class="slide-title">O ERRO Nº 1 (E COMO CORRIGIR)</div>
+    <div class="slide-body">Campo: Especificação
+Tipo: Alerta / Contraste Antes-e-Depois
+Layout sugerido: Fundo vermelho escuro (#8B0000) suavizado com overlay gradiente escuro (do centro para as bordas). Ícone de "⚠️" grande no topo centralizado. Divisão vertical clara: lado esquerdo "ERRADO" com X vermelho, lado direito "CERTO" com ✓ verde. Exemplos visuais (mockup de post) em miniatura abaixo de cada lado.
+Objetivo: Criar contraste brutal entre o que o hotel faz hoje e o que deveria fazer. Provocar o pensamento "nossa, eu faço exatamente isso errado".
+Texto principal: "O erro nº 1 que todo hotel comete (e como corrigir AGORA):"
+ERRADO: ❌ Postar foto genérica com frase vazia: "Venha relaxar no Paraíso Hotel 🌴" — Isso não vende. Isso decora feed.
+CERTO: ✅ Postar foto real com copy que resolve objeção: "A 8 minutos da praia, com café da manhã incluso e cancelamento grátis até 24h antes. Link na bio."</div>
+    <div class="slide-notes">Tempo de leitura: 5-6 segundos
+Emoção alvo: Desconforto produtivo / "Preciso mudar isso hoje"</div>
+  </div>
+  <div class="slide">
+    <div class="slide-number">Slide 9</div>
+    <div class="slide-title">CHECKLIST VISUAL (SLIDE "SALVÁVEL")</div>
+    <div class="slide-body">Campo: Especificação
+Tipo: Checklist / Sumário de Ação
+Layout sugerido: Fundo cinza claro (#F2F2F2). Título no topo. 5 cards empilhados verticalmente com bordas arredondadas (12px), cada um com ícone à esquerda + frase curta à direita. Checkmarks verdes em badge circular.
+Objetivo: Fixar o conteúdo na memória. Este é o slide que o usuário vai PRINTAR e SALVAR. Precisa ser visualmente impecável.
+Texto principal: "Seu checklist de independência hoteleira (salva esse slide):"
+Checklist: ✅ Poste conteúdo real 3x por semana (nunca foto de banco de imagem) / ✅ Responda todas as DMs em menos de 15 minutos / ✅ Use geolocalização em absolutamente todo post / ✅ Crie um link de reserva direta na bio do Instagram / ✅ Comece a construir sua audiência hoje — não dependa só de OTAs</div>
+    <div class="slide-notes">Tempo de leitura: 5-6 segundos
+Emoção alvo: Satisfação / "Salvei isso aqui" / Sensação de progresso</div>
+  </div>
+  <div class="slide">
+    <div class="slide-number">Slide 10</div>
+    <div class="slide-title">CTA FINAL (CONVERSÃO)</div>
+    <div class="slide-body">Campo: Especificação
+Tipo: Call to Action / Conversão Direta
+Layout sugerido: Fundo azul marinho profundo (#0A1628). Foto profissional do Lucas Tigre à esquerda em moldura circular com borda branca de 5px. Nome e @ abaixo da foto. Texto do CTA à direita com hierarquia clara. Botão visual estilizado "FALE COMIGO" (retângulo arredondado com cor laranja #F5A623, sem ser botão real — é apenas elemento visual).
+Objetivo: Converter todo o interesse acumulado em AÇÃO. Fazer o hoteleiro mandar DM IMEDIATAMENTE.
+Texto principal: "Seu hotel merece vender direto. Eu mostro o caminho."
+CTA stack: 📩 Mande uma DM com a palavra "HOTEL" agora / 📲 @lucastigrereal / 📧 contato@lucastigre.com.br / 🔗 Link na bio
+Slide: Retenção Estimada
+1 (Capa): 100%
+2 (Problema): 78%
+3 (Dado): 65%
+4 (Comportamento): 58%
+5 (Solução): 52%
+6 (Case): 48%
+7 (Pilares): 43%
+8 (Erro): 38%
+9 (Checklist): 35%
+10 (CTA): 28-32%</div>
+    <div class="slide-notes">Tempo de leitura: 3-4 segundos
+Emoção alvo: Decisão / Impulso de agir / "Vou mandar mensagem agora"</div>
+  </div>
+  </div>
+  <button class="nav-btn" id="nextBtn" onclick="navigate(1)">&#8594;</button>
+</div>
+
+<div class="dots" id="dotsContainer">
+  <button class="dot active" onclick="goTo(0)" title="Slide 1"></button>  <button class="dot" onclick="goTo(1)" title="Slide 2"></button>  <button class="dot" onclick="goTo(2)" title="Slide 3"></button>  <button class="dot" onclick="goTo(3)" title="Slide 4"></button>  <button class="dot" onclick="goTo(4)" title="Slide 5"></button>  <button class="dot" onclick="goTo(5)" title="Slide 6"></button>  <button class="dot" onclick="goTo(6)" title="Slide 7"></button>  <button class="dot" onclick="goTo(7)" title="Slide 8"></button>  <button class="dot" onclick="goTo(8)" title="Slide 9"></button>  <button class="dot" onclick="goTo(9)" title="Slide 10"></button>
+</div>
+
+<script>
+  var current = 0;
+  var total = 10;
+
+  function update() {
+    document.querySelectorAll('.slide').forEach(function(el, i) {
+      el.classList.toggle('active', i === current);
+    });
+    document.querySelectorAll('.dot').forEach(function(el, i) {
+      el.classList.toggle('active', i === current);
+    });
+    document.getElementById('counterLabel').textContent = (current + 1) + ' / ' + total;
+    document.getElementById('prevBtn').disabled = current === 0;
+    document.getElementById('nextBtn').disabled = current === total - 1;
+    document.getElementById('progressFill').style.width = ((current + 1) / total * 100) + '%';
+  }
+
+  function navigate(dir) {
+    current = Math.max(0, Math.min(total - 1, current + dir));
+    update();
+  }
+
+  function goTo(i) {
+    current = i;
+    update();
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate(1);
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   navigate(-1);
+  });
+
+  update();
+</script>
+</body>
+</html>
