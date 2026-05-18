@@ -1,12 +1,12 @@
 # OMNIS Capability Catalog
-**Data:** 2026-05-18 | Baseado em outputs reais das fases 0-10
+**Data:** 2026-05-18 | Atualizado pós-G33 | Baseado em outputs reais
 
 ## 1. Campanha 30 dias (Content Factory)
 - **Status:** PRONTO
 - **Input:** projeto, nicho, objetivo, cidade/região, canal Instagram
 - **Output:** 30 legendas SEOgram + 30 roteiros Reels + calendário CSV + estratégia + proposta comercial + tabela de preços
 - **Arquivo exemplo:** missions/MIS-20260518-002/05_outputs/
-- **Comando atual:** invocar skill omnis via Claude Code com brief da missão
+- **Comando atual:** `omnis local campaign --profile @perfil --theme "tema" --objective "obj"`
 - **Limitações:** sem publicação automática, sem agendamento real
 - **Próxima evolução:** integrar com Publer para agendar direto
 
@@ -15,25 +15,26 @@
 - **Input:** tema, perfil, tom, objetivo
 - **Output:** estrutura slide a slide + copy + briefing Canva + direção visual + CTA + legenda SEOgram
 - **Arquivo exemplo:** missions/MIS-20260518-003/05_outputs/
-- **Comando atual:** mission brief via Claude Code
+- **Comando atual:** `omnis local carousel --profile @perfil --theme "tema"`
+- **Preview:** `cockpit/carousel_preview.html` (navegável, prev/next, print-friendly)
 - **Limitações:** sem geração de imagem, sem exportação PNG
-- **Próxima evolução:** preview HTML navegável
+- **Próxima evolução:** Output Factory ZIP + preview PNG
 
 ## 3. Pacote de Reels (Video Engine)
-- **Status:** PRONTO
+- **Status:** PRONTO (roteiro) | EM EVOLUÇÃO (render real — Wave F06)
 - **Input:** tema, perfil, nicho, tom
 - **Output:** 10 roteiros cena a cena + 10 hooks + textos de tela + capas + legendas + briefing de edição
 - **Arquivo exemplo:** missions/MIS-20260518-004/05_outputs/
-- **Comando atual:** mission brief via Claude Code
+- **Comando atual:** `omnis local reels --profile @perfil --theme "tema"`
 - **Limitações:** sem processamento de vídeo real, sem SRT, sem render
-- **Próxima evolução:** Video Studio com ffmpeg + whisper local
+- **Próxima evolução:** Video Studio MVP (Wave F06) — ingest + SRT + render ffmpeg
 
 ## 4. Blueprint de App (App Factory)
 - **Status:** PRONTO
 - **Input:** nome do app, domínio, usuários-alvo, features
 - **Output:** PRD + user stories + schema SQL + API contract + frontend spec + test plan + README
 - **Arquivo exemplo:** missions/MIS-20260518-005/05_outputs/
-- **Comando atual:** mission brief via Claude Code
+- **Comando atual:** `omnis local app --name "Nome" --domain "domínio"`
 - **Limitações:** sem scaffold real de código, sem deploy
 - **Próxima evolução:** repo scaffold + openhands mock
 
@@ -42,24 +43,25 @@
 - **Input:** nome da skill, descrição, input/output esperado
 - **Output:** SKILL.md + run.py + manifest.json + sample_payload.json + skill_report.md
 - **Arquivo exemplo:** missions/MIS-20260518-006/05_outputs/
-- **Comando atual:** mission brief via Claude Code
+- **Comando atual:** `omnis local forge --skill-name "nome" --description "desc"`
 - **Limitações:** sem registro automático em skills.yaml
 - **Próxima evolução:** auto-registro + testes automáticos
 
-## 6. Daily Briefing (Autonomous Ops)
+## 6. Weekly Production Ritual
+- **Status:** PRONTO (Wave G33)
+- **Input:** projeto, nicho, objetivo, cidade, canal
+- **Output:** 7 posts + 7 stories + 5 roteiros Reels + 1 carrossel + 1 proposta + learning update + manifest JSON
+- **Comando atual:** `WeeklyPackOrchestrator(project=...).run()` via Python
+- **Comando futuro:** `omnis local weekly-pack --project X --theme Y`
+- **Limitações:** sem publicação automática
+
+## 7. Daily Briefing (Autonomous Ops)
 - **Status:** PRONTO
 - **Input:** data, projetos ativos
 - **Output:** briefing do dia com prioridades, tarefas e alertas
 - **Arquivo exemplo:** docs/AUTONOMOUS_OPS_REPORT.md
 - **Comando atual:** scripts/autonomous_ops.py
 - **Limitações:** sem dados em tempo real, sem integração externa
-
-## 7. Weekly Pack (Autonomous Ops)
-- **Status:** PRONTO
-- **Input:** semana, projetos
-- **Output:** pack semanal com conteúdo, vídeos, design, proposta
-- **Arquivo exemplo:** docs/AUTONOMOUS_OPS_REPORT.md
-- **Próxima evolução:** Weekly Production Ritual com comando curto
 
 ## 8. Proposta Comercial
 - **Status:** PRONTO (dentro de Content Factory)
