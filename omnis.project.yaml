@@ -1,0 +1,30 @@
+name: omnis-control
+owner: lucas_tigre
+purpose: "Local-first operating system for agentic execution, missions, app factory, health bridge, maintenance and future KRATOS integration."
+
+default_rules:
+  forbid_push_without_human_authorization: true
+  forbid_secret_exposure: true
+  require_selective_staging: true
+  forbid_destructive_actions_without_dry_run: true
+  require_wave_registry_update: true
+
+domains:
+  runtime:
+    description: "First real missions, executor, scheduler, result store, orchestrator, events, logs, metrics and exports."
+  health_bridge:
+    description: "jarvis doctor normalization and GET /health bridge."
+  app_factory:
+    description: "Idea intake, PRD generator, schema/API/task planning, scaffold dry-run and docs."
+  maintenance:
+    description: "Path safety, temp cleanup dry-run, report hygiene, config audits and skill reports."
+  templates:
+    description: "Mission templates and QA finalization."
+  project_os:
+    description: "Governance, state, registries, guardrails, prompts and runbooks."
+
+known_test_notes:
+  pre_existing_failures:
+    - id: test_cli_graph_run_list
+      status: known_pre_existing
+      rule: "Can be documented as out of scope only if unchanged and not caused by current work."

@@ -1,0 +1,67 @@
+worktrees:
+  - id: omnis-control
+    path: "C:/Users/lucas/omnis-control"
+    branch: "feature/omnis-5waves-runtime-supreme"
+    role: "principal_orchestrator"
+    status: ACTIVE
+    scope:
+      - Runtime
+      - Health review
+      - Project OS bootstrap
+    rules:
+      - "Do not run G24 Maintenance here."
+      - "Do not duplicate W201-W205."
+      - "Do not push."
+
+  - id: omnis-maintenance
+    path: "C:/Users/lucas/omnis-maintenance"
+    branch: "feature/omnis-maintenance-w201-w205"
+    role: "maintenance_audit"
+    status: REVIEW
+    scope:
+      - W201-W205
+    rules:
+      - "Resolve or document secret risk before merge."
+      - "No deletions without dry-run."
+
+  - id: omnis-health
+    path: "C:/Users/lucas/omnis-health"
+    branch: "feature/omnis-health-w196-w200"
+    role: "health_bridge"
+    status: PAUSED_COMPARE
+    scope:
+      - W196-W200
+    rules:
+      - "Compare with ed594dd before continuing."
+
+  - id: omnis-appfactory
+    path: "C:/Users/lucas/omnis-appfactory"
+    branch: "feature/omnis-appfactory-w133-w162"
+    role: "app_factory_advanced"
+    status: ACTIVE
+    scope:
+      - W133-W162
+    rules:
+      - "Do not touch Runtime."
+      - "Do not touch Health."
+      - "Dry-run for scaffold."
+
+  - id: omnis-templates
+    path: "C:/Users/lucas/omnis-templates"
+    branch: "feature/omnis-templates-w206-w215"
+    role: "templates_qa"
+    status: PAUSED
+    scope:
+      - W206-W215
+    rules:
+      - "Wait for Runtime/Health consolidation."
+
+  - id: omnis-runtime
+    path: "C:/Users/lucas/omnis-runtime"
+    branch: "feature/omnis-runtime-w186-w195"
+    role: "runtime_parallel"
+    status: REDUNDANT_READ_ONLY
+    scope:
+      - W186-W195
+    rules:
+      - "Do not implement unless anti-duplication audit clears it."

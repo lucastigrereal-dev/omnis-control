@@ -1,0 +1,38 @@
+blocked_items:
+  - id: secret_litellm_connectors_yaml
+    severity: P0
+    status: open
+    title: "Possible LiteLLM API key exposed"
+    file: "config/connectors.yaml"
+    line: 82
+    do_not_print_value: true
+    required_resolution:
+      - "Replace with env var placeholder."
+      - "Create or update example config."
+      - "Recommend key rotation/revocation."
+      - "Run or recommend secret scan."
+    blocks:
+      - "Maintenance merge"
+      - "Any release/push involving config"
+
+  - id: reports_ccos_logs_not_ignored
+    severity: P1
+    status: open
+    title: "reports/ccos/*.log not ignored"
+    required_resolution:
+      - "Decide whether to ignore reports/ccos/*.log or entire runtime reports."
+      - "Update .gitignore if appropriate."
+
+  - id: health_branch_possible_duplicate
+    severity: P1
+    status: open
+    title: "Separate health branch may duplicate ed594dd"
+    required_resolution:
+      - "Run read-only comparison before continuing health branch."
+
+  - id: templates_waiting_runtime_health
+    severity: P1
+    status: open
+    title: "Templates depend on Runtime/Health consolidation"
+    required_resolution:
+      - "Pause templates until Runtime/Health are merged or declared canonical."

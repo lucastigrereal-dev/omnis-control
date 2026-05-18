@@ -77,3 +77,25 @@ grep -r "secret\|token=\|api_key=\|password=\|OAuthReal\|publish_real\|send_real
 - In-memory first, mock adapters, file-backed JSONL persistence
 - Git worktrees for parallel development
 - PowerShell hooks for guardrails (Windows 11)
+
+## OMNIS Project OS
+
+Before any implementation, read:
+
+1. `omnis.project.yaml`
+2. `omnis_state.yaml`
+3. `omnis_wave_registry.yaml`
+4. `omnis_worktrees.yaml`
+5. `omnis_blocked_items.yaml`
+6. `omnis_guardrails.yaml`
+7. `docs/OMNIS_GUARDRAILS.md`
+8. `docs/OMNIS_CLAUDE_RUNBOOK.md`
+9. `docs/OMNIS_NEXT_ACTIONS.md`
+
+Rules:
+- Do not push without human authorization.
+- Do not expose or commit secrets.
+- Do not use `git add .`.
+- Do not duplicate waves.
+- Do not edit outside the current branch/worktree scope.
+- If P0 exists, resolve/report it before new feature work.

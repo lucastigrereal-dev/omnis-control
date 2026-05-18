@@ -1,0 +1,37 @@
+guardrails:
+  git:
+    forbid_push_without_human_authorization: true
+    forbid_git_add_dot: true
+    require_selective_staging: true
+    require_status_before_commit: true
+    require_diff_stat_before_commit: true
+
+  security:
+    forbid_secret_printing: true
+    forbid_secret_commit: true
+    secret_patterns:
+      - "api_key"
+      - "secret"
+      - "token"
+      - "sk-"
+      - "AKIA"
+    high_risk_files:
+      - ".env"
+      - "config/*.yaml"
+      - "config/*.json"
+      - "reports/**/*.log"
+
+  execution:
+    require_dry_run_for_cleanup: true
+    require_dry_run_for_scaffold: true
+    forbid_destructive_actions_without_human_authorization: true
+
+  waves:
+    forbid_duplicate_wave_execution: true
+    require_wave_registry_update_on_completion: true
+    require_anti_duplication_audit_if_parallel: true
+
+  tests:
+    require_domain_tests_before_commit: true
+    allow_known_preexisting_failure:
+      - test_cli_graph_run_list

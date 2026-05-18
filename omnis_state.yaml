@@ -1,0 +1,67 @@
+last_updated_by: "claude_code"
+phase: "project_os_bootstrap"
+current_focus:
+  - "Resolve P0 secret risk"
+  - "Consolidate Runtime/Health"
+  - "Review Maintenance branch"
+  - "Continue AppFactory only in isolated branch"
+  - "Pause Templates until Runtime/Health consolidated"
+
+p0_blockers:
+  - id: secret_litellm_connectors_yaml
+    status: open
+    severity: P0
+    file: "config/connectors.yaml"
+    line: 82
+    description: "Possible LiteLLM API key exposed. Do not print value. Externalize to env var and rotate/revoke."
+    required_action:
+      - "Do not display the secret."
+      - "Replace real value with env var placeholder."
+      - "Create or update safe example config."
+      - "Recommend key rotation/revocation."
+
+p1_blockers:
+  - id: reports_ccos_logs_not_ignored
+    status: open
+    severity: P1
+    description: "reports/ccos/*.log may appear as untracked and should be ignored or handled by policy."
+  - id: health_branch_possible_duplicate
+    status: open
+    severity: P1
+    description: "Separate health branch may duplicate main commit ed594dd."
+  - id: templates_waiting_runtime_health
+    status: open
+    severity: P1
+    description: "Templates should wait until Runtime/Health consolidation."
+
+known_completed:
+  app_factory_initial:
+    - W131
+    - W132
+  runtime_missions:
+    - W181-W185
+    - W191
+    - W192
+    - W193
+    - W194-W195
+  health_bridge:
+    - G23
+  maintenance:
+    - W201-W205
+
+next_safe_actions:
+  - id: handle_litellm_secret
+    priority: P0
+    description: "Remediate possible LiteLLM key exposure without printing key."
+  - id: freeze_main_from_g24
+    priority: P0
+    description: "Do not run G24 in main because Maintenance branch already did W201-W205."
+  - id: review_maintenance_branch
+    priority: P1
+    description: "Review Maintenance branch and security findings."
+  - id: compare_health_branch
+    priority: P1
+    description: "Compare separate health branch with ed594dd before further work."
+  - id: continue_appfactory
+    priority: P2
+    description: "Continue AppFactory W133-W162 only in isolated worktree."
