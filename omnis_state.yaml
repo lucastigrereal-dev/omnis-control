@@ -1,27 +1,21 @@
 last_updated_by: "claude_code"
-phase: "orchestrator_ready"
+phase: "consolidated"
+consolidation_date: "2026-05-18"
 current_focus:
-  - "Orchestrator ready — aguardando revisão dos outros worktrees"
-  - "Review Maintenance branch (W201-W205)"
-  - "Compare Health worktree com ed594dd"
-  - "Continue AppFactory only in isolated branch"
-  - "Pause Templates until Runtime/Health consolidated"
+  - "Principal consolidated — merge gate for all completed worktrees"
+  - "Health namespace conflict needs Lucas decision"
 
 p0_blockers: []
 
 p1_blockers:
+  - id: health_namespace_conflict
+    status: open
+    severity: P1
+    description: "omnis-health branch has src/omnis_health/ (more complete: doctor, checkers, 269-line server, 17 files, ~1988 LOC). Principal has src/health_bridge/ (minimal: 2 checks, 82-line server, 2 files). Both implement /health. Lucas must decide: merge omnis_health as canonical (preferred) and archive health_bridge, or keep both with clear purpose separation."
   - id: reports_ccos_logs_not_ignored
     status: open
     severity: P1
     description: "reports/ccos/*.log may appear as untracked and should be ignored or handled by policy."
-  - id: health_branch_possible_duplicate
-    status: open
-    severity: P1
-    description: "Separate health branch may duplicate main commit ed594dd."
-  - id: templates_waiting_runtime_health
-    status: open
-    severity: P1
-    description: "Templates should wait until Runtime/Health consolidation."
 
 known_completed:
   project_os:
@@ -31,6 +25,8 @@ known_completed:
   app_factory_initial:
     - W131
     - W132
+  app_factory_advanced:
+    - "W133-W162 complete, already on master (06caa49)"
   runtime_missions:
     - W181-W185
     - W191
@@ -38,20 +34,33 @@ known_completed:
     - W193
     - W194-W195
   health_bridge:
-    - G23
+    - G23 (principal, minimal)
+  health_omnis:
+    - "W196-W200 (omnis-health branch, complete — not yet merged)"
   maintenance:
-    - W201-W205
+    - "W201-W205 merged into principal (6df8db8)"
+
+worktrees_resolved:
+  merged:
+    - "omnis-maintenance → principal (6df8db8)"
+  redundant:
+    - "omnis-templates — 0 unique commits, same as 233cdf4"
+    - "omnis-runtime — 0 unique commits, same as 233cdf4"
+  already_on_master:
+    - "omnis-appfactory — at master 06caa49, W133-W162 complete"
+  needs_decision:
+    - "omnis-health — more complete than health_bridge, namespace conflict"
 
 next_safe_actions:
   - id: recommend_key_rotation
     priority: P0
-    description: "Lucas deve rotacionar/revogar a chave LiteLLM exposta (valor já removido do arquivo)."
-  - id: review_maintenance_branch
+    description: "Lucas deve rotacionar/revogar a chave LiteLLM exposta."
+  - id: resolve_health_namespace
     priority: P1
-    description: "Review Maintenance branch and security findings."
-  - id: compare_health_branch
+    description: "Lucas decide: merge omnis_health como canônico e arquivar health_bridge, ou outra resolução."
+  - id: archive_redundant_worktrees
     priority: P1
-    description: "Compare separate health branch with ed594dd before further work."
-  - id: continue_appfactory
+    description: "Remover worktrees omnis-templates e omnis-runtime (0 commits únicos)."
+  - id: clean_out_of_scope_files
     priority: P2
-    description: "Continue AppFactory W133-W162 only in isolated worktree."
+    description: "Resolver config/paths.yaml, docs/ESTADO_ATUAL_RESUMIDO.md, docs/disk_audit_report.json, reports/."

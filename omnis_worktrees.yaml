@@ -3,14 +3,13 @@ worktrees:
     path: "C:/Users/lucas/omnis-control"
     branch: "feature/omnis-5waves-runtime-supreme"
     role: "principal_orchestrator"
-    status: ORCHESTRATOR_READY
+    status: CONSOLIDATED
     scope:
       - Runtime (DONE)
-      - Health review (DONE)
-      - Project OS bootstrap (DONE)
+      - Health bridge minimal (DONE)
+      - Project OS (DONE)
+      - Maintenance merged (DONE)
     rules:
-      - "Do not run G24 Maintenance here."
-      - "Do not duplicate W201-W205."
       - "Do not push."
       - "No new features — merge gate only."
 
@@ -18,51 +17,69 @@ worktrees:
     path: "C:/Users/lucas/omnis-maintenance"
     branch: "feature/omnis-maintenance-w201-w205"
     role: "maintenance_audit"
-    status: REVIEW
+    status: MERGED_ARCHIVE
     scope:
       - W201-W205
     rules:
-      - "Resolve or document secret risk before merge."
-      - "No deletions without dry-run."
+      - "Already merged into principal. Archive worktree."
 
   - id: omnis-health
     path: "C:/Users/lucas/omnis-health"
     branch: "feature/omnis-health-w196-w200"
-    role: "health_bridge"
-    status: PAUSED_COMPARE
+    role: "health_bridge_complete"
+    status: VALUE_ADDED
     scope:
       - W196-W200
     rules:
-      - "Compare with ed594dd before continuing."
+      - "More complete than principal's health_bridge."
+      - "Namespace conflict: src/omnis_health/ vs src/health_bridge/."
+      - "Lucas decides resolution before merge."
 
   - id: omnis-appfactory
     path: "C:/Users/lucas/omnis-appfactory"
-    branch: "feature/omnis-appfactory-w133-w162"
+    branch: "master"
     role: "app_factory_advanced"
-    status: ACTIVE
+    status: DONE_ON_MASTER
     scope:
       - W133-W162
     rules:
-      - "Do not touch Runtime."
-      - "Do not touch Health."
-      - "Dry-run for scaffold."
+      - "Already on master at 06caa49. Worktree clean."
 
   - id: omnis-templates
     path: "C:/Users/lucas/omnis-templates"
     branch: "feature/omnis-templates-w206-w215"
     role: "templates_qa"
-    status: PAUSED
-    scope:
-      - W206-W215
+    status: REDUNDANT
+    scope: []
     rules:
-      - "Wait for Runtime/Health consolidation."
+      - "0 unique commits. Same as principal at 233cdf4. Archive."
 
   - id: omnis-runtime
     path: "C:/Users/lucas/omnis-runtime"
     branch: "feature/omnis-runtime-w186-w195"
     role: "runtime_parallel"
-    status: REDUNDANT_READ_ONLY
-    scope:
-      - W186-W195
+    status: REDUNDANT
+    scope: []
     rules:
-      - "Do not implement unless anti-duplication audit clears it."
+      - "0 unique commits. Same as principal at 233cdf4. Archive."
+
+  - id: omnis-p20-supreme
+    path: "C:/Users/lucas/omnis-p20-omnis-supreme"
+    branch: "parallel/p20-omnis-supreme"
+    role: "p20_experiment"
+    status: ARCHIVE_RECOMMENDED
+    scope:
+      - P20 Supreme Activation
+    rules:
+      - "0 ahead of master. Experiment completed. Can archive."
+
+  - id: omnis-runtime-bridge
+    path: "C:/Users/lucas/omnis-runtime-bridge"
+    branch: "feature/omnis-g14-app-factory"
+    role: "app_factory_dev"
+    status: ACTIVE_DEV
+    scope:
+      - W131-W134+
+    rules:
+      - "Active app factory development. 13 commits ahead."
+      - "Do not touch from principal."

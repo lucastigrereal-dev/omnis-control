@@ -6,6 +6,8 @@ status_legend:
   PENDING: "Not started"
   BLOCKED: "Blocked by risk/error/secret"
   FUTURE: "Future vision"
+  MERGED: "Merged into principal"
+  REDUNDANT: "No unique work — archive recommended"
 
 waves:
   - id: W131
@@ -44,10 +46,10 @@ waves:
   - id: W133-W162
     group: AppFactory
     name: AppFactory Advanced
-    status: ACTIVE
-    branch: "feature/omnis-appfactory-w133-w162"
+    status: DONE
+    branch: "master"
     worktree: "C:/Users/lucas/omnis-appfactory"
-    commit: null
+    commit: "06caa49"
     modules:
       - schema_planner
       - api_contract_planner
@@ -59,9 +61,9 @@ waves:
       - docs_generator
       - pipeline
     tests: []
-    next_action: "Continue isolated. Do not touch Runtime/Health."
+    next_action: "Complete. Worktree on master. No further action."
     blockers: []
-    risk: medium
+    risk: low
 
   - id: W181-W185
     group: Runtime
@@ -149,28 +151,48 @@ waves:
 
   - id: G23
     group: Health
-    name: Health Bridge
-    status: REVIEW
+    name: Health Bridge (minimal)
+    status: DONE
     branch: "feature/omnis-5waves-runtime-supreme"
     worktree: "C:/Users/lucas/omnis-control"
     commit: "ed594dd"
     modules:
       - health_bridge
-      - HTTP server
+      - HTTP server (82 lines)
       - CLI integration
     tests:
       - "first_missions + health_bridge 169 passed"
-    next_action: "Review and compare separate health worktree before merge."
+    next_action: "Keep unless superseded by omnis_health (W196-W200)."
     blockers: []
+    risk: low
+
+  - id: W196-W200
+    group: Health
+    name: Health Bridge (complete — omnis_health)
+    status: REVIEW
+    branch: "feature/omnis-health-w196-w200"
+    worktree: "C:/Users/lucas/omnis-health"
+    commit: "190520a"
+    modules:
+      - omnis_health (models, 269-line server)
+      - doctor command
+      - checkers (disk, docker, memory, obsidian, publisher, skills)
+      - timeout + fallback
+      - CLI start/stop/status
+    tests:
+      - "omnis_health + checkers — extensive test suite"
+    next_action: "Lucas decides: merge as canonical health (archive health_bridge) or reconcile namespaces."
+    blockers:
+      - health_namespace_conflict
     risk: medium
 
   - id: W201-W205
     group: Maintenance
     name: Maintenance Audit
-    status: REVIEW
+    status: MERGED
     branch: "feature/omnis-maintenance-w201-w205"
     worktree: "C:/Users/lucas/omnis-maintenance"
-    commit: null
+    commit: "e882432"
     modules:
       - runtime_paths_audit
       - temp_cleanup_plan
@@ -178,26 +200,19 @@ waves:
       - reports_hygiene
       - skill_reports_index
     tests: []
-    next_action: "Ready for review. P0 code fix done (1b278ad). Operator must rotate key."
+    next_action: "Merged into principal (6df8db8). Worktree can be archived."
     blockers: []
-    risk: medium
+    risk: low
 
   - id: W206-W215
     group: Templates
     name: Mission Templates + QA
-    status: PAUSED
+    status: REDUNDANT
     branch: "feature/omnis-templates-w206-w215"
     worktree: "C:/Users/lucas/omnis-templates"
-    commit: null
-    modules:
-      - mission_templates
-      - template_registry
-      - template_cli
-      - dry_run_from_template
-      - runtime_status
-      - final_summary
+    commit: "233cdf4"
+    modules: []
     tests: []
-    next_action: "Wait until Runtime/Health consolidation."
-    blockers:
-      - templates_waiting_runtime_health
-    risk: medium
+    next_action: "Archive worktree. 0 unique commits. Same as principal at 233cdf4."
+    blockers: []
+    risk: low

@@ -5,43 +5,50 @@
 
 ## Estado Resumido
 
-Fase: `orchestrator_ready` — principal consolidada, pronta como merge gate.
+Fase: `consolidated` — principal consolidada. 1 merge feito. 2 worktrees redundantes. 1 decisão pendente.
 
 ## Entregas Confirmadas
 
-| Domínio | Waves | Commits |
+| Domínio | Waves | Status |
 |---|---|---|
-| AppFactory Inicial | W131, W132 | d6f61e6 |
-| Runtime Missions | W181-W185, W191-W195 | 5dd22c9, f397eca, b539c3f, 18e234f, 8f48bbb |
-| Health Bridge | G23 | ed594dd |
-| Project OS | Governança | ff85a77 |
-| Security Fix | P0 LiteLLM | 1b278ad |
-| Maintenance | W201-W205 | Branch separada |
+| AppFactory Inicial | W131-W132 | DONE |
+| AppFactory Advanced | W133-W162 | DONE — já em master (`06caa49`) |
+| Runtime Missions | W181-W195 | DONE — 8 commits na principal |
+| Health Bridge | G23 | DONE — minimal (`ed594dd`) |
+| Health Complete | W196-W200 | REVIEW — branch separada, mais completo |
+| Project OS | Governança | DONE (`ff85a77`) |
+| Security Fix | P0 LiteLLM | DONE (`1b278ad`) |
+| Maintenance | W201-W205 | **MERGED** (`6df8db8`) |
+
+## Merges Realizados
+
+| Merge | Commit | Arquivos |
+|---|---|---|
+| Maintenance → Principal | `6df8db8` | 5 docs de auditoria |
 
 ## Bloqueadores
 
 | Severidade | ID | Status |
 |---|---|---|
-| ~~P0~~ | ~~secret_litellm_connectors_yaml~~ | **Resolvido** — código limpo em 1b278ad. Rotação manual pendente. |
+| ~~P0~~ | ~~secret_litellm~~ | Resolvido no código. Rotação externa pendente. |
+| P1 | health_namespace_conflict | Aberto — `omnis_health` vs `health_bridge` |
 | P1 | reports_ccos_logs_not_ignored | Aberto |
-| P1 | health_branch_possible_duplicate | Aberto |
-| P1 | templates_waiting_runtime_health | Aberto |
 
-## Worktrees
+## Worktrees — Status Final
 
 | Worktree | Branch | Status |
 |---|---|---|
-| omnis-control | feature/omnis-5waves-runtime-supreme | ORCHESTRATOR_READY |
-| omnis-maintenance | feature/omnis-maintenance-w201-w205 | REVIEW |
-| omnis-appfactory | feature/omnis-appfactory-w133-w162 | ACTIVE |
-| omnis-health | feature/omnis-health-w196-w200 | PAUSED_COMPARE |
-| omnis-templates | feature/omnis-templates-w206-w215 | PAUSED |
-| omnis-runtime | feature/omnis-runtime-w186-w195 | REDUNDANT |
+| omnis-control | feature/omnis-5waves-runtime-supreme | **CONSOLIDATED** |
+| omnis-maintenance | feature/omnis-maintenance-w201-w205 | MERGED → arquivar |
+| omnis-health | feature/omnis-health-w196-w200 | VALUE_ADDED — decidir |
+| omnis-appfactory | master | DONE_ON_MASTER |
+| omnis-templates | feature/omnis-templates-w206-w215 | **REDUNDANT** → arquivar |
+| omnis-runtime | feature/omnis-runtime-w186-w195 | **REDUNDANT** → arquivar |
+| omnis-p20-supreme | parallel/p20-omnis-supreme | ARCHIVE_RECOMMENDED |
+| omnis-runtime-bridge | feature/omnis-g14-app-factory | ACTIVE_DEV |
 
 ## Próxima Ação
 
-1. Lucas: rotacionar chave LiteLLM exposta
-2. Maintenance: review e preparar merge
-3. Health: comparar branch separada com ed594dd
-4. AppFactory: continuar isolado
-5. Templates: aguardar consolidação
+1. **P0:** Lucas rotaciona chave LiteLLM
+2. **P1:** Lucas decide sobre omnis_health vs health_bridge
+3. **P1:** Arquivar worktrees redundantes (templates, runtime)

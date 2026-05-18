@@ -10,27 +10,29 @@ blocked_items:
     resolution:
       - "Replaced real value with env var placeholder ${LITELLM_MASTER_KEY}"
       - "Created config/connectors.example.yaml with safe placeholders"
-      - "Recommend key rotation/revocation by operator"
+      - "Lucas must rotate/revoke key externally"
     blocks: []
+
+  - id: health_namespace_conflict
+    severity: P1
+    status: open
+    title: "Two health modules with overlapping purpose"
+    description: "omnis_health (complete) vs health_bridge (minimal). Lucas must decide."
+    required_resolution:
+      - "Option A: Merge omnis_health as canonical, archive health_bridge"
+      - "Option B: Keep both with clear purpose separation"
+      - "Option C: Port omnis_health improvements into health_bridge"
 
   - id: reports_ccos_logs_not_ignored
     severity: P1
     status: open
     title: "reports/ccos/*.log not ignored"
     required_resolution:
-      - "Decide whether to ignore reports/ccos/*.log or entire runtime reports."
-      - "Update .gitignore if appropriate."
+      - "Update .gitignore or document as intentional."
 
-  - id: health_branch_possible_duplicate
-    severity: P1
+  - id: redundant_worktrees
+    severity: P2
     status: open
-    title: "Separate health branch may duplicate ed594dd"
+    title: "omnis-templates and omnis-runtime have 0 unique commits"
     required_resolution:
-      - "Run read-only comparison before continuing health branch."
-
-  - id: templates_waiting_runtime_health
-    severity: P1
-    status: open
-    title: "Templates depend on Runtime/Health consolidation"
-    required_resolution:
-      - "Pause templates until Runtime/Health are merged or declared canonical."
+      - "Run git worktree remove on both."

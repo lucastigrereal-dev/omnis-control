@@ -1,37 +1,29 @@
 # OMNIS Active Worktrees
 
 **Fonte machine-readable:** `omnis_worktrees.yaml`
+**Atualizado:** 2026-05-18
 
-| Worktree | Branch | Role | Status | Escopo |
+## Worktrees
+
+| Worktree | Branch | Role | Status | Ação |
 |---|---|---|---|---|
-| omnis-control | feature/omnis-5waves-runtime-supreme | principal_orchestrator | ACTIVE | Runtime, Health, Project OS |
-| omnis-maintenance | feature/omnis-maintenance-w201-w205 | maintenance_audit | REVIEW | W201-W205 |
-| omnis-appfactory | feature/omnis-appfactory-w133-w162 | app_factory_advanced | ACTIVE | W133-W162 |
-| omnis-health | feature/omnis-health-w196-w200 | health_bridge | PAUSED_COMPARE | W196-W200 |
-| omnis-templates | feature/omnis-templates-w206-w215 | templates_qa | PAUSED | W206-W215 |
-| omnis-runtime | feature/omnis-runtime-w186-w195 | runtime_parallel | REDUNDANT_READ_ONLY | W186-W195 |
+| omnis-control | feature/omnis-5waves-runtime-supreme | principal_orchestrator | CONSOLIDATED | Merge gate |
+| omnis-maintenance | feature/omnis-maintenance-w201-w205 | maintenance_audit | MERGED_ARCHIVE | Arquivar |
+| omnis-health | feature/omnis-health-w196-w200 | health_bridge_complete | VALUE_ADDED | Lucas decide |
+| omnis-appfactory | master | app_factory_advanced | DONE_ON_MASTER | Manter read-only |
+| omnis-templates | feature/omnis-templates-w206-w215 | templates_qa | REDUNDANT | Arquivar |
+| omnis-runtime | feature/omnis-runtime-w186-w195 | runtime_parallel | REDUNDANT | Arquivar |
+| omnis-p20-supreme | parallel/p20-omnis-supreme | p20_experiment | ARCHIVE_RECOMMENDED | Arquivar |
+| omnis-runtime-bridge | feature/omnis-g14-app-factory | app_factory_dev | ACTIVE_DEV | Não tocar |
 
-## Regras por Worktree
+## Recomendações de Arquivação
 
-### omnis-control (principal)
-- Não rodar G24 Maintenance aqui
-- Não duplicar W201-W205
-- Não fazer push
+```sh
+# Worktrees com 0 commits únicos:
+git worktree remove C:/Users/lucas/omnis-templates
+git worktree remove C:/Users/lucas/omnis-runtime
 
-### omnis-maintenance
-- Resolver ou documentar risco de segredo antes de merge
-- Sem deleções sem dry-run
-
-### omnis-health
-- Comparar com ed594dd antes de continuar
-
-### omnis-appfactory
-- Não tocar em Runtime
-- Não tocar em Health
-- Dry-run para scaffold
-
-### omnis-templates
-- Aguardar consolidação Runtime/Health
-
-### omnis-runtime
-- Não implementar a menos que auditoria anti-duplicação confirme necessidade
+# Worktrees já mergeados/concluídos:
+git worktree remove C:/Users/lucas/omnis-maintenance
+git worktree remove C:/Users/lucas/omnis-p20-omnis-supreme
+```
