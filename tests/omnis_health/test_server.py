@@ -72,7 +72,7 @@ class TestHealthServer:
             data = json.loads(resp.read())
             assert data["overall_status"] == "ok"
             assert len(data["checks"]) == 1
-            assert data["checks"][0]["name"] == "disk"
+            assert "disk" in data["checks"]
         finally:
             server.stop()
 

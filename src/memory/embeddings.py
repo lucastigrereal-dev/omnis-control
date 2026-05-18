@@ -1,10 +1,16 @@
-"""Embedding Strategy — deterministic mock providers, zero external API calls."""
+"""Embedding Strategy — mock providers kept for backward compat, real provider via src.providers.embedding.
+
+New code should use: from src.providers.embedding import TFIDFEmbeddingProvider
+"""
 from __future__ import annotations
 
 import hashlib
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Protocol
+
+# Re-export real provider as the recommended default
+from src.providers.embedding import TFIDFEmbeddingProvider as RealEmbeddingProvider  # noqa: F401
 
 
 class EmbeddingProvider(Protocol):

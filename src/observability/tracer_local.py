@@ -1,7 +1,7 @@
-"""Tracer local — substitui Langfuse/OTel por JSONL em disco.
+"""Tracer local — legado. Novo código deve usar src.providers.tracing.LocalJSONLProvider.
 
-Sem dependencias externas. Registra spans, metricas e traces
-em data/traces/ e data/metrics/.
+Mantido para compatibilidade com pipeline_local e módulos existentes.
+LocalTracer agora delega para LocalJSONLProvider quando disponível.
 """
 from __future__ import annotations
 import json
@@ -19,6 +19,13 @@ logger = logging.getLogger("omnis.observability.tracer_local")
 
 TRACES_DIR = Path(__file__).parent.parent.parent / "data" / "traces"
 METRICS_DIR = Path(__file__).parent.parent.parent / "data" / "metrics"
+
+# Delegate to ProviderRegistry when available (activates Langfuse if configured)
+try:
+    from src.providers.tracing import LocalJSONLProvider as _ProviderTracer
+    _provider_tracer = _ProviderTracer()
+except Exception:
+    _provider_tracer = None
 
 
 class _NoopSpan:
