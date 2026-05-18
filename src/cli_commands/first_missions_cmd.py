@@ -421,6 +421,35 @@ def fm_result_show(
 
 
 # ---------------------------------------------------------------------------
+# Metrics
+# ---------------------------------------------------------------------------
+
+@first_missions_app.command(name="metrics")
+def fm_metrics(
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Show mission execution metrics summary."""
+    orch = _orch(dry_run=True)
+    s = orch.result_store.summary()
+
+    if json_output:
+        print(json.dumps(s, indent=2, ensure_ascii=False))
+        return
+
+    if s["total"] == 0:
+        console.print("No results stored — metrics unavailable.")
+        return
+
+    console.print("[bold]Mission Metrics Summary[/bold]\n")
+    console.print(f"  Total executions: {s['total']}")
+    console.print(f"  Successful: [green]{s['successful']}[/green]")
+    console.print(f"  Failed: [red]{s['failed']}[/red]")
+    console.print(f"  Dry-run: [blue]{s['dry_run']}[/blue]")
+    console.print(f"  Success rate: {s['success_rate']:.1%}")
+    console.print(f"  Avg duration: {s['avg_duration_ms']:.1f}ms")
+
+
+# ---------------------------------------------------------------------------
 # Validate
 # ---------------------------------------------------------------------------
 

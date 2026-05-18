@@ -124,6 +124,29 @@ class MissionResultStore:
             by_type[r.mission_type] = by_type.get(r.mission_type, 0) + 1
         return {"total": total, "by_status": by_status, "by_type": by_type, "dry_run": self.dry_run}
 
+    def summary(self) -> dict:
+        """Rich summary: counts, rates, avg duration, success/fail/dry breakdown."""
+        total = len(self._store)
+        if total == 0:
+            return {
+                "total": 0, "successful": 0, "failed": 0, "dry_run": 0,
+                "success_rate": 0.0, "avg_duration_ms": 0.0,
+            }
+
+        success = len(self.query(status=MissionStatus.COMPLETED.value))
+        failed = len(self.query(status=MissionStatus.FAILED.value))
+        dry = len(self.query(status=MissionStatus.DRY_RUN.value))
+        durations = [r.duration_ms for r in self._store.values() if r.duration_ms > 0]
+
+        return {
+            "total": total,
+            "successful": success,
+            "failed": failed,
+            "dry_run": dry,
+            "success_rate": round(success / max(total - dry, 1), 3),
+            "avg_duration_ms": round(sum(durations) / len(durations), 2) if durations else 0.0,
+        }
+
     # ------------------------------------------------------------------
     def _append(self, result: StoredResult) -> None:
         assert self._path is not None

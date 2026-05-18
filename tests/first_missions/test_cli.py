@@ -224,3 +224,21 @@ def test_cli_validate_json():
     data = json.loads(result.stdout)
     assert "valid" in data
     assert "issues" in data
+
+
+# ---------------------------------------------------------------------------
+# Metrics command
+# ---------------------------------------------------------------------------
+
+
+def test_cli_metrics():
+    result = runner.invoke(first_missions_app, ["metrics"])
+    assert result.exit_code == 0
+
+
+def test_cli_metrics_json():
+    result = runner.invoke(first_missions_app, ["metrics", "--json"])
+    assert result.exit_code == 0
+    data = json.loads(result.stdout)
+    assert "success_rate" in data
+    assert "avg_duration_ms" in data

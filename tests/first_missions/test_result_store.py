@@ -138,6 +138,28 @@ def test_store_stats():
     assert s["by_type"]["CUSTOM"] == 2
 
 
+def test_store_summary_empty():
+    store = MissionResultStore(dry_run=True)
+    s = store.summary()
+    assert s["total"] == 0
+    assert s["success_rate"] == 0.0
+    assert s["avg_duration_ms"] == 0.0
+
+
+def test_store_summary_with_data():
+    store = MissionResultStore(dry_run=True)
+    store.save(StoredResult(mission_id="a", status="COMPLETED", duration_ms=100.0))
+    store.save(StoredResult(mission_id="b", status="FAILED", duration_ms=50.0))
+    store.save(StoredResult(mission_id="c", status="DRY_RUN", duration_ms=10.0))
+    s = store.summary()
+    assert s["total"] == 3
+    assert s["successful"] == 1
+    assert s["failed"] == 1
+    assert s["dry_run"] == 1
+    assert s["success_rate"] == 0.5
+    assert s["avg_duration_ms"] > 0
+
+
 # ---------------------------------------------------------------------------
 # JSONL persistence
 # ---------------------------------------------------------------------------
