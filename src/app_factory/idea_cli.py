@@ -414,11 +414,33 @@ def idea_diff(
 def idea_recovery(
     idea_id: str = typer.Argument(..., help="ID da ideia"),
     force: bool = typer.Option(False, "--force", help="Forcar criacao de recovery plan mesmo sem falha"),
+    stage: str = typer.Option(None, "--stage", help="Simular falha em um estagio especifico"),
+    rollback: str = typer.Option(None, "--rollback", help="Rollback ate um estagio especifico"),
 ) -> None:
     """Mostra ou constroi plano de recuperacao para uma ideia."""
+    from src.app_factory.recovery import rollback_to_stage
+
     state = init_pipeline_state(idea_id)
-    state.mark_completed("validate_idea")
-    state.mark_failed("extract_requirements", "simulated: missing data")
+
+    # Simulate completed stages up to the failure point
+    simulate_fail = stage or "extract_requirements"
+    for s in STAGE_ORDER:
+        if s == simulate_fail:
+            state.mark_failed(s, f"simulated failure at {s}")
+            break
+        state.mark_completed(s)
+
+    if rollback:
+        try:
+            state = rollback_to_stage(state, rollback)
+            console.print(f"[yellow]Rollback para '{rollback}':[/yellow]")
+            for s in STAGE_ORDER:
+                if s in state.stages:
+                    console.print(f"  {s}: {state.stages[s].status.value}")
+        except ValueError as e:
+            console.print(f"[red]{e}[/red]")
+            raise typer.Exit(1)
+        return
 
     plan = build_recovery_plan(state, force_retry=force)
     if not plan.can_resume:
@@ -429,11 +451,11 @@ def idea_recovery(
     console.print(f"  Resume from: {plan.resume_from_stage}")
     console.print(f"  Failed stages: {', '.join(plan.failed_stages)}")
     console.print(f"  Progress before failure: {plan.state.progress_pct}%")
-    for stage in STAGE_ORDER:
-        if stage in plan.state.stages:
-            s = plan.state.stages[stage]
+    for s in STAGE_ORDER:
+        if s in plan.state.stages:
+            st = plan.state.stages[s]
             icon = {"completed": "[green]+[/green]", "failed": "[red]![/red]", "pending": "[dim]o[/dim]", "running": "[yellow]>[/yellow]", "skipped": "[dim]-[/dim]"}
-            console.print(f"  {icon.get(s.status.value, '?')} {stage}: {s.status.value}")
+            console.print(f"  {icon.get(st.status.value, '?')} {s}: {st.status.value}")
 
 
 @idea_app.command(name="status")
