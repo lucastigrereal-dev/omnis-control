@@ -183,3 +183,26 @@ def test_cli_preview_help():
     result = runner.invoke(first_missions_app, ["preview", "--help"])
     assert result.exit_code == 0
     assert "preview" in result.stdout.lower()
+
+
+# ---------------------------------------------------------------------------
+# Scheduler commands
+# ---------------------------------------------------------------------------
+
+
+def test_cli_schedule_empty():
+    """Schedule list on fresh orchestrator should be empty but not error."""
+    result = runner.invoke(first_missions_app, ["schedule"])
+    assert result.exit_code == 0
+
+
+def test_cli_schedule_json():
+    result = runner.invoke(first_missions_app, ["schedule", "--json"])
+    assert result.exit_code == 0
+    data = json.loads(result.stdout)
+    assert isinstance(data, list)
+
+
+def test_cli_schedule_add_nonexistent():
+    result = runner.invoke(first_missions_app, ["schedule-add", "nonexistent"])
+    assert result.exit_code == 1

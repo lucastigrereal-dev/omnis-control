@@ -421,6 +421,79 @@ def fm_result_show(
 
 
 # ---------------------------------------------------------------------------
+# Scheduler
+# ---------------------------------------------------------------------------
+
+@first_missions_app.command(name="schedule")
+def fm_schedule(
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """List all scheduled missions (pending + waiting)."""
+    orch = _orch(dry_run=True)
+    _seed_demo(orch)
+
+    entries = orch.scheduler.pending()
+
+    if json_output:
+        print(json.dumps([e.to_dict() for e in entries], indent=2, ensure_ascii=False))
+        return
+
+    if not entries:
+        stats = orch.scheduler.stats()
+        console.print(f"No pending entries. Queue: {stats['queued']}, Dispatched: {stats['dispatched']}")
+        return
+
+    table = Table(title=f"Scheduled Missions ({len(entries)})")
+    table.add_column("Entry ID", style="cyan", no_wrap=True)
+    table.add_column("Mission")
+    table.add_column("Status")
+    table.add_column("Run At")
+    table.add_column("Recurrent")
+
+    for e in entries:
+        table.add_row(
+            e.entry_id[:12],
+            (e.mission.name[:25] if e.mission else "?"),
+            e.status.value,
+            e.run_at[:16] if e.run_at else "now",
+            "[green]Yes[/green]" if e.recurrent else "-",
+        )
+    console.print(table)
+
+
+@first_missions_app.command(name="schedule-add")
+def fm_schedule_add(
+    mission_id: str = typer.Argument(..., help="Mission ID to schedule"),
+    run_at: Optional[str] = typer.Option(None, "--at", help="ISO timestamp (empty = now)"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Add a mission to the scheduler (dry-run by default)."""
+    orch = _orch(dry_run=True)
+    _seed_demo(orch)
+
+    actual = _resolve_id(orch, mission_id)
+    if actual is None:
+        console.print(f"[red]Mission not found: {mission_id}[/red]")
+        raise typer.Exit(1)
+
+    m = orch.registry.get(actual)
+    if m is None:
+        console.print(f"[red]Mission not found: {mission_id}[/red]")
+        raise typer.Exit(1)
+
+    entry = orch.scheduler.schedule(m, run_at=run_at or "")
+
+    if json_output:
+        print(json.dumps(entry.to_dict(), indent=2, ensure_ascii=False))
+    else:
+        console.print(f"[green]Mission scheduled![/green]")
+        console.print(f"  Entry ID: [cyan]{entry.entry_id}[/cyan]")
+        console.print(f"  Mission: {m.name}")
+        console.print(f"  Run at: {run_at or 'immediate'}")
+        console.print(f"  Status: {entry.status.value}")
+
+
+# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
