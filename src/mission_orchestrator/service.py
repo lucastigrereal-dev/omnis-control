@@ -10,6 +10,8 @@ from src.mission_orchestrator.planner import build_plan
 from src.mission_orchestrator.executor import execute
 from src.mission_orchestrator.errors import RunNotFoundError
 from src.mission_orchestrator.execution_manifest import write_manifest
+from src.providers.registry import ProviderRegistry
+from src.providers.tracing import TracingProvider
 
 BASE = Path(__file__).resolve().parent.parent.parent
 DEFAULT_RUNS_ROOT = BASE / "exports" / "orchestrator_runs"
@@ -45,18 +47,39 @@ def run(
     runs_root: Path = DEFAULT_RUNS_ROOT,
     runs_log: Path = DEFAULT_RUNS_LOG,
     packages_root: Optional[Path] = None,
+    _registry: Optional[ProviderRegistry] = None,
 ) -> OrchestratorRun:
-    """Plan + execute + persist. Returns OrchestratorRun."""
-    orch_run = build_plan(
-        request_text=request_text,
-        account_handle=account_handle,
-        objective=objective,
-        dry_run=dry_run,
-        allow_unknown=allow_unknown,
-        config_path=config_path,
-    )
-    orch_run = execute(orch_run, packages_root=packages_root)
-    _persist(orch_run, runs_root, runs_log)
+    """Plan + execute + persist. Returns OrchestratorRun.
+
+    Instrumented with TracingProvider. Configure LANGFUSE_PUBLIC_KEY for cloud tracing.
+    """
+    registry = _registry or ProviderRegistry.production()
+    tracer: TracingProvider = registry.get("tracing")  # type: ignore[assignment]
+
+    with tracer.span(
+        "orchestrator.run",
+        input={"request": request_text, "account": account_handle, "objective": objective, "dry_run": dry_run},
+    ) as ctx:
+        orch_run = build_plan(
+            request_text=request_text,
+            account_handle=account_handle,
+            objective=objective,
+            dry_run=dry_run,
+            allow_unknown=allow_unknown,
+            config_path=config_path,
+        )
+
+        with tracer.span("orchestrator.execute", trace_id=ctx.trace_id) as exec_ctx:
+            orch_run = execute(orch_run, packages_root=packages_root)
+            exec_ctx.set_output({
+                "run_id": orch_run.run_id,
+                "status": orch_run.status,
+                "steps": len(orch_run.steps),
+            })
+
+        _persist(orch_run, runs_root, runs_log)
+        ctx.set_output({"run_id": orch_run.run_id, "status": orch_run.status})
+
     return orch_run
 
 
