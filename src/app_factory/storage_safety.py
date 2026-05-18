@@ -116,8 +116,13 @@ def matches_blocked_pattern(path: str, patterns: list[str]) -> bool:
         for part in parts:
             if fnmatch(part, pattern):
                 return True
-        if pattern.endswith("/") and path.startswith(pattern.rstrip("/")):
-            return True
+        if pattern.endswith("/"):
+            prefix = pattern.rstrip("/")
+            if path.startswith(prefix):
+                return True
+            # Also check if any parent directory segment equals the prefix
+            if prefix in parts:
+                return True
     return False
 
 
