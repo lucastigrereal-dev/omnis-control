@@ -1,0 +1,23 @@
+{
+  "video_path": "tests\\video_studio\\fixtures\\sample.mp4",
+  "output_dir": "docs\\video_studio_output",
+  "dry_run": true,
+  "ingest": {
+    "path": "tests\\video_studio\\fixtures\\sample.mp4",
+    "format": "mp4",
+    "size_bytes": 32,
+    "duration_estimate_seconds": 0.0
+  },
+  "audio_path": "docs\\video_studio_output\\sample.wav",
+  "transcription": "Este video mostra um destino incrivel no Brasil. Confira as melhores praias e restaurantes da regiao. Nao perca as dicas exclusivas para aproveitar ao maximo sua viagem.",
+  "cuts": [
+    {
+      "start": 0.0,
+      "end": 30.0,
+      "text": "Este video mostra um destino incrivel no Brasil. Confira as melhores praias e restaurantes da regiao. Nao perca as dicas exclusivas para aproveitar ao maximo sua viagem."
+    }
+  ],
+  "srt_path": "docs\\video_studio_output\\sample.srt",
+  "rendered_path": "docs\\video_studio_output\\sample_cut.manifest.json",
+  "ffmpeg_available": true
+}

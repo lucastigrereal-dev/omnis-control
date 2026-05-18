@@ -1,0 +1,8 @@
+{
+  "dry_run": true,
+  "video_path": "tests\\video_studio\\fixtures\\sample.mp4",
+  "start": 0.0,
+  "end": 30.0,
+  "output_path": "docs\\video_studio_output\\sample_cut.mp4",
+  "duration": 30.0
+}

@@ -1,0 +1,104 @@
+{
+  "project": "A Gente Viaja Brasil",
+  "niche": "turismo regional interior SP",
+  "objective": "vender collabs hoteis fazenda",
+  "city": "Brotas",
+  "channel": "@agenteviajabrasil",
+  "dry_run": false,
+  "generated_at": "2026-05-18T20:56:34.378429",
+  "learning_context": [
+    "Hotéis respondem melhor a dados de CPM comparativo (R$0,15 vs R$15 Meta Ads)",
+    "CTAs com 'responde essa DM' tem 3x mais conversão que 'link na bio'",
+    "Carrosséis com dados geram 40% mais salvos que carrosséis só com fotos",
+    "Vídeos mostrando rosto geram 2x mais confiança que vídeos sem rosto",
+    "Propostas enviadas em até 24h após DM fecham 60% mais que após 48h"
+  ],
+  "posts": [
+    "[DIA 1 — Segunda] Post turismo regional interior SP em Brotas | Projeto: A Gente Viaja Brasil | Canal: @agenteviajabrasil | Objetivo: vender collabs hoteis fazenda | learning_context: Hotéis respondem melhor a dados de CPM comparativo (R$0,15 v... | [dry_run=True — conteúdo template, sem chamada externa]",
+    "[DIA 2 — Terça] Post turismo regional interior SP em Brotas | Projeto: A Gente Viaja Brasil | Canal: @agenteviajabrasil | Objetivo: vender collabs hoteis fazenda | learning_context: Hotéis respondem melhor a dados de CPM comparativo (R$0,15 v... | [dry_run=True — conteúdo template, sem chamada externa]",
+    "[DIA 3 — Quarta] Post turismo regional interior SP em Brotas | Projeto: A Gente Viaja Brasil | Canal: @agenteviajabrasil | Objetivo: vender collabs hoteis fazenda | learning_context: Hotéis respondem melhor a dados de CPM comparativo (R$0,15 v... | [dry_run=True — conteúdo template, sem chamada externa]",
+    "[DIA 4 — Quinta] Post turismo regional interior SP em Brotas | Projeto: A Gente Viaja Brasil | Canal: @agenteviajabrasil | Objetivo: vender collabs hoteis fazenda | learning_context: Hotéis respondem melhor a dados de CPM comparativo (R$0,15 v... | [dry_run=True — conteúdo template, sem chamada externa]",
+    "[DIA 5 — Sexta] Post turismo regional interior SP em Brotas | Projeto: A Gente Viaja Brasil | Canal: @agenteviajabrasil | Objetivo: vender collabs hoteis fazenda | learning_context: Hotéis respondem melhor a dados de CPM comparativo (R$0,15 v... | [dry_run=True — conteúdo template, sem chamada externa]",
+    "[DIA 6 — Sábado] Post turismo regional interior SP em Brotas | Projeto: A Gente Viaja Brasil | Canal: @agenteviajabrasil | Objetivo: vender collabs hoteis fazenda | learning_context: Hotéis respondem melhor a dados de CPM comparativo (R$0,15 v... | [dry_run=True — conteúdo template, sem chamada externa]",
+    "[DIA 7 — Domingo] Post turismo regional interior SP em Brotas | Projeto: A Gente Viaja Brasil | Canal: @agenteviajabrasil | Objetivo: vender collabs hoteis fazenda | learning_context: Hotéis respondem melhor a dados de CPM comparativo (R$0,15 v... | [dry_run=True — conteúdo template, sem chamada externa]"
+  ],
+  "stories": [
+    "[STORY 1] Formato: enquete | Niche: turismo regional interior SP | Cidade: Brotas | Projeto: A Gente Viaja Brasil | learning_context: Hotéis respondem melhor a dados de CPM comparativo (R$0,15 v... | [template]",
+    "[STORY 2] Formato: pergunta | Niche: turismo regional interior SP | Cidade: Brotas | Projeto: A Gente Viaja Brasil | learning_context: Hotéis respondem melhor a dados de CPM comparativo (R$0,15 v... | [template]",
+    "[STORY 3] Formato: contagem regressiva | Niche: turismo regional interior SP | Cidade: Brotas | Projeto: A Gente Viaja Brasil | learning_context: Hotéis respondem melhor a dados de CPM comparativo (R$0,15 v... | [template]",
+    "[STORY 4] Formato: link sticker | Niche: turismo regional interior SP | Cidade: Brotas | Projeto: A Gente Viaja Brasil | learning_context: Hotéis respondem melhor a dados de CPM comparativo (R$0,15 v... | [template]",
+    "[STORY 5] Formato: quiz | Niche: turismo regional interior SP | Cidade: Brotas | Projeto: A Gente Viaja Brasil | learning_context: Hotéis respondem melhor a dados de CPM comparativo (R$0,15 v... | [template]",
+    "[STORY 6] Formato: bastidores | Niche: turismo regional interior SP | Cidade: Brotas | Projeto: A Gente Viaja Brasil | learning_context: Hotéis respondem melhor a dados de CPM comparativo (R$0,15 v... | [template]",
+    "[STORY 7] Formato: CTA direto | Niche: turismo regional interior SP | Cidade: Brotas | Projeto: A Gente Viaja Brasil | learning_context: Hotéis respondem melhor a dados de CPM comparativo (R$0,15 v... | [template]"
+  ],
+  "reels": [
+    "[REEL 1] Hook: Você sabia que em Brotas... | Roteiro: intro → desenvolvimento → CTA → follow | Projeto: A Gente Viaja Brasil | [template]",
+    "[REEL 2] Hook: O segredo de turismo regional interior SP que ninguém conta | Roteiro: intro → desenvolvimento → CTA → follow | Projeto: A Gente Viaja Brasil | [template]",
+    "[REEL 3] Hook: 3 dicas de turismo regional interior SP em Brotas | Roteiro: intro → desenvolvimento → CTA → follow | Projeto: A Gente Viaja Brasil | [template]",
+    "[REEL 4] Hook: O melhor de Brotas em 30 segundos | Roteiro: intro → desenvolvimento → CTA → follow | Projeto: A Gente Viaja Brasil | [template]",
+    "[REEL 5] Hook: Por que vender collabs hoteis fazenda muda tudo no turismo regional interior SP | Roteiro: intro → desenvolvimento → CTA → follow | Projeto: A Gente Viaja Brasil | [template]"
+  ],
+  "carousel": {
+    "title": "Top 5 de turismo regional interior SP em Brotas",
+    "slides": [
+      "Slide 1: dica 1 de turismo regional interior SP — Brotas | [template]",
+      "Slide 2: dica 2 de turismo regional interior SP — Brotas | [template]",
+      "Slide 3: dica 3 de turismo regional interior SP — Brotas | [template]",
+      "Slide 4: dica 4 de turismo regional interior SP — Brotas | [template]",
+      "Slide 5: dica 5 de turismo regional interior SP — Brotas | [template]"
+    ],
+    "cta": "Salva esse carrossel e compartilha! | Projeto: A Gente Viaja Brasil",
+    "project": "A Gente Viaja Brasil"
+  },
+  "proposal": {
+    "title": "Proposta Comercial — A Gente Viaja Brasil",
+    "niche": "turismo regional interior SP",
+    "channel": "@agenteviajabrasil",
+    "city": "Brotas",
+    "objective": "vender collabs hoteis fazenda",
+    "packages": [
+      {
+        "name": "Starter",
+        "price": "R$350",
+        "items": [
+          "1 collab",
+          "1 perfil",
+          "1 post"
+        ]
+      },
+      {
+        "name": "Growth",
+        "price": "R$990/mês",
+        "items": [
+          "3 collabs",
+          "3 páginas",
+          "SEOgram"
+        ]
+      },
+      {
+        "name": "Premium",
+        "price": "R$1.200",
+        "items": [
+          "4 collabs",
+          "3 stories",
+          "3+ perfis"
+        ]
+      }
+    ],
+    "note": "[template — sem chamada externa]"
+  },
+  "learning_update": {
+    "summary": "Semana de produção turismo regional interior SP em Brotas — projeto A Gente Viaja Brasil",
+    "learnings": [
+      "Aprendizado 1: melhor horário para turismo regional interior SP no @agenteviajabrasil",
+      "Aprendizado 2: formato que mais engaja em Brotas",
+      "Aprendizado 3: hook mais eficaz para objetivo 'vender collabs hoteis fazenda'"
+    ],
+    "next_actions": [
+      "Gravar reels semana seguinte",
+      "Revisar métricas de engajamento",
+      "Atualizar proposta comercial para Brotas"
+    ],
+    "note": "[template]"
+  }
+}

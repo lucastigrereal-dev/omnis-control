@@ -1,0 +1,43 @@
+{
+  "mission_id": "A Gente Viaja Brasil_weekly_20260518",
+  "generated_at": "2026-05-18T20:56:34.379148+00:00",
+  "files": [
+    {
+      "path": "carousel.md",
+      "size_bytes": 534,
+      "ext": ".md"
+    },
+    {
+      "path": "learning_update.md",
+      "size_bytes": 503,
+      "ext": ".md"
+    },
+    {
+      "path": "posts.md",
+      "size_bytes": 2294,
+      "ext": ".md"
+    },
+    {
+      "path": "proposal.md",
+      "size_bytes": 238,
+      "ext": ".md"
+    },
+    {
+      "path": "reels.md",
+      "size_bytes": 921,
+      "ext": ".md"
+    },
+    {
+      "path": "stories.md",
+      "size_bytes": 1629,
+      "ext": ".md"
+    },
+    {
+      "path": "weekly_manifest.json",
+      "size_bytes": 7514,
+      "ext": ".json"
+    }
+  ],
+  "total_files": 7,
+  "total_bytes": 13633
+}

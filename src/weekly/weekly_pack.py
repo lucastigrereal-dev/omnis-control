@@ -16,6 +16,35 @@ class WeeklyPackOrchestrator:
     city: str
     channel: str
     dry_run: bool = True
+    _learning_context: list[str] = field(default_factory=list, repr=False)
+
+    # ------------------------------------------------------------------ #
+    # Builder methods
+    # ------------------------------------------------------------------ #
+
+    def with_learning_context(self, learnings_path: Path) -> "WeeklyPackOrchestrator":
+        """Read a JSONL learnings file and attach learning context to this orchestrator.
+
+        Each line in the JSONL must be a JSON object with a ``"learnings"`` key
+        (list[str]).  All learnings from all lines are merged and stored; they are
+        injected into generated posts/stories so the pack reflects previous week
+        knowledge.
+
+        Returns *self* so it can be chained after construction.
+        """
+        learnings_path = Path(learnings_path)
+        collected: list[str] = []
+        for raw_line in learnings_path.read_text(encoding="utf-8").splitlines():
+            raw_line = raw_line.strip()
+            if not raw_line:
+                continue
+            try:
+                obj = json.loads(raw_line)
+                collected.extend(obj.get("learnings", []))
+            except json.JSONDecodeError:
+                pass
+        self._learning_context = collected
+        return self
 
     # ------------------------------------------------------------------ #
     # Public API
@@ -31,6 +60,7 @@ class WeeklyPackOrchestrator:
             "channel": self.channel,
             "dry_run": self.dry_run,
             "generated_at": datetime.utcnow().isoformat(),
+            "learning_context": self._learning_context,
             "posts": self._gen_posts(),
             "stories": self._gen_stories(),
             "reels": self._gen_reels(),
@@ -48,10 +78,13 @@ class WeeklyPackOrchestrator:
 
     def _gen_posts(self, n: int = 7) -> list[str]:
         days = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"]
+        learning_suffix = ""
+        if self._learning_context:
+            learning_suffix = f" | learning_context: {self._learning_context[0][:60]}..."
         return [
             f"[DIA {i+1} — {days[i % 7]}] Post {self.niche} em {self.city} | "
             f"Projeto: {self.project} | Canal: {self.channel} | "
-            f"Objetivo: {self.objective} | "
+            f"Objetivo: {self.objective}{learning_suffix} | "
             f"[dry_run=True — conteúdo template, sem chamada externa]"
             for i in range(n)
         ]
@@ -61,10 +94,13 @@ class WeeklyPackOrchestrator:
             "enquete", "pergunta", "contagem regressiva",
             "link sticker", "quiz", "bastidores", "CTA direto",
         ]
+        learning_suffix = ""
+        if self._learning_context:
+            learning_suffix = f" | learning_context: {self._learning_context[0][:60]}..."
         return [
             f"[STORY {i+1}] Formato: {formats[i % len(formats)]} | "
             f"Niche: {self.niche} | Cidade: {self.city} | "
-            f"Projeto: {self.project} | [template]"
+            f"Projeto: {self.project}{learning_suffix} | [template]"
             for i in range(n)
         ]
 
