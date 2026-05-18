@@ -283,12 +283,17 @@ def idea_docs(idea_id: str = typer.Argument(..., help="ID da ideia")) -> None:
 
 
 @idea_app.command(name="build-plan")
-def idea_build_plan(idea_id: str = typer.Argument(..., help="ID da ideia")) -> None:
+def idea_build_plan(
+    idea_id: str = typer.Argument(..., help="ID da ideia"),
+    safety_dir: str = typer.Option(None, "--safety-dir", help="Auditar diretorio com storage safety"),
+) -> None:
     """Roda pipeline PRD -> schema -> API -> tasks -> validate."""
     try:
         result = build_planning_pipeline(
             idea_id, store=IdeaStore(dry_run=True), dry_run=True,
             with_quality_score=True, with_recovery=True,
+            with_storage_safety=safety_dir is not None,
+            safety_target_dir=safety_dir,
         )
     except Exception as exc:
         console.print(f"[red]Pipeline falhou:[/red] {exc}")
@@ -304,6 +309,9 @@ def idea_build_plan(idea_id: str = typer.Argument(..., help="ID da ideia")) -> N
         ps = result.pipeline_state
         console.print(f"  Pipeline Progress: {ps.get('progress_pct', '?')}% — {ps.get('overall_status', '?')}")
     console.print(f"  Docs: {len(result.docs.documents)}")
+    if result.storage_safety:
+        ss = result.storage_safety
+        console.print(f"  Storage Safety: {'PASS' if ss.get('passed') else 'FAIL'} ({ss.get('scanned_files', 0)} files)")
 
 
 @idea_app.command(name="safety")
