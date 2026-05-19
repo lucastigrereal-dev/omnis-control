@@ -148,6 +148,13 @@ def collect_quality() -> dict:
     if not scores:
         return {"scores": [], "summary": {}, "generated_at": _now_iso(), "available": True}
 
+    # Normalize field names: JSONL source uses package_id, HTML expects output_id
+    for s in scores:
+        if "package_id" in s and "output_id" not in s:
+            s["output_id"] = s["package_id"]
+        if "output_type" not in s:
+            s["output_type"] = "quality_check"
+
     avg = round(sum(s.get("overall", s.get("score", 0)) for s in scores) / len(scores), 1)
     grades = {}
     for s in scores:

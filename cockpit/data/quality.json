@@ -19,7 +19,9 @@
       ],
       "checks_failed": [],
       "warnings": [],
-      "scored_at": "2026-05-09T15:13:13Z"
+      "scored_at": "2026-05-09T15:13:13Z",
+      "output_id": "carousel_full_test",
+      "output_type": "quality_check"
     },
     {
       "package_id": "carousel_full_test",
@@ -40,7 +42,9 @@
       ],
       "checks_failed": [],
       "warnings": [],
-      "scored_at": "2026-05-09T15:13:13Z"
+      "scored_at": "2026-05-09T15:13:13Z",
+      "output_id": "carousel_full_test",
+      "output_type": "quality_check"
     },
     {
       "package_id": "carousel_full_test",
@@ -61,7 +65,9 @@
       ],
       "checks_failed": [],
       "warnings": [],
-      "scored_at": "2026-05-09T15:13:13Z"
+      "scored_at": "2026-05-09T15:13:13Z",
+      "output_id": "carousel_full_test",
+      "output_type": "quality_check"
     },
     {
       "package_id": "carousel_full_test",
@@ -82,7 +88,9 @@
       ],
       "checks_failed": [],
       "warnings": [],
-      "scored_at": "2026-05-09T15:13:13Z"
+      "scored_at": "2026-05-09T15:13:13Z",
+      "output_id": "carousel_full_test",
+      "output_type": "quality_check"
     },
     {
       "package_id": "carousel_full_test",
@@ -103,7 +111,9 @@
       ],
       "checks_failed": [],
       "warnings": [],
-      "scored_at": "2026-05-09T15:13:13Z"
+      "scored_at": "2026-05-09T15:13:13Z",
+      "output_id": "carousel_full_test",
+      "output_type": "quality_check"
     },
     {
       "package_id": "carousel_full_test",
@@ -124,7 +134,9 @@
       ],
       "checks_failed": [],
       "warnings": [],
-      "scored_at": "2026-05-09T15:13:14Z"
+      "scored_at": "2026-05-09T15:13:14Z",
+      "output_id": "carousel_full_test",
+      "output_type": "quality_check"
     },
     {
       "package_id": "carousel_full_test",
@@ -145,7 +157,9 @@
       ],
       "checks_failed": [],
       "warnings": [],
-      "scored_at": "2026-05-09T15:13:14Z"
+      "scored_at": "2026-05-09T15:13:14Z",
+      "output_id": "carousel_full_test",
+      "output_type": "quality_check"
     }
   ],
   "summary": {
@@ -155,8 +169,8 @@
       "ready_for_human_review": 7
     },
     "ready_count": 0,
-    "last_scored": ""
+    "last_scored": "carousel_full_test"
   },
-  "generated_at": "2026-05-18T23:25:01Z",
+  "generated_at": "2026-05-19T02:29:00Z",
   "available": true
 }

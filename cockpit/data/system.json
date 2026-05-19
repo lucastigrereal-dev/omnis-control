@@ -1,8 +1,8 @@
 {
   "disk": {
     "total_gb": 924.3,
-    "used_gb": 783.6,
-    "free_gb": 140.7,
+    "used_gb": 784.3,
+    "free_gb": 140.1,
     "percent_free": 15.2
   },
   "modules": [
@@ -69,5 +69,5 @@
   ],
   "modules_healthy": 10,
   "modules_total": 10,
-  "generated_at": "2026-05-18T23:25:01Z"
+  "generated_at": "2026-05-19T02:29:00Z"
 }
