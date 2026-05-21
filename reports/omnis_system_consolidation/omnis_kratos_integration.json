@@ -1,0 +1,67 @@
+{
+  "integration_name": "omnis_kratos",
+  "date": "2026-05-21",
+  "topology": {
+    "omnis_control": {
+      "path": "~/omnis-control",
+      "branch": "feature/omnis-5waves-runtime-supreme",
+      "health_port": 8700,
+      "skills": 47,
+      "source_files": "300+"
+    },
+    "kratos": {
+      "path": "~/kratos-mission-control",
+      "branch": "feature/fase14-integration",
+      "commits_ahead": 4,
+      "status": "modified"
+    },
+    "akasha": {
+      "type": "pgvector",
+      "port": 5432,
+      "docs": 20000,
+      "chunks": 606000
+    },
+    "publisher_os": {
+      "port": "8000 (Docker)",
+      "litellm": 4002,
+      "ollama": 11434
+    },
+    "event_bus": {
+      "type": "redis_pubsub",
+      "port": 6382,
+      "channels": ["system:heartbeat", "omnis:events", "akasha:events", "runtime:heartbeat"]
+    }
+  },
+  "callers_and_callees": [
+    {"from": "omnis_control", "to": "kratos", "via": "kratos_bridge/", "purpose": "mission_dispatch"},
+    {"from": "omnis_control", "to": "health_8700", "via": "REST", "purpose": "health_monitoring"},
+    {"from": "omnis_bus", "to": "kratos", "via": "redis_pubsub", "purpose": "events"},
+    {"from": "kratos", "to": "akasha", "via": "pgvector_sql", "purpose": "memory"},
+    {"from": "omnis_control", "to": "akasha", "via": "akasha_event_sink/", "purpose": "memory_write"},
+    {"from": "omnis_control", "to": "publisher_os", "via": "MCP", "purpose": "content_production"}
+  ],
+  "source_of_truth": {
+    "skills": "registry/skills.yaml",
+    "capabilities": "registry/capabilities.yaml",
+    "mission_state": "omnis_control/src/missions/",
+    "kratos_runtime": "kratos_fastapi",
+    "health": "omnis_health:8700",
+    "memory": "akasha_pgvector"
+  },
+  "duplicities": [
+    {"item": "skills.yaml vs omnis_skills.yaml", "impact": "two_catalogs_out_of_sync"},
+    {"item": "mission_definitions + templates", "impact": "dual_storage"},
+    {"item": "skill_health_tracking", "impact": "may_diverge"}
+  ],
+  "gaps": [
+    {"id": "no_system_topology_registry", "priority": "P1"},
+    {"id": "no_auth_between_omnis_kratos", "priority": "P0"},
+    {"id": "publisher_os_kratos_not_integrated", "priority": "P1"},
+    {"id": "no_cross_system_observability", "priority": "P1"},
+    {"id": "omnis_skills_yaml_out_of_sync", "priority": "P1"}
+  ],
+  "kratos_bridge_modules": [
+    "health_monitor.py", "event_stream.py", "dispatcher.py",
+    "permission_gate.py", "queue_manager.py", "snapshot.py", "view_router.py"
+  ]
+}

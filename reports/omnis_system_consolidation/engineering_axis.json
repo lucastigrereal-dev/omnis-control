@@ -1,0 +1,31 @@
+{
+  "axis": "engineering",
+  "status": "OPERATIONAL",
+  "pipeline": "architect → schema-planner → scaffolder → builder → qa → auditor → refactor → merge-gate",
+  "orchestration": "orchestrator → guardian → execution-runner",
+  "meta": "registry",
+  "p0_skills_on_disk": 12,
+  "p1_code_exists": true,
+  "p1_skills_on_disk": 0,
+  "p2_skills_on_disk": 0,
+  "modules_in_omnis_control": {
+    "total_source_files": "300+",
+    "total_modules": "70+",
+    "core_engineering_modules": [
+      "app_factory", "app_factory_supreme", "capabilityforge",
+      "capability_forge_lite", "capability_forge_real", "execution_graph",
+      "execution_queue", "missions", "skill_execution", "work_order",
+      "quality_gate", "quality_layer", "production_hardening"
+    ],
+    "integration_modules": [
+      "kratos_bridge", "runtime_bridge", "skills_bridge",
+      "skill_router_bridge", "plugin_runtime", "omnis_bus", "omnis_os"
+    ],
+    "observability_modules": ["observability", "observability_local"]
+  },
+  "gaps": {
+    "missing_skills": ["creator", "forgelite", "forgereal", "repo-intake", "dependency-audit", "adapter-builder", "bridge-builder", "matcher", "composer", "decomposer"],
+    "missing_observability_skill": true,
+    "missing_api_contract_tester": "covered-manually"
+  }
+}

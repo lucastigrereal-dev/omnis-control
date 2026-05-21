@@ -1,0 +1,33 @@
+{
+  "governance_level": "L2",
+  "levels": {
+    "L0_no_governance": {"blocked": true, "note": "raw terminal access not allowed"},
+    "L1_observer": {"status": "operational", "evidence": "health_checks, audit"},
+    "L2_approval_gates": {"status": "operational", "evidence": "approval_runtime, guardian"},
+    "L3_constrained_execution": {"status": "partial", "evidence": "skill_execution_boundaries"},
+    "L4_policy_as_code": {"status": "missing", "evidence": null},
+    "L5_self_governance": {"status": "missing", "evidence": null}
+  },
+  "zones": {
+    "safe": {"actions": ["health_check", "skill_listing", "report_gen", "code_audit", "draft_gen"], "gate": null},
+    "caution": {"actions": ["file_write", "git_commit", "skill_execution"], "gate": "guardian"},
+    "danger": {"actions": ["instagram_publish", "dm_send", "db_write_prod", "oauth_use", "financial_change"], "gate": "guardian + approval_runtime + human"}
+  },
+  "dangerous_action_gates": {
+    "instagram_publish": {"guardian": true, "approval_runtime": true, "human": true},
+    "send_dm": {"guardian": true, "approval_runtime": true, "human": true},
+    "delete_files": {"guardian": false, "approval_runtime": false, "human": true},
+    "db_write_prod": {"guardian": true, "approval_runtime": true, "human": true},
+    "oauth_use": {"guardian": false, "approval_runtime": true, "human": true},
+    "financial_change": {"guardian": true, "approval_runtime": true, "human": true},
+    "n8n_start": {"guardian": true, "approval_runtime": true, "human": true},
+    "webhook_send": {"guardian": true, "approval_runtime": true, "human": false}
+  },
+  "gaps": [
+    {"id": "L4_policy_engine", "priority": "P1", "impact": "policies_in_code_not_declarative"},
+    {"id": "L5_self_governance", "priority": "P2", "impact": "no_auto_adaptation"},
+    {"id": "governance_unused_by_skills", "priority": "P1", "impact": "bypassed_formal_governance"},
+    {"id": "oauth_token_not_gated", "priority": "P0", "impact": "credential_exposure_risk"},
+    {"id": "no_guardian_audit_trail", "priority": "P1", "impact": "no_review_past_gates"}
+  ]
+}

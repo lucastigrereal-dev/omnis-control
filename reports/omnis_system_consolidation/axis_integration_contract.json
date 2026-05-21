@@ -1,0 +1,32 @@
+{
+  "contract_name": "engineering_expression_integration",
+  "version": "1.0",
+  "date": "2026-05-21",
+  "axes": ["engineering", "expression"],
+  "engineering_delivers_to_expression": [
+    "app_scaffold", "api_contracts", "automation_workflows",
+    "capabilities", "quality_gates", "infrastructure", "event_bus"
+  ],
+  "expression_requests_from_engineering": [
+    "new_capability", "publisher_fix", "analytics_dashboard",
+    "approval_flow_update", "export_format", "video_fix"
+  ],
+  "connecting_capabilities": [
+    "cross_cutting.redis.bus",
+    "cross_cutting.health.check",
+    "omnis.content.crew",
+    "publisher_os.seogram.skill",
+    "external.meta.oauth"
+  ],
+  "data_boundaries": {
+    "can_circulate": ["content_drafts", "performance_metrics", "campaign_status", "pipeline_state", "skill_results"],
+    "privacy_boundary": ["lead_data", "revenue_data", "oauth_tokens", "contact_info"],
+    "requires_approval": ["instagram_publish", "dm_sending", "data_deletion", "financial_modification"]
+  },
+  "content_flow": "campaign-planner → content-machine → caption-approval → seogram-engine → approval-gate → publisher-queue → argos-publish → metrics-loop",
+  "enforcement_mechanisms": [
+    "approval_runtime", "guardian_skill", "work_order_system",
+    "execution_contracts", "skill_boundaries"
+  ],
+  "status": "DEFINED"
+}

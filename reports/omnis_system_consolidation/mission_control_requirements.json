@@ -1,0 +1,42 @@
+{
+  "mission_control": {
+    "version": "1.0",
+    "status": "requirements_defined",
+    "implementation": "not_started",
+    "design_principles": ["read_only_first", "single_source_of_truth", "no_new_backend", "local_only", "minimal_dependencies"]
+  },
+  "views": {
+    "health_overview": {"source": "GET :8700/health", "fields": ["status", "total_skills", "healthy", "stale", "missing_metadata"]},
+    "skills_registry": {"source": "health + omnis_skills.yaml", "fields": ["name", "status", "last_used", "priority", "category"]},
+    "capabilities_grid": {"source": "capabilities.yaml", "fields": ["id", "domain", "layer", "status", "risk"]},
+    "engineering_pipeline": {"skills": ["architect", "schema-planner", "scaffolder", "builder", "qa", "auditor", "guardian", "execution-runner", "merge-gate"], "status": "operational"},
+    "expression_pipeline": {"modules": ["content_factory", "design_art", "approval_center", "publisher", "video_studio"], "status": "operational"},
+    "integration_status": {
+      "omnis_kratos": "bridged",
+      "omnis_akasha": "event_sink",
+      "omnis_publisher_os": "mcp",
+      "kratos_akasha": "pending",
+      "publisher_instagram": "blocked"
+    },
+    "blockers": [
+      {"id": "meta_oauth", "priority": "P0", "affects": "instagram_publishing"},
+      {"id": "no_auth_omnis_kratos", "priority": "P0", "affects": "security"},
+      {"id": "oauth_not_gated", "priority": "P0", "affects": "credential_security"},
+      {"id": "p1_p2_not_installed", "priority": "P1", "affects": "completeness"},
+      {"id": "registry_drift", "priority": "P1", "affects": "consistency"}
+    ],
+    "next_action": "resolve_meta_oauth_blocker",
+    "risk_map": [
+      {"risk": "redis_spof", "level": "HIGH", "mitigation": "none_yet"},
+      {"risk": "no_auth", "level": "HIGH", "mitigation": "p0_auth_layer"},
+      {"risk": "crewai_stability", "level": "HIGH", "mitigation": "monitor_jobs"},
+      {"risk": "registry_drift", "level": "MEDIUM", "mitigation": "sync_script"},
+      {"risk": "jarvis_idle", "level": "LOW", "mitigation": "archive"}
+    ],
+    "implementation_options": {
+      "cli_dashboard": {"status": "recommended", "evidence": "dashboard_cmd.py_exists"},
+      "static_html": {"status": "possible", "note": "generate from health JSON"},
+      "cockpit_extension": {"status": "possible", "note": "requires :3200 running"}
+    }
+  }
+}

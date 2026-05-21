@@ -1,0 +1,33 @@
+{
+  "axis": "expression",
+  "status": "OPERATIONAL",
+  "pipeline": "strategy → production → seo → approval → queue → publish → metrics",
+  "skills_on_disk": 11,
+  "modules_in_omnis_control": {
+    "content_modules": ["content_factory", "content_queue", "content_scheduler", "caption_approval", "creative_production"],
+    "publisher_modules": ["publisher", "publisher_argos", "argos_bridge"],
+    "campaign_modules": ["campaign_manager", "campaign_auditor", "campaign_package"],
+    "approval_modules": ["approval_center", "approval_runtime"],
+    "design_modules": ["design_art", "brand", "render_engine"],
+    "video_modules": ["video_studio", "video_assets", "video_production"],
+    "delivery_modules": ["client_delivery", "delivery_portal", "delivery_templates"],
+    "marketing_modules": ["marketing"],
+    "legacy_modules": ["manual_publishing", "first_post"]
+  },
+  "blockers": {
+    "meta_oauth": "blocked - pending credentials",
+    "instagram_publish": "blocked by Meta OAuth"
+  },
+  "integration": {
+    "argos_bridge": "active",
+    "n8n_bridge": "active",
+    "meta_oauth": "blocked"
+  },
+  "gaps": {
+    "brand_voice_unregistered": true,
+    "calendar_auto_unregistered": true,
+    "approval_gate_unregistered": true,
+    "batch_export_unregistered": true,
+    "video_pipeline_unregistered": true
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "snapshot_timestamp": "2026-05-21T13:53:00-03:00",
+  "registries": {
+    "skills_yaml": "8 jarvis core + 15 custom + 4 deprecated",
+    "omnis_skills_yaml": "30 skills (12 P0, 10 P1, 8 P2)",
+    "capabilities_yaml": "14 seed capabilities",
+    "sectors_yaml": "7 sectors",
+    "agents_yaml": true,
+    "guardrails_yaml": true,
+    "decision_engine_yaml": true,
+    "workflows_yaml": true,
+    "models_yaml": true,
+    "memory_sources_yaml": true
+  },
+  "capabilities": {
+    "total": 14,
+    "active": 10,
+    "planned": 2,
+    "candidate": 2,
+    "by_domain": {
+      "kratos": 3,
+      "akasha": 2,
+      "omnis": 2,
+      "gringotts": 2,
+      "publisher_os": 1,
+      "cross_cutting": 2,
+      "external": 2
+    },
+    "by_risk": {
+      "high": ["omnis.content.crew", "omnis.mission.package", "cross_cutting.redis.bus", "external.meta.oauth"],
+      "medium": ["kratos.live.stream", "kratos.operational.truth", "kratos.event.bridge", "akasha.pgvector.source", "gringotts.cost.callback", "external.supabase.hotels"],
+      "low": ["akasha.event.listener", "gringotts.treasury.schema", "publisher_os.seogram.skill", "cross_cutting.health.check"]
+    }
+  },
+  "skills_on_disk": {
+    "total": 47,
+    "healthy": 47,
+    "stale": 0,
+    "missing_metadata": 0,
+    "empty_dir": 1
+  },
+  "skills_by_category": {
+    "omnis_p0_engineering": ["architect", "architect-omnis", "schema-planner", "scaffolder", "builder", "qa", "auditor", "refactor", "orchestrator", "guardian", "execution-runner", "merge-gate"],
+    "omnis_p1_not_installed": ["creator", "forgelite", "forgereal", "repo-intake", "dependency-audit", "adapter-builder", "bridge-builder", "matcher", "composer", "decomposer"],
+    "omnis_p2_not_installed": ["model-orchestration", "worldactions", "control", "scheduler", "missions", "improvement", "observability-local", "report"],
+    "expression_content": ["content-machine", "seogram-engine", "campaign-planner", "content-variant-maker", "hub-social", "brand", "humanizer", "design", "design-system", "banner-design", "slides"],
+    "jarvis_v1_idle": ["jarvis-brain", "jarvis-decide", "jarvis-delegate", "jarvis-guardrails", "jarvis-memory-write", "jarvis-morning", "jarvis-router", "skill-creator"],
+    "governance_safety": ["guardian", "qa-guard", "merge-gate", "git_guardian", "webhook-guardian", "workflow-validator", "workflow-versioning"],
+    "legacy_engineering": ["integration-architect", "memory-architect", "roadmap-planner", "mission-control-mapper"],
+    "cross_cutting_meta": ["registry", "skill-router", "using-superpowers", "systematic-debugging", "brainstorming", "cost-analyst"],
+    "observability": ["qa-guard", "auditor", "tester"],
+    "deprecated": ["knowledge-retriever", "morning-briefing", "organizer", "context-restorer"]
+  },
+  "gaps": {
+    "p1_missing_from_disk": 10,
+    "p2_missing_from_disk": 8,
+    "jarvis_idle_days": 22,
+    "no_observability_skill": true,
+    "no_operational_truth_skill": true
+  }
+}

@@ -1,0 +1,40 @@
+flowchart TB
+    subgraph OMNIS["OMNIS Control"]
+        OC["omnis-control/<br/>300+ files, 70+ modules"]
+        HS["Health Service :8700<br/>47/48 healthy"]
+        OB["OMNIS Bus<br/>Redis Pub/Sub :6382"]
+        KB["kratos_bridge/"]
+    end
+
+    subgraph KRATOS["KRATOS Ecosystem"]
+        KF["FastAPI<br/>Branch: fase14-integration"]
+        EB["event_bridge.py<br/>Redis Pub/Sub"]
+        MC["Mission Control Cockpit"]
+    end
+
+    subgraph AKASHA["Memory Layer"]
+        AP["pgvector :5432<br/>20K docs, 606K chunks"]
+        EL["event_listener.py<br/>Read-only"]
+    end
+
+    subgraph PUBLISHER["Publisher OS"]
+        PO["Publisher Core :8000"]
+        LL["LiteLLM :4002"]
+        OL["Ollama :11434"]
+        MCP["MCP Server"]
+    end
+
+    OC -->|kratos_bridge| KF
+    OC -->|GET /health| HS
+    OB <-->|Pub/Sub| EB
+    KF -->|SQL| AP
+    OC -->|event_sink| AP
+    EL -->|read-only| OB
+    OC -->|MCP| MCP
+    PO --> MCP
+
+    style OC fill:#1a1a2e,color:#fff
+    style HS fill:#16213e,color:#fff
+    style KF fill:#0f3460,color:#fff
+    style AP fill:#533483,color:#fff
+    style PO fill:#e94560,color:#fff

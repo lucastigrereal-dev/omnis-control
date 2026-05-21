@@ -1,0 +1,52 @@
+{
+  "roadmap_version": "1.0",
+  "date": "2026-05-21",
+  "p0": {
+    "items": [
+      {"id": "health_stable", "status": "done", "effort": "none"},
+      {"id": "skills_registry_clean", "status": "partial", "effort": "small"},
+      {"id": "axis_contract_defined", "status": "done", "effort": "none"},
+      {"id": "governance_boundaries", "status": "partial", "effort": "medium"},
+      {"id": "mission_control_readonly", "status": "defined", "effort": "small"},
+      {"id": "kratos_auth_awareness", "status": "partial", "effort": "medium"}
+    ],
+    "done": 2,
+    "partial": 3,
+    "not_started": 1
+  },
+  "p1": {
+    "items": [
+      {"id": "akasha_bridge_integration", "status": "partial", "effort": "medium"},
+      {"id": "publisher_safe_queue", "status": "partial", "effort": "medium"},
+      {"id": "capability_graph", "status": "not_started", "effort": "large"},
+      {"id": "evaluator_loop", "status": "not_started", "effort": "medium"},
+      {"id": "report_automation", "status": "partial", "effort": "small"},
+      {"id": "install_p1_forge_skills", "status": "not_started", "effort": "medium"},
+      {"id": "l4_policy_as_code", "status": "not_started", "effort": "large"},
+      {"id": "guardian_audit_trail", "status": "not_started", "effort": "small"},
+      {"id": "cross_system_observability", "status": "not_started", "effort": "medium"}
+    ],
+    "done": 0,
+    "partial": 3,
+    "not_started": 6
+  },
+  "p2": {
+    "items": [
+      {"id": "agentic_planner", "status": "not_started", "effort": "large"},
+      {"id": "sandbox_execution", "status": "not_started", "effort": "medium"},
+      {"id": "mcp_fabric", "status": "not_started", "effort": "large"},
+      {"id": "skill_factory", "status": "not_started", "effort": "medium"},
+      {"id": "semi_autonomy", "status": "not_started", "effort": "large"},
+      {"id": "install_p2_skills", "status": "not_started", "effort": "medium"},
+      {"id": "l5_self_governance", "status": "not_started", "effort": "large"}
+    ],
+    "done": 0,
+    "partial": 0,
+    "not_started": 7
+  },
+  "totals": {
+    "done": 2,
+    "partial": 6,
+    "not_started": 14
+  }
+}
