@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-05-18T22:46:05.242376Z",
+  "updated_at": "2026-05-19T02:55:51.232931Z",
   "total": 39,
   "templates": {
     "marketing_caption_alcance_reels": {
@@ -32,8 +32,8 @@
         "marketing\\marketing_caption_alcance_reels.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.213084Z",
-      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "created_at": "2026-05-19T02:55:51.213441Z",
+      "updated_at": "2026-05-19T02:55:51.213441Z",
       "deprecated_at": null
     },
     "marketing_caption_alcance_carousel": {
@@ -66,8 +66,8 @@
         "marketing\\marketing_caption_alcance_carousel.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.213084Z",
-      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "created_at": "2026-05-19T02:55:51.213441Z",
+      "updated_at": "2026-05-19T02:55:51.213441Z",
       "deprecated_at": null
     },
     "marketing_caption_autoridade_feed": {
@@ -100,8 +100,8 @@
         "marketing\\marketing_caption_autoridade_feed.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.213084Z",
-      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "created_at": "2026-05-19T02:55:51.213441Z",
+      "updated_at": "2026-05-19T02:55:51.213441Z",
       "deprecated_at": null
     },
     "marketing_caption_conversao_feed": {
@@ -134,8 +134,8 @@
         "marketing\\marketing_caption_conversao_feed.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.213084Z",
-      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "created_at": "2026-05-19T02:55:51.213441Z",
+      "updated_at": "2026-05-19T02:55:51.213441Z",
       "deprecated_at": null
     },
     "marketing_caption_relacionamento_stories": {
@@ -168,8 +168,8 @@
         "marketing\\marketing_caption_relacionamento_stories.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.213084Z",
-      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "created_at": "2026-05-19T02:55:51.213441Z",
+      "updated_at": "2026-05-19T02:55:51.213441Z",
       "deprecated_at": null
     },
     "marketing_caption_teste_flex": {
@@ -202,8 +202,8 @@
         "marketing\\marketing_caption_teste_flex.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.213084Z",
-      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "created_at": "2026-05-19T02:55:51.213441Z",
+      "updated_at": "2026-05-19T02:55:51.213441Z",
       "deprecated_at": null
     },
     "squad_marketing": {
@@ -234,8 +234,8 @@
         "ops\\squad_marketing.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.213084Z",
-      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "created_at": "2026-05-19T02:55:51.213441Z",
+      "updated_at": "2026-05-19T02:55:51.213441Z",
       "deprecated_at": null
     },
     "squad_sales": {
@@ -265,8 +265,8 @@
         "ops\\squad_sales.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.213084Z",
-      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "created_at": "2026-05-19T02:55:51.213441Z",
+      "updated_at": "2026-05-19T02:55:51.213441Z",
       "deprecated_at": null
     },
     "squad_app_factory": {
@@ -297,8 +297,8 @@
         "ops\\squad_app_factory.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.213084Z",
-      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "created_at": "2026-05-19T02:55:51.213441Z",
+      "updated_at": "2026-05-19T02:55:51.213441Z",
       "deprecated_at": null
     },
     "squad_ops": {
@@ -328,8 +328,8 @@
         "ops\\squad_ops.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.213084Z",
-      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "created_at": "2026-05-19T02:55:51.213441Z",
+      "updated_at": "2026-05-19T02:55:51.213441Z",
       "deprecated_at": null
     },
     "squad_security": {
@@ -358,8 +358,8 @@
         "ops\\squad_security.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.213084Z",
-      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "created_at": "2026-05-19T02:55:51.213441Z",
+      "updated_at": "2026-05-19T02:55:51.213441Z",
       "deprecated_at": null
     },
     "automation_skill_argos-bridge": {
@@ -389,8 +389,8 @@
         "automation\\automation_skill_argos-bridge.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.213084Z",
-      "updated_at": "2026-05-18T22:46:05.213084Z",
+      "created_at": "2026-05-19T02:55:51.214213Z",
+      "updated_at": "2026-05-19T02:55:51.214213Z",
       "deprecated_at": null
     },
     "automation_skill_create_30_day_content_calendar": {
@@ -420,8 +420,8 @@
         "automation\\automation_skill_create_30_day_content_calendar.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.214084Z",
-      "updated_at": "2026-05-18T22:46:05.214084Z",
+      "created_at": "2026-05-19T02:55:51.214213Z",
+      "updated_at": "2026-05-19T02:55:51.214213Z",
       "deprecated_at": null
     },
     "automation_skill_create_instagram_carousel": {
@@ -451,8 +451,8 @@
         "automation\\automation_skill_create_instagram_carousel.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.214084Z",
-      "updated_at": "2026-05-18T22:46:05.214084Z",
+      "created_at": "2026-05-19T02:55:51.214213Z",
+      "updated_at": "2026-05-19T02:55:51.214213Z",
       "deprecated_at": null
     },
     "automation_skill_create_sales_dm_sequence": {
@@ -483,8 +483,8 @@
         "automation\\automation_skill_create_sales_dm_sequence.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.214084Z",
-      "updated_at": "2026-05-18T22:46:05.214084Z",
+      "created_at": "2026-05-19T02:55:51.214213Z",
+      "updated_at": "2026-05-19T02:55:51.214213Z",
       "deprecated_at": null
     },
     "automation_skill_crm-pipeline": {
@@ -515,8 +515,8 @@
         "automation\\automation_skill_crm-pipeline.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.215084Z",
-      "updated_at": "2026-05-18T22:46:05.215084Z",
+      "created_at": "2026-05-19T02:55:51.214213Z",
+      "updated_at": "2026-05-19T02:55:51.214213Z",
       "deprecated_at": null
     },
     "automation_skill_export_content_batch_to_csv": {
@@ -546,8 +546,8 @@
         "automation\\automation_skill_export_content_batch_to_csv.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.215084Z",
-      "updated_at": "2026-05-18T22:46:05.215084Z",
+      "created_at": "2026-05-19T02:55:51.214997Z",
+      "updated_at": "2026-05-19T02:55:51.214997Z",
       "deprecated_at": null
     },
     "automation_skill_generate_seogram_caption": {
@@ -577,8 +577,8 @@
         "automation\\automation_skill_generate_seogram_caption.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.215084Z",
-      "updated_at": "2026-05-18T22:46:05.215084Z",
+      "created_at": "2026-05-19T02:55:51.214997Z",
+      "updated_at": "2026-05-19T02:55:51.214997Z",
       "deprecated_at": null
     },
     "automation_skill_jarvis-brain": {
@@ -609,8 +609,8 @@
         "automation\\automation_skill_jarvis-brain.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.216083Z",
-      "updated_at": "2026-05-18T22:46:05.216083Z",
+      "created_at": "2026-05-19T02:55:51.214997Z",
+      "updated_at": "2026-05-19T02:55:51.214997Z",
       "deprecated_at": null
     },
     "automation_skill_jarvis-decide": {
@@ -640,8 +640,8 @@
         "automation\\automation_skill_jarvis-decide.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.216083Z",
-      "updated_at": "2026-05-18T22:46:05.216083Z",
+      "created_at": "2026-05-19T02:55:51.214997Z",
+      "updated_at": "2026-05-19T02:55:51.214997Z",
       "deprecated_at": null
     },
     "automation_skill_jarvis-delegate": {
@@ -671,8 +671,8 @@
         "automation\\automation_skill_jarvis-delegate.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.217083Z",
-      "updated_at": "2026-05-18T22:46:05.217083Z",
+      "created_at": "2026-05-19T02:55:51.214997Z",
+      "updated_at": "2026-05-19T02:55:51.214997Z",
       "deprecated_at": null
     },
     "automation_skill_jarvis-guardrails": {
@@ -702,8 +702,8 @@
         "automation\\automation_skill_jarvis-guardrails.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.217083Z",
-      "updated_at": "2026-05-18T22:46:05.217083Z",
+      "created_at": "2026-05-19T02:55:51.214997Z",
+      "updated_at": "2026-05-19T02:55:51.214997Z",
       "deprecated_at": null
     },
     "automation_skill_jarvis-memory-write": {
@@ -734,8 +734,8 @@
         "automation\\automation_skill_jarvis-memory-write.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.217083Z",
-      "updated_at": "2026-05-18T22:46:05.217083Z",
+      "created_at": "2026-05-19T02:55:51.214997Z",
+      "updated_at": "2026-05-19T02:55:51.214997Z",
       "deprecated_at": null
     },
     "automation_skill_jarvis-morning": {
@@ -765,8 +765,8 @@
         "automation\\automation_skill_jarvis-morning.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.217083Z",
-      "updated_at": "2026-05-18T22:46:05.217083Z",
+      "created_at": "2026-05-19T02:55:51.214997Z",
+      "updated_at": "2026-05-19T02:55:51.214997Z",
       "deprecated_at": null
     },
     "automation_skill_jarvis-router": {
@@ -796,8 +796,8 @@
         "automation\\automation_skill_jarvis-router.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.217083Z",
-      "updated_at": "2026-05-18T22:46:05.217083Z",
+      "created_at": "2026-05-19T02:55:51.214997Z",
+      "updated_at": "2026-05-19T02:55:51.214997Z",
       "deprecated_at": null
     },
     "automation_skill_revenue-tracker": {
@@ -827,8 +827,8 @@
         "automation\\automation_skill_revenue-tracker.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.218084Z",
-      "updated_at": "2026-05-18T22:46:05.218084Z",
+      "created_at": "2026-05-19T02:55:51.214997Z",
+      "updated_at": "2026-05-19T02:55:51.214997Z",
       "deprecated_at": null
     },
     "automation_skill_skill-creator": {
@@ -858,8 +858,8 @@
         "automation\\automation_skill_skill-creator.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.218084Z",
-      "updated_at": "2026-05-18T22:46:05.218084Z",
+      "created_at": "2026-05-19T02:55:51.214997Z",
+      "updated_at": "2026-05-19T02:55:51.214997Z",
       "deprecated_at": null
     },
     "automation_skill_video_to_content": {
@@ -889,8 +889,8 @@
         "automation\\automation_skill_video_to_content.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.218084Z",
-      "updated_at": "2026-05-18T22:46:05.218084Z",
+      "created_at": "2026-05-19T02:55:51.214997Z",
+      "updated_at": "2026-05-19T02:55:51.214997Z",
       "deprecated_at": null
     },
     "mission_MIS-20260518-001": {
@@ -925,8 +925,8 @@
         "ops\\mission_MIS-20260518-001.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.219084Z",
-      "updated_at": "2026-05-18T22:46:05.219084Z",
+      "created_at": "2026-05-19T02:55:51.214997Z",
+      "updated_at": "2026-05-19T02:55:51.214997Z",
       "deprecated_at": null
     },
     "mission_MIS-20260518-002": {
@@ -961,8 +961,8 @@
         "ops\\mission_MIS-20260518-002.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.219084Z",
-      "updated_at": "2026-05-18T22:46:05.219084Z",
+      "created_at": "2026-05-19T02:55:51.214997Z",
+      "updated_at": "2026-05-19T02:55:51.214997Z",
       "deprecated_at": null
     },
     "mission_MIS-20260518-003": {
@@ -997,8 +997,8 @@
         "ops\\mission_MIS-20260518-003.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.219084Z",
-      "updated_at": "2026-05-18T22:46:05.219084Z",
+      "created_at": "2026-05-19T02:55:51.214997Z",
+      "updated_at": "2026-05-19T02:55:51.217021Z",
       "deprecated_at": null
     },
     "mission_MIS-20260518-004": {
@@ -1033,8 +1033,8 @@
         "ops\\mission_MIS-20260518-004.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.219084Z",
-      "updated_at": "2026-05-18T22:46:05.219084Z",
+      "created_at": "2026-05-19T02:55:51.217021Z",
+      "updated_at": "2026-05-19T02:55:51.217021Z",
       "deprecated_at": null
     },
     "mission_MIS-20260518-005": {
@@ -1069,8 +1069,8 @@
         "ops\\mission_MIS-20260518-005.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.219084Z",
-      "updated_at": "2026-05-18T22:46:05.219084Z",
+      "created_at": "2026-05-19T02:55:51.217021Z",
+      "updated_at": "2026-05-19T02:55:51.217021Z",
       "deprecated_at": null
     },
     "mission_MIS-20260518-006": {
@@ -1105,8 +1105,8 @@
         "ops\\mission_MIS-20260518-006.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.220084Z",
-      "updated_at": "2026-05-18T22:46:05.220084Z",
+      "created_at": "2026-05-19T02:55:51.217021Z",
+      "updated_at": "2026-05-19T02:55:51.217021Z",
       "deprecated_at": null
     },
     "mission_MIS-20260518-007": {
@@ -1141,8 +1141,8 @@
         "ops\\mission_MIS-20260518-007.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.220084Z",
-      "updated_at": "2026-05-18T22:46:05.220084Z",
+      "created_at": "2026-05-19T02:55:51.217021Z",
+      "updated_at": "2026-05-19T02:55:51.217021Z",
       "deprecated_at": null
     },
     "mission_MIS-20260518-008": {
@@ -1177,8 +1177,8 @@
         "ops\\mission_MIS-20260518-008.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.220084Z",
-      "updated_at": "2026-05-18T22:46:05.220084Z",
+      "created_at": "2026-05-19T02:55:51.217021Z",
+      "updated_at": "2026-05-19T02:55:51.217021Z",
       "deprecated_at": null
     },
     "mission_MIS-20260518-009": {
@@ -1213,8 +1213,8 @@
         "ops\\mission_MIS-20260518-009.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.221084Z",
-      "updated_at": "2026-05-18T22:46:05.221084Z",
+      "created_at": "2026-05-19T02:55:51.217021Z",
+      "updated_at": "2026-05-19T02:55:51.217021Z",
       "deprecated_at": null
     },
     "mission_MIS-20260518-010": {
@@ -1249,8 +1249,8 @@
         "ops\\mission_MIS-20260518-010.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.221084Z",
-      "updated_at": "2026-05-18T22:46:05.221084Z",
+      "created_at": "2026-05-19T02:55:51.217021Z",
+      "updated_at": "2026-05-19T02:55:51.217021Z",
       "deprecated_at": null
     },
     "mission_MIS-20260518-011": {
@@ -1285,8 +1285,8 @@
         "ops\\mission_MIS-20260518-011.json"
       ],
       "dependencies": [],
-      "created_at": "2026-05-18T22:46:05.221084Z",
-      "updated_at": "2026-05-18T22:46:05.221084Z",
+      "created_at": "2026-05-19T02:55:51.217021Z",
+      "updated_at": "2026-05-19T02:55:51.217021Z",
       "deprecated_at": null
     }
   }
