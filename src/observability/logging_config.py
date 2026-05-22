@@ -58,3 +58,7 @@ def setup_logging(level: str = "INFO", json_output: bool = True) -> None:
     root.addHandler(handler)
     for noisy in ("httpx", "httpcore", "urllib3", "asyncio"):
         logging.getLogger(noisy).setLevel(logging.WARNING)
+
+
+# Alias for backward compatibility with observability.__init__
+configure_logging = setup_logging
