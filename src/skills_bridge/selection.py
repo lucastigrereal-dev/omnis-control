@@ -2,6 +2,7 @@ from typing import Optional
 
 from src.skills_bridge.models import SkillCall, SkillSelection, SkillIntent, SkillDefinition, SkillSelectorResult
 from src.skills_bridge.errors import SkillNotFoundError
+from src.skills_bridge.dryrun import FALLBACK_SKILL_ID
 
 
 MOCK_SKILLS = [
@@ -101,7 +102,12 @@ class SkillSelector:
                     confidence=0.9,
                     reason=f"Name match: {skill_id}",
                 )
-        return SkillSelectorResult(fallback=True, reason=f"Skill '{skill_id}' not found")
+        return SkillSelectorResult(
+            selected_skill_id=FALLBACK_SKILL_ID,
+            confidence=0.0,
+            fallback=True,
+            reason=f"Skill '{skill_id}' not found"
+        )
 
     def select_by_intent(self, intent_text: str) -> SkillSelectorResult:
         """Select skill by intent text matching description and tags. Returns SkillSelectorResult."""
@@ -120,7 +126,12 @@ class SkillSelector:
                         confidence=0.6,
                         reason=f"Intent match via tag '{tag}': {intent_text}",
                     )
-        return SkillSelectorResult(fallback=True, reason=f"No skill for intent: {intent_text}")
+        return SkillSelectorResult(
+            selected_skill_id=FALLBACK_SKILL_ID,
+            confidence=0.0,
+            fallback=True,
+            reason=f"No skill for intent: {intent_text}"
+        )
 
     def select_by_tags(self, tags: list[str]) -> SkillSelectorResult:
         """Select skill by tags — picks the one with the most matching tags. Returns SkillSelectorResult."""
@@ -137,7 +148,12 @@ class SkillSelector:
                 confidence=min(0.5 + best_score * 0.2, 1.0),
                 reason=f"Tag match: {best_score} tags",
             )
-        return SkillSelectorResult(fallback=True, reason="No matching tags")
+        return SkillSelectorResult(
+            selected_skill_id=FALLBACK_SKILL_ID,
+            confidence=0.0,
+            fallback=True,
+            reason="No matching tags"
+        )
 
     def select(self, call: SkillCall) -> SkillSelection:
         if call.skill_id:

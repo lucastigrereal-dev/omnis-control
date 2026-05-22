@@ -37,16 +37,20 @@ class CheckResult:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> CheckResult:
-        status_raw = data.get("status") or data.get("severity", "ok")
-        try:
-            status = HealthStatus(status_raw)
-        except ValueError:
-            status = HealthStatus.UNKNOWN
+        error = data.get("error")
+        if error:
+            status = HealthStatus.ERROR
+        else:
+            status_raw = data.get("status") or data.get("severity", "ok")
+            try:
+                status = HealthStatus(status_raw)
+            except ValueError:
+                status = HealthStatus.UNKNOWN
         return cls(
             name=data["name"],
             status=status,
-            data=data.get("data", data),
-            error=data.get("error"),
+            data=data.get("data", {}),
+            error=error,
             duration_ms=data.get("duration_ms", 0),
             timestamp=data.get("timestamp", ""),
         )

@@ -79,7 +79,7 @@ class AuditTrail:
         if source:
             results = [e for e in results if e.source == source]
         if entry_type:
-            results = [e for e in results if e.entry_type.value == entry_type]
+            results = [e for e in results if e.entry_type.value == entry_type.lower()]
         return results
 
     @property
