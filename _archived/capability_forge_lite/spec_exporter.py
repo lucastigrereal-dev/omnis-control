@@ -6,10 +6,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-from src.capability_forge_lite.errors import ProposalNotFoundError
-from src.capability_forge_lite.models import CapabilityProposal
+from src.capability_forge_real.errors import ProposalNotFoundError
+from src.capability_forge_real.models import CapabilityProposal
 from src.capability_forge_lite import store as store_mod
-from src.capability_forge_lite.store import ProposalStore
+from src.capability_forge_real.store import ProposalStore
 
 BASE = Path(__file__).resolve().parent.parent.parent
 DEFAULT_SPECS_ROOT = BASE / "exports" / "capability_specs"

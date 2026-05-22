@@ -1,29 +1,49 @@
-"""P22 Capability Forge Real errors."""
+"""Errors for Capability Forge Real — merged from capabilityforge + capability_forge_lite."""
+
+
+class ForgeLiteError(Exception):
+    pass
 
 
 class ForgeRealError(Exception):
-    """Base error for P22 Capability Forge Real."""
+    pass
+
+
+class GapNotFoundError(ForgeLiteError):
+    pass
+
+
+class ProposalNotFoundError(ForgeLiteError):
+    pass
+
+
+class ProposalNotApprovedError(ForgeLiteError):
+    pass
+
+
+class DuplicateCapabilityError(ForgeLiteError):
+    pass
 
 
 class BuildError(ForgeRealError):
-    """Falha no build de uma capability."""
+    pass
 
 
-class ScaffoldError(BuildError):
-    """Falha ao gerar scaffold (path ja existe, template invalido)."""
+class ScaffoldError(ForgeRealError):
+    pass
 
 
-class PolicyScanError(BuildError):
-    """Violacao de politica de seguranca no codigo gerado."""
+class PolicyScanError(ForgeRealError):
+    pass
 
 
-class TestGenerationError(BuildError):
-    """Falha ao gerar ou validar testes."""
+class TestGenerationError(ForgeRealError):
+    pass
 
 
 class RegistrationError(ForgeRealError):
-    """Falha ao registrar capability como active."""
+    pass
 
 
 class RollbackError(ForgeRealError):
-    """Falha no rollback de arquivos gerados."""
+    pass

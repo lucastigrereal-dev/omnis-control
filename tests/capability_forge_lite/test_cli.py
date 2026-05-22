@@ -3,7 +3,7 @@ import json
 import pytest
 from typer.testing import CliRunner
 from src.cli import app
-from src.capability_forge_lite import store as store_mod
+from src.capability_forge_real import store as store_mod
 from src.capability_gap import store as gap_store_mod
 from src.capability_gap.models import CapabilityGap
 from src.capability_gap.store import GapStore

@@ -13,7 +13,7 @@ from src.capability_forge_real import (
     generate_test_content,
     count_test_functions,
 )
-from src.capability_forge_lite.models import (
+from src.capability_forge_real.models import (
     CapabilityProposal,
     PROPOSAL_STATUS_APPROVED,
     IMPL_TYPE_CLI_WRAPPER,

@@ -4,7 +4,7 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 
-from src.capabilityforge.policy import PolicyEngine, PolicyReport
+from src.capability_forge_real.policy import PolicyEngine, PolicyReport
 
 
 def scan_code(code: str) -> dict:

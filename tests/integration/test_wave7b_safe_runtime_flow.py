@@ -6,8 +6,8 @@ from pathlib import Path
 from src.runtime_orchestrator.service import OrchestratorService
 from src.war_room_bridge.adapter import WarRoomAdapter
 from src.war_room_bridge.models import WarRoomReport, OrderStatus
-from src.skill_router_bridge.catalog import SkillCatalog
-from src.skill_router_bridge.dryrun import DryRunDispatcher
+from src.skills_bridge.skill_catalog import SkillCatalog
+from src.skills_bridge.dryrun import DryRunDispatcher
 
 
 def _write_md_order(orders_dir: Path, filename: str, risk: str, title: str) -> Path:
@@ -88,7 +88,7 @@ class TestSafeRuntimeFlow:
         """Unknown skill dispatches with FALLBACK status."""
         catalog = SkillCatalog()
         dispatcher = DryRunDispatcher(catalog, dry_run=True)
-        from src.skill_router_bridge.models import SkillCall
+        from src.skills_bridge.models import SkillCall
         result = dispatcher.dispatch(SkillCall(skill_id="nonexistent-skill"))
         assert result["status"] == "FALLBACK"
         assert result["dry_run"] is True
@@ -96,7 +96,7 @@ class TestSafeRuntimeFlow:
     def test_dryrun_dispatcher_resolves_known_skill(self):
         """Known skill dispatches directly."""
         catalog = SkillCatalog()
-        from src.skill_router_bridge.models import SkillDefinition, SkillCall
+        from src.skills_bridge.models import SkillDefinition, SkillCall
         catalog.add_skill(SkillDefinition(skill_id="seogram", name="SEOgram"))
         dispatcher = DryRunDispatcher(catalog, dry_run=True)
         result = dispatcher.dispatch(SkillCall(skill_id="seogram"))

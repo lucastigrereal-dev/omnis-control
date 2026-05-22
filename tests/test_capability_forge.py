@@ -1,13 +1,13 @@
 """Tests for Capability Forge MVP (proposal-only)."""
 import pytest
 from pathlib import Path
-from src.capabilityforge.models import (
+from src.capability_forge_real.models import (
     CreationContext, CreationState, SkillSpec, RegistryEntry
 )
-from src.capabilityforge.lifecycle import transition, InvalidCreationTransitionError
-from src.capabilityforge.policy import PolicyEngine, PolicyReport
-from src.capabilityforge.registrymanager import RegistryManager
-from src.capabilityforge.orchestrator import CapabilityForge
+from src.capability_forge_real.lifecycle import transition, InvalidCreationTransitionError
+from src.capability_forge_real.policy import PolicyEngine, PolicyReport
+from src.capability_forge_real.registrymanager import RegistryManager
+from src.capability_forge_real.orchestrator import CapabilityForge
 
 
 class TestModels:

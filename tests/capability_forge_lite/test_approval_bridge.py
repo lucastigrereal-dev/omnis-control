@@ -1,20 +1,20 @@
 """Tests for Capability Approval Bridge."""
 import pytest
-from src.capability_forge_lite import store as store_mod
-from src.capability_forge_lite.store import ProposalStore
-from src.capability_forge_lite.models import (
+from src.capability_forge_real import store as store_mod
+from src.capability_forge_real.store import ProposalStore
+from src.capability_forge_real.models import (
     CapabilityProposal,
     PROPOSAL_STATUS_APPROVED,
     PROPOSAL_STATUS_REJECTED,
     PROPOSAL_STATUS_NEEDS_APPROVAL,
 )
-from src.capability_forge_lite.approval_bridge import (
+from src.capability_forge_real.approval_bridge import (
     request_proposal_approval,
     mark_proposal_approved,
     mark_proposal_rejected,
     get_approval_status,
 )
-from src.capability_forge_lite.errors import ProposalNotFoundError, ProposalNotApprovedError
+from src.capability_forge_real.errors import ProposalNotFoundError, ProposalNotApprovedError
 from src.approval_center import store as approval_store_mod
 from src.approval_center.store import ApprovalStore
 from src.approval_center.errors import ApprovalAlreadyResolvedError

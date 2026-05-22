@@ -2,9 +2,9 @@
 import socket
 import os
 import pytest
-from src.capability_forge_lite.proposal import propose_from_gap
-from src.capability_forge_lite.errors import GapNotFoundError
-from src.capability_forge_lite.models import PROPOSAL_STATUS_NEEDS_APPROVAL, PROPOSAL_STATUS_DRAFT
+from src.capability_forge_real.proposal import propose_from_gap
+from src.capability_forge_real.errors import GapNotFoundError
+from src.capability_forge_real.models import PROPOSAL_STATUS_NEEDS_APPROVAL, PROPOSAL_STATUS_DRAFT
 from src.capability_gap.models import CapabilityGap
 from src.capability_gap.store import GapStore
 
@@ -65,7 +65,7 @@ def test_gap_not_found_raises(tmp_path):
 
 
 def test_proposal_persisted_in_store(tmp_path):
-    from src.capability_forge_lite.store import ProposalStore
+    from src.capability_forge_real.store import ProposalStore
     gap = save_gap(tmp_path)
     proposal = propose_from_gap(
         gap.gap_id,

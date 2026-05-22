@@ -4,8 +4,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Optional
 
-from src.capability_forge_lite.errors import GapNotFoundError
-from src.capability_forge_lite.models import (
+from src.capability_forge_real.errors import GapNotFoundError
+from src.capability_forge_real.models import (
     CapabilityProposal,
     IMPL_TYPE_MANUAL_PROCESS,
     IMPL_TYPE_APP_FACTORY_FUTURE,
@@ -14,7 +14,7 @@ from src.capability_forge_lite.models import (
     IMPL_TYPE_CLI_WRAPPER,
 )
 from src.capability_forge_lite import store as store_mod
-from src.capability_forge_lite.store import ProposalStore
+from src.capability_forge_real.store import ProposalStore
 from src.capability_gap import store as gap_store_mod
 from src.capability_gap.store import GapStore
 

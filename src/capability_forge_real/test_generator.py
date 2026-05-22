@@ -1,7 +1,7 @@
 """P22 Capability Forge Real — test generator for scaffolded skills."""
 from __future__ import annotations
 
-from src.capability_forge_lite.models import CapabilityProposal
+from src.capability_forge_real.models import CapabilityProposal
 from src.capability_forge_real.scaffold import _slug, _class_name
 
 

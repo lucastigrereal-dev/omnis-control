@@ -14,17 +14,19 @@ from src.mission_orchestrator.models import (
     RUN_STATUS_BLOCKED,
 )
 from src.mission_orchestrator.errors import UnknownIntentError
+from src.utils.dry_run import resolve_dry_run
 
 
 def build_plan(
     request_text: str,
     account_handle: str = "",
     objective: str = "engajamento",
-    dry_run: bool = True,
+    dry_run: bool = None,
     allow_unknown: bool = False,
     config_path: Optional[Path] = None,
 ) -> OrchestratorRun:
     """Build an OrchestratorRun with planned steps. No execution."""
+    dry_run = resolve_dry_run(dry_run)
     from src.mission_builder.intent import detect_intent
     from src.skill_matcher.matcher import match_capabilities
     from src.sector_registry.matcher import match_sector

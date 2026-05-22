@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from typing import Optional
 
-from src.capability_forge_lite.models import CapabilityProposal
+from src.capability_forge_real.models import CapabilityProposal
 
 BASE = Path(__file__).resolve().parent.parent.parent
 DEFAULT_PROPOSALS_LOG = BASE / "data" / "capability_proposals.jsonl"

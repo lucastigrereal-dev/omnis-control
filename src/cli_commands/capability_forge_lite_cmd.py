@@ -27,10 +27,10 @@ def cmd_propose(
     json_out: bool = typer.Option(False, "--json"),
 ) -> None:
     """Cria proposta de capability a partir de um gap existente."""
-    from src.capability_forge_lite import store as store_mod
+    from src.capability_forge_real import store as store_mod
     from src.capability_gap import store as gap_store_mod
-    from src.capability_forge_lite.proposal import propose_from_gap
-    from src.capability_forge_lite.errors import GapNotFoundError
+    from src.capability_forge_real.proposal import propose_from_gap
+    from src.capability_forge_real.errors import GapNotFoundError
 
     try:
         proposal = propose_from_gap(
@@ -66,8 +66,8 @@ def cmd_list(
     json_out: bool = typer.Option(False, "--json"),
 ) -> None:
     """Lista proposals existentes."""
-    from src.capability_forge_lite import store as store_mod
-    from src.capability_forge_lite.store import ProposalStore
+    from src.capability_forge_real import store as store_mod
+    from src.capability_forge_real.store import ProposalStore
 
     proposals = ProposalStore(store_mod.DEFAULT_PROPOSALS_LOG).list_all(limit=limit)
 
@@ -101,8 +101,8 @@ def cmd_show(
     json_out: bool = typer.Option(False, "--json"),
 ) -> None:
     """Mostra detalhes de uma proposal."""
-    from src.capability_forge_lite import store as store_mod
-    from src.capability_forge_lite.store import ProposalStore
+    from src.capability_forge_real import store as store_mod
+    from src.capability_forge_real.store import ProposalStore
 
     p = ProposalStore(store_mod.DEFAULT_PROPOSALS_LOG).get(proposal_id)
     if p is None:
@@ -133,9 +133,9 @@ def cmd_export_spec(
     json_out: bool = typer.Option(False, "--json"),
 ) -> None:
     """Exporta arquivos de spec para uma proposal."""
-    from src.capability_forge_lite import store as store_mod
-    from src.capability_forge_lite.spec_exporter import export_spec
-    from src.capability_forge_lite.errors import ProposalNotFoundError
+    from src.capability_forge_real import store as store_mod
+    from src.capability_forge_real.spec_exporter import export_spec
+    from src.capability_forge_real.errors import ProposalNotFoundError
 
     try:
         spec_dir = export_spec(proposal_id, proposals_log=store_mod.DEFAULT_PROPOSALS_LOG)
@@ -160,9 +160,9 @@ def cmd_validate_spec(
     json_out: bool = typer.Option(False, "--json"),
 ) -> None:
     """Valida arquivos de spec exportados para uma proposal."""
-    from src.capability_forge_lite import store as store_mod
-    from src.capability_forge_lite.spec_validator import validate_spec
-    from src.capability_forge_lite.errors import ProposalNotFoundError
+    from src.capability_forge_real import store as store_mod
+    from src.capability_forge_real.spec_validator import validate_spec
+    from src.capability_forge_real.errors import ProposalNotFoundError
 
     try:
         result = validate_spec(proposal_id, proposals_log=store_mod.DEFAULT_PROPOSALS_LOG)
@@ -200,10 +200,10 @@ def cmd_request_approval(
 ) -> None:
     """Cria pedido de aprovacao para uma proposal no Approval Center."""
     import json as _json
-    from src.capability_forge_lite import store as store_mod
+    from src.capability_forge_real import store as store_mod
     from src.approval_center import store as approval_store_mod
-    from src.capability_forge_lite.approval_bridge import request_proposal_approval
-    from src.capability_forge_lite.errors import ProposalNotFoundError
+    from src.capability_forge_real.approval_bridge import request_proposal_approval
+    from src.capability_forge_real.errors import ProposalNotFoundError
 
     try:
         request_id = request_proposal_approval(
@@ -231,10 +231,10 @@ def cmd_mark_approved(
     note: str = typer.Option("", "--note"),
 ) -> None:
     """Marca proposta como aprovada (resolve o pedido de aprovacao)."""
-    from src.capability_forge_lite import store as store_mod
+    from src.capability_forge_real import store as store_mod
     from src.approval_center import store as approval_store_mod
-    from src.capability_forge_lite.approval_bridge import mark_proposal_approved
-    from src.capability_forge_lite.errors import ProposalNotFoundError, ProposalNotApprovedError
+    from src.capability_forge_real.approval_bridge import mark_proposal_approved
+    from src.capability_forge_real.errors import ProposalNotFoundError, ProposalNotApprovedError
 
     try:
         mark_proposal_approved(
@@ -257,10 +257,10 @@ def cmd_mark_rejected(
     note: str = typer.Option("", "--note"),
 ) -> None:
     """Marca proposta como rejeitada."""
-    from src.capability_forge_lite import store as store_mod
+    from src.capability_forge_real import store as store_mod
     from src.approval_center import store as approval_store_mod
-    from src.capability_forge_lite.approval_bridge import mark_proposal_rejected
-    from src.capability_forge_lite.errors import ProposalNotFoundError, ProposalNotApprovedError
+    from src.capability_forge_real.approval_bridge import mark_proposal_rejected
+    from src.capability_forge_real.errors import ProposalNotFoundError, ProposalNotApprovedError
 
     try:
         mark_proposal_rejected(
@@ -283,9 +283,9 @@ def cmd_register(
 ) -> None:
     """Registra capability aprovada em capabilities.yaml como 'planned'."""
     import json as _json
-    from src.capability_forge_lite import store as store_mod
-    from src.capability_forge_lite.registrar import register_capability
-    from src.capability_forge_lite.errors import (
+    from src.capability_forge_real import store as store_mod
+    from src.capability_forge_real.registrar import register_capability
+    from src.capability_forge_real.errors import (
         ProposalNotFoundError,
         ProposalNotApprovedError,
         DuplicateCapabilityError,

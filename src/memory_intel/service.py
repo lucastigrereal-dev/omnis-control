@@ -49,6 +49,7 @@ from src.memory_pack.models import (
     ACTION_UPSERT,
 )
 from src.memory_pack.service import MemoryPackPlanner
+from src.utils.dry_run import resolve_dry_run
 
 
 # ── Main Service ─────────────────────────────────────────────────────────────
@@ -67,8 +68,8 @@ class MemoryIntelligence:
         plan = mi.writeback(mission, report)
     """
 
-    def __init__(self, dry_run: bool = True):
-        self.dry_run = dry_run
+    def __init__(self, dry_run: bool = None):
+        self.dry_run = resolve_dry_run(dry_run)
         self.planner = MemoryPackPlanner.create()
         self.config = MemoryIntelConfig.load()
 

@@ -5,15 +5,15 @@ import json
 from pathlib import Path
 from typing import Optional
 
-from src.capability_forge_lite.models import (
+from src.capability_forge_real.models import (
     CapabilityProposal,
     PROPOSAL_STATUS_APPROVED,
     IMPL_TYPE_CLI_WRAPPER,
     IMPL_TYPE_OFFLINE_PACKAGE,
 )
-from src.capability_forge_lite.registrar import register_capability
-from src.capability_forge_lite.store import ProposalStore
-from src.capability_forge_lite import store as store_mod
+from src.capability_forge_real.registrar import register_capability
+from src.capability_forge_real.store import ProposalStore
+from src.capability_forge_real import store as store_mod
 from src.capability_forge_real.models import (
     BuildResult,
     BuildState,

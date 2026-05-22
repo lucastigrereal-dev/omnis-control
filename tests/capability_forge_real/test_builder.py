@@ -8,7 +8,7 @@ from unittest.mock import patch, MagicMock
 from src.capability_forge_real.builder import CapabilityBuilder
 from src.capability_forge_real.models import BuildResult, BuildState
 from src.capability_forge_real.errors import BuildError, ScaffoldError
-from src.capability_forge_lite.models import (
+from src.capability_forge_real.models import (
     CapabilityProposal,
     PROPOSAL_STATUS_APPROVED,
     PROPOSAL_STATUS_DRAFT,

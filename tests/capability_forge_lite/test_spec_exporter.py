@@ -2,11 +2,11 @@
 import json
 import pytest
 from pathlib import Path
-from src.capability_forge_lite import store as store_mod
-from src.capability_forge_lite.store import ProposalStore
-from src.capability_forge_lite.models import CapabilityProposal
-from src.capability_forge_lite.spec_exporter import export_spec, DEFAULT_SPECS_ROOT
-from src.capability_forge_lite.errors import ProposalNotFoundError
+from src.capability_forge_real import store as store_mod
+from src.capability_forge_real.store import ProposalStore
+from src.capability_forge_real.models import CapabilityProposal
+from src.capability_forge_real.spec_exporter import export_spec, DEFAULT_SPECS_ROOT
+from src.capability_forge_real.errors import ProposalNotFoundError
 
 
 def make_proposal(tmp_path, sector="apps", risk="high") -> CapabilityProposal:
@@ -73,7 +73,7 @@ def test_spec_md_contains_capability_name(tmp_path):
 
 
 def test_impl_plan_varies_by_type(tmp_path):
-    from src.capability_forge_lite.models import IMPL_TYPE_APP_FACTORY_FUTURE
+    from src.capability_forge_real.models import IMPL_TYPE_APP_FACTORY_FUTURE
     p_apps = CapabilityProposal.from_gap(
         "gap_abc", "crm_capability", "apps", "crm_plan",
         risk_level="high", implementation_type=IMPL_TYPE_APP_FACTORY_FUTURE,

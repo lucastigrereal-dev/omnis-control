@@ -2,16 +2,16 @@
 import pytest
 import yaml
 from pathlib import Path
-from src.capability_forge_lite import store as store_mod
-from src.capability_forge_lite.store import ProposalStore
-from src.capability_forge_lite.models import (
+from src.capability_forge_real import store as store_mod
+from src.capability_forge_real.store import ProposalStore
+from src.capability_forge_real.models import (
     CapabilityProposal,
     PROPOSAL_STATUS_APPROVED,
     PROPOSAL_STATUS_REGISTERED,
     IMPL_TYPE_APP_FACTORY_FUTURE,
 )
-from src.capability_forge_lite.registrar import register_capability
-from src.capability_forge_lite.errors import (
+from src.capability_forge_real.registrar import register_capability
+from src.capability_forge_real.errors import (
     ProposalNotFoundError,
     ProposalNotApprovedError,
     DuplicateCapabilityError,

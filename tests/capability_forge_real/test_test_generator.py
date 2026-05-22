@@ -7,7 +7,7 @@ from src.capability_forge_real.test_generator import (
     generate_test_content,
     count_test_functions,
 )
-from src.capability_forge_lite.models import CapabilityProposal, IMPL_TYPE_CLI_WRAPPER
+from src.capability_forge_real.models import CapabilityProposal, IMPL_TYPE_CLI_WRAPPER
 
 
 # ── Fixtures ─────────────────────────────────────────────────────────────────

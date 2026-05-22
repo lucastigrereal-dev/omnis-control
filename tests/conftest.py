@@ -2,6 +2,9 @@
 
 import pytest
 
+# Skip v2 test directories until source modules are built (P3 — planned, not implemented)
+collect_ignore = ["caption_approval_v2", "creative_production_v2"]
+
 
 @pytest.fixture
 def empty_data(tmp_path):

@@ -6,25 +6,25 @@ from pathlib import Path
 
 from src.capability_gap.models import CapabilityGap
 from src.capability_gap.store import GapStore
-from src.capability_forge_lite import store as store_mod
-from src.capability_forge_lite.store import ProposalStore
-from src.capability_forge_lite.proposal import propose_from_gap
-from src.capability_forge_lite.spec_exporter import export_spec
-from src.capability_forge_lite.spec_validator import validate_spec
-from src.capability_forge_lite.approval_bridge import (
+from src.capability_forge_real import store as store_mod
+from src.capability_forge_real.store import ProposalStore
+from src.capability_forge_real.proposal import propose_from_gap
+from src.capability_forge_real.spec_exporter import export_spec
+from src.capability_forge_real.spec_validator import validate_spec
+from src.capability_forge_real.approval_bridge import (
     request_proposal_approval,
     mark_proposal_approved,
     mark_proposal_rejected,
     get_approval_status,
 )
-from src.capability_forge_lite.registrar import register_capability
-from src.capability_forge_lite.models import (
+from src.capability_forge_real.registrar import register_capability
+from src.capability_forge_real.models import (
     PROPOSAL_STATUS_APPROVED,
     PROPOSAL_STATUS_REJECTED,
     PROPOSAL_STATUS_REGISTERED,
     PROPOSAL_STATUS_NEEDS_APPROVAL,
 )
-from src.capability_forge_lite.errors import (
+from src.capability_forge_real.errors import (
     ProposalNotApprovedError,
     DuplicateCapabilityError,
 )

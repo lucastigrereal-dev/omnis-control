@@ -2,12 +2,12 @@
 import json
 import pytest
 from pathlib import Path
-from src.capability_forge_lite import store as store_mod
-from src.capability_forge_lite.store import ProposalStore
-from src.capability_forge_lite.models import CapabilityProposal
-from src.capability_forge_lite.spec_exporter import export_spec
-from src.capability_forge_lite.spec_validator import validate_spec
-from src.capability_forge_lite.errors import ProposalNotFoundError
+from src.capability_forge_real import store as store_mod
+from src.capability_forge_real.store import ProposalStore
+from src.capability_forge_real.models import CapabilityProposal
+from src.capability_forge_real.spec_exporter import export_spec
+from src.capability_forge_real.spec_validator import validate_spec
+from src.capability_forge_real.errors import ProposalNotFoundError
 
 
 def make_and_export(tmp_path, sector="apps", risk="high"):

@@ -7,17 +7,17 @@ from typing import Optional
 
 import yaml
 
-from src.capability_forge_lite.errors import (
+from src.capability_forge_real.errors import (
     ProposalNotFoundError,
     ProposalNotApprovedError,
     DuplicateCapabilityError,
 )
-from src.capability_forge_lite.models import (
+from src.capability_forge_real.models import (
     PROPOSAL_STATUS_APPROVED,
     PROPOSAL_STATUS_REGISTERED,
 )
-from src.capability_forge_lite import store as store_mod
-from src.capability_forge_lite.store import ProposalStore
+from src.capability_forge_real import store as store_mod
+from src.capability_forge_real.store import ProposalStore
 from src.skill_matcher.loader import DEFAULT_CONFIG_PATH
 
 BASE = Path(__file__).resolve().parent.parent.parent

@@ -1,14 +1,30 @@
-"""P22 Capability Forge Real CLI — build, status, rollback commands."""
+"""Capability Forge Real CLI — merged argparse + typer commands."""
 from __future__ import annotations
 
 import argparse
+import asyncio
+import json
 import sys
 from pathlib import Path
+from typing import Optional
 
-from src.capability_forge_lite.store import ProposalStore
-from src.capability_forge_lite import store as store_mod
+import typer
+
+from src.capability_forge_real.store import ProposalStore
+from src.capability_forge_real import store as store_mod
 from src.capability_forge_real.builder import CapabilityBuilder
 from src.capability_forge_real.models import BuildResult
+from src.capability_forge_real.orchestrator import CapabilityForge
+from src.capability_forge_real.registrymanager import RegistryManager
+
+forge = CapabilityForge()
+registry = RegistryManager()
+
+forge_app = typer.Typer(
+    name="forge",
+    help="Capability Forge — fabrica governada de skills",
+    add_completion=False,
+)
 
 
 def cmd_build(args) -> int:
@@ -91,3 +107,59 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+# ── Typer forge_app commands ──────────────────────────────────────────────────
+
+@forge_app.command(name="propose")
+def propose(
+    gap: str = typer.Argument(..., help="Descricao da lacuna/necessidade"),
+    sector: str = typer.Option(..., "--sector", help="Setor: marketing, sales, operations..."),
+    name: str = typer.Option("", "--name", help="Nome sugerido para a skill"),
+):
+    """Detecta gap e propoe spec de nova skill."""
+    result = asyncio.run(forge.propose_skill(gap, sector, name))
+    typer.echo(json.dumps(result, indent=2, ensure_ascii=False))
+
+
+@forge_app.command(name="approve")
+def approve(
+    name: str = typer.Argument(..., help="Nome da skill"),
+    approver: str = typer.Option("lucas", "--approver", help="Identificacao do aprovador"),
+):
+    """Aprova uma skill gerada para status 'approved'."""
+    result = asyncio.run(forge.approve_skill(name, approver))
+    typer.echo(json.dumps(result, indent=2, ensure_ascii=False))
+
+
+@forge_app.command(name="list")
+def list_skills(
+    status: Optional[str] = typer.Option(None, "--status", help="Filtrar por status"),
+    sector: Optional[str] = typer.Option(None, "--sector", help="Filtrar por setor"),
+):
+    """Lista skills no registry."""
+    if status:
+        skills = registry.list_by_status(status)
+    elif sector:
+        skills = registry.list_by_sector(sector)
+    else:
+        skills = registry._load_all()
+    typer.echo(json.dumps(skills, indent=2, ensure_ascii=False, default=str))
+
+
+@forge_app.command(name="audit")
+def audit(
+    name: str = typer.Argument(..., help="Nome da skill"),
+):
+    """Executa policy check em uma skill do registry."""
+    from src.capability_forge_real.policy import PolicyEngine
+    entry = registry.get(name)
+    if not entry:
+        typer.echo(f"Skill '{name}' nao encontrada.")
+        return
+    engine = PolicyEngine()
+    report = engine.check_file(Path(entry["path"]) / "run.py") if entry.get("path") else None
+    if report:
+        typer.echo(report.summary())
+    else:
+        typer.echo("Sem arquivo run.py para auditar.")

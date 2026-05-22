@@ -1,10 +1,11 @@
 from src.runtime_orchestrator.pipeline import RuntimePipeline
 from src.runtime_orchestrator.models import PipelineResult, StepStatus
+from src.utils.dry_run import resolve_dry_run
 
 
 class OrchestratorService:
-    def __init__(self, dry_run: bool = True):
-        self.dry_run = dry_run
+    def __init__(self, dry_run: bool = None):
+        self.dry_run = resolve_dry_run(dry_run)
 
     def build_pipeline(self) -> RuntimePipeline:
         pipeline = RuntimePipeline(dry_run=self.dry_run)

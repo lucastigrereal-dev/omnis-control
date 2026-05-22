@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 from typing import Optional
 
-from src.capability_forge_lite.models import (
+from src.capability_forge_real.models import (
     CapabilityProposal,
     IMPL_TYPE_CLI_WRAPPER,
     IMPL_TYPE_OFFLINE_PACKAGE,

@@ -1,6 +1,6 @@
 """Tests for ProposalStore."""
-from src.capability_forge_lite.models import CapabilityProposal
-from src.capability_forge_lite.store import ProposalStore
+from src.capability_forge_real.models import CapabilityProposal
+from src.capability_forge_real.store import ProposalStore
 
 
 def make_proposal(gap_id="gap_001", risk="high") -> CapabilityProposal:

@@ -1,5 +1,5 @@
 """Tests for Capability Forge Lite models."""
-from src.capability_forge_lite.models import (
+from src.capability_forge_real.models import (
     CapabilityProposal,
     PROPOSAL_STATUS_DRAFT,
     PROPOSAL_STATUS_NEEDS_APPROVAL,

@@ -20,7 +20,7 @@ from src.capability_forge_real.scaffold import (
     _class_name,
 )
 from src.capability_forge_real.models import SkillTemplateConfig
-from src.capability_forge_lite.models import (
+from src.capability_forge_real.models import (
     CapabilityProposal,
     IMPL_TYPE_CLI_WRAPPER,
     IMPL_TYPE_OFFLINE_PACKAGE,

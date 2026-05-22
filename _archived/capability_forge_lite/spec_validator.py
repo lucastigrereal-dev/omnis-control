@@ -5,10 +5,10 @@ import json
 from pathlib import Path
 from typing import Optional
 
-from src.capability_forge_lite.errors import ProposalNotFoundError
+from src.capability_forge_real.errors import ProposalNotFoundError
 from src.capability_forge_lite import store as store_mod
-from src.capability_forge_lite.store import ProposalStore
-from src.capability_forge_lite.spec_exporter import DEFAULT_SPECS_ROOT
+from src.capability_forge_real.store import ProposalStore
+from src.capability_forge_real.spec_exporter import DEFAULT_SPECS_ROOT
 
 REQUIRED_FILES = [
     "capability_manifest.json",

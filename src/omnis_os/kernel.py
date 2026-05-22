@@ -16,15 +16,16 @@ from src.omnis_os.registry import ModuleRegistry
 from src.omnis_os.dependency import resolve_order, detect_cycles, validate_dependencies
 from src.omnis_os.event_bus import EventBus
 from src.omnis_os.health_monitor import HealthMonitor
+from src.utils.dry_run import resolve_dry_run
 
 
 class OmnisKernel:
     """OMNIS OS Kernel — bootstraps and manages the module ecosystem."""
 
     def __init__(self, config: Optional[KernelConfig] = None,
-                 dry_run: bool = True):
+                 dry_run: bool = None):
         self.config = config or KernelConfig()
-        self.dry_run = dry_run
+        self.dry_run = resolve_dry_run(dry_run)
         self.registry = ModuleRegistry()
         self.event_bus = EventBus(dry_run=dry_run)
         self.health_monitor = HealthMonitor(

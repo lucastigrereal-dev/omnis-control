@@ -20,7 +20,7 @@ from src.capability_forge_real.errors import (
     RegistrationError,
     RollbackError,
 )
-from src.capability_forge_lite.models import (
+from src.capability_forge_real.models import (
     CapabilityProposal,
     IMPL_TYPE_CLI_WRAPPER,
     IMPL_TYPE_MANUAL_PROCESS,
