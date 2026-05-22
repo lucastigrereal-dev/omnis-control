@@ -6,6 +6,8 @@ from enum import Enum
 
 class MissionStatus(str, Enum):
     DRAFT = "draft"
+    CREATED = "created"
+    PLANNED = "planned"
     RUNNING = "running"
     WAITING_APPROVAL = "waiting_approval"
     PAUSED = "paused"
@@ -15,7 +17,9 @@ class MissionStatus(str, Enum):
 
 
 VALID_TRANSITIONS: dict[MissionStatus, list[MissionStatus]] = {
-    MissionStatus.DRAFT: [MissionStatus.RUNNING, MissionStatus.CANCELLED],
+    MissionStatus.DRAFT: [MissionStatus.CREATED, MissionStatus.RUNNING, MissionStatus.CANCELLED],
+    MissionStatus.CREATED: [MissionStatus.PLANNED, MissionStatus.CANCELLED],
+    MissionStatus.PLANNED: [MissionStatus.RUNNING, MissionStatus.CANCELLED],
     MissionStatus.RUNNING: [
         MissionStatus.WAITING_APPROVAL,
         MissionStatus.PAUSED,

@@ -467,6 +467,134 @@ def mission_resume_context(
                 console.print(f"    [{e.get('stage', '?')}] {e.get('error', '')[:80]}")
 
 
+@missions_app.command(name="validate")
+def mission_validate(
+    mission_id: str = typer.Argument(..., help="ID da mission"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Valida um Mission Package completo."""
+    repo = _repo()
+    actual_id = _resolve_id(repo, mission_id)
+    if actual_id is None:
+        console.print(f"[red]Mission nao encontrada: {mission_id}[/red]")
+        raise typer.Exit(1)
+
+    try:
+        contract = repo.get_contract(actual_id)
+    except Exception as e:
+        console.print(f"[red]Erro ao carregar contract: {e}[/red]")
+        raise typer.Exit(1)
+
+    from src.missions.task_decomposition import TaskDecomposition
+    from src.missions.memory_lookup import MockMemoryLookup
+    from src.missions.cost_tracker import MockCostTracker
+    from src.missions.mission_package import MissionPackage
+
+    mid = contract.mission_id or contract.content_hash()
+    plan = TaskDecomposition.create_default(mid)
+    memory_ctx = MockMemoryLookup().lookup(contract.intent or contract.objective)
+    cost_est = MockCostTracker().estimate(mid, len(plan.tasks), plan.total_estimated_tokens)
+
+    pkg = MissionPackage(contract=contract, plan=plan, memory=memory_ctx, cost=cost_est)
+
+    issues = []
+    if not contract.title:
+        issues.append("Missing title")
+    if not contract.objective:
+        issues.append("Missing objective")
+    if not mid:
+        issues.append("Missing mission_id")
+
+    valid = len(issues) == 0
+
+    if json_output:
+        print(json.dumps({
+            "valid": valid,
+            "mission_id": mid,
+            "title": contract.title,
+            "priority": contract.priority.value,
+            "task_count": len(plan.tasks),
+            "memory_source": memory_ctx.source,
+            "cost_estimate": cost_est.estimated_cost,
+            "issues": issues,
+        }, indent=2, ensure_ascii=False))
+    else:
+        if valid:
+            console.print(f"[green]Mission Package VALIDO[/green]")
+        else:
+            console.print(f"[red]Mission Package INVALIDO[/red]")
+            for issue in issues:
+                console.print(f"  [red]- {issue}[/red]")
+        console.print(f"  Mission ID: [cyan]{mid}[/cyan]")
+        console.print(f"  Titulo: {contract.title}")
+        console.print(f"  Priority: {contract.priority.value}")
+        console.print(f"  Tasks: {len(plan.tasks)} (planning→memory→execution→review→report)")
+        console.print(f"  Memory Source: {memory_ctx.source}")
+        console.print(f"  Cost Estimate: ${cost_est.estimated_cost:.2f}")
+
+
+@missions_app.command(name="package")
+def mission_package(
+    mission_id: str = typer.Argument(..., help="ID da mission"),
+    json_output: bool = typer.Option(False, "--json", help="Output as JSON"),
+) -> None:
+    """Exporta o Mission Package completo como JSON."""
+    repo = _repo()
+    actual_id = _resolve_id(repo, mission_id)
+    if actual_id is None:
+        console.print(f"[red]Mission nao encontrada: {mission_id}[/red]")
+        raise typer.Exit(1)
+
+    try:
+        contract = repo.get_contract(actual_id)
+    except Exception as e:
+        console.print(f"[red]Erro ao carregar contract: {e}[/red]")
+        raise typer.Exit(1)
+
+    from src.missions.task_decomposition import TaskDecomposition
+    from src.missions.memory_lookup import MockMemoryLookup
+    from src.missions.cost_tracker import MockCostTracker
+    from src.missions.mission_package import MissionPackage
+
+    mid = contract.mission_id or contract.content_hash()
+    plan = TaskDecomposition.create_default(mid)
+    memory_ctx = MockMemoryLookup().lookup(contract.intent or contract.objective)
+    cost_est = MockCostTracker().estimate(mid, len(plan.tasks), plan.total_estimated_tokens)
+    events = repo.get_events(actual_id)
+
+    pkg = MissionPackage(contract=contract, plan=plan, memory=memory_ctx, cost=cost_est, event_count=len(events))
+
+    output = {
+        "mission_package": {
+            "contract": json.loads(contract.model_dump_json()),
+            "plan": json.loads(plan.model_dump_json()),
+            "memory": json.loads(memory_ctx.model_dump_json()),
+            "cost": json.loads(cost_est.model_dump_json()),
+            "event_count": len(events),
+            "event_types": list(set(e.event_type for e in events)),
+        },
+        "summary": pkg.summary(),
+    }
+
+    if json_output:
+        print(json.dumps(output, indent=2, ensure_ascii=False))
+    else:
+        console.print(f"[green]Mission Package exportado[/green]")
+        console.print(f"  Mission ID: [cyan]{mid}[/cyan]")
+        console.print(f"  Titulo: {contract.title}")
+        console.print(f"  Priority: {contract.priority.value}")
+        console.print(f"  Tasks: {len(plan.tasks)}")
+        for t in plan.tasks:
+            icon = "[green]X[/green]" if t.status.value == "completed" else "[dim]-[/dim]"
+            console.print(f"    {icon} [{t.type.value}] {t.description[:60]}")
+        console.print(f"  Memory Source: {memory_ctx.source}")
+        console.print(f"  Cost: ${cost_est.estimated_cost:.2f} est / ${cost_est.actual_cost:.2f} actual")
+        console.print(f"  Events: {len(events)}")
+        if events:
+            console.print(f"  Event Types: {', '.join(set(e.event_type for e in events))}")
+        console.print(f"\n  [dim]Package validado com sucesso.[/dim]")
+
+
 def _resolve_id(repo: JsonlRepository, id_fragment: str) -> Optional[str]:
     """Resolve ID por prefixo ou hash exato."""
     # Se o arquivo existe com o id exato

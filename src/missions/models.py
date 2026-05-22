@@ -17,6 +17,13 @@ class RiskLevel(str, Enum):
     CRITICAL = "critical"
 
 
+class Priority(str, Enum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
+    CRITICAL = "critical"
+
+
 class ApprovalPolicy(str, Enum):
     NONE = "none"
     AUTO = "auto"
@@ -78,10 +85,26 @@ class MissionContract(BaseModel):
     parent_mission_id: Optional[str] = None
     deadline: Optional[datetime] = None
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    # M6.2 — MissionPackage extension fields (all with defaults for backward compat)
+    mission_id: str = ""
+    intent: str = ""
+    priority: Priority = Priority.MEDIUM
+    source: str = ""
+    owner: str = ""
+    correlation_id: str = ""
+    cost_estimate: float = 0.0
+    memory_context_ids: list[str] = Field(default_factory=list)
+    tasks: list[dict] = Field(default_factory=list)
+    updated_at: Optional[datetime] = None
+
+    def model_post_init(self, __context: object) -> None:
+        """Set mission_id to content_hash if left empty."""
+        if not self.mission_id:
+            self.__dict__["mission_id"] = self.content_hash()
 
     def content_hash(self) -> str:
-        """SHA-256 of canonical JSON excluding created_at."""
-        data = self.model_dump(mode="json", exclude={"created_at"})
+        """SHA-256 of canonical JSON excluding created_at, updated_at, and mission_id."""
+        data = self.model_dump(mode="json", exclude={"created_at", "updated_at", "mission_id"})
         canonical = json.dumps(data, sort_keys=True, ensure_ascii=True, separators=(",", ":"))
         return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 

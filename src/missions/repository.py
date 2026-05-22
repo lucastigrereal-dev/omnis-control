@@ -294,6 +294,7 @@ class JsonlRepository(MissionRepository):
             "mission_paused": "paused",
             "mission_resumed": "running",
             "approval_granted": "running",
+            "mission_planned": "planned",
         }
         new_status = status_map.get(event.event_type)
         if new_status is None:

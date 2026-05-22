@@ -84,6 +84,9 @@ def _apply_event(state: TaskState, ev: EventEnvelope) -> TaskState:
         case "plan_approved":
             pass
 
+        case "mission_planned":
+            kwargs["status"] = MissionStatus.PLANNED
+
         case "step_started":
             kwargs["current_step"] = ev.payload.get("step_id", "")
 

@@ -9,7 +9,7 @@ Audited 9 config files. 1 critical security finding, 1 high path mismatch. No de
 ## Finding 1: CRITICAL — API Key exposed in committed config
 
 **File:** `config/connectors.yaml:82`
-**Content:** `"Master key: sk-pub-os-UwN4DEcTMMzB6SxxSaJpaj"`
+**Content:** `"Master key: ${LITELLM_MASTER_KEY}"` (hardcoded — since redacted)
 
 The LiteLLM master key is hardcoded in a committed YAML file. This key:
 - Is visible to anyone with repo access
