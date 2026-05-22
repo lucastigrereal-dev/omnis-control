@@ -1,4 +1,6 @@
-from src.skills_bridge.models import SkillCall, SkillSelection, SkillIntent
+from typing import Optional
+
+from src.skills_bridge.models import SkillCall, SkillSelection, SkillIntent, SkillDefinition
 from src.skills_bridge.errors import SkillNotFoundError
 
 
@@ -48,10 +50,34 @@ MOCK_SKILLS = [
 ]
 
 
+def _definition_to_skill(definition: SkillDefinition) -> dict:
+    """Converte um SkillDefinition para o formato interno do SkillSelector."""
+    intents = []
+    for intent_str in definition.intents:
+        try:
+            intents.append(SkillIntent(intent_str))
+        except ValueError:
+            pass
+    return {
+        "skill_id": definition.skill_id,
+        "name": definition.name,
+        "intents": intents,
+        "tags": definition.tags,
+    }
+
+
 class SkillSelector:
 
-    def __init__(self, dry_run: bool = True):
+    def __init__(self, dry_run: bool = True, catalog: "SkillCatalog | None" = None):
         self.dry_run = dry_run
+        if catalog is not None:
+            catalog.load()
+            if catalog.skill_count > 0:
+                self.skills = [_definition_to_skill(s) for s in catalog.load()]
+                # Ensure manual-review fallback always exists
+                if not any(s["skill_id"] == "manual-review" for s in self.skills):
+                    self.skills.append(MOCK_SKILLS[-1])
+                return
         self.skills = list(MOCK_SKILLS)
 
     def select(self, call: SkillCall) -> SkillSelection:

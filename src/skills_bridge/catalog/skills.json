@@ -1,0 +1,59 @@
+{
+  "skills": [
+    {
+      "skill_id": "generate_seogram_caption",
+      "name": "Generate SEOgram Caption",
+      "description": "Generate SEO-optimized Instagram captions with hashtags and hooks",
+      "tier": "core",
+      "risk": "LOW",
+      "requires_approval": false,
+      "category": "content",
+      "tags": ["seo", "caption", "instagram", "content", "social"],
+      "intents": ["create", "generate"]
+    },
+    {
+      "skill_id": "generate_caption",
+      "name": "Generate Caption",
+      "description": "Generate Instagram caption for travel/food/family content",
+      "tier": "core",
+      "risk": "LOW",
+      "requires_approval": false,
+      "category": "content",
+      "tags": ["caption", "instagram", "content", "social"],
+      "intents": ["create", "generate"]
+    },
+    {
+      "skill_id": "jarvis-router",
+      "name": "Jarvis Router",
+      "description": "Classify intent and route to the correct sector",
+      "tier": "core",
+      "risk": "LOW",
+      "requires_approval": false,
+      "category": "ops",
+      "tags": ["router", "intent", "classify", "dispatch"],
+      "intents": ["read", "analyze"]
+    },
+    {
+      "skill_id": "jarvis-brain",
+      "name": "Jarvis Brain",
+      "description": "Gather context from all memory sources",
+      "tier": "core",
+      "risk": "LOW",
+      "requires_approval": false,
+      "category": "ops",
+      "tags": ["brain", "context", "memory", "analyse"],
+      "intents": ["analyze", "generate"]
+    },
+    {
+      "skill_id": "manual-review",
+      "name": "Manual Review",
+      "description": "Fallback skill for tasks that cannot be automated",
+      "tier": "core",
+      "risk": "LOW",
+      "requires_approval": true,
+      "category": "ops",
+      "tags": ["manual", "fallback", "review"],
+      "intents": []
+    }
+  ]
+}

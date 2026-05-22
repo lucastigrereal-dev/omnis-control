@@ -40,6 +40,10 @@ class FallbackChain:
 
             try:
                 result = adapter.execute(prompt, model, **context)
+                if result.get("status") == "error":
+                    self._attempts.append({"model": name, "status": "failed", "error": result.get("error", "unknown")})
+                    last_error = RuntimeError(result.get("error", "unknown"))
+                    continue
                 result["fallback_used"] = len(self._attempts) > 0
                 result["fallback_attempts"] = self._attempts
                 self._current_model = model

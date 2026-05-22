@@ -2,9 +2,9 @@ import json
 import pytest
 from pathlib import Path
 
-from src.skill_router_bridge.catalog import SkillCatalog
-from src.skill_router_bridge.models import SkillDefinition, SkillRisk
-from src.skill_router_bridge.errors import CatalogLoadError
+from src.skills_bridge.skill_catalog import SkillCatalog
+from src.skills_bridge.models import SkillDefinition, SkillRisk
+from src.skills_bridge.errors import CatalogLoadError
 
 
 class TestSkillCatalog:

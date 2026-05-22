@@ -1,6 +1,7 @@
-from src.skill_router_bridge.catalog import SkillCatalog
-from src.skill_router_bridge.selector import SkillSelector, FALLBACK_SKILL_ID
-from src.skill_router_bridge.models import SkillDefinition
+from src.skills_bridge.skill_catalog import SkillCatalog
+from src.skills_bridge.selection import SkillSelector
+from src.skills_bridge.dryrun import FALLBACK_SKILL_ID
+from src.skills_bridge.models import SkillDefinition
 
 
 def make_catalog(skills: list[dict]) -> SkillCatalog:

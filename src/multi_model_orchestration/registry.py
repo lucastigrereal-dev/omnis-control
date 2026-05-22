@@ -12,11 +12,14 @@ from src.multi_model_orchestration.models import (
     PROVIDER_ANTHROPIC,
     PROVIDER_GROQ,
     PROVIDER_MOCK,
+    PROVIDER_OPENAI,
+    PROVIDER_OLLAMA,
     CAPABILITY_CODE,
     CAPABILITY_ANALYSIS,
     CAPABILITY_PLANNING,
     CAPABILITY_TEXT,
     CAPABILITY_CLASSIFICATION,
+    CAPABILITY_SUMMARIZATION,
     ModelConfig,
     TaskClass,
 )
@@ -131,9 +134,17 @@ class ModelRegistry:
     def seed_defaults(self) -> None:
         """Seed registry with default model configurations and register adapters."""
         from src.multi_model_orchestration.adapters.mock_adapter import register as register_mock
+        from src.multi_model_orchestration.adapters.openai_adapter import register as register_openai
+        from src.multi_model_orchestration.adapters.anthropic_adapter import register as register_anthropic
+        from src.multi_model_orchestration.adapters.ollama_adapter import register as register_ollama
+
         register_mock()
+        register_openai()
+        register_anthropic()
+        register_ollama()
 
         defaults = [
+            # ── Anthropic ──────────────────────────────────────────────────
             ModelConfig.new("claude-opus-4-7", PROVIDER_ANTHROPIC,
                             capabilities=[CAPABILITY_TEXT, CAPABILITY_CODE, CAPABILITY_ANALYSIS, CAPABILITY_PLANNING],
                             cost_per_1k_tokens=0.015, avg_latency_ms=3000, max_tokens=200000, priority=2),
@@ -141,11 +152,39 @@ class ModelRegistry:
                             capabilities=[CAPABILITY_TEXT, CAPABILITY_CODE, CAPABILITY_ANALYSIS],
                             cost_per_1k_tokens=0.003, avg_latency_ms=1500, max_tokens=200000, priority=1),
             ModelConfig.new("claude-haiku-4-5", PROVIDER_ANTHROPIC,
-                            capabilities=[CAPABILITY_TEXT, CAPABILITY_CLASSIFICATION],
+                            capabilities=[CAPABILITY_TEXT, CAPABILITY_CLASSIFICATION, CAPABILITY_SUMMARIZATION],
                             cost_per_1k_tokens=0.001, avg_latency_ms=500, max_tokens=200000, priority=1),
+            # ── OpenAI ─────────────────────────────────────────────────────
+            ModelConfig.new("gpt-4o", PROVIDER_OPENAI,
+                            capabilities=[CAPABILITY_TEXT, CAPABILITY_CODE, CAPABILITY_ANALYSIS, CAPABILITY_PLANNING],
+                            cost_per_1k_tokens=0.005, avg_latency_ms=1200, max_tokens=128000, priority=2),
+            ModelConfig.new("gpt-4.1-mini", PROVIDER_OPENAI,
+                            capabilities=[CAPABILITY_TEXT, CAPABILITY_CLASSIFICATION, CAPABILITY_SUMMARIZATION],
+                            cost_per_1k_tokens=0.0006, avg_latency_ms=400, max_tokens=128000, priority=1),
+            # ── Ollama (local + cloud) ─────────────────────────────────────
+            ModelConfig.new("qwen2.5-coder:7b", PROVIDER_OLLAMA,
+                            capabilities=[CAPABILITY_TEXT, CAPABILITY_CODE, CAPABILITY_ANALYSIS, CAPABILITY_CLASSIFICATION],
+                            cost_per_1k_tokens=0.0, avg_latency_ms=800, max_tokens=4096, priority=10),
+            ModelConfig.new("llama3.2:3b", PROVIDER_OLLAMA,
+                            capabilities=[CAPABILITY_TEXT, CAPABILITY_CLASSIFICATION, CAPABILITY_SUMMARIZATION],
+                            cost_per_1k_tokens=0.0, avg_latency_ms=400, max_tokens=4096, priority=10),
+            ModelConfig.new("llama3.1:8b", PROVIDER_OLLAMA,
+                            capabilities=[CAPABILITY_TEXT, CAPABILITY_CODE, CAPABILITY_ANALYSIS],
+                            cost_per_1k_tokens=0.0, avg_latency_ms=1000, max_tokens=4096, priority=10),
+            ModelConfig.new("deepseek-v4-pro:cloud", PROVIDER_OLLAMA,
+                            capabilities=[CAPABILITY_TEXT, CAPABILITY_CODE, CAPABILITY_ANALYSIS, CAPABILITY_PLANNING],
+                            cost_per_1k_tokens=0.0, avg_latency_ms=2000, max_tokens=8192, priority=8),
+            ModelConfig.new("nomic-embed-text:latest", PROVIDER_OLLAMA,
+                            capabilities=[CAPABILITY_TEXT, CAPABILITY_CLASSIFICATION],
+                            cost_per_1k_tokens=0.0, avg_latency_ms=200, max_tokens=8192, priority=10),
+            ModelConfig.new("qwen-coder-q5-recommended:latest", PROVIDER_OLLAMA,
+                            capabilities=[CAPABILITY_TEXT, CAPABILITY_CODE, CAPABILITY_ANALYSIS],
+                            cost_per_1k_tokens=0.0, avg_latency_ms=600, max_tokens=4096, priority=10),
+            # ── Groq ───────────────────────────────────────────────────────
             ModelConfig.new("groq-llama-3-70b", PROVIDER_GROQ,
                             capabilities=[CAPABILITY_TEXT, CAPABILITY_CLASSIFICATION],
                             cost_per_1k_tokens=0.0005, avg_latency_ms=200, max_tokens=8192, priority=3),
+            # ── Mock (fallback) ────────────────────────────────────────────
             ModelConfig.new("mock-model", PROVIDER_MOCK,
                             capabilities=[CAPABILITY_TEXT, CAPABILITY_CODE, CAPABILITY_ANALYSIS, CAPABILITY_PLANNING, CAPABILITY_CLASSIFICATION],
                             cost_per_1k_tokens=0.0, avg_latency_ms=1, max_tokens=4096, priority=99),

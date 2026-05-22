@@ -1,4 +1,4 @@
-from src.skill_router_bridge.models import (
+from src.skills_bridge.models import (
     SkillDefinition,
     SkillCall,
     SkillSelectorResult,

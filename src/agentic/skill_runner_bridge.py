@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from src.agentic.task_dispatcher import DispatchEntry, DispatchPlan
-from src.skills_bridge.adapter import MockSkillAdapter
+from src.skills_bridge.adapter import MockSkillAdapter, RealSkillAdapter, SkillAdapter
 from src.skills_bridge.models import SkillCall, SkillIntent
 from src.skills_bridge.selection import SkillSelector
 
@@ -94,10 +94,15 @@ class ExecutionResult:
 class SkillRunnerBridge:
     """Conecta DispatchPlan entries ao SkillSelector e executa skills."""
 
-    def __init__(self, dry_run: bool = True) -> None:
+    def __init__(self, dry_run: bool = True, adapter: SkillAdapter | None = None) -> None:
         self.dry_run = dry_run
         self.selector = SkillSelector(dry_run=dry_run)
-        self.adapter = MockSkillAdapter(dry_run=dry_run)
+        if adapter is not None:
+            self.adapter = adapter
+        elif dry_run:
+            self.adapter = MockSkillAdapter(dry_run=True)
+        else:
+            self.adapter = RealSkillAdapter(dry_run=False)
 
     def execute_plan(self, plan: DispatchPlan) -> list[ExecutionResult]:
         """Executa todas as entries de um plano, atualizando status."""

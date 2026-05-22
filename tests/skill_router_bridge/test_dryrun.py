@@ -1,10 +1,10 @@
 import pytest
 
-from src.skill_router_bridge.catalog import SkillCatalog
-from src.skill_router_bridge.dryrun import DryRunDispatcher, FALLBACK_SKILL_ID
-from src.skill_router_bridge.selector import SkillSelector
-from src.skill_router_bridge.models import SkillCall, SkillDefinition
-from src.skill_router_bridge.errors import DispatchError
+from src.skills_bridge.skill_catalog import SkillCatalog
+from src.skills_bridge.dryrun import DryRunDispatcher, FALLBACK_SKILL_ID
+from src.skills_bridge.models import SkillDefinition
+from src.skills_bridge.errors import DispatchError
+from src.skills_bridge.models import SkillCall
 
 
 def make_catalog(skills: list[dict]) -> SkillCatalog:
