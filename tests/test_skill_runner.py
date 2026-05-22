@@ -20,8 +20,8 @@ def test_run_skill_inexistent_raises():
 
 def test_run_skill_dry_run_default():
     """Sem --yes, run_skill retorna dry_run."""
-    # Pega qualquer skill real com run.py
-    skills_dir = os.path.expanduser("~/.claude/skills")
+    # Pega qualquer skill real com run.py do repositorio
+    skills_dir = os.path.join(os.path.dirname(__file__), "..", "skills")
     if not os.path.isdir(skills_dir):
         pytest.skip("Nenhuma skills dir encontrada")
     real_skills = [
@@ -40,7 +40,7 @@ def test_run_skill_dry_run_default():
 
 def test_run_skill_no_payload_ok():
     """Skill sem payload não falha se a skill aceita sem args."""
-    skills_dir = os.path.expanduser("~/.claude/skills")
+    skills_dir = os.path.join(os.path.dirname(__file__), "..", "skills")
     real_skills = [
         d
         for d in os.listdir(skills_dir)
@@ -132,7 +132,7 @@ def test_list_skills_invalid_skill_returns_error():
 
 def test_dry_run_does_not_run():
     """Dry-run não executa a skill de verdade (não gera side effects)."""
-    skills_dir = os.path.expanduser("~/.claude/skills")
+    skills_dir = os.path.join(os.path.dirname(__file__), "..", "skills")
     real_skills = [
         d
         for d in os.listdir(skills_dir)

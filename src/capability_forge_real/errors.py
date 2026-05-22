@@ -29,15 +29,15 @@ class BuildError(ForgeRealError):
     pass
 
 
-class ScaffoldError(ForgeRealError):
+class ScaffoldError(BuildError):
     pass
 
 
-class PolicyScanError(ForgeRealError):
+class PolicyScanError(BuildError):
     pass
 
 
-class TestGenerationError(ForgeRealError):
+class TestGenerationError(BuildError):
     pass
 
 

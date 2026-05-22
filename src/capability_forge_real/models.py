@@ -126,16 +126,19 @@ class CapabilityProposal:
 
 # ── P22 BuildResult / BuildState / SkillTemplateConfig ──────────────────────
 
-def _new_id() -> str:
-    return uuid.uuid4().hex[:12]
+def _new_id(prefix: str = "") -> str:
+    raw = uuid.uuid4().hex[:12]
+    if prefix:
+        return f"{prefix}_{raw[:8]}"
+    return raw
 
 
 def _now_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 class BuildState(str, Enum):
-    INIT = "init"
+    PROPOSAL_APPROVED = "proposal_approved"
     SCAFFOLDING = "scaffolding"
     POLICY_SCANNING = "policy_scanning"
     POLICY_FAILED = "policy_failed"
@@ -146,6 +149,14 @@ class BuildState(str, Enum):
     DONE = "done"
     ROLLED_BACK = "rolled_back"
 
+VALID_TRANSITIONS: dict[BuildState, set[BuildState]] = {
+    BuildState.PROPOSAL_APPROVED: {BuildState.SCAFFOLDING},
+    BuildState.SCAFFOLDING: {BuildState.POLICY_SCANNING},
+    BuildState.POLICY_SCANNING: {BuildState.POLICY_FAILED, BuildState.TEST_GENERATING},
+    BuildState.TEST_GENERATING: {BuildState.VALIDATING},
+    BuildState.VALIDATING: {BuildState.TEST_FAILED, BuildState.REGISTERING},
+    BuildState.REGISTERING: {BuildState.DONE},
+}
 
 TERMINAL_STATES: set[BuildState] = {BuildState.DONE, BuildState.POLICY_FAILED, BuildState.TEST_FAILED, BuildState.ROLLED_BACK}
 
@@ -155,21 +166,35 @@ class BuildResult:
     build_id: str
     proposal: CapabilityProposal
     dry_run: bool = True
-    state: BuildState = BuildState.INIT
+    state: BuildState = BuildState.PROPOSAL_APPROVED
     files_created: list[str] = field(default_factory=list)
-    policy_scan: dict | None = None
+    policy_scan: dict | None = field(default_factory=lambda: {"passed": True, "violations": []})
     test_count: int = 0
 
     @classmethod
     def new(cls, proposal: CapabilityProposal, dry_run: bool = True) -> "BuildResult":
         return cls(build_id=_new_id(), proposal=proposal, dry_run=dry_run)
 
+    @property
+    def is_terminal(self) -> bool:
+        return self.state in TERMINAL_STATES
+
+    @property
+    def is_success(self) -> bool:
+        return self.state == BuildState.DONE
+
     def transition(self, state: BuildState) -> None:
+        if self.is_terminal:
+            raise ValueError("Transicao invalida: estado terminal")
+        valid = VALID_TRANSITIONS.get(self.state, set())
+        if state not in valid:
+            raise ValueError("Transicao invalida")
         self.state = state
 
     def to_dict(self) -> dict:
         return {
             "build_id": self.build_id,
+            "proposal_id": self.proposal.proposal_id,
             "proposal": self.proposal.to_dict(),
             "dry_run": self.dry_run,
             "state": self.state.value,
@@ -178,9 +203,23 @@ class BuildResult:
             "test_count": self.test_count,
         }
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "BuildResult":
+        proposal_data = data.get("proposal", {})
+        return cls(
+            build_id=data["build_id"],
+            proposal=CapabilityProposal.from_dict(proposal_data),
+            dry_run=data.get("dry_run", True),
+            state=BuildState(data.get("state", BuildState.PROPOSAL_APPROVED.value)),
+            files_created=data.get("files_created", []),
+            policy_scan=data.get("policy_scan"),
+            test_count=data.get("test_count", 0),
+        )
+
 
 @dataclass
 class SkillTemplateConfig:
+    template_id: str = ""
     implementation_type: str = IMPL_TYPE_CLI_WRAPPER
     target_dir: str = "skills"
     filename: str = "run.py"
@@ -203,14 +242,42 @@ class SkillTemplateConfig:
         requires_policy_scan: bool = True,
     ) -> "SkillTemplateConfig":
         return cls(
+            template_id=_new_id("tpl"),
             implementation_type=implementation_type,
             target_dir=target_dir,
             filename=filename,
             class_prefix=class_prefix,
-            test_dir=test_dir,
-            test_filename=test_filename,
+            test_dir=test_dir if test_dir else target_dir,
+            test_filename=test_filename if test_filename else "test_run.py",
             min_tests=min_tests,
             requires_policy_scan=requires_policy_scan,
+        )
+
+    def to_dict(self) -> dict:
+        return {
+            "template_id": self.template_id,
+            "implementation_type": self.implementation_type,
+            "target_dir": self.target_dir,
+            "filename": self.filename,
+            "class_prefix": self.class_prefix,
+            "test_dir": self.test_dir,
+            "test_filename": self.test_filename,
+            "min_tests": self.min_tests,
+            "requires_policy_scan": self.requires_policy_scan,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "SkillTemplateConfig":
+        return cls(
+            template_id=data.get("template_id", ""),
+            implementation_type=data.get("implementation_type", IMPL_TYPE_CLI_WRAPPER),
+            target_dir=data.get("target_dir", "skills"),
+            filename=data.get("filename", "run.py"),
+            class_prefix=data.get("class_prefix", ""),
+            test_dir=data.get("test_dir", ""),
+            test_filename=data.get("test_filename", "test_run.py"),
+            min_tests=data.get("min_tests", 3),
+            requires_policy_scan=data.get("requires_policy_scan", True),
         )
 
 

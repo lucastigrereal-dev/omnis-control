@@ -37,10 +37,15 @@ class CheckResult:
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> CheckResult:
+        status_raw = data.get("status") or data.get("severity", "ok")
+        try:
+            status = HealthStatus(status_raw)
+        except ValueError:
+            status = HealthStatus.UNKNOWN
         return cls(
             name=data["name"],
-            status=HealthStatus(data["status"]),
-            data=data.get("data", {}),
+            status=status,
+            data=data.get("data", data),
             error=data.get("error"),
             duration_ms=data.get("duration_ms", 0),
             timestamp=data.get("timestamp", ""),
@@ -58,12 +63,11 @@ class HealthReport:
     next_steps: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
-        # checks as dict keyed by name so consumers can do data["checks"]["disk"]
         return {
             "session_id": self.session_id,
             "timestamp": self.timestamp,
             "overall_status": self.overall_status.value,
-            "checks": {c.name: c.to_dict() for c in self.checks},
+            "checks": [c.to_dict() for c in self.checks],
             "risks": self.risks,
             "next_steps": self.next_steps,
         }

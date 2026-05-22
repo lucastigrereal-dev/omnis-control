@@ -74,8 +74,8 @@ class TestBuildState:
         assert BuildState.POLICY_FAILED.value == "policy_failed"
         assert BuildState.TEST_FAILED.value == "test_failed"
 
-    def test_nine_states(self):
-        assert len(BuildState) == 9
+    def test_ten_states(self):
+        assert len(BuildState) == 10
 
     def test_terminal_states_correct(self):
         assert BuildState.DONE in TERMINAL_STATES

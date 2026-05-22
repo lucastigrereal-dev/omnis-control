@@ -30,8 +30,8 @@ class SkillIntent(str, Enum):
 class SkillCall:
     call_id: str = field(default_factory=lambda: _new_id("skc"))
     skill_id: str = ""
-    intent: SkillIntent = SkillIntent.UNKNOWN
-    input_payload: dict = field(default_factory=dict)
+    intent: SkillIntent | str = SkillIntent.UNKNOWN
+    payload: dict = field(default_factory=dict)
     dry_run: bool = True
     risk_level: str = "LOW"
     expected_artifacts: list[str] = field(default_factory=list)
@@ -39,12 +39,27 @@ class SkillCall:
     tags: list[str] = field(default_factory=list)
     created_at: str = field(default_factory=_now_iso)
 
+    def __post_init__(self):
+        if isinstance(self.intent, str):
+            try:
+                self.intent = SkillIntent(self.intent)
+            except ValueError:
+                self.intent = SkillIntent.UNKNOWN
+
+    @property
+    def input_payload(self) -> dict:
+        return self.payload
+
+    @input_payload.setter
+    def input_payload(self, value: dict) -> None:
+        self.payload = value
+
     def to_dict(self) -> dict:
         return {
             "call_id": self.call_id,
             "skill_id": self.skill_id,
-            "intent": self.intent.value,
-            "input_payload": self.input_payload,
+            "intent": self.intent.value if isinstance(self.intent, SkillIntent) else str(self.intent),
+            "payloar": self.payload,
             "dry_run": self.dry_run,
             "risk_level": self.risk_level,
             "expected_artifacts": self.expected_artifacts,
@@ -52,6 +67,19 @@ class SkillCall:
             "tags": self.tags,
             "created_at": self.created_at,
         }
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "SkillCall":
+        return cls(
+            call_id=data.get("call_id", ""),
+            skill_id=data.get("skill_id", ""),
+            intent=data.get("intent", "unknown"),
+            payload=data.get("payloar", data.get("payload", {})),
+            dry_run=data.get("dry_run", True),
+            risk_level=data.get("risk_level", "LOW"),
+            requires_approval=data.get("requires_approval", False),
+            tags=data.get("tags", []),
+        )
 
 
 @dataclass

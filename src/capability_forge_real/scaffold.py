@@ -314,8 +314,9 @@ def get_file_paths(
     source_dir = base / "src" / config.target_dir / slug
     paths["source"] = source_dir / config.filename
 
-    if config.test_dir and config.test_filename:
+    if config.test_dir:
         test_dir = base / "tests" / config.test_dir / slug
-        paths["test"] = test_dir / config.test_filename
+        test_filename = config.test_filename or "test_run.py"
+        paths["test"] = test_dir / test_filename
 
     return paths
