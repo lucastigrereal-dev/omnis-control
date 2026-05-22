@@ -1,0 +1,7 @@
+# Ativa providers que JÁ EXISTEM no código (estavam em fallback por falta de lib)
+langgraph>=0.2.50          # ativa src/providers/langgraph_provider.py
+langchain-core>=0.3.25
+mem0ai>=0.1.35             # ativa src/providers/mem0_provider.py
+sentence-transformers>=3.0 # embeddings locais (Serafim/nomic) — sem custo
+# NOTA: NAO instalar litellm como gateway central — UTOPICO marca DEPRECATED.
+#       O routing real é src/providers/model_router.py (Claude/OpenRouter/Ollama).
