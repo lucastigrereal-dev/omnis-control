@@ -1,0 +1,1 @@
+"""Contracts — single canonical contract registry for capabilities and missions."""
