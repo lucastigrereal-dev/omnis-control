@@ -22,9 +22,15 @@ class OllamaAdapter:
     def execute(self, prompt: str, model: ModelConfig, **kwargs: dict) -> dict:
         t0 = datetime.now(timezone.utc)
         try:
+            messages = []
+            system = kwargs.get("system", "")
+            if system:
+                messages.append({"role": "system", "content": str(system)})
+            messages.append({"role": "user", "content": prompt})
+
             payload = json.dumps({
                 "model": model.name,
-                "messages": [{"role": "user", "content": prompt}],
+                "messages": messages,
                 "stream": False,
                 "options": {
                     "num_predict": kwargs.get("max_tokens", model.max_tokens),
