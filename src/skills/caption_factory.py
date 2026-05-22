@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
 
 from src.skills.caption_skill import (
     CaptionRequest,
@@ -131,6 +132,11 @@ class CaptionFactory:
         """Generate a single caption (called by worker threads)."""
         prompt = build_caption_prompt(req)
 
+        # If research hint is attached, append it to the prompt for richer output
+        hint = getattr(req, '_research_hint', '')
+        if hint:
+            prompt = f"{prompt}\n\n{hint}"
+
         call = SkillCall(
             skill_id="generate_caption",
             intent=SkillIntent.GENERATE,
@@ -180,6 +186,24 @@ class CaptionFactory:
 
         batch_result.total_time_ms = int((time.perf_counter() - t0) * 1000)
         return batch_result
+
+    def produce_batch_with_research(
+        self,
+        request: BatchCaptionRequest,
+        research_context=None,
+    ) -> BatchCaptionResult:
+        """Generate N captions enriched with memory research context.
+
+        The research context adds top hooks, saturated themes, viral patterns,
+        and book/obsidian insights to the LLM prompt for higher-quality output.
+        Returns the same BatchCaptionResult as produce_batch.
+        """
+        if research_context is not None and not research_context.is_empty:
+            hint = research_context.to_prompt_hint()
+            individual = request.individual_requests()
+            for req in individual:
+                req._research_hint = hint
+        return self.produce_batch(request)
 
     def produce_and_save(
         self,
