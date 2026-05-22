@@ -16,6 +16,15 @@ class EventType(str, Enum):
     STEP_SKIPPED = "step_skipped"
     APPROVAL_REQUESTED = "approval_requested"
     APPROVAL_RESOLVED = "approval_resolved"
+    # Shadow mode events
+    SHADOW_RUN_STARTED = "shadow_run_started"
+    SHADOW_RUN_COMPLETED = "shadow_run_completed"
+    SHADOW_NODE_PROMOTED = "shadow_node_promoted"
+    # Replay visibility hooks
+    REPLAY_STARTED = "replay_started"
+    REPLAY_COMPLETED = "replay_completed"
+    RESUME_STARTED = "resume_started"
+    RESUME_COMPLETED = "resume_completed"
 
 
 def _now() -> str:

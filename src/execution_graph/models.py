@@ -141,6 +141,59 @@ class StepRunLog:
 
 
 RUN_STATUS_BLOCKED = "blocked_pending_approval"
+RUN_STATUS_SHADOW = "shadow"
+
+
+@dataclass
+class ShadowConfig:
+    """Per-node dry_run control for gradual shadow→real transition.
+
+    Each node starts with dry_run=True (shadow). As nodes are validated,
+    their dry_run flag is removed, allowing real execution.
+    """
+
+    node_dry_run: dict[str, bool] = field(default_factory=dict)
+    shadow_mode: bool = True
+    replay_trace_enabled: bool = True
+    real_nodes: set[str] = field(default_factory=set)
+
+    def is_dry_run(self, step_id: str) -> bool:
+        """Check if a specific node is still in dry_run (shadow) mode."""
+        if not self.shadow_mode:
+            return False
+        if step_id in self.real_nodes:
+            return False
+        return self.node_dry_run.get(step_id, True)
+
+    def promote_to_real(self, step_id: str) -> None:
+        """Promote a single node from shadow to real execution."""
+        self.real_nodes.add(step_id)
+        self.node_dry_run[step_id] = False
+
+    def promote_all(self) -> None:
+        """Promote all nodes to real execution (exit shadow mode)."""
+        self.shadow_mode = False
+
+    def remaining_shadow_nodes(self, graph: "ExecutionGraph") -> set[str]:
+        """Return set of step_ids still in shadow mode."""
+        return {n.step_id for n in graph.nodes if self.is_dry_run(n.step_id)}
+
+    def to_dict(self) -> dict:
+        return {
+            "node_dry_run": self.node_dry_run,
+            "shadow_mode": self.shadow_mode,
+            "replay_trace_enabled": self.replay_trace_enabled,
+            "real_nodes": sorted(self.real_nodes),
+        }
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "ShadowConfig":
+        return cls(
+            node_dry_run=d.get("node_dry_run", {}),
+            shadow_mode=d.get("shadow_mode", True),
+            replay_trace_enabled=d.get("replay_trace_enabled", True),
+            real_nodes=set(d.get("real_nodes", [])),
+        )
 
 
 @dataclass
