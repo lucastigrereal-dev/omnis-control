@@ -1,6 +1,7 @@
 """Testes da API OMNIS — /agent/* endpoints."""
 import json
 import os
+from dataclasses import dataclass
 
 import pytest
 from fastapi.testclient import TestClient
@@ -41,6 +42,30 @@ class TestAgentRunsEndpoint:
         r = client.get("/agent/runs/nonexistent-run-id")
         assert r.status_code == 404
 
+    def test_get_run_found_200_with_payload(self, monkeypatch):
+        from src.api.routers import agent as agent_router
+
+        @dataclass
+        class _Run:
+            run_id: str
+
+            def to_dict(self):
+                return {"run_id": self.run_id, "status": "completed"}
+
+        class _Repo:
+            def list_all(self):
+                return [_Run("run-123")]
+
+        monkeypatch.setattr(agent_router, "AgentRunRepository", _Repo)
+        r = client.get("/agent/runs/run-123")
+        assert r.status_code == 200
+        assert r.json()["run_id"] == "run-123"
+
+    @pytest.mark.parametrize("limit", [0, 201])
+    def test_list_runs_limit_validation_422(self, limit):
+        r = client.get(f"/agent/runs?limit={limit}")
+        assert r.status_code == 422
+
 
 class TestAgentSchedulesEndpoint:
     def test_list_schedules_returns_200(self):
@@ -57,6 +82,26 @@ class TestAgentSchedulesEndpoint:
         r = client.get("/agent/schedules?enabled_only=true")
         assert r.status_code == 200
 
+    def test_list_schedules_enabled_only_filters_disabled(self, monkeypatch):
+        from src.api.routers import agent as agent_router
+
+        @dataclass
+        class _Schedule:
+            schedule_id: str
+            enabled: bool
+
+            def to_dict(self):
+                return {"schedule_id": self.schedule_id, "enabled": self.enabled}
+
+        class _Repo:
+            def list_all(self):
+                return [_Schedule("s1", True), _Schedule("s2", False)]
+
+        monkeypatch.setattr(agent_router, "ScheduleRepository", _Repo)
+        data = client.get("/agent/schedules?enabled_only=true").json()
+        assert data["total"] == 1
+        assert data["schedules"][0]["schedule_id"] == "s1"
+
     def test_schedule_history_empty(self):
         r = client.get("/agent/schedules/nonexistent/history")
         assert r.status_code == 200
@@ -69,6 +114,11 @@ class TestAgentSchedulesEndpoint:
         assert "schedule_id" in data
         assert "total" in data
         assert "runs" in data
+
+    @pytest.mark.parametrize("limit", [0, 101])
+    def test_schedule_history_limit_validation_422(self, limit):
+        r = client.get(f"/agent/schedules/nonexistent/history?limit={limit}")
+        assert r.status_code == 422
 
 
 class TestAgentMemoryEndpoint:

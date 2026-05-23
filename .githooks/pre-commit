@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+
+python scripts/secret_scan_staged.py
+status=$?
+if [ "$status" -ne 0 ]; then
+  echo "[codex][pre-commit] secret scan failed."
+  exit "$status"
+fi
+
+exit 0
+
