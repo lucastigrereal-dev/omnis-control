@@ -10,6 +10,7 @@ from rich.table import Table
 from rich.panel import Panel
 
 from src.agentic.agent_models import AgentRunRepository, AgentRunStatus, StepStatus
+from src.agentic.batch_runner import BatchReport, BatchRunner, BatchVerdict
 from src.agentic.caption_draft_agent import CaptionDraftAgent
 from src.memory.caption_memory import CaptionMemoryReader
 
@@ -91,6 +92,27 @@ def agent_runs(
     console.print(table)
 
 
+# ── batch ─────────────────────────────────────────────────────────────────────
+
+@agent_app.command(name="batch")
+def agent_batch(
+    limit: int = typer.Option(5, "--limit", "-n", help="Máx de itens a processar"),
+    account: str | None = typer.Option(None, "--account", "-a", help="Filtrar por conta"),
+    dry_run: bool = typer.Option(True, "--dry-run/--real", help="Simula sem persistir"),
+    json_out: bool = typer.Option(False, "--json", help="Saída em JSON"),
+) -> None:
+    """Processa N itens planned/needs_caption da fila em sequência."""
+    runner_obj = BatchRunner(dry_run=dry_run)
+    report = runner_obj.run(limit=limit, account_filter=account)
+
+    if json_out:
+        console.print_json(json.dumps(report.to_dict()))
+        raise typer.Exit(0)
+
+    _print_batch_report(report)
+    raise typer.Exit(0)
+
+
 # ── memory ────────────────────────────────────────────────────────────────────
 
 @agent_app.command(name="memory")
@@ -154,3 +176,45 @@ def _print_run(run) -> None:  # type: ignore[no-untyped-def]
 
     if run.error:
         console.print(f"\n[red]Erro:[/red] {run.error}")
+
+
+def _print_batch_report(report: BatchReport) -> None:
+    mode = "[blue]dry_run[/blue]" if report.dry_run else "[green]real[/green]"
+    console.print(
+        f"\n[bold]Batch[/bold] [cyan]{report.batch_id}[/cyan]  {mode}"
+        f"  candidates={report.total_candidates}"
+        f"  processed={report.total_processed}"
+    )
+
+    table = Table(show_header=True, show_lines=False, box=None, padding=(0, 1))
+    table.add_column("queue_id", style="cyan", no_wrap=True, width=14)
+    table.add_column("account", width=20)
+    table.add_column("objective", width=14)
+    table.add_column("verdict", width=14)
+    table.add_column("draft_id", style="dim")
+
+    verdict_colors = {
+        BatchVerdict.APPROVED: "green",
+        BatchVerdict.APPROVED_DRY: "blue",
+        BatchVerdict.NEEDS_REVIEW: "yellow",
+        BatchVerdict.FAILED: "red",
+        BatchVerdict.SKIPPED: "dim",
+    }
+
+    for r in report.results:
+        color = verdict_colors.get(r.verdict, "white")
+        table.add_row(
+            r.queue_id[:12],
+            r.account_handle,
+            r.objective,
+            f"[{color}]{r.verdict}[/{color}]",
+            r.draft_id[:12] if r.draft_id else r.error[:30],
+        )
+    console.print(table)
+
+    console.print(
+        f"\n  [green]approved[/green] {report.approved}"
+        f"  [yellow]needs_review[/yellow] {report.needs_review}"
+        f"  [red]failed[/red] {report.failed}"
+        f"  [dim]skipped[/dim] {report.skipped}"
+    )

@@ -38,6 +38,32 @@ def test_agent_memory_help():
     assert result.exit_code == 0
 
 
+def test_agent_batch_help():
+    result = runner.invoke(app, ["agent", "batch", "--help"])
+    assert result.exit_code == 0
+    assert "limit" in result.output.lower()
+
+
+def test_agent_batch_empty_queue_exits_zero():
+    result = runner.invoke(app, ["agent", "batch", "--dry-run"])
+    assert result.exit_code == 0
+
+
+def test_agent_batch_json_empty_queue():
+    result = runner.invoke(app, ["agent", "batch", "--dry-run", "--json"])
+    assert result.exit_code == 0
+    data = json.loads(result.output)
+    assert "batch_id" in data
+    assert data["total_processed"] == 0
+
+
+def test_agent_batch_json_has_summary_fields():
+    result = runner.invoke(app, ["agent", "batch", "--dry-run", "--json"])
+    data = json.loads(result.output)
+    for key in ("approved", "needs_review", "failed", "skipped", "results"):
+        assert key in data
+
+
 # ── agent run — item inexistente ──────────────────────────────────────────────
 
 def test_agent_run_missing_id_exits_nonzero():
