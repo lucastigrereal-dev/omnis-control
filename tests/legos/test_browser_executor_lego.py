@@ -1,6 +1,8 @@
 """Testes do BrowserExecutorLego — OMNIS Lego Web."""
 from __future__ import annotations
 
+import sys
+import types
 import threading
 
 import pytest
@@ -138,3 +140,119 @@ def test_semaphore_timeout_when_held():
         assert "semaphore_timeout" in (result.error or "")
     finally:
         _BROWSER_SEMAPHORE.release()
+
+
+def test_execute_returns_sandbox_blocked_when_url_invalid(monkeypatch):
+    lego = BrowserExecutorLego()
+
+    def _raise_invalid(_url: str):
+        raise ValueError("invalid_url")
+
+    monkeypatch.setattr(lego._sandbox, "validate_url", _raise_invalid)
+    task = BrowserTask(url="javascript:alert(1)", goal="extrair", dry_run=True)
+
+    result = lego.execute(task)
+    assert result.success is False
+    assert "sandbox_blocked" in (result.error or "")
+
+
+def test_run_browser_timeout_branch(monkeypatch):
+    lego = BrowserExecutorLego()
+    task = BrowserTask(
+        url="https://example.com",
+        goal="extrair título",
+        dry_run=True,
+        timeout_seconds=1,
+    )
+
+    class FakePWTimeout(Exception):
+        pass
+
+    class _FakePage:
+        def set_default_timeout(self, _ms: int):
+            pass
+
+        def goto(self, *_args, **_kwargs):
+            raise FakePWTimeout("timeout")
+
+    class _FakeBrowser:
+        def new_page(self):
+            return _FakePage()
+
+        def close(self):
+            pass
+
+    class _FakeChromium:
+        def launch(self, headless=True):
+            return _FakeBrowser()
+
+    class _FakePlayCtx:
+        chromium = _FakeChromium()
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_exc):
+            return False
+
+    fake_sync_module = types.SimpleNamespace(
+        sync_playwright=lambda: _FakePlayCtx(),
+        TimeoutError=FakePWTimeout,
+    )
+    monkeypatch.setitem(sys.modules, "playwright.sync_api", fake_sync_module)
+    monkeypatch.setitem(sys.modules, "playwright", types.SimpleNamespace(sync_api=fake_sync_module))
+
+    result = lego._run_browser(task)
+    assert result.success is False
+    assert "timeout" in (result.error or "")
+
+
+def test_run_browser_generic_exception_branch(monkeypatch):
+    lego = BrowserExecutorLego()
+    task = BrowserTask(
+        url="https://example.com",
+        goal="extrair título",
+        dry_run=True,
+        timeout_seconds=1,
+    )
+
+    class FakePWTimeout(Exception):
+        pass
+
+    class _FakePage:
+        def set_default_timeout(self, _ms: int):
+            pass
+
+        def goto(self, *_args, **_kwargs):
+            raise RuntimeError("boom")
+
+    class _FakeBrowser:
+        def new_page(self):
+            return _FakePage()
+
+        def close(self):
+            pass
+
+    class _FakeChromium:
+        def launch(self, headless=True):
+            return _FakeBrowser()
+
+    class _FakePlayCtx:
+        chromium = _FakeChromium()
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_exc):
+            return False
+
+    fake_sync_module = types.SimpleNamespace(
+        sync_playwright=lambda: _FakePlayCtx(),
+        TimeoutError=FakePWTimeout,
+    )
+    monkeypatch.setitem(sys.modules, "playwright.sync_api", fake_sync_module)
+    monkeypatch.setitem(sys.modules, "playwright", types.SimpleNamespace(sync_api=fake_sync_module))
+
+    result = lego._run_browser(task)
+    assert result.success is False
+    assert "boom" in (result.error or "")
