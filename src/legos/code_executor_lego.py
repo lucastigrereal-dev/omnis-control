@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 import subprocess
 import sys
 from datetime import datetime, timezone
@@ -28,6 +29,18 @@ _DEPLOY_KEYWORDS = frozenset({
     "release", "lançar", "entregar", "ship",
 })
 
+_UNSAFE_GOAL_PATTERN = re.compile(
+    r"""(?ix)
+    [\r\n]
+    |;
+    |&&
+    |\|\|
+    |` 
+    |\$\(
+    |\b(__import__|exec\s*\(|eval\s*\(|subprocess|os\.system)\b
+    """
+)
+
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -36,6 +49,10 @@ def _now_iso() -> str:
 def _requires_deploy_approval(goal: str) -> bool:
     g = goal.lower()
     return any(kw in g for kw in _DEPLOY_KEYWORDS)
+
+
+def _has_unsafe_goal_payload(goal: str) -> bool:
+    return bool(_UNSAFE_GOAL_PATTERN.search(goal))
 
 
 class CodeExecutorLego:
@@ -147,17 +164,29 @@ class CodeExecutorLego:
                 error=f"local_sandbox: somente Python suportado (got {spec.language})",
             )
 
-        # Gera script mínimo de validação baseado no goal
+        # Defense in depth: bloqueia marcadores de injeção óbvios.
+        if _has_unsafe_goal_payload(spec.goal):
+            _logger.warning("[code] sandbox: injection payload detected in goal")
+            return CodeResult(
+                success=False, output="", files_created=[],
+                tests_passed=False, dry_run=False,
+                error="local_sandbox: unsafe_goal_payload",
+                artifacts={"blocked": True, "reason": "unsafe_goal_payload"},
+            )
+
+        # goal e output_dir passados como argv — NUNCA interpolados no código.
+        # Isso isola dados de código e elimina o vetor de RCE pela raiz.
         script = (
-            f"# Auto-gerado por CodeExecutorLego\n"
-            f"# Goal: {spec.goal}\n"
-            f"print('sandbox: goal recebido')\n"
-            f"print('output_dir:', {spec.output_dir!r})\n"
+            "import sys\n"
+            "goal = sys.argv[1] if len(sys.argv) > 1 else ''\n"
+            "output_dir = sys.argv[2] if len(sys.argv) > 2 else ''\n"
+            "print('sandbox: goal recebido')\n"
+            "print('output_dir:', output_dir)\n"
         )
 
         try:
             result = subprocess.run(
-                [sys.executable, "-c", script],
+                [sys.executable, "-c", script, "--", spec.goal, spec.output_dir],
                 capture_output=True, text=True, timeout=30,
             )
             success = result.returncode == 0
