@@ -5,6 +5,7 @@ from typing import Optional
 
 from src.multi_model_orchestration.adapters import ADAPTER_REGISTRY, ModelAdapter, get_adapter
 from src.multi_model_orchestration.classifier import TaskClassifier
+from src.multi_model_orchestration.cost_tracker import CostTracker
 from src.multi_model_orchestration.errors import AllModelsExhaustedError, RoutingError
 from src.multi_model_orchestration.fallback import FallbackChain
 from src.multi_model_orchestration.models import (
@@ -29,10 +30,12 @@ class ModelRouter:
         self,
         registry: Optional[ModelRegistry] = None,
         classifier: Optional[TaskClassifier] = None,
+        cost_tracker: Optional[CostTracker] = None,
         dry_run: bool = True,
     ) -> None:
         self.registry = registry or ModelRegistry(dry_run=dry_run)
         self.classifier = classifier or TaskClassifier(dry_run=dry_run)
+        self.cost_tracker = cost_tracker or CostTracker(dry_run=dry_run)
         self.dry_run = dry_run
 
     # ── Public API ─────────────────────────────────────────────────────────
@@ -61,6 +64,7 @@ class ModelRouter:
     def execute(self, request: RoutingRequest) -> dict:
         """Full pipeline: route → execute → result."""
         decision = self._decide(request)
+        self.cost_tracker.assert_within_limit(decision.estimated_cost_usd)
 
         if self.dry_run:
             return {
@@ -77,13 +81,21 @@ class ModelRouter:
             result = adapter.execute(request.prompt, decision.selected_model, context=request.context)
             if result.get("status") in {"error", "failed"} and decision.has_fallback:
                 chain = FallbackChain(decision.fallback_chain, self.registry)
-                return chain.execute(request.prompt, request.context)
+                fallback_result = chain.execute(request.prompt, request.context)
+                self._record_result_cost(fallback_result, decision.selected_model, request.task.task_type)
+                return fallback_result
             result["decision"] = decision.to_dict()
+            self._record_result_cost(result, decision.selected_model, request.task.task_type)
             return result
         except Exception:
             if decision.has_fallback:
                 chain = FallbackChain(decision.fallback_chain, self.registry)
-                return chain.execute(request.prompt, request.context.to_dict() if hasattr(request.context, "to_dict") else request.context)
+                fallback_result = chain.execute(
+                    request.prompt,
+                    request.context.to_dict() if hasattr(request.context, "to_dict") else request.context,
+                )
+                self._record_result_cost(fallback_result, decision.selected_model, request.task.task_type)
+                return fallback_result
             raise
 
     # ── Internal ────────────────────────────────────────────────────────────
@@ -113,6 +125,15 @@ class ModelRouter:
             strategy=strategy,
             is_dry_run=self.dry_run,
         )
+
+    def _record_result_cost(self, result: dict, default_model: ModelConfig, task_type: str) -> None:
+        """Record model usage after execution without trusting caller-provided costs."""
+        tokens_used = int(result.get("tokens_used") or 0)
+        if tokens_used <= 0:
+            return
+
+        model = self.registry.find_by_name(result.get("model", "")) or default_model
+        self.cost_tracker.record(model, task_type, tokens_used)
 
     @staticmethod
     @staticmethod

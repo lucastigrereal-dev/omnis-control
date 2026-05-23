@@ -3,6 +3,7 @@ import pytest
 
 from src.multi_model_orchestration.models import (
     CAPABILITY_CODE,
+    CAPABILITY_TEXT,
     COMPLEXITY_CRITICAL,
     COMPLEXITY_HIGH,
     COMPLEXITY_LOW,
@@ -11,9 +12,10 @@ from src.multi_model_orchestration.models import (
     RoutingRequest,
     TaskClass,
 )
+from src.multi_model_orchestration.cost_tracker import CostTracker
 from src.multi_model_orchestration.registry import ModelRegistry
 from src.multi_model_orchestration.router import ModelRouter
-from src.multi_model_orchestration.errors import RoutingError
+from src.multi_model_orchestration.errors import CostLimitError, RoutingError
 
 
 class TestModelRouter:
@@ -67,6 +69,59 @@ class TestModelRouter:
         result = router.execute(req)
         assert result["status"] == "dry_run"
         assert "decision" in result
+
+    def test_execute_enforces_cost_limit_before_provider_call(self):
+        from src.multi_model_orchestration.adapters.mock_adapter import register as register_mock
+
+        register_mock()
+        registry = ModelRegistry()
+        registry.register(ModelConfig.new(
+            "expensive-mock",
+            PROVIDER_MOCK,
+            capabilities=[CAPABILITY_TEXT],
+            cost_per_1k_tokens=0.05,
+        ))
+        tracker = CostTracker(daily_limit_usd=0.01, dry_run=False)
+        router = ModelRouter(registry=registry, cost_tracker=tracker, dry_run=False)
+        task = TaskClass.new(
+            "classify_intent",
+            complexity=COMPLEXITY_LOW,
+            min_capabilities=[CAPABILITY_TEXT],
+            max_cost_usd=0.10,
+        )
+        req = RoutingRequest.new(task, prompt="x" * 5000, dry_run=False)
+
+        with pytest.raises(CostLimitError):
+            router.execute(req)
+
+        assert tracker.entry_count == 0
+
+    def test_execute_records_cost_after_provider_result(self):
+        from src.multi_model_orchestration.adapters.mock_adapter import register as register_mock
+
+        register_mock()
+        registry = ModelRegistry()
+        registry.register(ModelConfig.new(
+            "metered-mock",
+            PROVIDER_MOCK,
+            capabilities=[CAPABILITY_TEXT],
+            cost_per_1k_tokens=0.01,
+        ))
+        tracker = CostTracker(daily_limit_usd=1.0, dry_run=False)
+        router = ModelRouter(registry=registry, cost_tracker=tracker, dry_run=False)
+        task = TaskClass.new(
+            "classify_intent",
+            complexity=COMPLEXITY_LOW,
+            min_capabilities=[CAPABILITY_TEXT],
+            max_cost_usd=0.10,
+        )
+        req = RoutingRequest.new(task, prompt="x" * 4000, dry_run=False)
+
+        result = router.execute(req)
+
+        assert result["status"] == "dry_run"
+        assert tracker.entry_count == 1
+        assert tracker.by_provider()[PROVIDER_MOCK] == 0.01
 
     # ── error cases ───────────────────────────────────────────────────────
 
