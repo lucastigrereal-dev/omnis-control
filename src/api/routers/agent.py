@@ -32,7 +32,7 @@ def get_agent_run(run_id: str) -> dict:
     for run in repo.list_all():
         if run.run_id == run_id:
             return run.to_dict()
-    raise HTTPException(404, f"Run não encontrado: {run_id}")
+    raise HTTPException(404, f"AgentRun[{run_id}]: Run não encontrado")
 
 
 @router.get("/schedules")

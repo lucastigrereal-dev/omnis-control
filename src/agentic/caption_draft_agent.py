@@ -93,8 +93,9 @@ class CaptionDraftAgent:
         step = run.add_step("fetch_queue_item", input_summary=f"queue_id={queue_id}")
         item = self._queue.get(queue_id)
         if not item:
-            step.fail(f"QueueItem não encontrado: {queue_id}")
-            run.fail(f"QueueItem não encontrado: {queue_id}")
+            message = f"AgentRun[{run.run_id}]: QueueItem não encontrado: {queue_id}"
+            step.fail(message)
+            run.fail(message)
             return None
         run.account_handle = item.account_handle
         run.objective = item.objective or "alcance"
@@ -141,8 +142,9 @@ class CaptionDraftAgent:
             )
             return output
         except Exception as exc:
-            step.fail(str(exc))
-            run.fail(f"Geração de legenda falhou: {exc}")
+            message = f"AgentRun[{run.run_id}]: geração de legenda falhou: {exc}"
+            step.fail(message)
+            run.fail(message)
             # retorna output vazio para encerrar o run sem crash
             return CaptionLLMOutput(
                 hook="", body="", cta="", hashtags=[], raw="",
@@ -185,8 +187,9 @@ class CaptionDraftAgent:
         gate = ApprovalGate(drafts_manager=self._drafts)
         draft = self._drafts.get(draft_id)
         if not draft:
-            step.fail(f"Draft {draft_id} não encontrado para gate")
-            return {"verdict": "error", "blocks": ["draft not found"], "queue_status": "unchanged"}
+            message = f"AgentRun[{run.run_id}]: Draft {draft_id} não encontrado para gate"
+            step.fail(message)
+            return {"verdict": "error", "blocks": [message], "queue_status": "unchanged"}
 
         # submete para revisão
         self._drafts.submit(draft_id)
@@ -218,8 +221,9 @@ class CaptionDraftAgent:
             step.complete("verdict=approved queue=caption_ready")
             return {"verdict": "approved", "blocks": [], "queue_status": QueueStatus.CAPTION_READY}
         except ValueError as exc:
-            step.complete(f"verdict=needs_review reason={exc}")
-            return {"verdict": "needs_review", "blocks": [str(exc)], "queue_status": "unchanged"}
+            message = f"AgentRun[{run.run_id}]: approval gate needs_review: {exc}"
+            step.complete(f"verdict=needs_review reason={message}")
+            return {"verdict": "needs_review", "blocks": [message], "queue_status": "unchanged"}
 
     def _write_memory(
         self,
@@ -259,5 +263,5 @@ class CaptionDraftAgent:
             step.complete(f"gravado account={item.account_handle} objective={run.objective}")
             gate_result["memory_written"] = True
         except Exception as exc:
-            step.fail(str(exc))
+            step.fail(f"AgentRun[{run.run_id}]: memory writeback falhou: {exc}")
             gate_result["memory_written"] = False

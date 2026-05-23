@@ -174,13 +174,14 @@ class BatchRunner:
         try:
             run = self._agent.run(item.queue_id)
         except Exception as exc:
+            message = f"BatchRunner[{item.queue_id}]: agent run falhou antes de gerar run_id: {exc}"
             return BatchItemResult(
                 queue_id=item.queue_id,
                 account_handle=item.account_handle,
                 objective=item.objective or "",
                 run_id="error",
                 verdict=BatchVerdict.FAILED,
-                error=str(exc),
+                error=message,
             )
 
         if run.status == AgentRunStatus.FAILED:
@@ -190,7 +191,7 @@ class BatchRunner:
                 objective=item.objective or "",
                 run_id=run.run_id,
                 verdict=BatchVerdict.FAILED,
-                error=run.error or "",
+                error=run.error or f"AgentRun[{run.run_id}]: falha sem mensagem",
             )
 
         verdict = run.result.get("gate_verdict", BatchVerdict.SKIPPED)
