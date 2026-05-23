@@ -1,0 +1,116 @@
+"""Testes do VideoProcessorLego — OMNIS Lego de Vídeo."""
+from __future__ import annotations
+
+import pytest
+
+from src.interfaces.video_processor import VideoSpec, VideoResult
+from src.legos.video_processor_lego import VideoProcessorLego, _requires_publish_approval
+
+
+# ── _requires_publish_approval ────────────────────────────────────────────────
+
+def test_publish_keyword_detected():
+    assert _requires_publish_approval("publicar no Instagram") is True
+
+def test_upload_keyword_detected():
+    assert _requires_publish_approval("upload do vídeo") is True
+
+def test_safe_goal_not_flagged():
+    assert _requires_publish_approval("transcrever vídeo") is False
+
+
+# ── approval gate ─────────────────────────────────────────────────────────────
+
+def test_real_publish_goal_blocked():
+    lego = VideoProcessorLego()
+    spec = VideoSpec(video_path="clip.mp4", goal="publicar no Instagram", dry_run=False)
+    result = lego.execute(spec)
+    assert result.success is False
+    assert result.error == "approval_required"
+    assert result.artifacts.get("approval_required") is True
+
+
+def test_dry_run_not_blocked_by_approval():
+    lego = VideoProcessorLego()
+    spec = VideoSpec(video_path="clip.mp4", goal="publicar no Instagram", dry_run=True)
+    # dry_run ignora gate para publicação
+    result = lego.execute(spec)
+    assert result.error != "approval_required"
+
+
+# ── health_check ─────────────────────────────────────────────────────────────
+
+def test_health_check_returns_bool():
+    assert isinstance(VideoProcessorLego().health_check(), bool)
+
+
+def test_health_check_true_when_whisper_and_ffmpeg_available():
+    assert VideoProcessorLego().health_check() is True
+
+
+# ── transcribe dry_run ────────────────────────────────────────────────────────
+
+def test_transcribe_dry_run_no_files():
+    lego = VideoProcessorLego()
+    spec = VideoSpec(video_path="sample.mp4", goal="transcrever", dry_run=True)
+    result = lego.execute(spec)
+    assert result.success is True
+    assert result.dry_run is True
+    assert result.files_created == []
+    assert "dry_run" in result.output.lower() or "planejada" in result.output.lower()
+
+
+def test_transcribe_dry_run_artifacts_mode():
+    lego = VideoProcessorLego()
+    spec = VideoSpec(video_path="sample.mp4", goal="transcribe", dry_run=True)
+    result = lego.execute(spec)
+    assert result.artifacts.get("mode") == "dry_run"
+
+
+# ── cut dry_run (usa FFmpegRenderer que já tem dry_run nativo) ────────────────
+
+def test_cut_dry_run_creates_manifest(tmp_path):
+    lego = VideoProcessorLego()
+    spec = VideoSpec(
+        video_path=str(tmp_path / "video.mp4"),
+        goal="cut",
+        dry_run=True,
+        output_dir=str(tmp_path / "out"),
+        start_seconds=0.0,
+        end_seconds=10.0,
+    )
+    result = lego.execute(spec)
+    assert result.success is True
+    assert result.dry_run is True
+    # FFmpegRenderer cria .manifest.json em dry_run
+    assert len(result.files_created) == 1
+    assert result.files_created[0].endswith(".manifest.json")
+
+
+# ── extract_audio dry_run ─────────────────────────────────────────────────────
+
+def test_extract_audio_dry_run_no_files():
+    lego = VideoProcessorLego()
+    spec = VideoSpec(video_path="sample.mp4", goal="extract_audio", dry_run=True)
+    result = lego.execute(spec)
+    assert result.success is True
+    assert result.files_created == []
+
+
+# ── unknown goal ─────────────────────────────────────────────────────────────
+
+def test_unknown_goal_returns_error():
+    lego = VideoProcessorLego()
+    spec = VideoSpec(video_path="clip.mp4", goal="fazer magia", dry_run=True)
+    result = lego.execute(spec)
+    assert result.success is False
+    assert "goal desconhecido" in (result.error or "")
+
+
+# ── Protocol compliance ───────────────────────────────────────────────────────
+
+def test_lego_satisfies_video_processor_protocol():
+    from src.interfaces.video_processor import VideoProcessor
+    lego: VideoProcessor = VideoProcessorLego()
+    assert hasattr(lego, "execute")
+    assert hasattr(lego, "health_check")

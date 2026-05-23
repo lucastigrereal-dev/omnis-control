@@ -32,6 +32,8 @@ def _staged_src_python_files() -> list[str]:
         ["git", "diff", "--cached", "--name-only", "--diff-filter=ACMR"],
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         check=True,
     )
     files = [line.strip() for line in proc.stdout.splitlines() if line.strip()]
@@ -43,12 +45,16 @@ def _read_staged_file(path: str) -> str:
         ["git", "show", f":{path}"],
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         check=True,
     )
-    return proc.stdout
+    return proc.stdout or ""
 
 
 def scan_text(path: str, text: str) -> list[Finding]:
+    if not text:
+        return []
     findings: list[Finding] = []
     for idx, raw_line in enumerate(text.splitlines(), start=1):
         line = raw_line.strip()
