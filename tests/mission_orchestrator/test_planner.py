@@ -1,6 +1,12 @@
 """Tests for mission orchestrator planner."""
 import pytest
-from src.mission_orchestrator.planner import build_plan
+from src.mission_orchestrator.planner import (
+    _build_steps,
+    _match_capabilities,
+    _parse_intent,
+    _validate_plan,
+    build_plan,
+)
 from src.mission_orchestrator.errors import UnknownIntentError
 from src.mission_orchestrator.models import RUN_STATUS_PLANNED
 
@@ -49,3 +55,33 @@ def test_plan_dry_run_skips_asset_steps():
     run = build_plan("carrossel hotel", dry_run=True)
     skipped = [s for s in run.steps if s.module == "asset_inbox" and s.status == "skipped"]
     assert len(skipped) >= 1
+
+
+def test_parse_intent_returns_detected_tuple():
+    intent, deliverable, description = _parse_intent("quero um reels do hotel")
+    assert intent == "reels"
+    assert deliverable
+    assert description
+
+
+def test_match_capabilities_returns_capabilities_and_sector():
+    cap_results, sector_result = _match_capabilities("cria campanha de posts para hotel")
+    assert len(cap_results) >= 1
+    assert sector_result is not None
+
+
+def test_build_steps_preserves_dry_run_asset_skips():
+    steps = _build_steps("carrossel hotel", dry_run=True)
+    asset_steps = [step for step in steps if step.module == "asset_inbox"]
+    assert len(asset_steps) == 2
+    assert all(step.status == "skipped" for step in asset_steps)
+
+
+def test_validate_plan_rejects_unknown_without_capability():
+    with pytest.raises(UnknownIntentError):
+        _validate_plan(
+            request_text="algo que nao bate com nada",
+            intent="unknown",
+            cap_results=[],
+            allow_unknown=False,
+        )
