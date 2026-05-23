@@ -25,6 +25,7 @@ jarvis = "src.cli:app"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+norecursedirs = ["tests/_archive", ".git", "__pycache__", "*.egg-info"]
 
 [build-system]
 requires = ["setuptools>=61.0"]

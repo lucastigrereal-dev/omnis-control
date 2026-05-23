@@ -9,7 +9,8 @@ from pathlib import Path
 from .models import VideoAsset
 from .status import AssetStatus
 
-REGISTRY_PATH = os.path.expanduser("~/omnis-control/data/video_assets.jsonl")
+_ROOT = os.path.normpath(os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control")))
+REGISTRY_PATH = os.path.join(_ROOT, "data", "video_assets.jsonl")
 
 
 class Registry:

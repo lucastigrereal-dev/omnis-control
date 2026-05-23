@@ -70,7 +70,10 @@ class JsonlRepository(MissionRepository):
 
     def __init__(self, base_dir: Optional[str] = None) -> None:
         if base_dir is None:
-            base_dir = os.path.expanduser("~/omnis-control/data/missions")
+            base_dir = os.path.join(
+                os.path.normpath(os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control"))),
+                "data", "missions",
+            )
         self.base_dir = Path(base_dir)
         self.contracts_dir = self.base_dir / "contracts"
         self.events_dir = self.base_dir / "events"

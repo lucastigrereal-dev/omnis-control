@@ -480,13 +480,13 @@ class TestQueueOperations:
 class TestSecurity:
     def test_accounts_path_within_control(self):
         from src.content_queue.accounts import ACCOUNTS_PATH
-        control = os.path.expanduser("~/omnis-control")
-        assert ACCOUNTS_PATH.startswith(control)
+        control = os.path.normpath(os.path.expanduser("~/omnis-control"))
+        assert os.path.normpath(ACCOUNTS_PATH).startswith(control)
 
     def test_queue_path_within_control(self):
         from src.content_queue.queue import QUEUE_PATH
-        control = os.path.expanduser("~/omnis-control")
-        assert QUEUE_PATH.startswith(control)
+        control = os.path.normpath(os.path.expanduser("~/omnis-control"))
+        assert os.path.normpath(QUEUE_PATH).startswith(control)
 
     def test_no_external_imports(self):
         """content_queue package não importa nada externo."""

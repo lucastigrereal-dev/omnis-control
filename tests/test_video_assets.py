@@ -475,8 +475,8 @@ class TestSecurity:
     def test_registry_within_control_dir(self):
         """Registry path deve estar dentro de ~/omnis-control/."""
         from src.video_assets.registry import REGISTRY_PATH
-        control = os.path.expanduser("~/omnis-control")
-        assert REGISTRY_PATH.startswith(control), \
+        control = os.path.normpath(os.path.expanduser("~/omnis-control"))
+        assert os.path.normpath(REGISTRY_PATH).startswith(control), \
             f"Registry fora do controle: {REGISTRY_PATH}"
 
     def test_no_external_imports(self):

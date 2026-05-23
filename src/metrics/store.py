@@ -15,7 +15,10 @@ class MetricsStore:
 
     def __init__(self, base_dir: Optional[str] = None) -> None:
         if base_dir is None:
-            base_dir = os.path.expanduser("~/omnis-control/data/metrics_spine")
+            base_dir = os.path.join(
+                os.path.normpath(os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control"))),
+                "data", "metrics_spine",
+            )
         self.base_dir = Path(base_dir)
         self.metrics_path = self.base_dir / "metrics.jsonl"
         self.runs_path = self.base_dir / "runs.jsonl"

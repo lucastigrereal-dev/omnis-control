@@ -14,13 +14,17 @@ import time
 
 import yaml
 
+_ROOT = os.path.normpath(os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control")))
+_CLAUDE = os.path.normpath(os.getenv("CLAUDE_DIR", os.path.expanduser("~/.claude")))
+_PUB_OS = os.path.normpath(os.getenv("PUBLISHER_OS_DIR", os.path.expanduser("~/publisher-os")))
+
 SEARCH_ROOTS = [
-    os.path.expanduser("~/.claude/skills"),
-    os.path.expanduser("~/publisher-os"),
-    os.path.expanduser("~/JARVIS_OS"),
-    os.path.expanduser("~/omnis-control"),
+    os.path.join(_CLAUDE, "skills"),
+    _PUB_OS,
+    os.path.normpath(os.path.expanduser("~/JARVIS_OS")),
+    _ROOT,
 ]
-CONFIG_PATH = os.path.expanduser("~/omnis-control/config/paths.yaml")
+CONFIG_PATH = os.path.join(_ROOT, "config", "paths.yaml")
 SCAN_TIMEOUT_S = 30
 
 
@@ -93,7 +97,7 @@ def _check_keyword_in_path(roots: list[str], keywords: list[str]) -> list[dict[s
 def _check_video_to_content_skill() -> list[dict[str, object]]:
     """Check for video_to_content skill."""
     evidence = []
-    skill_path = os.path.expanduser("~/.claude/skills/video_to_content")
+    skill_path = os.path.join(_CLAUDE, "skills", "video_to_content")
     if os.path.isdir(skill_path):
         evidence.append({
             "path": skill_path,
@@ -106,7 +110,7 @@ def _check_video_to_content_skill() -> list[dict[str, object]]:
 def _check_argos_bridge_skill() -> list[dict[str, object]]:
     """Check for argos-bridge skill."""
     evidence = []
-    skill_path = os.path.expanduser("~/.claude/skills/argos-bridge")
+    skill_path = os.path.join(_CLAUDE, "skills", "argos-bridge")
     if os.path.isdir(skill_path):
         evidence.append({
             "path": skill_path,
@@ -119,7 +123,7 @@ def _check_argos_bridge_skill() -> list[dict[str, object]]:
 def _check_publisher_video_code() -> list[dict[str, object]]:
     """Scan publisher-os for video/media related code."""
     evidence = []
-    pub_root = os.path.expanduser("~/publisher-os")
+    pub_root = _PUB_OS
     video_terms = ["video", "media", "asset", "reel", "scheduled", "published"]
     if not os.path.isdir(pub_root):
         return evidence
@@ -148,7 +152,7 @@ def _check_publisher_video_code() -> list[dict[str, object]]:
 
 def _check_video_asset_registry() -> dict[str, object]:
     """Check if the local Video Asset Registry exists and has data."""
-    registry_path = os.path.expanduser("~/omnis-control/data/video_assets.jsonl")
+    registry_path = os.path.join(_ROOT, "data", "video_assets.jsonl")
     result = {
         "exists": os.path.isfile(registry_path),
         "asset_count": 0,
@@ -164,7 +168,7 @@ def _check_video_asset_registry() -> dict[str, object]:
 
 def _check_account_registry() -> dict[str, object]:
     """Check if the Account Registry exists and has data."""
-    path = os.path.expanduser("~/omnis-control/data/accounts.jsonl")
+    path = os.path.join(_ROOT, "data", "accounts.jsonl")
     result = {"exists": os.path.isfile(path), "account_count": 0}
     if result["exists"]:
         try:
@@ -177,7 +181,7 @@ def _check_account_registry() -> dict[str, object]:
 
 def _check_content_queue() -> dict[str, object]:
     """Check if the Content Queue file exists and has data."""
-    path = os.path.expanduser("~/omnis-control/data/content_queue.jsonl")
+    path = os.path.join(_ROOT, "data", "content_queue.jsonl")
     result = {"exists": os.path.isfile(path), "item_count": 0}
     if result["exists"]:
         try:
@@ -256,19 +260,19 @@ def _build_all_evidence(scans: dict[str, object]) -> list[dict[str, object]]:
     content_queue = scans["content_queue"]
     if registry["exists"]:
         all_evidence.append({
-            "path": os.path.expanduser("~/omnis-control/data/video_assets.jsonl"),
+            "path": os.path.join(_ROOT, "data", "video_assets.jsonl"),
             "keyword": "video_asset_registry",
             "type": "registry",
         })
     if accounts_reg["exists"]:
         all_evidence.append({
-            "path": os.path.expanduser("~/omnis-control/data/accounts.jsonl"),
+            "path": os.path.join(_ROOT, "data", "accounts.jsonl"),
             "keyword": "instagram_account_mapping",
             "type": "registry",
         })
     if content_queue["exists"]:
         all_evidence.append({
-            "path": os.path.expanduser("~/omnis-control/data/content_queue.jsonl"),
+            "path": os.path.join(_ROOT, "data", "content_queue.jsonl"),
             "keyword": "daily_content_queue",
             "type": "registry",
         })

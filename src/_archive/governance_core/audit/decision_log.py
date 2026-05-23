@@ -8,7 +8,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
-DEFAULT_LOG_PATH = os.path.expanduser("~/.claude/logs/governance_audit.jsonl")
+_CLAUDE = os.path.normpath(os.getenv("CLAUDE_DIR", os.path.expanduser("~/.claude")))
+DEFAULT_LOG_PATH = os.path.join(_CLAUDE, "logs", "governance_audit.jsonl")
 
 
 class DecisionLog:

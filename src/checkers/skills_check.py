@@ -1,8 +1,9 @@
 import os
 import yaml
 
-SKILLS_DIR = os.path.expanduser("~/.claude/skills")
-REGISTRY_FILE = os.path.expanduser("~/.claude/registry/skills.yaml")
+_CLAUDE = os.path.normpath(os.getenv("CLAUDE_DIR", os.path.expanduser("~/.claude")))
+SKILLS_DIR = os.path.join(_CLAUDE, "skills")
+REGISTRY_FILE = os.path.join(_CLAUDE, "registry", "skills.yaml")
 
 
 def _list_skill_entries() -> list[dict[str, object]]:

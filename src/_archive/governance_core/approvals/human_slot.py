@@ -14,7 +14,8 @@ from enum import Enum
 from pathlib import Path
 from typing import Optional
 
-PENDING_QUEUE_PATH = os.path.expanduser("~/.claude/state/human_slot_pending.json")
+_CLAUDE = os.path.normpath(os.getenv("CLAUDE_DIR", os.path.expanduser("~/.claude")))
+PENDING_QUEUE_PATH = os.path.join(_CLAUDE, "state", "human_slot_pending.json")
 
 
 class SlotDecision(str, Enum):

@@ -103,7 +103,7 @@ def check_local_filesystem(tool_id: str) -> ToolHealthResult:
     t0 = time.monotonic()
     try:
         import os
-        repo = os.path.expanduser("~/omnis-control")
+        repo = os.path.normpath(os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control")))
         exists = os.path.isdir(repo)
         files = os.listdir(repo)[:10] if exists else []
         duration = int((time.monotonic() - t0) * 1000)

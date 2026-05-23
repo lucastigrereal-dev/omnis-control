@@ -13,8 +13,9 @@ from pathlib import Path
 from .models import QueueItem, QueueStatus, _now_iso
 from .accounts import AccountRegistry, _normalize_handle
 
-QUEUE_PATH = os.path.expanduser("~/omnis-control/data/content_queue.jsonl")
-VIDEO_ASSETS_PATH = os.path.expanduser("~/omnis-control/data/video_assets.jsonl")
+_ROOT = os.path.normpath(os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control")))
+QUEUE_PATH = os.path.join(_ROOT, "data", "content_queue.jsonl")
+VIDEO_ASSETS_PATH = os.path.join(_ROOT, "data", "video_assets.jsonl")
 MAX_DAYS_DEFAULT = 7
 MAX_DAYS_WITHOUT_FORCE = 30
 MAX_DAYS_ABSOLUTE = 90

@@ -3,7 +3,10 @@ import uuid
 import os
 from datetime import datetime, timezone
 
-_LOG_DIR = os.path.expanduser("~/omnis-control/logs")
+_LOG_DIR = os.path.join(
+    os.path.normpath(os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control"))),
+    "logs",
+)
 _MISSIONS_FILE = os.path.join(_LOG_DIR, "missions.jsonl")
 _TOOL_RUNS_FILE = os.path.join(_LOG_DIR, "tool_runs.jsonl")
 

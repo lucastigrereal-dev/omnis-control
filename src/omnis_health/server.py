@@ -14,7 +14,8 @@ from typing import Callable
 
 from src.omnis_health.models import CheckResult, HealthReport, HealthStatus
 
-STATE_FILE = os.path.expanduser("~/.claude/health_server_state.json")
+_CLAUDE = os.path.normpath(os.getenv("CLAUDE_DIR", os.path.expanduser("~/.claude")))
+STATE_FILE = os.path.join(_CLAUDE, "health_server_state.json")
 
 
 @dataclass

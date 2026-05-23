@@ -11,7 +11,8 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from pathlib import Path
 
-ACCOUNTS_PATH = os.path.expanduser("~/omnis-control/data/accounts.jsonl")
+_ROOT = os.path.normpath(os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control")))
+ACCOUNTS_PATH = os.path.join(_ROOT, "data", "accounts.jsonl")
 DEFAULT_POSTING_TIMES = ["08:50", "17:50", "20:50"]
 DEFAULT_FORMATS = ["reels", "stories", "feed", "carousel"]
 

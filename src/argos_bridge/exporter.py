@@ -4,11 +4,11 @@ import csv
 import json
 import os
 
-from .draft_builder import list_all
+from .draft_builder import list_all, _ROOT
 from .models import ArgosDraft
 
 
-EXPORT_DIR = os.path.expanduser("~/omnis-control/data/exports/argos")
+EXPORT_DIR = os.path.join(_ROOT, "data", "exports", "argos")
 
 
 def _ensure_dir() -> None:

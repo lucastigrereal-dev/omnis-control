@@ -23,7 +23,8 @@ from src.caption_approval import DraftsManager
 
 logger = logging.getLogger(__name__)
 
-WORKFLOW_PATH = os.path.expanduser("~/omnis-control/data/workflow_results.jsonl")
+_ROOT = os.path.normpath(os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control")))
+WORKFLOW_PATH = os.path.join(_ROOT, "data", "workflow_results.jsonl")
 
 
 class WorkflowEngine:
@@ -176,7 +177,7 @@ class WorkflowEngine:
     def _brief(self, topic: str, pagina: str, formato: str,
                objective: str, workflow_id: str, dry_run: bool) -> dict:
         """Estágio BRIEF: cria documento de briefing."""
-        briefs_dir = os.path.expanduser(f"~/omnis-control/data/briefs")
+        briefs_dir = os.path.join(_ROOT, "data", "briefs")
         Path(briefs_dir).mkdir(parents=True, exist_ok=True)
 
         brief_content = f"""# Briefing de Conteúdo — OMNIS

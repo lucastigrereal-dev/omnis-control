@@ -10,8 +10,9 @@ from pathlib import Path
 
 from .models import CaptionDraft, DraftStatus, ApprovalAction, ApprovalLogEntry, _now_iso
 
-DRAFTS_PATH = os.path.expanduser("~/omnis-control/data/caption_drafts.jsonl")
-APPROVAL_LOG_PATH = os.path.expanduser("~/omnis-control/data/approval_log.jsonl")
+_ROOT = os.path.normpath(os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control")))
+DRAFTS_PATH = os.path.join(_ROOT, "data", "caption_drafts.jsonl")
+APPROVAL_LOG_PATH = os.path.join(_ROOT, "data", "approval_log.jsonl")
 STALE_DAYS = 3
 
 

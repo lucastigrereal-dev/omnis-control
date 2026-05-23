@@ -51,7 +51,20 @@ app = typer.Typer(
 )
 console = Console()
 
-PATHS_YAML = os.path.expanduser("~/omnis-control/config/paths.yaml")
+_OMNIS_ROOT = os.path.normpath(
+    os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control"))
+)
+_CLAUDE_DIR = os.path.normpath(
+    os.getenv("CLAUDE_DIR", os.path.expanduser("~/.claude"))
+)
+_DAILY_PROPHET_DIR = os.path.normpath(
+    os.getenv("DAILY_PROPHET_DIR", os.path.expanduser("~/daily-prophet-hotels"))
+)
+_LLM_ROUTER_DIR = os.path.normpath(
+    os.getenv("LLM_ROUTER_DIR", os.path.expanduser("~/llm-router"))
+)
+
+PATHS_YAML = os.path.join(_OMNIS_ROOT, "config", "paths.yaml")
 
 
 def _load_paths_config() -> dict:
@@ -195,7 +208,7 @@ def skill_info(skill_name: str = typer.Argument(..., help="Nome da skill")):
         log_mission(session_id, "skill-info", "error", int((time.time()-start)*1000), errors=[str(e)])
         raise typer.Exit(1)
 
-    skills_dir = os.path.expanduser("~/.claude/skills")
+    skills_dir = os.path.join(_CLAUDE_DIR, "skills")
     entry_path = os.path.join(skills_dir, name)
 
     info = {
@@ -568,14 +581,14 @@ def report():
     start = time.time()
 
     content = status_report.generate(session_id)
-    report_path = os.path.expanduser("~/omnis-control/docs/ESTADO_ATUAL_RESUMIDO.md")
+    report_path = os.path.join(_OMNIS_ROOT, "docs", "ESTADO_ATUAL_RESUMIDO.md")
     try:
         with open(report_path, "w", encoding="utf-8") as f:
             f.write(content)
         console.print(f"[green]Relatório gerado:[/green] {report_path}")
 
         # Update last_validated in paths.yaml
-        config_path = os.path.expanduser("~/omnis-control/config/paths.yaml")
+        config_path = os.path.join(_OMNIS_ROOT, "config", "paths.yaml")
         if os.path.isfile(config_path):
             try:
                 with open(config_path, encoding="utf-8") as f:
@@ -679,7 +692,7 @@ def sales_status():
         console.print(f"  Arquivos SQL: {dp.get('sql_files', 0)}")
         console.print(f"  Status: {dp['status']}")
     else:
-        console.print(f"  [red]Diretorio nao encontrado em ~/daily-prophet-hotels[/red]")
+        console.print(f"  [red]Diretorio nao encontrado em {_DAILY_PROPHET_DIR}[/red]")
         console.print(f"  Status: {dp['status']}")
 
 
@@ -749,7 +762,7 @@ def llm_models():
     """Lista modelos configurados no LLM Router."""
     from src.intelligence.llm_router_bridge import list_models, config_available
     if not config_available():
-        console.print("[yellow]config.yaml nao encontrado em ~/llm-router/[/yellow]")
+        console.print(f"[yellow]config.yaml nao encontrado em {_LLM_ROUTER_DIR}[/yellow]")
         return
     models = list_models()
     if not models:
@@ -1065,7 +1078,7 @@ def va_export(
     fmt: str = typer.Option("csv", "--format", help="Formato de exportação (csv)"),
 ):
     """Exporta registro como CSV."""
-    path = os.path.expanduser(f"~/omnis-control/data/video_assets_export.{fmt}")
+    path = os.path.join(_OMNIS_ROOT, "data", f"video_assets_export.{fmt}")
     registry = Registry()
     if fmt == "csv":
         registry.export_csv(path)
@@ -1354,9 +1367,9 @@ def cq_export(
     account_filter: str = typer.Option(None, "--account", help="Filtrar por conta"),
 ):
     """Exporta fila como CSV."""
-    Path(os.path.expanduser("~/omnis-control/data/exports")).mkdir(parents=True, exist_ok=True)
+    Path(os.path.join(_OMNIS_ROOT, "data", "exports")).mkdir(parents=True, exist_ok=True)
     export_name = f"queue_export_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.{fmt}"
-    path = os.path.expanduser(f"~/omnis-control/data/exports/{export_name}")
+    path = os.path.join(_OMNIS_ROOT, "data", "exports", export_name)
 
     queue = CQQueue()
     if fmt == "csv":
@@ -1596,9 +1609,9 @@ def cap_export(
 ):
     """Exporta rascunhos como CSV."""
     from pathlib import Path
-    Path(os.path.expanduser("~/omnis-control/data/exports")).mkdir(parents=True, exist_ok=True)
+    Path(os.path.join(_OMNIS_ROOT, "data", "exports")).mkdir(parents=True, exist_ok=True)
     export_name = f"caption_drafts_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.csv"
-    path = os.path.expanduser(f"~/omnis-control/data/exports/{export_name}")
+    path = os.path.join(_OMNIS_ROOT, "data", "exports", export_name)
 
     dm = DraftsManager()
     dm.export_csv(path, status_filter=status_filter, account_filter=account_filter)
@@ -1942,7 +1955,7 @@ def wf_list(
     import json as _json
     from pathlib import Path
 
-    wf_path = os.path.expanduser("~/omnis-control/data/workflow_results.jsonl")
+    wf_path = os.path.join(_OMNIS_ROOT, "data", "workflow_results.jsonl")
     if not os.path.isfile(wf_path):
         console.print("Nenhum workflow executado ainda.")
         return

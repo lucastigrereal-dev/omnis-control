@@ -23,7 +23,10 @@ class ToolRegistry:
 
     def __init__(self, base_dir: Optional[str] = None) -> None:
         if base_dir is None:
-            base_dir = os.path.expanduser("~/omnis-control/data/tool_registry")
+            base_dir = os.path.join(
+                os.path.normpath(os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control"))),
+                "data", "tool_registry",
+            )
         self.base_dir = Path(base_dir)
         self.tools_path = self.base_dir / "tools.jsonl"
         self.log_path = self.base_dir / "validation_log.jsonl"

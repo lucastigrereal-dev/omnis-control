@@ -11,7 +11,8 @@ from pathlib import Path
 
 from .models import CaptionTemplate
 
-TEMPLATES_PATH = os.path.expanduser("~/omnis-control/data/caption_templates.json")
+_ROOT = os.path.normpath(os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control")))
+TEMPLATES_PATH = os.path.join(_ROOT, "data", "caption_templates.json")
 
 
 def _default_templates() -> list[CaptionTemplate]:

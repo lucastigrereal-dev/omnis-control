@@ -14,7 +14,8 @@ from typing import Callable
 from .models import ArgosDraft, ArgosStatus, WarnCode
 
 
-DRAFTS_PATH = os.path.expanduser("~/omnis-control/data/argos_drafts.jsonl")
+_ROOT = os.path.normpath(os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control")))
+DRAFTS_PATH = os.path.join(_ROOT, "data", "argos_drafts.jsonl")
 
 
 def _load_drafts() -> list[ArgosDraft]:

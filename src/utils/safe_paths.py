@@ -1,7 +1,12 @@
 import os
 
 
-CONTROL_DIR = os.path.normpath(os.path.expanduser("~/omnis-control"))
+CONTROL_DIR = os.path.normpath(
+    os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control"))
+)
+CLAUDE_DIR = os.path.normpath(
+    os.getenv("CLAUDE_DIR", os.path.expanduser("~/.claude"))
+)
 
 
 def validate_write_path(path: str) -> str:
@@ -61,7 +66,7 @@ def resolve_skill_path(name: str) -> str | None:
     safe = validate_skill_name(name)
     skills_roots = [
         os.getenv("OMNIS_SKILLS_PATH") or os.path.join(CONTROL_DIR, "skills"),
-        os.path.normpath(os.path.expanduser("~/.claude/skills")),
+        os.path.join(CLAUDE_DIR, "skills"),
     ]
 
     for skills_dir in skills_roots:
@@ -83,8 +88,8 @@ def safe_read_path(path: str) -> str:
 
     allowed_prefixes = [
         CONTROL_DIR,
-        os.path.normpath(os.path.expanduser("~/.claude")),
-        os.path.normpath(os.path.expanduser("~/publisher-os")),
+        CLAUDE_DIR,
+        os.path.normpath(os.getenv("PUBLISHER_OS_DIR", os.path.expanduser("~/publisher-os"))),
         os.path.normpath(os.path.expanduser("~/JARVIS_OS")),
     ]
 

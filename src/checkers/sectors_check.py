@@ -5,12 +5,13 @@ import re
 
 import yaml
 
-SECTORS_PATH = os.path.expanduser("~/omnis-control/config/sectors.yaml")
+_ROOT = os.path.normpath(os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control")))
+SECTORS_PATH = os.path.join(_ROOT, "config", "sectors.yaml")
 
 
 def _load_yaml_block() -> dict[str, object]:
     """Extrai o bloco ```yaml ... ``` do arquivo markdown."""
-    path = os.path.expanduser(SECTORS_PATH)
+    path = SECTORS_PATH
     if not os.path.isfile(path):
         return {}
     text = open(path, encoding="utf-8").read()

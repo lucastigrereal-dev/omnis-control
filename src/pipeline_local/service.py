@@ -19,7 +19,8 @@ from .models import (
 logger = logging.getLogger("omnis.pipeline_local.service")
 
 # Store path
-PIPELINE_RUNS_PATH = os.path.expanduser("~/omnis-control/data/pipeline_runs.jsonl")
+_ROOT = os.path.normpath(os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control")))
+PIPELINE_RUNS_PATH = os.path.join(_ROOT, "data", "pipeline_runs.jsonl")
 
 
 class PipelineLocalService:

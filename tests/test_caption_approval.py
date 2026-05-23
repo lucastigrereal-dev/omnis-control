@@ -455,10 +455,10 @@ class TestExport:
 class TestSecurity:
     def test_drafts_path_within_control(self):
         from src.caption_approval.drafts import DRAFTS_PATH
-        control = os.path.expanduser("~/omnis-control")
-        assert DRAFTS_PATH.startswith(control)
+        control = os.path.normpath(os.path.expanduser("~/omnis-control"))
+        assert os.path.normpath(DRAFTS_PATH).startswith(control)
 
     def test_log_path_within_control(self):
         from src.caption_approval.drafts import APPROVAL_LOG_PATH
-        control = os.path.expanduser("~/omnis-control")
-        assert APPROVAL_LOG_PATH.startswith(control)
+        control = os.path.normpath(os.path.expanduser("~/omnis-control"))
+        assert os.path.normpath(APPROVAL_LOG_PATH).startswith(control)
