@@ -1,6 +1,7 @@
 """Tests for mission orchestrator planner."""
 import pytest
 from src.mission_orchestrator.planner import (
+    _apply_capability_intelligence,
     _build_steps,
     _match_capabilities,
     _parse_intent,
@@ -85,3 +86,45 @@ def test_validate_plan_rejects_unknown_without_capability():
             cap_results=[],
             allow_unknown=False,
         )
+
+
+def test_validate_plan_allows_unknown_when_capability_exists():
+    class _Cap:
+        capability_id = "cap_demo"
+        risk_level = "low"
+
+    _validate_plan(
+        request_text="pedido fora da taxonomia, mas com match de cap",
+        intent="unknown",
+        cap_results=[_Cap()],
+        allow_unknown=False,
+    )
+
+
+def test_apply_capability_intelligence_uses_gap_when_no_capabilities(monkeypatch):
+    from src.mission_orchestrator.models import OrchestratorRun
+    from src.capability_gap import detector as gap_detector
+
+    class _Gap:
+        def __init__(self, gap_id: str, risk_level: str):
+            self.gap_id = gap_id
+            self.risk_level = risk_level
+
+    class _GapResult:
+        def __init__(self):
+            self.gaps = [_Gap("gap_1", "medium"), _Gap("gap_2", "low")]
+
+    monkeypatch.setattr(gap_detector, "detect", lambda _request: _GapResult())
+
+    run = OrchestratorRun.new("request sem capabilities")
+    _apply_capability_intelligence(
+        run=run,
+        request_text="request sem capabilities",
+        cap_results=[],
+        sector_result=None,
+    )
+
+    assert run.sector_id == "unknown"
+    assert run.matched_capabilities == []
+    assert run.suggested_gap_ids == ["gap_1", "gap_2"]
+    assert run.approval_required is True
