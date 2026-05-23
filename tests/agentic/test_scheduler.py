@@ -205,6 +205,47 @@ def test_service_multiple_due(tmp_path):
     assert len(executed) == 3
 
 
+def test_service_runs_multiple_schedules_with_same_next_run_at(tmp_path):
+    sched_repo = ScheduleRepository(path=str(tmp_path / "schedules.jsonl"))
+    run_repo = ScheduleRunRepository(path=str(tmp_path / "schedule_runs.jsonl"))
+    svc = SchedulerService(
+        schedule_repo=sched_repo,
+        run_repo=run_repo,
+        batch_runner_factory=_NullFactory(),
+    )
+    same_due_at = (datetime.now(timezone.utc) - timedelta(minutes=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    for idx in range(2):
+        sched_repo.save(
+            BatchSchedule(
+                schedule_id=f"s{idx}",
+                account_filter=None,
+                limit=5,
+                dry_run=True,
+                interval_hours=1,
+                next_run_at=same_due_at,
+            )
+        )
+
+    executed = svc.run_due()
+
+    assert [run.schedule_id for run in executed] == ["s0", "s1"]
+    assert len(svc.history()) == 2
+
+
+def test_service_schedule_can_advance_past_one_run_count(tmp_path):
+    svc = _make_svc(tmp_path, _NullFactory())
+    schedule = svc.add(interval_hours=1, run_now=True)
+    svc.run_due()
+    updated = svc.list_schedules()[0]
+    updated.next_run_at = (datetime.now(timezone.utc) - timedelta(minutes=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    svc._schedules.save(updated)
+
+    svc.run_due()
+
+    assert svc.list_schedules()[0].run_count == 2
+    assert len(svc.history(schedule.schedule_id)) == 2
+
+
 def test_schedule_run_to_dict():
     r = ScheduleRun(
         run_id="r1", schedule_id="s1", account_filter="@x",
@@ -214,3 +255,18 @@ def test_schedule_run_to_dict():
     d = r.to_dict()
     assert d["approved"] == 2
     json.dumps(d)
+
+
+def test_schedule_run_from_dict_roundtrip():
+    original = ScheduleRun(
+        run_id="r1", schedule_id="s1", account_filter="@x",
+        limit=5, dry_run=True, approved=2, needs_review=1, failed=0,
+        total_processed=3, batch_id="b1",
+    )
+
+    restored = ScheduleRun.from_dict(original.to_dict())
+
+    assert restored.run_id == original.run_id
+    assert restored.schedule_id == original.schedule_id
+    assert restored.account_filter == original.account_filter
+    assert restored.total_processed == original.total_processed

@@ -160,6 +160,18 @@ def test_batch_processes_needs_caption(tmp_path):
     assert report.total_processed == 1
 
 
+def test_batch_status_filter_explicit_overrides_default_processable_set(tmp_path):
+    items = [
+        ("@x", "alcance", QueueStatus.PLANNED),
+        ("@x", "alcance", QueueStatus.PUBLISHED),
+        ("@x", "alcance", QueueStatus.NEEDS_CAPTION),
+    ]
+    runner = _make_runner(tmp_path, dry_run=True, items=items)
+    report = runner.run(limit=5, status_filter={QueueStatus.PUBLISHED})
+    assert report.total_processed == 1
+    assert report.results[0].account_handle == "@x"
+
+
 def test_batch_result_has_run_id(tmp_path):
     items = [("@oinatalrn", "alcance", "planned")]
     runner = _make_runner(tmp_path, dry_run=True, items=items)
