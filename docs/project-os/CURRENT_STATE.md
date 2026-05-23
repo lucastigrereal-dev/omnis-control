@@ -1,8 +1,8 @@
 # OMNIS Current State
 
-**Atualizado:** 2026-05-23 — Fases 1-4 completas: Consolidação + API HTTP + Agente mínimo real
+**Atualizado:** 2026-05-23 — Fases 1-14 completas: Consolidação + API HTTP + Agente + LLM real + Observabilidade
 **Branch:** feature/omnis-5waves-runtime-supreme
-**Último commit:** f7423a0 — feat(fase-4): agente mínimo real — AgentRun/AgentStep + MemoryInterface + CaptionDraftAgent
+**Último commit:** 93739d7 — docs(audit): Codex audit results — dead code map + consolidation proposal
 
 ## Status Geral
 Fase: OMNIS_LOCAL_SUPREME_COMPLETE — 11 fases (0-10) concluídas. 30/30 outputs reais gerados. Fábrica local autônoma operacional.
@@ -42,11 +42,15 @@ Fase F (Cockpit HTML local) — CONCLUÍDO
 - runtime_bridge: 26/26
 - omnis_health: 49/49
 - skills_bridge: 36/36
-- api (Fase 3): 34/34
+- api (Fase 3 + 11 + 14): 56/56
 - agent_models (Fase 4): 15/15
-- caption_draft_agent (Fase 4): 14/14
+- caption_draft_agent (Fase 4 + 13-B): 34/34
 - memory_interface (Fase 4): 8/8
-- Suite completa: **~8383 passed, 4 skipped, 0 failed**
+- llm_adapter (Fase 5 + 13-B): 19/19
+- scheduler (Fase 6-10): 62/62
+- batch_runner (Fase 9): 28/28
+- cli_agent (Fase 12 + 13-B + 14): 34/34
+- Suite completa: **~8542 passed, 4 skipped, 0 failed**
 
 ## Working Tree
 - reports/ccos/*.log + *.md → ignorados via .gitignore (DONE)
@@ -84,6 +88,41 @@ Fase F (Cockpit HTML local) — CONCLUÍDO
 - `src/agentic/caption_draft_agent.py` — loop QueueItem → memory → draft → AgentRun
 - 37 testes novos passando
 
+### Fases 5-10 — LLM + Scheduler + Batch (2026-05-23)
+- Fase 5: `LiteLLMAdapter` + `MockLLMAdapter` + `CaptionLLMOutput`
+- Fase 6: `BatchSchedule` + `ScheduleRepository` (JSONL)
+- Fase 7: `ScheduleRunRepository` + histórico de execuções
+- Fase 8: `SchedulerService.run_due()` — executa schedules vencidos
+- Fase 9: `BatchRunner.run_batch()` — processa fila com CaptionDraftAgent
+- Fase 10: `CaptionMemoryWriter/Reader` + memória de legendas aprovadas
+- CLI: `omnis agent batch`, `schedule-add/list/run/history/remove`
+
+### Fase 11 — API /agent/* (2026-05-23, commit 3c9c1c9)
+- `src/api/routers/agent.py` — 6 endpoints GET-only para KRATOS
+- GET /agent/runs, /agent/runs/{id}, /agent/schedules, /agent/schedules/{id}/history, /agent/memory, /agent/status
+- 22 testes API passando
+
+### Fase 12 — `omnis agent status` (2026-05-23, commit 69ec955)
+- Dashboard one-shot: queue + runs + schedules + memory + litellm_available
+- `--json` flag para integração KRATOS
+- 12 testes CLI passando
+
+### Fase 13-B — LiteLLM health_check + _parse_response + --real wire (2026-05-23, commit 097a836)
+- `LiteLLMAdapter.health_check()` — ping :4002/health, 3s timeout, returns bool
+- `LiteLLMAdapter._parse_response()` — static method, testável sem HTTP
+- `CaptionDraftAgent` com LLM failure handling (URLError + socket.timeout)
+- 9 novos testes adapter + 4 testes agent failure
+
+### Fase 14 — --real guard + GET /agent/status litellm_available (2026-05-23, commit 3c9c1c9)
+- `_require_litellm()` guard no CLI: bloqueia --real quando LiteLLM indisponível
+- `GET /agent/status` inclui `litellm_available` bool
+- 5 novos testes guard + 8 novos testes API status
+
+### Codex Audit (2026-05-23, commit 93739d7)
+- `docs/project-os/DEAD_CODE_AUDIT.md` — 107 VIVO, 6 SUSPEITO, 4 FANTASMA, 0 violações LLM
+- `docs/project-os/CODEX_SRC_CONSOLIDATION_PROPOSAL.md` — fronteiras limpas confirmadas
+- `docs/project-os/AGENT_FLOW.md` — fluxo end-to-end documentado
+
 ## Próxima Ação
-- Aguardando Codex: CODEX_SRC_CONSOLIDATION_PROPOSAL.md (auditoria read-only de reports/memory/agentic)
-- Fase 5 planejada: LLM real no CaptionDraftAgent (spec em docs/project-os/FASE5_SPEC.md)
+- Wave seguinte do WAVE_REGISTRY — ver `docs/project-os/WAVE_REGISTRY.md`
+- Candidatos: aprovação humana de rascunhos (ApprovalGate UI), pipeline multi-conta, ou scheduling cron real
