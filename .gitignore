@@ -2,6 +2,7 @@
 __pycache__/
 *.pyc
 logs/*.jsonl
+logs/*.log
 logs/briefing_*.md
 diagnose*.json
 .pytest_cache/
@@ -14,6 +15,7 @@ diagnose*.json
 .env.*
 data/*.jsonl
 data/*.csv
+data/audit/
 data/exports/*.csv
 data/exports/argos/*.json
 docs/_claude_input/
@@ -26,6 +28,7 @@ data/publisher_store/
 skill_reports/
 data/missions/contracts/*.json
 data/missions/contracts/*.hash
+data/missions/checkpoints/
 data/missions/events/*.jsonl
 data/missions/index.jsonl
 data/pipeline_runs/*.json
@@ -41,6 +44,7 @@ storage/asset_inbox/
 data/asset_inbox_registry.jsonl
 data/orchestrator_runs.jsonl
 bundles/
+missions/.replays/
 .claude/worktrees/
 reports/ccos/*.log
 reports/ccos/*.md
