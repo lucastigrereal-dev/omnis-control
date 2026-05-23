@@ -9,6 +9,8 @@ Regras OMNIS:
 - 1 tarefa pesada por vez (Whisper carrega modelo na RAM)
 - Approval gate antes de publicação/envio
 - health_check() verifica whisper + ffmpeg
+- Path validation: rejeita ../ em video_path e output_dir
+- Whisper pinado: WHISPER_MODEL_SIZE + WHISPER_CACHE_DIR controláveis via env
 """
 from __future__ import annotations
 
@@ -23,6 +25,14 @@ from src.video_studio.render_ffmpeg import FFmpegRenderer
 
 _logger = logging.getLogger("omnis.legos.video")
 
+# Modelo Whisper pinado via env var — evita auto-upgrade silencioso
+_WHISPER_MODEL_SIZE = os.getenv("WHISPER_MODEL_SIZE", "tiny")
+# Cache controlável: aponta para cache interno/air-gapped se necessário
+_WHISPER_CACHE_DIR = os.getenv(
+    "WHISPER_CACHE_DIR",
+    str(Path.home() / ".cache" / "whisper"),
+)
+
 # 1 operação pesada por vez (Whisper consome RAM)
 _VIDEO_SEMAPHORE = threading.Semaphore(1)
 
@@ -34,6 +44,20 @@ _PUBLISH_KEYWORDS = frozenset({
 
 def _requires_publish_approval(goal: str) -> bool:
     return any(kw in goal.lower() for kw in _PUBLISH_KEYWORDS)
+
+
+def _assert_path_safe(path: str, param_name: str) -> None:
+    """Rejeita path traversal (../) em video_path ou output_dir.
+
+    Normaliza o caminho e verifica se algum componente é '..'.
+    Bloqueia ../../etc/passwd, ..\..\..\windows\system32, etc.
+    """
+    if not path:
+        return
+    normalized = os.path.normpath(path)
+    parts = normalized.replace("\\", "/").split("/")
+    if ".." in parts:
+        raise ValueError(f"{param_name}: path traversal detectado: {path!r}")
 
 
 class VideoProcessorLego:
@@ -58,6 +82,18 @@ class VideoProcessorLego:
 
     def execute(self, spec: VideoSpec) -> VideoResult:
         """Processa vídeo de acordo com spec.goal."""
+        # Path traversal gate — bloqueia ../ em video_path e output_dir
+        try:
+            _assert_path_safe(spec.video_path, "video_path")
+            _assert_path_safe(spec.output_dir, "output_dir")
+        except ValueError as exc:
+            _logger.warning("[video] PATH TRAVERSAL blocked: %s", exc)
+            return VideoResult(
+                success=False, output="", files_created=[],
+                dry_run=spec.dry_run, error=str(exc),
+                artifacts={"blocked": True, "reason": "path_traversal"},
+            )
+
         if not spec.dry_run and _requires_publish_approval(spec.goal):
             _logger.warning("[video] APPROVAL REQUIRED for goal: '%s'", spec.goal[:80])
             return VideoResult(
@@ -185,11 +221,30 @@ class VideoProcessorLego:
         )
 
     @classmethod
-    def _get_whisper_model(cls, model_size: str = "tiny"):
-        """Lazy load do modelo Whisper — tiny = ~150MB RAM."""
+    def _get_whisper_model(cls):
+        """Lazy load do modelo Whisper.
+
+        Usa _WHISPER_MODEL_SIZE (env WHISPER_MODEL_SIZE, default 'tiny') e
+        _WHISPER_CACHE_DIR (env WHISPER_CACHE_DIR) para controle de versão e cache.
+        download_root garante que o modelo vai para o cache interno,
+        não para a localização padrão do sistema — evita auto-download de fonte não controlada.
+        """
+        model_size = _WHISPER_MODEL_SIZE
+        cache_dir = Path(_WHISPER_CACHE_DIR)
+
         with cls._whisper_lock:
             if cls._whisper_model is None:
                 import whisper
-                _logger.info("[video] Loading Whisper model '%s'...", model_size)
-                cls._whisper_model = whisper.load_model(model_size)
+                cached_file = cache_dir / f"{model_size}.pt"
+                if cached_file.exists():
+                    _logger.info("[video] Whisper '%s' from cache: %s", model_size, cached_file)
+                else:
+                    _logger.info(
+                        "[video] Whisper '%s' — first load, downloading to %s",
+                        model_size, cache_dir,
+                    )
+                cls._whisper_model = whisper.load_model(
+                    model_size, download_root=str(cache_dir),
+                )
+                _logger.info("[video] Whisper '%s' loaded OK", model_size)
         return cls._whisper_model
