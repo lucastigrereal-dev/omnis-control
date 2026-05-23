@@ -6,6 +6,9 @@ from .research_conductor import (
     ResearchConductor, ResearchSpec, ResearchResult,
     ResearchPerspective, ResearchCitation,
 )
+from .channel_messenger import (
+    ChannelMessenger, MessageSpec, MessageResult, ChannelDelivery,
+)
 
 __all__ = [
     "BrowserExecutor", "BrowserTask", "BrowserResult",
@@ -13,4 +16,5 @@ __all__ = [
     "VideoProcessor", "VideoSpec", "VideoResult",
     "ResearchConductor", "ResearchSpec", "ResearchResult",
     "ResearchPerspective", "ResearchCitation",
+    "ChannelMessenger", "MessageSpec", "MessageResult", "ChannelDelivery",
 ]
