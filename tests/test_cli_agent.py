@@ -140,6 +140,46 @@ def test_agent_memory_account_and_objective_unknown():
     assert "Nenhuma" in result.output
 
 
+# ── schedule commands ─────────────────────────────────────────────────────────
+
+def test_schedule_add_help():
+    result = runner.invoke(app, ["agent", "schedule-add", "--help"])
+    assert result.exit_code == 0
+    assert "every" in result.output.lower()
+
+
+def test_schedule_list_empty():
+    result = runner.invoke(app, ["agent", "schedule-list", "--json"])
+    assert result.exit_code == 0
+    data = json.loads(result.output)
+    assert isinstance(data, list)
+
+
+def test_schedule_run_no_due():
+    result = runner.invoke(app, ["agent", "schedule-run"])
+    assert result.exit_code == 0
+    assert "vencido" in result.output.lower() or result.output.strip() == ""
+
+
+def test_schedule_run_json_no_due():
+    result = runner.invoke(app, ["agent", "schedule-run", "--json"])
+    assert result.exit_code == 0
+    data = json.loads(result.output)
+    assert isinstance(data, list)
+
+
+def test_schedule_history_empty():
+    result = runner.invoke(app, ["agent", "schedule-history", "--json"])
+    assert result.exit_code == 0
+    data = json.loads(result.output)
+    assert isinstance(data, list)
+
+
+def test_schedule_remove_missing():
+    result = runner.invoke(app, ["agent", "schedule-remove", "nonexistent-id"])
+    assert result.exit_code != 0
+
+
 def test_agent_memory_with_data(tmp_path):
     mem_path = str(tmp_path / "data" / "caption_memory.jsonl")
     os.makedirs(str(tmp_path / "data"), exist_ok=True)

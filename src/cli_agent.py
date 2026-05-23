@@ -12,6 +12,7 @@ from rich.panel import Panel
 from src.agentic.agent_models import AgentRunRepository, AgentRunStatus, StepStatus
 from src.agentic.batch_runner import BatchReport, BatchRunner, BatchVerdict
 from src.agentic.caption_draft_agent import CaptionDraftAgent
+from src.agentic.scheduler import SchedulerService
 from src.memory.caption_memory import CaptionMemoryReader
 
 agent_app = typer.Typer(name="agent", help="CaptionDraftAgent — loop completo de geração")
@@ -111,6 +112,150 @@ def agent_batch(
 
     _print_batch_report(report)
     raise typer.Exit(0)
+
+
+# ── schedule ──────────────────────────────────────────────────────────────────
+
+@agent_app.command(name="schedule-add")
+def schedule_add(
+    every: float = typer.Option(..., "--every", "-e", help="Intervalo em horas (ex: 6, 0.5)"),
+    account: str | None = typer.Option(None, "--account", "-a"),
+    limit: int = typer.Option(5, "--limit", "-n"),
+    dry_run: bool = typer.Option(True, "--dry-run/--real"),
+    run_now: bool = typer.Option(False, "--run-now", help="Agenda para executar imediatamente"),
+) -> None:
+    """Adiciona um schedule de batch recorrente."""
+    svc = SchedulerService()
+    schedule = svc.add(
+        interval_hours=every,
+        account_filter=account,
+        limit=limit,
+        dry_run=dry_run,
+        run_now=run_now,
+    )
+    console.print(f"[green]Schedule criado:[/green] [cyan]{schedule.schedule_id}[/cyan]")
+    console.print(f"  Intervalo:  {every}h")
+    console.print(f"  Conta:      {account or 'todas'}")
+    console.print(f"  Limit:      {limit}")
+    console.print(f"  Mode:       {'dry_run' if dry_run else 'real'}")
+    console.print(f"  Próximo:    {schedule.next_run_at}")
+
+
+@agent_app.command(name="schedule-list")
+def schedule_list(
+    json_out: bool = typer.Option(False, "--json"),
+) -> None:
+    """Lista schedules cadastrados."""
+    svc = SchedulerService()
+    schedules = svc.list_schedules()
+
+    if json_out:
+        console.print_json(json.dumps([s.to_dict() for s in schedules]))
+        return
+
+    if not schedules:
+        console.print("[yellow]Nenhum schedule cadastrado.[/yellow]")
+        return
+
+    table = Table(title="Schedules", show_lines=False)
+    table.add_column("id", style="cyan", no_wrap=True)
+    table.add_column("account")
+    table.add_column("every", justify="right")
+    table.add_column("limit", justify="right")
+    table.add_column("mode")
+    table.add_column("runs", justify="right")
+    table.add_column("next_run", style="dim")
+    table.add_column("enabled")
+
+    for s in schedules:
+        table.add_row(
+            s.schedule_id,
+            s.account_filter or "todas",
+            f"{s.interval_hours}h",
+            str(s.limit),
+            "dry" if s.dry_run else "real",
+            str(s.run_count),
+            s.next_run_at[:16].replace("T", " "),
+            "[green]✓[/green]" if s.enabled else "[red]✗[/red]",
+        )
+    console.print(table)
+
+
+@agent_app.command(name="schedule-run")
+def schedule_run(
+    json_out: bool = typer.Option(False, "--json"),
+) -> None:
+    """Executa todos os schedules vencidos. Chamar via cron ou Task Scheduler."""
+    svc = SchedulerService()
+    executed = svc.run_due()
+
+    if json_out:
+        console.print_json(json.dumps([r.to_dict() for r in executed]))
+        return
+
+    if not executed:
+        console.print("[dim]Nenhum schedule vencido.[/dim]")
+        return
+
+    for r in executed:
+        console.print(
+            f"[cyan]{r.schedule_id}[/cyan]  "
+            f"processed={r.total_processed}  "
+            f"[green]approved={r.approved}[/green]  "
+            f"[yellow]review={r.needs_review}[/yellow]  "
+            f"[red]failed={r.failed}[/red]"
+        )
+
+
+@agent_app.command(name="schedule-remove")
+def schedule_remove(
+    schedule_id: str = typer.Argument(..., help="ID do schedule a remover"),
+) -> None:
+    """Remove um schedule pelo ID."""
+    svc = SchedulerService()
+    removed = svc.remove(schedule_id)
+    if removed:
+        console.print(f"[green]Removido:[/green] {schedule_id}")
+    else:
+        console.print(f"[red]Não encontrado:[/red] {schedule_id}")
+        raise typer.Exit(1)
+
+
+@agent_app.command(name="schedule-history")
+def schedule_history(
+    schedule_id: str | None = typer.Option(None, "--schedule", "-s"),
+    limit: int = typer.Option(10, "--limit", "-n"),
+    json_out: bool = typer.Option(False, "--json"),
+) -> None:
+    """Histórico de execuções de schedules."""
+    svc = SchedulerService()
+    runs = list(reversed(svc.history(schedule_id)))[:limit]
+
+    if json_out:
+        console.print_json(json.dumps([r.to_dict() for r in runs]))
+        return
+
+    if not runs:
+        console.print("[yellow]Nenhuma execução registrada.[/yellow]")
+        return
+
+    table = Table(title="Schedule History", show_lines=False)
+    table.add_column("run_id", style="cyan", no_wrap=True)
+    table.add_column("schedule_id", style="dim")
+    table.add_column("processed", justify="right")
+    table.add_column("approved", justify="right", style="green")
+    table.add_column("review", justify="right", style="yellow")
+    table.add_column("failed", justify="right", style="red")
+    table.add_column("executed_at", style="dim")
+
+    for r in runs:
+        table.add_row(
+            r.run_id, r.schedule_id[:10],
+            str(r.total_processed), str(r.approved),
+            str(r.needs_review), str(r.failed),
+            r.executed_at[:16].replace("T", " "),
+        )
+    console.print(table)
 
 
 # ── memory ────────────────────────────────────────────────────────────────────
