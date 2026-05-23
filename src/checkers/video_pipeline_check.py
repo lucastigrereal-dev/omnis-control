@@ -21,7 +21,7 @@ _PUB_OS = os.path.normpath(os.getenv("PUBLISHER_OS_DIR", os.path.expanduser("~/p
 SEARCH_ROOTS = [
     os.path.join(_CLAUDE, "skills"),
     _PUB_OS,
-    os.path.normpath(os.path.expanduser("~/JARVIS_OS")),
+    os.path.normpath(os.getenv("JARVIS_OS_DIR", os.path.expanduser("~/JARVIS_OS"))),
     _ROOT,
 ]
 CONFIG_PATH = os.path.join(_ROOT, "config", "paths.yaml")

@@ -21,7 +21,8 @@ from src.oauth_readiness.env_probe import (
 
 def _run_probe():
     """Executa probe contra .env canonico uma vez e retorna summary."""
-    env_path = os.path.expanduser("~/publisher-os/.env")
+    _pub_os = os.getenv("PUBLISHER_OS_DIR", os.path.expanduser("~/publisher-os"))
+    env_path = os.path.join(_pub_os, ".env")
     return probe_env_vars(env_path)
 
 

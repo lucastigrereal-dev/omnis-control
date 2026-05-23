@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any
 
 
-DEFAULT_HEALTH_PATH = Path.home() / ".claude" / "state" / "omnis_health.json"
+DEFAULT_HEALTH_PATH = Path(os.getenv("CLAUDE_DIR", str(Path.home() / ".claude"))) / "state" / "omnis_health.json"
 
 
 def _now() -> str:

@@ -1,6 +1,7 @@
 """SecuritySandbox — safety guardrails for Computer Use agents."""
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 
@@ -22,9 +23,9 @@ BLOCKED_ACTIONS = [
 ]
 
 ALLOWED_PATHS = [
-    "C:\\Users\\lucas\\omnis-control",
-    "C:\\Users\\lucas\\publisher-os",
-    "C:\\Users\\lucas\\daily-prophet-hotels",
+    os.path.normpath(os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control"))),
+    os.path.normpath(os.getenv("PUBLISHER_OS_DIR", os.path.expanduser("~/publisher-os"))),
+    os.path.normpath(os.getenv("DAILY_PROPHET_DIR", os.path.expanduser("~/daily-prophet-hotels"))),
     "/tmp",
     "./",
     "exports/",

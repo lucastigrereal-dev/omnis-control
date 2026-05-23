@@ -1,7 +1,8 @@
 import os
 
-OBSIDIAN_VAULT = os.path.normpath(os.path.expanduser(
-    "~/Desktop/ARQUIVOS_MANUS_CLAUDE/OBSIDIAN/ComandoCentral"
+OBSIDIAN_VAULT = os.path.normpath(os.getenv(
+    "OBSIDIAN_VAULT",
+    os.path.expanduser("~/Desktop/ARQUIVOS_MANUS_CLAUDE/OBSIDIAN/ComandoCentral"),
 ))
 TIMEOUT = 10
 
