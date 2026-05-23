@@ -87,3 +87,44 @@ class TestAgentMemoryEndpoint:
         data = r.json()
         assert data["account_filter"] == "@contaquejamaisteve"
         assert data["total_entries"] == 0
+
+
+class TestAgentStatusEndpoint:
+    def test_status_returns_200(self):
+        r = client.get("/agent/status")
+        assert r.status_code == 200
+
+    def test_status_has_queue(self):
+        data = client.get("/agent/status").json()
+        assert "queue" in data
+        for key in ("total", "pending", "caption_ready"):
+            assert key in data["queue"]
+
+    def test_status_has_runs(self):
+        data = client.get("/agent/status").json()
+        assert "runs" in data
+        for key in ("total", "completed", "dry_run", "failed"):
+            assert key in data["runs"]
+
+    def test_status_has_schedules(self):
+        data = client.get("/agent/status").json()
+        assert "schedules" in data
+        for key in ("total", "active", "due_now"):
+            assert key in data["schedules"]
+
+    def test_status_has_memory(self):
+        data = client.get("/agent/status").json()
+        assert "memory" in data
+        assert "total_entries" in data["memory"]
+
+    def test_status_has_litellm_available(self):
+        data = client.get("/agent/status").json()
+        assert "litellm_available" in data
+        assert isinstance(data["litellm_available"], bool)
+
+    def test_status_counts_are_non_negative(self):
+        data = client.get("/agent/status").json()
+        assert data["queue"]["total"] >= 0
+        assert data["runs"]["total"] >= 0
+        assert data["schedules"]["total"] >= 0
+        assert data["memory"]["total_entries"] >= 0

@@ -1,8 +1,10 @@
 """GET /agent — observabilidade da camada agentic para KRATOS."""
 from fastapi import APIRouter, HTTPException, Query
 
-from src.agentic.agent_models import AgentRunRepository
+from src.agentic.agent_models import AgentRunRepository, AgentRunStatus
+from src.agentic.llm_adapter import LiteLLMAdapter
 from src.agentic.scheduler import ScheduleRepository, ScheduleRunRepository
+from src.content_queue import Queue, QueueStatus
 from src.memory.caption_memory import CaptionMemoryReader
 
 router = APIRouter()
@@ -66,3 +68,46 @@ def get_memory_stats(
     reader = CaptionMemoryReader()
     total = reader.count(account)
     return {"account_filter": account, "total_entries": total}
+
+
+@router.get("/status")
+def get_agent_status() -> dict:
+    """Snapshot de saúde da camada agentic — equivalente a `omnis agent status --json`."""
+    q = Queue()
+    all_items = q.list_all()
+    pending = [i for i in all_items if i.status in (QueueStatus.PLANNED, QueueStatus.NEEDS_CAPTION)]
+    caption_ready = [i for i in all_items if i.status == "caption_ready"]
+
+    repo = AgentRunRepository()
+    all_runs = repo.list_all()
+    run_counts = {
+        "completed": sum(1 for r in all_runs if r.status == AgentRunStatus.COMPLETED),
+        "dry_run": sum(1 for r in all_runs if r.status == AgentRunStatus.DRY_RUN),
+        "failed": sum(1 for r in all_runs if r.status == AgentRunStatus.FAILED),
+    }
+
+    sched_repo = ScheduleRepository()
+    schedules = sched_repo.list_all()
+    active = [s for s in schedules if s.enabled]
+    due = [s for s in active if s.is_due]
+
+    reader = CaptionMemoryReader()
+
+    return {
+        "queue": {
+            "total": len(all_items),
+            "pending": len(pending),
+            "caption_ready": len(caption_ready),
+        },
+        "runs": {
+            "total": len(all_runs),
+            **run_counts,
+        },
+        "schedules": {
+            "total": len(schedules),
+            "active": len(active),
+            "due_now": len(due),
+        },
+        "memory": {"total_entries": reader.count()},
+        "litellm_available": LiteLLMAdapter().health_check(),
+    }

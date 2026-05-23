@@ -23,6 +23,19 @@ console = Console()
 _ROOT = os.path.normpath(os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control")))
 
 
+# ── helpers ───────────────────────────────────────────────────────────────────
+
+def _require_litellm(json_out: bool) -> None:
+    """Aborta com exit 1 se LiteLLM não estiver disponível."""
+    if not LiteLLMAdapter().health_check():
+        msg = "LiteLLM indisponível em :4002. Use --dry-run ou inicie o gateway."
+        if json_out:
+            console.print_json(json.dumps({"error": msg, "status": "failed"}))
+        else:
+            console.print(f"[red]Erro:[/red] {msg}")
+        raise typer.Exit(1)
+
+
 # ── run ───────────────────────────────────────────────────────────────────────
 
 @agent_app.command(name="run")
@@ -32,6 +45,8 @@ def agent_run(
     json_out: bool = typer.Option(False, "--json", help="Saída em JSON"),
 ) -> None:
     """Executa o loop completo para um item da fila."""
+    if not dry_run:
+        _require_litellm(json_out)
     agent = CaptionDraftAgent(dry_run=dry_run)
     run = agent.run(queue_id)
 
@@ -105,6 +120,8 @@ def agent_batch(
     json_out: bool = typer.Option(False, "--json", help="Saída em JSON"),
 ) -> None:
     """Processa N itens planned/needs_caption da fila em sequência."""
+    if not dry_run:
+        _require_litellm(json_out)
     runner_obj = BatchRunner(dry_run=dry_run)
     report = runner_obj.run(limit=limit, account_filter=account)
 

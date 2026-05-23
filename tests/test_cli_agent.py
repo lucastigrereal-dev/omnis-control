@@ -264,3 +264,36 @@ def test_agent_status_json_has_litellm_key():
     data = json.loads(result.output)
     assert "litellm_available" in data
     assert isinstance(data["litellm_available"], bool)
+
+
+# ── --real guard ──────────────────────────────────────────────────────────────
+
+def test_agent_run_real_guard_exits_nonzero_when_litellm_down():
+    # LiteLLM não está rodando nos testes — guard deve bloquear
+    result = runner.invoke(app, ["agent", "run", "any-id", "--real"])
+    assert result.exit_code != 0
+
+
+def test_agent_run_real_guard_json_has_error():
+    result = runner.invoke(app, ["agent", "run", "any-id", "--real", "--json"])
+    assert result.exit_code != 0
+    data = json.loads(result.output)
+    assert "error" in data
+
+
+def test_agent_batch_real_guard_exits_nonzero_when_litellm_down():
+    result = runner.invoke(app, ["agent", "batch", "--real"])
+    assert result.exit_code != 0
+
+
+def test_agent_batch_real_guard_json_has_error():
+    result = runner.invoke(app, ["agent", "batch", "--real", "--json"])
+    assert result.exit_code != 0
+    data = json.loads(result.output)
+    assert "error" in data
+
+
+def test_agent_batch_dry_run_ignores_guard():
+    # --dry-run não checa LiteLLM — deve continuar normalmente
+    result = runner.invoke(app, ["agent", "batch", "--dry-run"])
+    assert result.exit_code == 0
