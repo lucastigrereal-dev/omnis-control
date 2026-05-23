@@ -4,7 +4,11 @@ from __future__ import annotations
 import pytest
 
 from src.interfaces.video_processor import VideoSpec, VideoResult
-from src.legos.video_processor_lego import VideoProcessorLego, _requires_publish_approval
+from src.legos.video_processor_lego import (
+    VideoProcessorLego,
+    _VIDEO_SEMAPHORE,
+    _requires_publish_approval,
+)
 
 
 # ── _requires_publish_approval ────────────────────────────────────────────────
@@ -105,6 +109,57 @@ def test_unknown_goal_returns_error():
     result = lego.execute(spec)
     assert result.success is False
     assert "goal desconhecido" in (result.error or "")
+
+
+def test_transcribe_real_returns_semaphore_timeout_when_busy():
+    lego = VideoProcessorLego()
+    acquired = _VIDEO_SEMAPHORE.acquire(blocking=False)
+    assert acquired, "semaphore should be free before test"
+    try:
+        result = lego.execute(VideoSpec(video_path="sample.mp4", goal="transcribe", dry_run=False))
+        assert result.success is False
+        assert result.error == "video_semaphore_timeout"
+    finally:
+        _VIDEO_SEMAPHORE.release()
+
+
+def test_extract_audio_real_returns_error_when_ffmpeg_fails(monkeypatch, tmp_path):
+    lego = VideoProcessorLego()
+
+    class _Proc:
+        returncode = 1
+        stderr = "ffmpeg failed due to invalid stream"
+
+    monkeypatch.setattr("subprocess.run", lambda *_a, **_k: _Proc())
+    spec = VideoSpec(
+        video_path=str(tmp_path / "sample.mp4"),
+        goal="extract_audio",
+        dry_run=False,
+        output_dir=str(tmp_path / "out"),
+    )
+    result = lego.execute(spec)
+    assert result.success is False
+    assert "ffmpeg failed" in (result.error or "")
+
+
+def test_extract_audio_real_success_branch(monkeypatch, tmp_path):
+    lego = VideoProcessorLego()
+
+    class _Proc:
+        returncode = 0
+        stderr = ""
+
+    monkeypatch.setattr("subprocess.run", lambda *_a, **_k: _Proc())
+    spec = VideoSpec(
+        video_path=str(tmp_path / "sample.mp4"),
+        goal="extract_audio",
+        dry_run=False,
+        output_dir=str(tmp_path / "out"),
+    )
+    result = lego.execute(spec)
+    assert result.success is True
+    assert len(result.files_created) == 1
+    assert result.files_created[0].endswith("_audio.mp3")
 
 
 # ── Protocol compliance ───────────────────────────────────────────────────────
