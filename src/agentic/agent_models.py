@@ -18,6 +18,8 @@ AGENT_RUNS_PATH = os.path.join(_ROOT, "data", "agent_runs.jsonl")
 
 
 class AgentRunStatus:
+    """Valores validos para o ciclo de vida de um AgentRun."""
+
     RUNNING = "running"
     COMPLETED = "completed"
     FAILED = "failed"
@@ -25,6 +27,8 @@ class AgentRunStatus:
 
 
 class StepStatus:
+    """Valores validos para o ciclo de vida de um AgentStep."""
+
     PENDING = "pending"
     OK = "ok"
     SKIPPED = "skipped"
@@ -33,6 +37,8 @@ class StepStatus:
 
 @dataclass
 class AgentStep:
+    """Um passo individual executado dentro de um AgentRun."""
+
     step_id: str
     run_id: str
     name: str
@@ -44,30 +50,37 @@ class AgentStep:
     finished_at: str | None = None
 
     def complete(self, output_summary: str = "") -> None:
+        """Marca o passo como concluido com sucesso."""
         self.status = StepStatus.OK
         self.output_summary = output_summary
         self.finished_at = _now_iso()
 
     def skip(self, reason: str = "") -> None:
+        """Marca o passo como ignorado com uma justificativa curta."""
         self.status = StepStatus.SKIPPED
         self.output_summary = reason
         self.finished_at = _now_iso()
 
     def fail(self, error: str) -> None:
+        """Marca o passo como falho e preserva a mensagem de erro."""
         self.status = StepStatus.ERROR
         self.error = error
         self.finished_at = _now_iso()
 
     def to_dict(self) -> dict[str, object]:
+        """Serializa o passo para persistencia JSONL."""
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: dict[str, object]) -> "AgentStep":
+    def from_dict(cls: type["AgentStep"], data: dict[str, object]) -> "AgentStep":
+        """Reconstrui um passo a partir de um dicionario persistido."""
         return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
 
 
 @dataclass
 class AgentRun:
+    """Execucao rastreavel de um agente OMNIS."""
+
     run_id: str
     agent: str
     account_handle: str
@@ -83,6 +96,7 @@ class AgentRun:
     # ── lifecycle ───────────────────────────────────────────────────────
 
     def add_step(self, name: str, input_summary: str = "") -> AgentStep:
+        """Cria e anexa um novo passo ao run."""
         step = AgentStep(
             step_id=uuid.uuid4().hex[:8],
             run_id=self.run_id,
@@ -93,11 +107,13 @@ class AgentRun:
         return step
 
     def complete(self, result: dict[str, object] | None = None) -> None:
+        """Finaliza o run como concluido ou dry-run concluido."""
         self.status = AgentRunStatus.DRY_RUN if self.dry_run else AgentRunStatus.COMPLETED
         self.result = result or {}
         self.finished_at = _now_iso()
 
     def fail(self, error: str) -> None:
+        """Finaliza o run como falho."""
         self.status = AgentRunStatus.FAILED
         self.error = error
         self.finished_at = _now_iso()
@@ -105,12 +121,14 @@ class AgentRun:
     # ── serialization ───────────────────────────────────────────────────
 
     def to_dict(self) -> dict[str, object]:
+        """Serializa o run completo, incluindo steps."""
         d = asdict(self)
         d["steps"] = [s.to_dict() for s in self.steps]
         return d
 
     @classmethod
-    def from_dict(cls, data: dict[str, object]) -> "AgentRun":
+    def from_dict(cls: type["AgentRun"], data: dict[str, object]) -> "AgentRun":
+        """Reconstrui um run a partir de um dicionario persistido."""
         steps_raw = data.pop("steps", [])
         run = cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
         run.steps = [AgentStep.from_dict(s) for s in steps_raw]
@@ -125,10 +143,12 @@ class AgentRunRepository:
         Path(os.path.dirname(path)).mkdir(parents=True, exist_ok=True)
 
     def save(self, run: AgentRun) -> None:
+        """Adiciona um run ao arquivo JSONL."""
         with open(self.path, "a", encoding="utf-8") as f:
             f.write(json.dumps(run.to_dict()) + "\n")
 
     def list_all(self) -> list[AgentRun]:
+        """Carrega todos os runs persistidos."""
         if not os.path.exists(self.path):
             return []
         runs = []
@@ -140,6 +160,7 @@ class AgentRunRepository:
         return runs
 
     def get(self, run_id: str) -> AgentRun | None:
+        """Busca um run pelo identificador."""
         for run in self.list_all():
             if run.run_id == run_id:
                 return run

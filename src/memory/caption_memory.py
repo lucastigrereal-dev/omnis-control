@@ -23,6 +23,8 @@ CAPTION_MEMORY_PATH = os.path.join(_ROOT, "data", "caption_memory.jsonl")
 
 @dataclass
 class CaptionMemoryEntry:
+    """Legenda aprovada persistida para reuso semantico simples."""
+
     entry_id: str
     account_handle: str
     objective: str
@@ -33,10 +35,12 @@ class CaptionMemoryEntry:
     approved_at: str = field(default_factory=_now_iso)
 
     def to_dict(self) -> dict[str, object]:
+        """Serializa a entrada para JSONL."""
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: dict[str, object]) -> "CaptionMemoryEntry":
+    def from_dict(cls: type["CaptionMemoryEntry"], data: dict[str, object]) -> "CaptionMemoryEntry":
+        """Reconstrui uma entrada persistida."""
         return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
 
 
@@ -56,6 +60,7 @@ class CaptionMemoryWriter:
         run_id: str,
         draft_id: str,
     ) -> CaptionMemoryEntry:
+        """Persiste uma legenda aprovada e retorna a entrada criada."""
         entry = CaptionMemoryEntry(
             entry_id=uuid.uuid4().hex[:12],
             account_handle=account_handle,
@@ -105,6 +110,7 @@ class CaptionMemoryReader:
         return [e.caption_text for e in matches[:top_k]]
 
     def count(self, account_handle: str | None = None) -> int:
+        """Conta entradas totais ou filtradas por conta."""
         if not os.path.exists(self.path):
             return 0
         total = 0

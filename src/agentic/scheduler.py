@@ -38,6 +38,8 @@ SCHEDULE_RUNS_PATH = os.path.join(_ROOT, "data", "agent_schedule_runs.jsonl")
 
 @dataclass
 class BatchSchedule:
+    """Configuracao persistida de um batch recorrente."""
+
     schedule_id: str
     account_filter: str | None
     limit: int
@@ -51,26 +53,32 @@ class BatchSchedule:
 
     @property
     def is_due(self) -> bool:
+        """Indica se o schedule esta habilitado e vencido."""
         if not self.enabled:
             return False
         now = datetime.now(timezone.utc)
         return _parse_iso(self.next_run_at) <= now
 
     def advance(self) -> None:
+        """Move o schedule para a proxima janela de execucao."""
         self.last_run_at = _now_iso()
         self.next_run_at = _add_hours(self.last_run_at, self.interval_hours)
         self.run_count += 1
 
     def to_dict(self) -> dict[str, object]:
+        """Serializa o schedule para JSONL."""
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: dict[str, object]) -> "BatchSchedule":
+    def from_dict(cls: type["BatchSchedule"], data: dict[str, object]) -> "BatchSchedule":
+        """Reconstrui um schedule persistido."""
         return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
 
 
 @dataclass
 class ScheduleRun:
+    """Registro historico de uma execucao disparada por schedule."""
+
     run_id: str
     schedule_id: str
     account_filter: str | None
@@ -84,21 +92,26 @@ class ScheduleRun:
     executed_at: str = field(default_factory=_now_iso)
 
     def to_dict(self) -> dict[str, object]:
+        """Serializa a execucao agendada para JSONL/API."""
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: dict[str, object]) -> "ScheduleRun":
+    def from_dict(cls: type["ScheduleRun"], data: dict[str, object]) -> "ScheduleRun":
+        """Reconstrui um registro de execucao agendada."""
         return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
 
 
 # ── repositories ──────────────────────────────────────────────────────────────
 
 class ScheduleRepository:
+    """Repositorio JSONL de BatchSchedule."""
+
     def __init__(self, path: str = SCHEDULES_PATH) -> None:
         self.path = path
         Path(os.path.dirname(path)).mkdir(parents=True, exist_ok=True)
 
     def list_all(self) -> list[BatchSchedule]:
+        """Lista schedules validos, ignorando linhas corrompidas."""
         if not os.path.exists(self.path):
             return []
         schedules = []
@@ -113,12 +126,14 @@ class ScheduleRepository:
         return schedules
 
     def get(self, schedule_id: str) -> BatchSchedule | None:
+        """Busca um schedule pelo identificador."""
         for s in self.list_all():
             if s.schedule_id == schedule_id:
                 return s
         return None
 
     def save(self, schedule: BatchSchedule) -> None:
+        """Insere ou substitui um schedule no arquivo JSONL."""
         schedules = self.list_all()
         idx = next((i for i, s in enumerate(schedules) if s.schedule_id == schedule.schedule_id), None)
         if idx is not None:
@@ -128,6 +143,7 @@ class ScheduleRepository:
         self._rewrite(schedules)
 
     def remove(self, schedule_id: str) -> bool:
+        """Remove um schedule pelo identificador."""
         schedules = self.list_all()
         filtered = [s for s in schedules if s.schedule_id != schedule_id]
         if len(filtered) == len(schedules):
@@ -142,15 +158,19 @@ class ScheduleRepository:
 
 
 class ScheduleRunRepository:
+    """Repositorio JSONL do historico de execucoes agendadas."""
+
     def __init__(self, path: str = SCHEDULE_RUNS_PATH) -> None:
         self.path = path
         Path(os.path.dirname(path)).mkdir(parents=True, exist_ok=True)
 
     def save(self, run: ScheduleRun) -> None:
+        """Adiciona uma execucao ao historico."""
         with open(self.path, "a", encoding="utf-8") as f:
             f.write(json.dumps(run.to_dict()) + "\n")
 
     def list_all(self) -> list[ScheduleRun]:
+        """Lista execucoes historicas validas."""
         if not os.path.exists(self.path):
             return []
         runs = []
@@ -165,6 +185,7 @@ class ScheduleRunRepository:
         return runs
 
     def for_schedule(self, schedule_id: str) -> list[ScheduleRun]:
+        """Lista execucoes historicas de um schedule especifico."""
         return [r for r in self.list_all() if r.schedule_id == schedule_id]
 
 
@@ -191,6 +212,7 @@ class SchedulerService:
         dry_run: bool = True,
         run_now: bool = False,
     ) -> BatchSchedule:
+        """Cria e persiste um novo schedule de batch."""
         schedule = BatchSchedule(
             schedule_id=uuid.uuid4().hex[:10],
             account_filter=account_filter,
@@ -203,9 +225,11 @@ class SchedulerService:
         return schedule
 
     def remove(self, schedule_id: str) -> bool:
+        """Remove um schedule existente."""
         return self._schedules.remove(schedule_id)
 
     def list_schedules(self) -> list[BatchSchedule]:
+        """Lista todos os schedules cadastrados."""
         return self._schedules.list_all()
 
     def run_due(self) -> list[ScheduleRun]:
@@ -222,6 +246,7 @@ class SchedulerService:
         return executed
 
     def history(self, schedule_id: str | None = None) -> list[ScheduleRun]:
+        """Retorna historico geral ou filtrado por schedule."""
         if schedule_id:
             return self._runs.for_schedule(schedule_id)
         return self._runs.list_all()
@@ -250,7 +275,11 @@ class SchedulerService:
 # ── factory ───────────────────────────────────────────────────────────────────
 
 class BatchRunnerFactory:
-    def make(self, schedule: BatchSchedule) -> BatchRunner: ...
+    """Contrato minimo para criar BatchRunner a partir de um schedule."""
+
+    def make(self, schedule: BatchSchedule) -> BatchRunner:
+        """Cria um BatchRunner configurado para o schedule recebido."""
+        ...
 
 
 class _DefaultBatchRunnerFactory:

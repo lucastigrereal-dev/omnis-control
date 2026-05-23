@@ -27,6 +27,8 @@ PROCESSABLE_STATUSES = {QueueStatus.PLANNED, QueueStatus.NEEDS_CAPTION}
 # ── models ────────────────────────────────────────────────────────────────────
 
 class BatchVerdict:
+    """Resultados normalizados para cada item processado no batch."""
+
     APPROVED = "approved"
     APPROVED_DRY = "approved_dry"
     NEEDS_REVIEW = "needs_review"
@@ -36,6 +38,8 @@ class BatchVerdict:
 
 @dataclass
 class BatchItemResult:
+    """Resultado individual de um QueueItem dentro de um batch."""
+
     queue_id: str
     account_handle: str
     objective: str
@@ -45,11 +49,14 @@ class BatchItemResult:
     error: str = ""
 
     def to_dict(self) -> dict[str, object]:
+        """Serializa o resultado individual para resposta/log."""
         return asdict(self)
 
 
 @dataclass
 class BatchReport:
+    """Relatorio agregado de uma execucao do BatchRunner."""
+
     batch_id: str
     dry_run: bool
     account_filter: str | None
@@ -64,25 +71,31 @@ class BatchReport:
 
     @property
     def approved(self) -> int:
+        """Conta itens aprovados, incluindo dry-run aprovado."""
         return sum(1 for r in self.results
                    if r.verdict in (BatchVerdict.APPROVED, BatchVerdict.APPROVED_DRY))
 
     @property
     def needs_review(self) -> int:
+        """Conta itens que precisam de revisao humana."""
         return sum(1 for r in self.results if r.verdict == BatchVerdict.NEEDS_REVIEW)
 
     @property
     def failed(self) -> int:
+        """Conta itens que falharam durante o processamento."""
         return sum(1 for r in self.results if r.verdict == BatchVerdict.FAILED)
 
     @property
     def skipped(self) -> int:
+        """Conta itens ignorados pelo agente."""
         return sum(1 for r in self.results if r.verdict == BatchVerdict.SKIPPED)
 
     def finish(self) -> None:
+        """Marca o relatorio como finalizado."""
         self.finished_at = _now_iso()
 
     def to_dict(self) -> dict[str, object]:
+        """Serializa o relatorio agregado para CLI/API."""
         return {
             "batch_id": self.batch_id,
             "dry_run": self.dry_run,
