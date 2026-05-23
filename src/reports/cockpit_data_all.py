@@ -266,14 +266,9 @@ def collect_system() -> dict:
     modules_to_check = [
         ("live_cockpit", "src.live_cockpit"),
         ("offline_dashboard", "src.offline_dashboard"),
-        ("template_registry", "src.template_registry"),
         ("local_search", "src.local_search"),
-        ("backlog", "src.backlog"),
-        ("parallel_runner", "src.parallel_runner"),
         ("quality_gate", "src.quality_gate"),
-        ("app_factory_exec", "src.app_factory_exec"),
         ("mission_replay", "src.mission_replay"),
-        ("output_versioning", "src.output_versioning"),
     ]
     modules = []
     for name, namespace in modules_to_check:
