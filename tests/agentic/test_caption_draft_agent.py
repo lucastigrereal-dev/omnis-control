@@ -4,6 +4,7 @@ import pytest
 
 from src.agentic.agent_models import AgentRun, AgentRunRepository, AgentRunStatus, StepStatus
 from src.agentic.caption_draft_agent import CaptionDraftAgent
+from src.agentic.llm_adapter import MockLLMAdapter
 from src.caption_approval.drafts import DraftsManager
 from src.content_queue.queue import Queue
 from src.content_queue.models import QueueItem, QueueStatus
@@ -142,12 +143,40 @@ def test_agent_real_creates_draft(tmp_path):
     )
     memory = MemoryInterface(dry_run=True)
     repo = AgentRunRepository(path=str(tmp_path / "runs.jsonl"))
-    agent = CaptionDraftAgent(dry_run=False, queue=queue, drafts_manager=drafts, memory=memory, repo=repo)
+    agent = CaptionDraftAgent(
+        dry_run=False, queue=queue, drafts_manager=drafts,
+        memory=memory, repo=repo, llm=MockLLMAdapter(),
+    )
     run = agent.run(queue_id)
     assert run.status == AgentRunStatus.COMPLETED
     draft_id = run.result["draft_id"]
     assert not draft_id.startswith("dry-")
-    # draft deve existir no DraftsManager
     draft = drafts.get(draft_id)
     assert draft is not None
     assert draft.account_handle == "@oinatalrn"
+
+
+# ── LLM adapter integration ───────────────────────────────────────────────────
+
+def test_agent_uses_injected_llm(tmp_path):
+    queue, queue_id = _make_queue_with_item(tmp_path)
+    repo = AgentRunRepository(path=str(tmp_path / "runs.jsonl"))
+    agent = CaptionDraftAgent(
+        dry_run=True, queue=queue, repo=repo, llm=MockLLMAdapter(),
+    )
+    run = agent.run(queue_id)
+    assert run.status == AgentRunStatus.DRY_RUN
+    assert run.result["model_used"] == "mock/deterministic"
+
+
+def test_agent_result_has_model_used(tmp_path):
+    agent, queue_id, _ = _make_agent(tmp_path)
+    run = agent.run(queue_id)
+    assert "model_used" in run.result
+    assert "tokens_used" in run.result
+
+
+def test_agent_result_caption_len_positive(tmp_path):
+    agent, queue_id, _ = _make_agent(tmp_path)
+    run = agent.run(queue_id)
+    assert run.result["caption_len"] > 0
