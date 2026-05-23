@@ -197,3 +197,63 @@ def test_agent_memory_with_data(tmp_path):
             os.environ["OMNIS_ROOT"] = orig
 
     assert result.exit_code == 0
+
+
+# ── agent status ──────────────────────────────────────────────────────────────
+
+def test_agent_status_help():
+    result = runner.invoke(app, ["agent", "status", "--help"])
+    assert result.exit_code == 0
+
+
+def test_agent_status_exits_zero():
+    result = runner.invoke(app, ["agent", "status"])
+    assert result.exit_code == 0
+
+
+def test_agent_status_json_exits_zero():
+    result = runner.invoke(app, ["agent", "status", "--json"])
+    assert result.exit_code == 0
+
+
+def test_agent_status_json_shape():
+    result = runner.invoke(app, ["agent", "status", "--json"])
+    assert result.exit_code == 0
+    data = json.loads(result.output)
+    assert "queue" in data
+    assert "runs" in data
+    assert "schedules" in data
+    assert "memory" in data
+
+
+def test_agent_status_json_queue_keys():
+    result = runner.invoke(app, ["agent", "status", "--json"])
+    data = json.loads(result.output)
+    for key in ("total", "pending", "caption_ready"):
+        assert key in data["queue"]
+
+
+def test_agent_status_json_runs_keys():
+    result = runner.invoke(app, ["agent", "status", "--json"])
+    data = json.loads(result.output)
+    for key in ("total", "completed", "dry_run", "failed"):
+        assert key in data["runs"]
+
+
+def test_agent_status_json_schedules_keys():
+    result = runner.invoke(app, ["agent", "status", "--json"])
+    data = json.loads(result.output)
+    for key in ("total", "active", "due_now"):
+        assert key in data["schedules"]
+
+
+def test_agent_status_json_memory_key():
+    result = runner.invoke(app, ["agent", "status", "--json"])
+    data = json.loads(result.output)
+    assert "total_entries" in data["memory"]
+
+
+def test_agent_group_has_status():
+    result = runner.invoke(app, ["agent", "--help"])
+    assert result.exit_code == 0
+    assert "status" in result.output

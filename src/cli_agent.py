@@ -13,6 +13,7 @@ from src.agentic.agent_models import AgentRunRepository, AgentRunStatus, StepSta
 from src.agentic.batch_runner import BatchReport, BatchRunner, BatchVerdict
 from src.agentic.caption_draft_agent import CaptionDraftAgent
 from src.agentic.scheduler import SchedulerService
+from src.content_queue import Queue, QueueStatus
 from src.memory.caption_memory import CaptionMemoryReader
 
 agent_app = typer.Typer(name="agent", help="CaptionDraftAgent — loop completo de geração")
@@ -256,6 +257,116 @@ def schedule_history(
             r.executed_at[:16].replace("T", " "),
         )
     console.print(table)
+
+
+# ── status ───────────────────────────────────────────────────────────────────
+
+@agent_app.command(name="status")
+def agent_status(
+    json_out: bool = typer.Option(False, "--json", help="Saída em JSON"),
+) -> None:
+    """Painel de observabilidade da camada agentic (read-only)."""
+    # Queue
+    q = Queue()
+    all_items = q.list_all()
+    pending = [i for i in all_items if i.status in (QueueStatus.PLANNED, QueueStatus.NEEDS_CAPTION)]
+    caption_ready = [i for i in all_items if i.status == "caption_ready"]
+
+    # Runs
+    repo = AgentRunRepository()
+    all_runs = list(reversed(repo.list_all()))
+    recent_runs = all_runs[:5]
+    run_counts = {
+        AgentRunStatus.COMPLETED: sum(1 for r in all_runs if r.status == AgentRunStatus.COMPLETED),
+        AgentRunStatus.DRY_RUN: sum(1 for r in all_runs if r.status == AgentRunStatus.DRY_RUN),
+        AgentRunStatus.FAILED: sum(1 for r in all_runs if r.status == AgentRunStatus.FAILED),
+    }
+
+    # Schedules
+    svc = SchedulerService()
+    schedules = svc.list_schedules()
+    active_schedules = [s for s in schedules if s.enabled]
+    due_schedules = [s for s in active_schedules if s.is_due]
+
+    # Memory
+    reader = CaptionMemoryReader()
+    memory_total = reader.count()
+
+    if json_out:
+        console.print_json(json.dumps({
+            "queue": {
+                "total": len(all_items),
+                "pending": len(pending),
+                "caption_ready": len(caption_ready),
+            },
+            "runs": {
+                "total": len(all_runs),
+                "completed": run_counts[AgentRunStatus.COMPLETED],
+                "dry_run": run_counts[AgentRunStatus.DRY_RUN],
+                "failed": run_counts[AgentRunStatus.FAILED],
+            },
+            "schedules": {
+                "total": len(schedules),
+                "active": len(active_schedules),
+                "due_now": len(due_schedules),
+            },
+            "memory": {"total_entries": memory_total},
+        }))
+        return
+
+    # ── Rich dashboard ────────────────────────────────────────────────────────
+    console.print("\n[bold cyan]OMNIS Agent Status[/bold cyan]\n")
+
+    # Queue panel
+    q_color = "green" if not pending else "yellow"
+    console.print(
+        f"  [bold]Fila:[/bold]  "
+        f"total=[white]{len(all_items)}[/white]  "
+        f"[{q_color}]pendente={len(pending)}[/{q_color}]  "
+        f"[green]caption_ready={len(caption_ready)}[/green]"
+    )
+
+    # Schedules panel
+    sched_color = "red" if due_schedules else "green"
+    console.print(
+        f"  [bold]Schedules:[/bold]  "
+        f"ativos=[white]{len(active_schedules)}[/white]  "
+        f"[{sched_color}]vencidos={len(due_schedules)}[/{sched_color}]"
+    )
+    if due_schedules:
+        console.print(f"  [red]  ↳ {len(due_schedules)} schedule(s) aguardando `omnis agent schedule-run`[/red]")
+
+    # Memory
+    console.print(f"  [bold]Memória:[/bold]  [cyan]{memory_total}[/cyan] legendas aprovadas")
+
+    # Recent runs table
+    if recent_runs:
+        console.print()
+        table = Table(title="Últimos 5 Runs", show_lines=False, box=None, padding=(0, 1))
+        table.add_column("run_id", style="cyan", width=14)
+        table.add_column("account", width=20)
+        table.add_column("status", width=12)
+        table.add_column("gate", width=14)
+        table.add_column("started_at", style="dim")
+        for r in recent_runs:
+            s_color = {
+                AgentRunStatus.COMPLETED: "green",
+                AgentRunStatus.DRY_RUN: "blue",
+                AgentRunStatus.FAILED: "red",
+            }.get(r.status, "white")
+            gate = r.result.get("gate_verdict", "—") if r.result else "—"
+            table.add_row(
+                r.run_id[:12],
+                r.account_handle,
+                f"[{s_color}]{r.status}[/{s_color}]",
+                str(gate),
+                r.started_at[:16].replace("T", " "),
+            )
+        console.print(table)
+    else:
+        console.print("\n  [dim]Nenhum run registrado.[/dim]")
+
+    console.print()
 
 
 # ── memory ────────────────────────────────────────────────────────────────────
