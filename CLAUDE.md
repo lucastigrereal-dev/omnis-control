@@ -5,6 +5,13 @@ OMNIS é o motor executor e orquestrador operacional.
 KRATOS é o cockpit (observa). Aurora interpreta e orienta.
 OMNIS executa. KRATOS observa. Aurora interpreta.
 
+## Estado atual canônico
+- Branch atual: `feature/omnis-5waves-runtime-supreme`.
+- Wave 0 retomada após queda do Claude Code/Ollama.
+- Checkpoint verde confirmado: `8846 passed, 4 skipped`.
+- Último commit de código verde: `fix(wave-0): restore green suite after interrupted claude run`.
+- Freio obrigatório: NÃO avançar para Wave 1 sem GO explícito do Lucas.
+
 ## Antes de agir (OBRIGATÓRIO)
 Ler:
 - docs/project-os/PROJECT_OS.md
@@ -13,6 +20,14 @@ Ler:
 - docs/project-os/RUNBOOK.md
 - docs/project-os/WAVE_REGISTRY.md
 - docs/project-os/ACTIVE_WORKTREES.md
+- docs/project-os/OMNIS_REFINAMENTO_50_DECISOES.md
+
+Referências externas somente leitura:
+- C:\Users\lucas\Downloads\OMNIS_BLUEPRINT_CANONICO.md
+- C:\Users\lucas\Downloads\OMNIS_ORQUESTRADOR.md
+- C:\Users\lucas\Downloads\OMNIS_RUNBOOK_CLAUDE_CODE.md
+- C:\Users\lucas\Downloads\OMNIS_RUNBOOK_RETOMADA.md
+- C:\Users\lucas\Downloads\Downloads_COMET\REPOS_SKILLS_LEGO.md
 
 ## Proibido
 - Tocar KRATOS ou kratos-mission-control
@@ -21,6 +36,8 @@ Ler:
 - Apagar worktrees sem autorização
 - Misturar G14 App Factory com CCOS/P37 sem decisão explícita
 - Commitar secrets
+- Rodar `C:\Users\lucas\Downloads\OMNIS_INTEGRATION_MASTER_SCRIPT.md` como script automático.
+- Instalar pacotes, subir/reiniciar Docker ou criar gateway novo sem GO explícito.
 
 ## Authority Model
 
@@ -51,6 +68,9 @@ Git worktrees for parallel development
 
 ## Standard commands
 ```sh
+# Git baseline
+git status --short
+
 # Targeted tests
 python -m pytest tests/<module>/ --import-mode=importlib -p no:warnings -v
 
@@ -61,6 +81,15 @@ python -m pytest tests/ --import-mode=importlib -p no:warnings -q
 python scripts/omnis_state_check.py
 python scripts/omnis_guard_check.py
 ```
+
+## Retomada de sessão
+Se a sessão cair, primeiro rode:
+```sh
+git status --short
+python -m pytest tests/ --import-mode=importlib -p no:warnings -q
+```
+
+Depois continue só se a suite continuar verde ou se a falha estiver concentrada no cluster atual. Não refaça trabalho já commitado.
 
 ## OMNIS SKILL SYSTEM v1.0
 
@@ -77,4 +106,5 @@ Skills em: .claude/skills/ | Orquestrador: .claude/waves/orchestrator.md
 
 ### Como usar
 1. Preencha BLUEPRINT.md
-2. Execute: claude "execute o blueprint em BLUEPRINT.md"
+2. Execute waves uma por vez, sempre parando no gate.
+3. Para contexto grande, leia os docs canônicos acima como referência, sem mover arquivos de Downloads.
