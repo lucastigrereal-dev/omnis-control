@@ -1,8 +1,8 @@
 # OMNIS Current State
 
-**Atualizado:** 2026-05-22 — Wave A + Codex Refactor (type hints + extract helpers)
+**Atualizado:** 2026-05-22 — Fase 1: Portabilidade + MODULES.md + Arquivamento FANTASMA/LEGADO
 **Branch:** feature/omnis-5waves-runtime-supreme
-**Último commit:** a7c21bb — feat(omnis): W-E1-E4 ForgeOrchestrator
+**Último commit:** 62cf55e — chore(fase-1): portabilidade + arquivamento de módulos FANTASMA/LEGADO
 
 ## Status Geral
 Fase: OMNIS_LOCAL_SUPREME_COMPLETE — 11 fases (0-10) concluídas. 30/30 outputs reais gerados. Fábrica local autônoma operacional.
@@ -42,8 +42,8 @@ Fase F (Cockpit HTML local) — CONCLUÍDO
 - runtime_bridge: 26/26
 - omnis_health: 49/49 (health_bridge era fantasma — removido)
 - skills_bridge: 36 testes (antes em dir mal nomeado `skill_router_bridge` — corrigido)
-- Suite completa: **8903 passed, 4 skipped, 0 failed**
-- 18 novos arquivos de teste de caracterização criados pelo Codex
+- Suite completa: **8830 passed, 3 skipped, 0 failed** (73 testes movidos para tests/_archive/)
+- 18 novos arquivos de teste de caracterização criados pelo Codex (Wave Codex)
 
 ## Working Tree
 - reports/ccos/*.log + *.md → ignorados via .gitignore (DONE)
@@ -59,5 +59,11 @@ Fase F (Cockpit HTML local) — CONCLUÍDO
 - 🔴 `feature/kratos-0-10-operational-truth` — **BLOQUEADA** (60 falhas, T-006 pendente)
 - Ver: `docs/project-os/MERGE_LOCKS.md`
 
-## Próxima Ação
-Lucas: autorizar push/merge após revisar MERGE_LOCKS.md + MERGE_READY_REPORT.md
+## Fase 1 — Concluída (2026-05-22)
+- PASSO 1: docs/project-os/MODULES.md gerado (21 CORE + 46 SUPPORT + 20 EXP + 25 DUP + 6 LEG + 2 FAN)
+- PASSO 2: 23 arquivos src/ portabilizados (os.getenv OMNIS_ROOT + CLAUDE_DIR + 4 outros)
+- PASSO 3: 6 módulos arquivados → src/_archive/ + tests/_archive/ (backlog, executors, omnis_control, parallel_runner, governance_core, health)
+
+## Próxima Ação (aguardando GO do Lucas)
+- Fase 2: decisão sobre famílias de drift (Mission, Execution, Provider, Memory, Approval)
+- Quando Lucas der GO: reconciliar uma família por vez (começar por reports/status_report.py)
