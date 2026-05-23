@@ -8,6 +8,8 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from pathlib import Path
 
+from src.utils.file_lock import jsonl_write_lock
+
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -144,8 +146,9 @@ class AgentRunRepository:
 
     def save(self, run: AgentRun) -> None:
         """Adiciona um run ao arquivo JSONL."""
-        with open(self.path, "a", encoding="utf-8") as f:
-            f.write(json.dumps(run.to_dict()) + "\n")
+        with jsonl_write_lock(self.path):
+            with open(self.path, "a", encoding="utf-8") as f:
+                f.write(json.dumps(run.to_dict()) + "\n")
 
     def list_all(self) -> list[AgentRun]:
         """Carrega todos os runs persistidos."""

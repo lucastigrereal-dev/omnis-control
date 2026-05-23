@@ -12,6 +12,7 @@ from pathlib import Path
 
 from .models import QueueItem, QueueStatus, _now_iso
 from .accounts import AccountRegistry, _normalize_handle
+from src.utils.file_lock import jsonl_write_lock
 
 _ROOT = os.path.normpath(os.getenv("OMNIS_ROOT", os.path.expanduser("~/omnis-control")))
 QUEUE_PATH = os.path.join(_ROOT, "data", "content_queue.jsonl")
@@ -336,10 +337,12 @@ class Queue:
     # ------------------------------------------------------------------ Internal
 
     def _append(self, item: QueueItem) -> None:
-        with open(self.path, "a", encoding="utf-8") as f:
-            f.write(json.dumps(item.to_dict(), ensure_ascii=False) + "\n")
+        with jsonl_write_lock(self.path):
+            with open(self.path, "a", encoding="utf-8") as f:
+                f.write(json.dumps(item.to_dict(), ensure_ascii=False) + "\n")
 
     def _rewrite(self, items: list[QueueItem]) -> None:
-        with open(self.path, "w", encoding="utf-8") as f:
-            for i in items:
-                f.write(json.dumps(i.to_dict(), ensure_ascii=False) + "\n")
+        with jsonl_write_lock(self.path):
+            with open(self.path, "w", encoding="utf-8") as f:
+                for i in items:
+                    f.write(json.dumps(i.to_dict(), ensure_ascii=False) + "\n")

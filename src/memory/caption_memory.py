@@ -12,6 +12,8 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from pathlib import Path
 
+from src.utils.file_lock import jsonl_write_lock
+
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -70,8 +72,9 @@ class CaptionMemoryWriter:
             run_id=run_id,
             draft_id=draft_id,
         )
-        with open(self.path, "a", encoding="utf-8") as f:
-            f.write(json.dumps(entry.to_dict()) + "\n")
+        with jsonl_write_lock(self.path):
+            with open(self.path, "a", encoding="utf-8") as f:
+                f.write(json.dumps(entry.to_dict()) + "\n")
         return entry
 
 

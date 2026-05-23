@@ -13,6 +13,8 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from src.utils.file_lock import jsonl_write_lock
+
 from src.agentic.batch_runner import BatchReport, BatchRunner
 
 
@@ -152,9 +154,10 @@ class ScheduleRepository:
         return True
 
     def _rewrite(self, schedules: list[BatchSchedule]) -> None:
-        with open(self.path, "w", encoding="utf-8") as f:
-            for s in schedules:
-                f.write(json.dumps(s.to_dict()) + "\n")
+        with jsonl_write_lock(self.path):
+            with open(self.path, "w", encoding="utf-8") as f:
+                for s in schedules:
+                    f.write(json.dumps(s.to_dict()) + "\n")
 
 
 class ScheduleRunRepository:
@@ -166,8 +169,9 @@ class ScheduleRunRepository:
 
     def save(self, run: ScheduleRun) -> None:
         """Adiciona uma execucao ao historico."""
-        with open(self.path, "a", encoding="utf-8") as f:
-            f.write(json.dumps(run.to_dict()) + "\n")
+        with jsonl_write_lock(self.path):
+            with open(self.path, "a", encoding="utf-8") as f:
+                f.write(json.dumps(run.to_dict()) + "\n")
 
     def list_all(self) -> list[ScheduleRun]:
         """Lista execucoes historicas validas."""
