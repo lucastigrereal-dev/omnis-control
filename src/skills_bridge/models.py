@@ -26,7 +26,7 @@ class SkillIntent(str, Enum):
     UNKNOWN = "unknown"
 
 
-@dataclass
+@dataclass(init=False)
 class SkillCall:
     call_id: str = field(default_factory=lambda: _new_id("skc"))
     skill_id: str = ""
@@ -38,6 +38,32 @@ class SkillCall:
     requires_approval: bool = False
     tags: list[str] = field(default_factory=list)
     created_at: str = field(default_factory=_now_iso)
+
+    def __init__(
+        self,
+        call_id: str | None = None,
+        skill_id: str = "",
+        intent: SkillIntent | str = SkillIntent.UNKNOWN,
+        payload: dict | None = None,
+        input_payload: dict | None = None,
+        dry_run: bool = True,
+        risk_level: str = "LOW",
+        expected_artifacts: list[str] | None = None,
+        requires_approval: bool = False,
+        tags: list[str] | None = None,
+        created_at: str | None = None,
+    ):
+        self.call_id = call_id or _new_id("skc")
+        self.skill_id = skill_id
+        self.intent = intent
+        self.payload = payload if payload is not None else (input_payload or {})
+        self.dry_run = dry_run
+        self.risk_level = risk_level
+        self.expected_artifacts = expected_artifacts or []
+        self.requires_approval = requires_approval
+        self.tags = tags or []
+        self.created_at = created_at or _now_iso()
+        self.__post_init__()
 
     def __post_init__(self):
         if isinstance(self.intent, str):

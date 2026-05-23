@@ -75,6 +75,9 @@ class ModelRouter:
 
         try:
             result = adapter.execute(request.prompt, decision.selected_model, context=request.context)
+            if result.get("status") in {"error", "failed"} and decision.has_fallback:
+                chain = FallbackChain(decision.fallback_chain, self.registry)
+                return chain.execute(request.prompt, request.context)
             result["decision"] = decision.to_dict()
             return result
         except Exception:

@@ -551,7 +551,11 @@ def doctor():
     if hasattr(sys.stdout, 'reconfigure'):
         sys.stdout.reconfigure(encoding='utf-8')
 
-    print(json.dumps(report.to_dict(), indent=2, ensure_ascii=False))
+    output = report.to_dict()
+    invoked_from_shim = os.path.basename(sys.argv[0]) in {"omnis.py", "jarvis.py"}
+    if invoked_from_shim:
+        output["checks"] = checks
+    print(json.dumps(output, indent=2, ensure_ascii=False))
 
 
 @app.command()

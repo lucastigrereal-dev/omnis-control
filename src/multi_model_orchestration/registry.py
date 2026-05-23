@@ -74,11 +74,14 @@ class ModelRegistry:
     def find_for_task(self, task: TaskClass) -> list[ModelConfig]:
         """Find models capable of handling a given task."""
         candidates = self.find(capabilities=task.min_capabilities, max_cost=task.max_cost_usd)
+        def cloud_penalty(model: ModelConfig) -> int:
+            return 1 if model.provider == PROVIDER_OLLAMA and ":cloud" in model.name else 0
+
         # Sort: cheapest first for low complexity, most capable first for critical
         if task.complexity in (COMPLEXITY_CRITICAL, COMPLEXITY_HIGH):
-            candidates.sort(key=lambda m: (-len(m.capabilities), m.priority, m.cost_per_1k_tokens))
+            candidates.sort(key=lambda m: (-len(m.capabilities), cloud_penalty(m), m.priority, m.cost_per_1k_tokens))
         else:
-            candidates.sort(key=lambda m: (m.cost_per_1k_tokens, m.priority))
+            candidates.sort(key=lambda m: (m.cost_per_1k_tokens, cloud_penalty(m), m.priority))
         return candidates
 
     # ── Lifecycle ────────────────────────────────────────────────────────────

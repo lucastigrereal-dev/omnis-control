@@ -287,8 +287,11 @@ def cmd_run_list(
                 manifest_file = d / "manifest.json"
                 if manifest_file.exists():
                     import json as _json
-                    with open(manifest_file, "r", encoding="utf-8") as f:
-                        m = _json.load(f)
+                    try:
+                        with open(manifest_file, "r", encoding="utf-8") as f:
+                            m = _json.load(f)
+                    except _json.JSONDecodeError:
+                        continue
                     runs.append({
                         "run_id": d.name,
                         "status": m.get("status"),

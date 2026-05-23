@@ -60,13 +60,17 @@ def resolve_skill_path(name: str) -> str | None:
     Returns the directory path if found, None otherwise.
     """
     safe = validate_skill_name(name)
-    skills_dir = os.getenv("OMNIS_SKILLS_PATH") or os.path.join(CONTROL_DIR, "skills")
-    candidate = os.path.join(skills_dir, safe)
+    skills_roots = [
+        os.getenv("OMNIS_SKILLS_PATH") or os.path.join(CONTROL_DIR, "skills"),
+        os.path.normpath(os.path.expanduser("~/.claude/skills")),
+    ]
 
-    if not os.path.isdir(candidate):
-        return None
+    for skills_dir in skills_roots:
+        candidate = os.path.join(skills_dir, safe)
+        if os.path.isdir(candidate):
+            return candidate
 
-    return candidate
+    return None
 
 
 def safe_read_path(path: str) -> str:

@@ -151,7 +151,7 @@ class BuildState(str, Enum):
 
 VALID_TRANSITIONS: dict[BuildState, set[BuildState]] = {
     BuildState.PROPOSAL_APPROVED: {BuildState.SCAFFOLDING},
-    BuildState.SCAFFOLDING: {BuildState.POLICY_SCANNING},
+    BuildState.SCAFFOLDING: {BuildState.POLICY_SCANNING, BuildState.REGISTERING},
     BuildState.POLICY_SCANNING: {BuildState.POLICY_FAILED, BuildState.TEST_GENERATING},
     BuildState.TEST_GENERATING: {BuildState.VALIDATING},
     BuildState.VALIDATING: {BuildState.TEST_FAILED, BuildState.REGISTERING},
@@ -173,7 +173,7 @@ class BuildResult:
 
     @classmethod
     def new(cls, proposal: CapabilityProposal, dry_run: bool = True) -> "BuildResult":
-        return cls(build_id=_new_id(), proposal=proposal, dry_run=dry_run)
+        return cls(build_id=_new_id("bld"), proposal=proposal, dry_run=dry_run)
 
     @property
     def is_terminal(self) -> bool:
@@ -236,8 +236,8 @@ class SkillTemplateConfig:
         target_dir: str = "skills",
         filename: str = "run.py",
         class_prefix: str = "",
-        test_dir: str = "",
-        test_filename: str = "",
+        test_dir: str | None = None,
+        test_filename: str | None = None,
         min_tests: int = 3,
         requires_policy_scan: bool = True,
     ) -> "SkillTemplateConfig":
@@ -247,8 +247,8 @@ class SkillTemplateConfig:
             target_dir=target_dir,
             filename=filename,
             class_prefix=class_prefix,
-            test_dir=test_dir if test_dir else target_dir,
-            test_filename=test_filename if test_filename else "test_run.py",
+            test_dir=target_dir if test_dir is None else test_dir,
+            test_filename="test_run.py" if test_filename is None else test_filename,
             min_tests=min_tests,
             requires_policy_scan=requires_policy_scan,
         )

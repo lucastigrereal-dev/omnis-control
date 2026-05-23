@@ -62,6 +62,7 @@ def _definition_to_skill(definition: SkillDefinition) -> dict:
     return {
         "skill_id": definition.skill_id,
         "name": definition.name,
+        "description": definition.description,
         "intents": intents,
         "tags": definition.tags,
     }
@@ -72,17 +73,14 @@ class SkillSelector:
     def __init__(self, catalog: "SkillCatalog | None" = None, dry_run: bool = True):
         self.dry_run = dry_run
         self.catalog = catalog
+        self.skills = list(MOCK_SKILLS)
         if catalog is not None:
-            skills = catalog.load() if hasattr(catalog, 'load') else []
-            if not skills:
-                catalog.load() if hasattr(catalog, '_loaded') and not catalog._loaded else None
-            # Build skills list from catalog
-            self._skills_list: list[SkillDefinition] = []
-            if catalog is not None:
-                try:
-                    self._skills_list = catalog.load() if callable(getattr(catalog, 'load', None)) else []
-                except Exception:
-                    self._skills_list = []
+            try:
+                self._skills_list = catalog.load() if callable(getattr(catalog, "load", None)) else []
+            except Exception:
+                self._skills_list = []
+            if self._skills_list:
+                self.skills = [_definition_to_skill(skill) for skill in self._skills_list]
         else:
             self._skills_list = []
 
