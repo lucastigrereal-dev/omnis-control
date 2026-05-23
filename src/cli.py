@@ -2282,11 +2282,13 @@ def mission_close(
 # ---------------------------------------------------------------------------
 
 from src.routers import factory_router, system_router
+from src.cli_agent import agent_app
 
 factory_router.register(app)   # assets, offline, render, quality, campaign, manual-publish, delivery
 system_router.register(app)    # argos-drafts, creative, publisher, forge, pipeline, missions, tools, metrics, oauth, post
 
 # Inline apps (definidos neste arquivo)
+app.add_typer(agent_app)
 app.add_typer(sales_app)
 app.add_typer(memory_app)
 app.add_typer(llm_app)
