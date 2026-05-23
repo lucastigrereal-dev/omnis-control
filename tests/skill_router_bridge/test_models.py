@@ -3,6 +3,7 @@ from src.skills_bridge.models import (
     SkillCall,
     SkillSelectorResult,
     SkillRisk,
+    SkillIntent,
 )
 
 
@@ -66,22 +67,22 @@ class TestSkillCall:
         call = SkillCall.from_dict({
             "call_id": "skc_x",
             "skill_id": "seogram",
-            "intent": "create post",
+            "intent": "create",
             "dry_run": False,
         })
         assert call.skill_id == "seogram"
-        assert call.intent == "create post"
+        assert call.intent == SkillIntent.CREATE
         assert call.dry_run is False
 
     def test_to_dict_round_trip(self):
         call = SkillCall(
             skill_id="test-skill",
-            intent="test intent",
+            intent="generate",
             payload={"key": "val"},
         )
         data = call.to_dict()
         assert data["skill_id"] == "test-skill"
-        assert data["intent"] == "test intent"
+        assert data["intent"] == "generate"
 
 
 class TestSkillSelectorResult:
