@@ -1,6 +1,6 @@
 # OMNIS Current State
 
-**Atualizado:** 2026-05-18 — OMNIS Local Supreme Complete
+**Atualizado:** 2026-05-22 — Wave A: Verdade do Disco aplicada
 **Branch:** feature/omnis-5waves-runtime-supreme
 **Último commit:** a7c21bb — feat(omnis): W-E1-E4 ForgeOrchestrator
 
@@ -19,17 +19,18 @@ Fase F (Cockpit HTML local) — CONCLUÍDO
 | AppFactory Inicial | W131-W132 | DONE |
 | AppFactory Advanced | W133-W162 | DONE (em master, 06caa49) |
 | Runtime Missions | W181-W195 | DONE |
-| Health (canonical) | W196-W200 | DONE — omnis_health + health_bridge ambos ativos |
+| Health (canonical) | W196-W200 | DONE — omnis_health é o módulo canônico real |
 | Maintenance | W201-W205 | MERGED |
 | Templates + QA | W206-W215 | REDUNDANT_ARCHIVE_RECOMMENDED (0 commits únicos) |
 | RuntimeBridge | P37-P42 | DONE — 26/26 testes passando |
 | Project OS | Governança | DONE V2 |
 
-## Health Bridge — Estado Canônico
-- `src/health_bridge/` — W196-W200 server + models (ativo, 58 testes passando)
-- `src/omnis_health/` — modelos unificados canônicos (re-exportados)
-- Nenhum import quebrado. Ambos coexistem sem conflito.
-- P1 health_bridge_superseded: FECHADO — sem código a remover, sem import quebrado.
+## Health — Estado Canônico (Wave A corrigido 2026-05-22)
+- `src/omnis_health/` — módulo REAL e canônico (modelos, HealthReport, HealthStatus)
+- `src/health_bridge/` — DELETADO (estava vazio — W196-W200 nunca implementou o módulo)
+- `tests/health_bridge/` — DELETADO (estava vazio — sem nenhum teste real)
+- `tests/omnis_health/` — 49 testes passando (contagem anterior de 58 era incorreta)
+- P1 health_bridge_superseded: FECHADO definitivo — diretórios fantasmas removidos.
 
 ## RuntimeBridge P37-P42
 - `src/runtime_bridge/` — bridge.py + models.py + errors.py
@@ -37,10 +38,11 @@ Fase F (Cockpit HTML local) — CONCLUÍDO
 - 26/26 testes passando
 - Status: DONE
 
-## Suite
+## Suite (2026-05-22 — verdade do disco)
 - runtime_bridge: 26/26
-- health_bridge + omnis_health: 58/58
-- Suite completa: 7838/7840 (2 falhas pré-existentes: test_cli_graph_run_list, test_deterministic)
+- omnis_health: 49/49 (health_bridge era fantasma — removido)
+- skills_bridge: 36 testes (antes em dir mal nomeado `skill_router_bridge` — corrigido)
+- Suite completa: **8853 passed, 4 skipped, 0 failed**
 
 ## Working Tree
 - reports/ccos/*.log + *.md → ignorados via .gitignore (DONE)
@@ -52,5 +54,9 @@ Fase F (Cockpit HTML local) — CONCLUÍDO
 - P0 LiteLLM: código ok, rotação de chave externa — AÇÃO HUMANA NECESSÁRIA
 - P0 não bloqueia merge local
 
+## Travas de Merge Ativas
+- 🔴 `feature/kratos-0-10-operational-truth` — **BLOQUEADA** (60 falhas, T-006 pendente)
+- Ver: `docs/project-os/MERGE_LOCKS.md`
+
 ## Próxima Ação
-Lucas: autorizar push/merge após revisar MERGE_READY_REPORT.md
+Lucas: autorizar push/merge após revisar MERGE_LOCKS.md + MERGE_READY_REPORT.md
