@@ -96,6 +96,11 @@ class TestSelect:
         squad = selector.select("app_factory")
         assert squad.squad_id == "SQD-APP"
 
+    def test_apps_alias_selects_app_factory_squad(self, selector):
+        squad = selector.select("apps")
+        assert squad.squad_id == "SQD-APP"
+        assert squad.sector == "app_factory"
+
     def test_computer_ops_selects_computer_ops_squad(self, selector):
         squad = selector.select("computer_ops")
         assert squad.squad_id == "SQD-OPS"

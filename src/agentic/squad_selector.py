@@ -158,6 +158,10 @@ _SQUADS: dict[str, SquadDefinition] = {
     ),
 }
 
+_SECTOR_ALIASES: dict[str, str] = {
+    "apps": "app_factory",
+}
+
 _FALLBACK_SQUAD = SquadDefinition(
     squad_id="SQD-GEN",
     name="General Squad",
@@ -181,7 +185,8 @@ class SquadSelector:
 
     def select(self, sector: str) -> SquadDefinition:
         """Retorna o squad para um setor, ou fallback se não encontrado."""
-        squad = self._squads.get(sector)
+        canonical_sector = _SECTOR_ALIASES.get(sector, sector)
+        squad = self._squads.get(canonical_sector)
         if squad:
             return squad
         return _FALLBACK_SQUAD
