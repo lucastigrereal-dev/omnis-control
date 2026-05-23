@@ -1,6 +1,6 @@
 # OMNIS Current State
 
-**Atualizado:** 2026-05-22 — Wave A: Verdade do Disco aplicada
+**Atualizado:** 2026-05-22 — Wave A + Codex Refactor (type hints + extract helpers)
 **Branch:** feature/omnis-5waves-runtime-supreme
 **Último commit:** a7c21bb — feat(omnis): W-E1-E4 ForgeOrchestrator
 
@@ -42,7 +42,8 @@ Fase F (Cockpit HTML local) — CONCLUÍDO
 - runtime_bridge: 26/26
 - omnis_health: 49/49 (health_bridge era fantasma — removido)
 - skills_bridge: 36 testes (antes em dir mal nomeado `skill_router_bridge` — corrigido)
-- Suite completa: **8853 passed, 4 skipped, 0 failed**
+- Suite completa: **8903 passed, 4 skipped, 0 failed**
+- 18 novos arquivos de teste de caracterização criados pelo Codex
 
 ## Working Tree
 - reports/ccos/*.log + *.md → ignorados via .gitignore (DONE)
