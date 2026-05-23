@@ -4,8 +4,6 @@ from __future__ import annotations
 import json
 import threading
 
-import pytest
-
 from src.utils.file_lock import jsonl_write_lock
 
 
