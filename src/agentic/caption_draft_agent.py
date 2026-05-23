@@ -1,6 +1,6 @@
 """CaptionDraftAgent — agente mínimo real que executa o loop completo.
 
-Loop: QueueItem → MemoryContext → LLM → CaptionDraft → AgentRun salvo.
+Loop: QueueItem → MemoryContext → LLM → CaptionDraft → ApprovalGate → QueueItem(caption_ready).
 dry_run=True por padrão: usa MockLLMAdapter, sem persistência permanente.
 """
 from __future__ import annotations
@@ -14,9 +14,10 @@ from src.agentic.llm_adapter import (
     LLMAdapter,
     MockLLMAdapter,
 )
+from src.caption_approval.approvals import ApprovalGate
 from src.caption_approval.drafts import DraftsManager
 from src.caption_approval.models import DraftStatus
-from src.content_queue.models import QueueItem
+from src.content_queue.models import QueueItem, QueueStatus
 from src.content_queue.queue import Queue
 from src.memory.interface import MemoryContext, MemoryInterface
 
@@ -59,7 +60,12 @@ class CaptionDraftAgent:
 
         mem_ctx = self._query_memory(run, item)
         llm_output = self._generate_caption(run, item, mem_ctx)
+        if run.status == "failed":
+            self._repo.save(run)
+            return run
+
         draft_id = self._persist_draft(run, item, llm_output)
+        gate_result = self._run_approval_gate(run, draft_id, item)
 
         run.complete(result={
             "draft_id": draft_id,
@@ -68,6 +74,9 @@ class CaptionDraftAgent:
             "model_used": llm_output.model_used,
             "tokens_used": llm_output.tokens_used,
             "memory_patterns": mem_ctx.patterns,
+            "gate_verdict": gate_result["verdict"],
+            "gate_blocks": gate_result["blocks"],
+            "queue_status": gate_result["queue_status"],
             "dry_run": self.dry_run,
         })
         self._repo.save(run)
@@ -149,8 +158,60 @@ class CaptionDraftAgent:
             account_handle=item.account_handle,
             caption_text=llm_output.raw,
             hashtags=llm_output.hashtags,
+            cta=llm_output.cta,
             objective=run.objective,
             format=item.format or "feed",
         )
         step.complete(f"draft_id={draft.draft_id} status={DraftStatus.DRAFT}")
         return draft.draft_id
+
+    def _run_approval_gate(
+        self, run: AgentRun, draft_id: str, item: QueueItem
+    ) -> dict[str, object]:
+        step = run.add_step(
+            "approval_gate",
+            input_summary=f"draft_id={draft_id} dry_run={self.dry_run}",
+        )
+
+        if self.dry_run:
+            step.complete("dry_run — gate simulado: approved")
+            return {"verdict": "approved_dry", "blocks": [], "queue_status": "caption_ready"}
+
+        gate = ApprovalGate(drafts_manager=self._drafts)
+        draft = self._drafts.get(draft_id)
+        if not draft:
+            step.fail(f"Draft {draft_id} não encontrado para gate")
+            return {"verdict": "error", "blocks": ["draft not found"], "queue_status": "unchanged"}
+
+        # submete para revisão
+        self._drafts.submit(draft_id)
+
+        # valida
+        validation = gate.validate(
+            caption_text=draft.caption_text,
+            hashtags=draft.hashtags,
+            cta=draft.cta,
+        )
+
+        if validation.blocked:
+            step.complete(
+                f"verdict=needs_review blocks={len(validation.blocks)}"
+            )
+            return {
+                "verdict": "needs_review",
+                "blocks": validation.blocks,
+                "queue_status": "unchanged",
+            }
+
+        # auto-aprova e atualiza queue
+        def _queue_updater(queue_id: str, status: str) -> bool:
+            result = self._queue.update(queue_id, status=status)
+            return result is not None
+
+        try:
+            gate.approve(draft_id, queue_updater=_queue_updater)
+            step.complete("verdict=approved queue=caption_ready")
+            return {"verdict": "approved", "blocks": [], "queue_status": QueueStatus.CAPTION_READY}
+        except ValueError as exc:
+            step.complete(f"verdict=needs_review reason={exc}")
+            return {"verdict": "needs_review", "blocks": [str(exc)], "queue_status": "unchanged"}
