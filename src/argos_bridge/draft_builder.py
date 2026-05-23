@@ -9,7 +9,7 @@ Regras:
 
 import os
 import uuid
-from typing import Optional
+from typing import Callable
 
 from .models import ArgosDraft, ArgosStatus, WarnCode
 
@@ -41,7 +41,11 @@ def _save_drafts(drafts: list[ArgosDraft]) -> None:
 class DraftBuilder:
     """Valida fontes e cria ArgosDrafts."""
 
-    def __init__(self, queue_provider, caption_provider):
+    def __init__(
+        self,
+        queue_provider: Callable[[str], object | None],
+        caption_provider: Callable[[str], object | None],
+    ) -> None:
         """queue_provider: callable(queue_id) -> QueueItem | None
         caption_provider: callable(draft_id) -> CaptionDraft | None
         account_exists: callable(handle) -> bool
@@ -49,7 +53,7 @@ class DraftBuilder:
         self._get_queue = queue_provider
         self._get_caption = caption_provider
 
-    def create(self, queue_id: str) -> tuple[Optional[ArgosDraft], list[str]]:
+    def create(self, queue_id: str) -> tuple[ArgosDraft | None, list[str]]:
         """Cria um ArgosDraft a partir de um queue_id.
 
         Returns:
@@ -117,7 +121,7 @@ class DraftBuilder:
         return draft, []
 
 
-def get(queue_id: str) -> Optional[ArgosDraft]:
+def get(queue_id: str) -> ArgosDraft | None:
     """Busca um ArgosDraft por queue_id."""
     drafts = _load_drafts()
     for d in drafts:
@@ -126,7 +130,7 @@ def get(queue_id: str) -> Optional[ArgosDraft]:
     return None
 
 
-def get_by_id(draft_id: str) -> Optional[ArgosDraft]:
+def get_by_id(draft_id: str) -> ArgosDraft | None:
     """Busca um ArgosDraft por draft_id."""
     drafts = _load_drafts()
     for d in drafts:
@@ -140,7 +144,7 @@ def list_all() -> list[ArgosDraft]:
     return _load_drafts()
 
 
-def stats() -> dict:
+def stats() -> dict[str, object]:
     """Estatísticas dos ArgosDrafts."""
     drafts = _load_drafts()
     by_status: dict[str, int] = {}

@@ -9,9 +9,10 @@ import time
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from http.server import HTTPServer, BaseHTTPRequestHandler
+from types import ModuleType
 from typing import Callable
 
-from src.omnis_health.models import HealthReport, HealthStatus
+from src.omnis_health.models import CheckResult, HealthReport, HealthStatus
 
 STATE_FILE = os.path.expanduser("~/.claude/health_server_state.json")
 
@@ -79,8 +80,6 @@ def build_health_report(
     from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
 
     from src.checkers import disk_check, docker_check, publisher_check, memory_check, obsidian_check, skills_check, video_pipeline_check
-    from src.omnis_health.models import CheckResult
-
     check_modules = [
         ("disk", disk_check),
         ("docker", docker_check),
@@ -94,7 +93,7 @@ def build_health_report(
     results: dict[str, CheckResult] = {}
     start_time = time.time()
 
-    def _run_one(name: str, mod) -> CheckResult:
+    def _run_one(name: str, mod: ModuleType) -> CheckResult:
         check_start = time.time()
         try:
             data = mod.check()
@@ -149,7 +148,6 @@ def build_health_report(
     else:
         overall = HealthStatus.OK
 
-    total_dur = int((time.time() - start_time) * 1000)
     return HealthReport(
         session_id="health-server",
         timestamp=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -162,8 +160,6 @@ def build_health_report(
 
 def _fallback_report(error_msg: str) -> HealthReport:
     """Absolute fallback — returns a valid report even when everything fails."""
-    from src.omnis_health.models import CheckResult
-
     return HealthReport(
         session_id="health-server-fallback",
         timestamp=datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -174,7 +170,7 @@ def _fallback_report(error_msg: str) -> HealthReport:
     )
 
 
-def _collect_risks(checks: list) -> list[str]:
+def _collect_risks(checks: list[CheckResult]) -> list[str]:
     """Collect risk messages from error checks."""
     risks = []
     for c in checks:
@@ -213,7 +209,7 @@ class HealthRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body.encode("utf-8"))
 
-    def log_message(self, format, *args) -> None:
+    def log_message(self, format: str, *args: object) -> None:
         pass
 
 

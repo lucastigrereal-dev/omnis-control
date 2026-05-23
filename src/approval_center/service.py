@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 from src.approval_center.errors import ApprovalNotFoundError, ApprovalAlreadyResolvedError
 from src.approval_center.models import (
@@ -23,7 +22,7 @@ def request_approval(
     description: str = "",
     capability_id: str = "unknown",
     risk_level: str = "high",
-    approvals_log=None,
+    approvals_log: Path | str | None = None,
 ) -> ApprovalRequest:
     log_path = approvals_log if approvals_log is not None else store_mod.DEFAULT_APPROVALS_LOG
     req = ApprovalRequest.new(
@@ -36,7 +35,11 @@ def request_approval(
     return req
 
 
-def approve(request_id: str, note: str = "", approvals_log=None) -> ApprovalRequest:
+def approve(
+    request_id: str,
+    note: str = "",
+    approvals_log: Path | str | None = None,
+) -> ApprovalRequest:
     log_path = approvals_log if approvals_log is not None else store_mod.DEFAULT_APPROVALS_LOG
     store = ApprovalStore(log_path)
     existing = store.get(request_id)
@@ -47,10 +50,15 @@ def approve(request_id: str, note: str = "", approvals_log=None) -> ApprovalRequ
             f"Request {request_id} already resolved as {existing.status}"
         )
     updated = store.update_status(request_id, APPROVAL_STATUS_APPROVED, note=note)
+    assert updated is not None
     return updated
 
 
-def reject(request_id: str, note: str = "", approvals_log=None) -> ApprovalRequest:
+def reject(
+    request_id: str,
+    note: str = "",
+    approvals_log: Path | str | None = None,
+) -> ApprovalRequest:
     log_path = approvals_log if approvals_log is not None else store_mod.DEFAULT_APPROVALS_LOG
     store = ApprovalStore(log_path)
     existing = store.get(request_id)
@@ -61,4 +69,5 @@ def reject(request_id: str, note: str = "", approvals_log=None) -> ApprovalReque
             f"Request {request_id} already resolved as {existing.status}"
         )
     updated = store.update_status(request_id, APPROVAL_STATUS_REJECTED, note=note)
+    assert updated is not None
     return updated

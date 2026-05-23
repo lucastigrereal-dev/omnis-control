@@ -5,7 +5,7 @@ QDRANT_URL = "http://localhost:6333"
 AKASHA_CONTAINER = "akasha-postgres"
 
 
-def _qdrant_collections() -> dict:
+def _qdrant_collections() -> dict[str, object]:
     try:
         import httpx
         resp = httpx.get(f"{QDRANT_URL}/collections", timeout=5.0)
@@ -22,7 +22,7 @@ def _qdrant_collections() -> dict:
         return {"accessible": False, "error": str(e)}
 
 
-def _akasha_status() -> dict:
+def _akasha_status() -> dict[str, object]:
     try:
         output = subprocess.run(
             ["docker", "ps", "--filter", f"name={AKASHA_CONTAINER}", "--format", "{{json .}}"],
@@ -45,7 +45,7 @@ def _akasha_status() -> dict:
         return {"container_found": False, "error": str(e)}
 
 
-def check() -> dict:
+def check() -> dict[str, object]:
     qdrant = _qdrant_collections()
     akasha = _akasha_status()
 

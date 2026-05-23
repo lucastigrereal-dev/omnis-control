@@ -4,7 +4,6 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Optional
 
 
 class EventType(str, Enum):
@@ -42,9 +41,9 @@ class GraphEvent:
     status: str = ""
     message: str = ""
     timestamp: str = field(default_factory=_now)
-    metadata: dict = field(default_factory=dict)
+    metadata: dict[str, object] = field(default_factory=dict)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "event_type": self.event_type.value,
             "graph_run_id": self.graph_run_id,
@@ -58,7 +57,7 @@ class GraphEvent:
         }
 
     @classmethod
-    def from_dict(cls, d: dict) -> "GraphEvent":
+    def from_dict(cls, d: dict[str, object]) -> "GraphEvent":
         return cls(
             event_type=EventType(d["event_type"]),
             graph_run_id=d["graph_run_id"],
@@ -102,7 +101,7 @@ class EventLog:
     def __len__(self) -> int:
         return len(self._events)
 
-    def to_dicts(self) -> list[dict]:
+    def to_dicts(self) -> list[dict[str, object]]:
         return [e.to_dict() for e in self._events]
 
 

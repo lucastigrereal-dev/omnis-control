@@ -2,14 +2,13 @@
 
 import os
 import re
-from typing import Optional
 
 import yaml
 
 SECTORS_PATH = os.path.expanduser("~/omnis-control/config/sectors.yaml")
 
 
-def _load_yaml_block() -> dict:
+def _load_yaml_block() -> dict[str, object]:
     """Extrai o bloco ```yaml ... ``` do arquivo markdown."""
     path = os.path.expanduser(SECTORS_PATH)
     if not os.path.isfile(path):
@@ -25,7 +24,7 @@ def _load_yaml_block() -> dict:
         return {}
 
 
-def check() -> dict:
+def check() -> dict[str, object]:
     """Retorna dict com setores e status."""
     data = _load_yaml_block()
     raw = data.get("sectors", [])
@@ -44,7 +43,7 @@ def check() -> dict:
     return {"sectors": sectors, "total": len(sectors)}
 
 
-def by_status() -> dict[str, list]:
+def by_status() -> dict[str, list[str]]:
     """Agrupa setores por status."""
     result = check()
     grouped: dict[str, list] = {}
@@ -54,7 +53,7 @@ def by_status() -> dict[str, list]:
     return grouped
 
 
-def get_sector(sector_id: str) -> Optional[dict]:
+def get_sector(sector_id: str) -> dict[str, object] | None:
     """Retorna um setor especifico por ID."""
     result = check()
     for s in result.get("sectors", []):

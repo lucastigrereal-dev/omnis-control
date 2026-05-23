@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from src.execution_graph.models import StepStatus
-from src.execution_queue.models import QueueItem, QueueItemStatus, QueueResult
+from src.execution_queue.models import QueueItem, QueueItemStatus
 
 # StepRunLog final status → QueueItemStatus
 STATUS_MAP: dict[str, QueueItemStatus] = {
@@ -57,7 +57,6 @@ class BridgeResult:
 
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> "BridgeResult":
-        from src.execution_queue.queue import ExecutionQueue
         items = []
         for raw in d.get("queue_items", []):
             item = QueueItem(

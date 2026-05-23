@@ -2,7 +2,6 @@
 
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
-from typing import Optional
 
 
 class ArgosStatus:
@@ -36,19 +35,19 @@ class ArgosDraft:
     caption_text: str = ""
     hashtags: list[str] = field(default_factory=list)
     cta: str = ""
-    asset_id: Optional[str] = None
-    media_path: Optional[str] = None
-    scheduled_date: Optional[str] = None
-    scheduled_time: Optional[str] = None
+    asset_id: str | None = None
+    media_path: str | None = None
+    scheduled_date: str | None = None
+    scheduled_time: str | None = None
     status: str = ArgosStatus.LOCAL_DRAFT
     warnings: list[str] = field(default_factory=list)
-    notes: Optional[str] = None
+    notes: str | None = None
     created_at: str = field(default_factory=_now_iso)
     updated_at: str = field(default_factory=_now_iso)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: dict) -> "ArgosDraft":
+    def from_dict(cls, data: dict[str, object]) -> "ArgosDraft":
         return cls(**data)

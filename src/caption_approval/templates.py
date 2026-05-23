@@ -8,7 +8,6 @@ e opcionalmente por formato (reels, carousel, stories, feed).
 import json
 import os
 from pathlib import Path
-from typing import Optional
 
 from .models import CaptionTemplate
 
@@ -99,7 +98,7 @@ class TemplateLibrary:
         self.path = path
         self._ensure_defaults()
 
-    def _ensure_defaults(self):
+    def _ensure_defaults(self) -> None:
         """Cria arquivo com templates padrão se não existir."""
         if not os.path.isfile(self.path):
             Path(os.path.dirname(self.path)).mkdir(parents=True, exist_ok=True)
@@ -123,7 +122,7 @@ class TemplateLibrary:
         """Retorna templates para um formato."""
         return [t for t in self.list_all() if t.format is None or t.format == format]
 
-    def get_best_match(self, objective: str, format: str) -> Optional[CaptionTemplate]:
+    def get_best_match(self, objective: str, format: str) -> CaptionTemplate | None:
         """Melhor template: match objetivo + formato, fallback para objetivo."""
         # Match exato
         for t in self.list_all():
@@ -135,9 +134,15 @@ class TemplateLibrary:
                 return t
         return None
 
-    def render(self, template: CaptionTemplate, hook: str = "",
-               body: str = "", cta: str = "",
-               local: str = "", hotel: str = "") -> dict:
+    def render(
+        self,
+        template: CaptionTemplate,
+        hook: str = "",
+        body: str = "",
+        cta: str = "",
+        local: str = "",
+        hotel: str = "",
+    ) -> dict[str, object]:
         """Renderiza um template substituindo placeholders."""
         hook_text = hook if hook else template.hook_template
         body_text = body if body else template.body_template

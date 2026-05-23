@@ -5,7 +5,6 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
 
 
 def _now_iso() -> str:
@@ -41,7 +40,7 @@ class LearningEntry:
             lines.append(f"**Tags:** {', '.join(self.tags)}")
         return "\n".join(lines)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "id": self.id,
             "topic": self.topic,
@@ -62,7 +61,7 @@ class LearningReport:
     total: int = 0
     writeback_status: str = "pending"
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "mission_id": self.mission_id,
             "entries": [e.to_dict() for e in self.entries],
@@ -86,8 +85,8 @@ class LearningWriter:
         mission_id: str,
         sector: str,
         objectives: list[str],
-        execution_summary: dict,
-        mission_path: Optional[Path] = None,
+        execution_summary: dict[str, object],
+        mission_path: Path | None = None,
     ) -> LearningReport:
         """Gera aprendizado com base no que foi observado durante a execução."""
         entries = self._derive_learnings(mission_id, sector, objectives, execution_summary)
@@ -110,7 +109,7 @@ class LearningWriter:
         mission_id: str,
         sector: str,
         objectives: list[str],
-        summary: dict,
+        summary: dict[str, object],
     ) -> list[LearningEntry]:
         entries: list[LearningEntry] = []
 

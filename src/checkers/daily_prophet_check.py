@@ -5,7 +5,7 @@ from pathlib import Path
 ROOT = Path.home() / "daily-prophet-hotels"
 
 
-def check() -> dict:
+def check() -> dict[str, object]:
     """Verifica estado do Daily Prophet Hotels."""
     try:
         exists = ROOT.is_dir()

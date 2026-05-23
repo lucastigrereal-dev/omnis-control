@@ -1,8 +1,6 @@
 """P25 ModelRegistry — register, find, enable/disable models."""
 from __future__ import annotations
 
-from typing import Optional
-
 from src.multi_model_orchestration.errors import InvalidModelConfigError
 from src.multi_model_orchestration.models import (
     COMPLEXITY_CRITICAL,
@@ -45,11 +43,11 @@ class ModelRegistry:
             return True
         return False
 
-    def get(self, model_id: str) -> Optional[ModelConfig]:
+    def get(self, model_id: str) -> ModelConfig | None:
         """Get a model by ID, or None."""
         return self._models.get(model_id)
 
-    def find_by_name(self, name: str) -> Optional[ModelConfig]:
+    def find_by_name(self, name: str) -> ModelConfig | None:
         """Find a model by exact name match."""
         for m in self._models.values():
             if m.name == name:
@@ -58,7 +56,11 @@ class ModelRegistry:
 
     # ── Search / Filter ─────────────────────────────────────────────────────
 
-    def find(self, capabilities: Optional[list[str]] = None, max_cost: Optional[float] = None) -> list[ModelConfig]:
+    def find(
+        self,
+        capabilities: list[str] | None = None,
+        max_cost: float | None = None,
+    ) -> list[ModelConfig]:
         """Find models matching criteria. Enabled only."""
         results: list[ModelConfig] = []
         for m in self._models.values():
@@ -74,6 +76,7 @@ class ModelRegistry:
     def find_for_task(self, task: TaskClass) -> list[ModelConfig]:
         """Find models capable of handling a given task."""
         candidates = self.find(capabilities=task.min_capabilities, max_cost=task.max_cost_usd)
+
         def cloud_penalty(model: ModelConfig) -> int:
             return 1 if model.provider == PROVIDER_OLLAMA and ":cloud" in model.name else 0
 

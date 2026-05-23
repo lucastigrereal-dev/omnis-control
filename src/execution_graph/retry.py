@@ -29,7 +29,7 @@ class RetryConfig:
             return min(self.base_delay_seconds * attempt, self.max_delay_seconds)
         return min(self.base_delay_seconds * (2 ** (attempt - 1)), self.max_delay_seconds)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "max_retries": self.max_retries,
             "backoff": self.backoff.value,
@@ -39,7 +39,7 @@ class RetryConfig:
         }
 
     @classmethod
-    def from_dict(cls, d: dict) -> "RetryConfig":
+    def from_dict(cls, d: dict[str, object]) -> "RetryConfig":
         return cls(
             max_retries=d.get("max_retries", 3),
             backoff=BackoffStrategy(d.get("backoff", "exponential")),
@@ -60,14 +60,14 @@ class RetryPolicy:
     def is_retryable(self, status: str) -> bool:
         return status in self.config.retryable_statuses
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "config": self.config.to_dict(),
             "per_step": {k: v.to_dict() for k, v in self.per_step.items()},
         }
 
     @classmethod
-    def from_dict(cls, d: dict) -> "RetryPolicy":
+    def from_dict(cls, d: dict[str, object]) -> "RetryPolicy":
         config = RetryConfig.from_dict(d.get("config", {}))
         per_step = {
             k: RetryConfig.from_dict(v) for k, v in d.get("per_step", {}).items()

@@ -1,8 +1,6 @@
 """P25 ModelRouter — select best model for each task."""
 from __future__ import annotations
 
-from typing import Optional
-
 from src.multi_model_orchestration.adapters import ADAPTER_REGISTRY, ModelAdapter, get_adapter
 from src.multi_model_orchestration.classifier import TaskClassifier
 from src.multi_model_orchestration.cost_tracker import CostTracker
@@ -28,9 +26,9 @@ class ModelRouter:
 
     def __init__(
         self,
-        registry: Optional[ModelRegistry] = None,
-        classifier: Optional[TaskClassifier] = None,
-        cost_tracker: Optional[CostTracker] = None,
+        registry: ModelRegistry | None = None,
+        classifier: TaskClassifier | None = None,
+        cost_tracker: CostTracker | None = None,
         dry_run: bool = True,
     ) -> None:
         self.registry = registry or ModelRegistry(dry_run=dry_run)
@@ -43,7 +41,7 @@ class ModelRouter:
     def select_model(
         self,
         task_type: str,
-        complexity: Optional[str] = None,
+        complexity: str | None = None,
         risk_level: str = "low",
         preferred_provider: str = "",
         prompt: str = "",
@@ -61,7 +59,7 @@ class ModelRouter:
         request = RoutingRequest.new(task, preferred_provider=preferred_provider)
         return self._decide(request)
 
-    def execute(self, request: RoutingRequest) -> dict:
+    def execute(self, request: RoutingRequest) -> dict[str, object]:
         """Full pipeline: route → execute → result."""
         decision = self._decide(request)
         self.cost_tracker.assert_within_limit(decision.estimated_cost_usd)
@@ -126,7 +124,12 @@ class ModelRouter:
             is_dry_run=self.dry_run,
         )
 
-    def _record_result_cost(self, result: dict, default_model: ModelConfig, task_type: str) -> None:
+    def _record_result_cost(
+        self,
+        result: dict[str, object],
+        default_model: ModelConfig,
+        task_type: str,
+    ) -> None:
         """Record model usage after execution without trusting caller-provided costs."""
         tokens_used = int(result.get("tokens_used") or 0)
         if tokens_used <= 0:
@@ -135,7 +138,6 @@ class ModelRouter:
         model = self.registry.find_by_name(result.get("model", "")) or default_model
         self.cost_tracker.record(model, task_type, tokens_used)
 
-    @staticmethod
     @staticmethod
     def _pick(candidates: list[ModelConfig], task: TaskClass) -> tuple[ModelConfig, list[str], str, str]:
         """Pick the best model and build a fallback chain."""

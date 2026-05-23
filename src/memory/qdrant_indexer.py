@@ -29,7 +29,7 @@ def _embed_text(text: str) -> list[float]:
     return [(b / 127.5) - 1.0 for b in expanded]
 
 
-def get_status() -> dict:
+def get_status() -> dict[str, object]:
     """Retorna status do Qdrant e colecoes. Nunca lanca excecao."""
     client = _get_client()
     if client is None:
@@ -66,7 +66,7 @@ def ensure_collection() -> bool:
         return False
 
 
-def index_drafts(drafts_path: str | None = None) -> dict:
+def index_drafts(drafts_path: str | None = None) -> dict[str, object]:
     """Indexa drafts no Qdrant. Retorna {indexed, skipped, errors, fallback_embedding}."""
     client = _get_client()
     if client is None:

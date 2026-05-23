@@ -34,7 +34,7 @@ def _count_md_files(root: str) -> tuple[int, list[str], bool]:
     return md_count, top_names[:15], partial
 
 
-def check() -> dict:
+def check() -> dict[str, object]:
     vault_exists = os.path.isdir(OBSIDIAN_VAULT)
 
     if not vault_exists:

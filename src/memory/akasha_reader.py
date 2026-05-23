@@ -5,7 +5,6 @@ DSN local (read-only, sem valor em prod):
 """
 
 import os
-from typing import Optional
 
 DSN = os.getenv("AKASHA_DSN", "postgresql://akasha:akasha123@localhost:5432/akasha")
 
@@ -31,7 +30,7 @@ def ping() -> bool:
         return False
 
 
-def get_recent_memories(limit: int = 5) -> list[dict]:
+def get_recent_memories(limit: int = 5) -> list[dict[str, object]]:
     """Retorna as N memorias mais recentes da memoria_global.
 
     Colunas reais: conteudo, ingerido_em (nao content/created_at).
@@ -62,7 +61,7 @@ def get_recent_memories(limit: int = 5) -> list[dict]:
         return [{"error": str(e)}]
 
 
-def get_project_context(project_name: str) -> Optional[str]:
+def get_project_context(project_name: str) -> str | None:
     """Busca descricao de um projeto em memoria_projetos por nome (ILIKE)."""
     conn = _connect()
     if conn is None:

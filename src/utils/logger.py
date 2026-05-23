@@ -1,6 +1,5 @@
 import json
 import uuid
-import time
 import os
 from datetime import datetime, timezone
 
@@ -15,7 +14,7 @@ def new_session_id() -> str:
     return str(uuid.uuid4())
 
 
-def _write_jsonl(filepath: str, record: dict) -> None:
+def _write_jsonl(filepath: str, record: dict[str, object]) -> None:
     try:
         with open(filepath, "a", encoding="utf-8") as f:
             f.write(json.dumps(record, ensure_ascii=False) + "\n")
@@ -29,7 +28,7 @@ def log_mission(
     status: str,
     duration_ms: int,
     summary: str = "",
-    errors: list | None = None,
+    errors: list[str] | None = None,
 ) -> None:
     record = {
         "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),

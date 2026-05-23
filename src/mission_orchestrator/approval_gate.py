@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 from src.mission_orchestrator.models import OrchestratorRun, RUN_STATUS_BLOCKED
 from src.approval_center import store as store_mod
@@ -18,7 +17,7 @@ GATE_NOT_REQUIRED = "not_required"
 
 def check_approval_gate(
     run: OrchestratorRun,
-    approvals_log=None,
+    approvals_log: Path | None = None,
 ) -> str:
     """Check approval gate status for a run.
 
@@ -47,7 +46,7 @@ def check_approval_gate(
 
 def create_approval_request(
     run: OrchestratorRun,
-    approvals_log=None,
+    approvals_log: Path | None = None,
 ) -> str:
     """Create an approval request for a run that requires approval.
 

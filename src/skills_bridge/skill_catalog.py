@@ -1,7 +1,6 @@
 """SkillCatalog — load and resolve skills from JSON catalog or registry."""
 import json
 from pathlib import Path
-from typing import Optional
 
 from src.skills_bridge.models import SkillDefinition
 from src.skills_bridge.errors import CatalogLoadError
@@ -13,7 +12,7 @@ class SkillCatalog:
     Merged from src/skill_router_bridge/catalog.py (archived).
     """
 
-    def __init__(self, catalog_path: Optional[str] = None):
+    def __init__(self, catalog_path: str | None = None) -> None:
         self.catalog_path = Path(catalog_path) if catalog_path else None
         self._skills: dict[str, SkillDefinition] = {}
         self._loaded = False

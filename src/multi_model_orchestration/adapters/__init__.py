@@ -1,7 +1,7 @@
 """P25 adapters — thin wrappers for model providers."""
 from __future__ import annotations
 
-from typing import Callable, Optional, Protocol
+from typing import Callable, Protocol
 
 from src.multi_model_orchestration.models import ModelConfig
 
@@ -11,7 +11,7 @@ class ModelAdapter(Protocol):
 
     provider: str
 
-    def execute(self, prompt: str, model: ModelConfig, **kwargs: dict) -> dict:
+    def execute(self, prompt: str, model: ModelConfig, **kwargs: object) -> dict[str, object]:
         """Execute a prompt on the model. Returns standardized response dict."""
         ...
 
@@ -34,7 +34,7 @@ def register_adapter(provider: str, factory: AdapterFactory) -> None:
     ADAPTER_REGISTRY[provider] = factory
 
 
-def get_adapter(provider: str) -> Optional[ModelAdapter]:
+def get_adapter(provider: str) -> ModelAdapter | None:
     """Get an adapter instance for a provider, or None if not registered."""
     factory = ADAPTER_REGISTRY.get(provider)
     if factory is None:

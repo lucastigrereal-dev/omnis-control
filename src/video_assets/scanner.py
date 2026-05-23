@@ -8,7 +8,6 @@ import os
 import time
 import uuid
 from datetime import datetime, timezone
-from typing import Optional
 
 from .models import VideoAsset, _make_fingerprint
 from .registry import Registry
@@ -28,13 +27,16 @@ SCAN_TIMEOUT_S = 30
 class Scanner:
     """Scanner local de arquivos de vídeo."""
 
-    def __init__(self, registry: Optional[Registry] = None):
+    def __init__(self, registry: Registry | None = None):
         self.registry = registry or Registry()
 
-    def scan(self, roots: Optional[list[str]] = None,
-             dry_run: bool = True,
-             max_depth: int = MAX_DEPTH,
-             max_files: int = MAX_FILES) -> dict:
+    def scan(
+        self,
+        roots: list[str] | None = None,
+        dry_run: bool = True,
+        max_depth: int = MAX_DEPTH,
+        max_files: int = MAX_FILES,
+    ) -> dict[str, object]:
         """
         Varre diretórios em busca de arquivos de vídeo.
 
@@ -111,8 +113,15 @@ class Scanner:
             "roots": roots,
         }
 
-    def _walk(self, directory: str, depth: int, max_depth: int,
-              max_files: int, deadline: float, results: list):
+    def _walk(
+        self,
+        directory: str,
+        depth: int,
+        max_depth: int,
+        max_files: int,
+        deadline: float,
+        results: list[tuple[str, int, float]],
+    ) -> None:
         if depth > max_depth or len(results) >= max_files:
             return
         if time.time() > deadline:

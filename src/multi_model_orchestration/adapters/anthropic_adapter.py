@@ -26,7 +26,7 @@ class AnthropicAdapter:
             self._client = Anthropic(api_key=api_key)
         return self._client
 
-    def execute(self, prompt: str, model: ModelConfig, **kwargs: dict) -> dict:
+    def execute(self, prompt: str, model: ModelConfig, **kwargs: object) -> dict[str, object]:
         t0 = datetime.now(timezone.utc)
         try:
             response = self.client.messages.create(

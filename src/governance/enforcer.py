@@ -58,7 +58,7 @@ class EnforcerVerdict:
     def allowed(self) -> bool:
         return self.verdict == VERDICT_APPROVED
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "action_type": self.action_type,
             "risk_level": self.risk_level,

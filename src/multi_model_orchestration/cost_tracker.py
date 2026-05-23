@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Optional
 
 from src.multi_model_orchestration.errors import CostLimitError
 from src.multi_model_orchestration.models import ModelConfig, RoutingDecision
@@ -124,7 +123,7 @@ class CostTracker:
         """Clear all entries (for testing)."""
         self._entries.clear()
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "daily_limit_usd": self.daily_limit_usd,
             "daily_total": self.daily_total,

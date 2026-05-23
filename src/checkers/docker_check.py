@@ -2,7 +2,7 @@ import subprocess
 import json
 
 
-def check() -> dict:
+def check() -> dict[str, object]:
     result = {
         "containers_running": 0,
         "containers_unhealthy": 0,
@@ -54,7 +54,7 @@ def check() -> dict:
     return result
 
 
-def _try_docker_sdk(result: dict) -> dict:
+def _try_docker_sdk(result: dict[str, object]) -> dict[str, object]:
     try:
         import docker  # type: ignore
         client = docker.from_env()

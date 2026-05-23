@@ -19,7 +19,7 @@ class OllamaAdapter:
     def __init__(self) -> None:
         self._base_url = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
 
-    def execute(self, prompt: str, model: ModelConfig, **kwargs: dict) -> dict:
+    def execute(self, prompt: str, model: ModelConfig, **kwargs: object) -> dict[str, object]:
         t0 = datetime.now(timezone.utc)
         try:
             messages = []

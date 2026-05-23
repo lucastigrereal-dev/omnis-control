@@ -4,7 +4,6 @@ from __future__ import annotations
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Optional
 
 
 def _now_iso() -> str:
@@ -32,7 +31,7 @@ class OrchestratorStep:
     output: str = ""
     notes: str = ""
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "step_id": self.step_id,
             "label": self.label,
@@ -54,18 +53,18 @@ class OrchestratorRun:
     dry_run: bool
     status: str
     steps: list[OrchestratorStep] = field(default_factory=list)
-    mission_id: Optional[str] = None
-    sector_id: Optional[str] = None
-    squad_id: Optional[str] = None
-    graph_run_id: Optional[str] = None
+    mission_id: str | None = None
+    sector_id: str | None = None
+    squad_id: str | None = None
+    graph_run_id: str | None = None
     matched_capabilities: list[str] = field(default_factory=list)
     suggested_gap_ids: list[str] = field(default_factory=list)
     approval_required: bool = False
-    approval_id: Optional[str] = None
+    approval_id: str | None = None
     warnings: list[str] = field(default_factory=list)
     blockers: list[str] = field(default_factory=list)
     created_at: str = field(default_factory=_now_iso)
-    completed_at: Optional[str] = None
+    completed_at: str | None = None
 
     @classmethod
     def new(
@@ -86,7 +85,7 @@ class OrchestratorRun:
             status=RUN_STATUS_PLANNED,
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "run_id": self.run_id,
             "request_text": self.request_text,
@@ -111,7 +110,7 @@ class OrchestratorRun:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "OrchestratorRun":
+    def from_dict(cls, data: dict[str, object]) -> "OrchestratorRun":
         steps = [
             OrchestratorStep(**s)
             for s in data.pop("steps", [])

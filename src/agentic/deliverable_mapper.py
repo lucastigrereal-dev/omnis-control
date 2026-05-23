@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 from src.agentic.mission_intake import MissionIntakeResult
 
@@ -18,13 +17,13 @@ class DeliverableSpec:
 
 @dataclass
 class DeliverableManifest:
-    mission_id: Optional[str]
+    mission_id: str | None
     setor: str
     tipo: str
     deliverables: list[DeliverableSpec] = field(default_factory=list)
     export_hint: str = ""
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "mission_id": self.mission_id,
             "setor": self.setor,
@@ -39,7 +38,7 @@ class DeliverableManifest:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "DeliverableManifest":
+    def from_dict(cls, data: dict[str, object]) -> "DeliverableManifest":
         specs = [
             DeliverableSpec(**d) for d in data.pop("deliverables", [])
         ]

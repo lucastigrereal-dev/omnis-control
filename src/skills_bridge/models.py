@@ -1,9 +1,7 @@
 import uuid
-import secrets
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
-from typing import Optional
 
 
 def _now_iso() -> str:
@@ -31,7 +29,7 @@ class SkillCall:
     call_id: str = field(default_factory=lambda: _new_id("skc"))
     skill_id: str = ""
     intent: SkillIntent | str = SkillIntent.UNKNOWN
-    payload: dict = field(default_factory=dict)
+    payload: dict[str, object] = field(default_factory=dict)
     dry_run: bool = True
     risk_level: str = "LOW"
     expected_artifacts: list[str] = field(default_factory=list)
@@ -44,8 +42,8 @@ class SkillCall:
         call_id: str | None = None,
         skill_id: str = "",
         intent: SkillIntent | str = SkillIntent.UNKNOWN,
-        payload: dict | None = None,
-        input_payload: dict | None = None,
+        payload: dict[str, object] | None = None,
+        input_payload: dict[str, object] | None = None,
         dry_run: bool = True,
         risk_level: str = "LOW",
         expected_artifacts: list[str] | None = None,
@@ -65,7 +63,7 @@ class SkillCall:
         self.created_at = created_at or _now_iso()
         self.__post_init__()
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if isinstance(self.intent, str):
             try:
                 self.intent = SkillIntent(self.intent)
@@ -73,14 +71,14 @@ class SkillCall:
                 self.intent = SkillIntent.UNKNOWN
 
     @property
-    def input_payload(self) -> dict:
+    def input_payload(self) -> dict[str, object]:
         return self.payload
 
     @input_payload.setter
-    def input_payload(self, value: dict) -> None:
+    def input_payload(self, value: dict[str, object]) -> None:
         self.payload = value
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "call_id": self.call_id,
             "skill_id": self.skill_id,
@@ -95,7 +93,7 @@ class SkillCall:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "SkillCall":
+    def from_dict(cls, data: dict[str, object]) -> "SkillCall":
         return cls(
             call_id=data.get("call_id", ""),
             skill_id=data.get("skill_id", ""),
@@ -121,7 +119,7 @@ class SkillSelection:
     tags: list[str] = field(default_factory=list)
     created_at: str = field(default_factory=_now_iso)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "selection_id": self.selection_id,
             "skill_id": self.skill_id,
@@ -157,7 +155,7 @@ class SkillDefinition:
     tags: list[str] = field(default_factory=list)
     intents: list[str] = field(default_factory=list)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "skill_id": self.skill_id,
             "name": self.name,
@@ -171,7 +169,7 @@ class SkillDefinition:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "SkillDefinition":
+    def from_dict(cls, data: dict[str, object]) -> "SkillDefinition":
         return cls(
             skill_id=data.get("skill_id", data.get("id", "")),
             name=data.get("name", ""),
@@ -198,7 +196,7 @@ class SkillSelectorResult:
     def is_high_confidence(self) -> bool:
         return self.confidence >= 0.8
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "result_id": self.result_id,
             "selected_skill_id": self.selected_skill_id,

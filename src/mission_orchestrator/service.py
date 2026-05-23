@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Optional
 
 from src.mission_orchestrator.models import OrchestratorRun, _now_iso
 from src.mission_orchestrator.planner import build_plan
@@ -22,7 +21,7 @@ def plan(
     objective: str = "engajamento",
     dry_run: bool = True,
     allow_unknown: bool = False,
-    config_path: Optional[Path] = None,
+    config_path: Path | None = None,
 ) -> OrchestratorRun:
     """Build a plan without executing. Returns OrchestratorRun."""
     return build_plan(
@@ -41,10 +40,10 @@ def run(
     objective: str = "engajamento",
     dry_run: bool = True,
     allow_unknown: bool = False,
-    config_path: Optional[Path] = None,
+    config_path: Path | None = None,
     runs_root: Path = DEFAULT_RUNS_ROOT,
     runs_log: Path = DEFAULT_RUNS_LOG,
-    packages_root: Optional[Path] = None,
+    packages_root: Path | None = None,
 ) -> OrchestratorRun:
     """Plan + execute + persist. Returns OrchestratorRun."""
     orch_run = build_plan(
@@ -66,11 +65,11 @@ def run_with_approval(
     objective: str = "engajamento",
     dry_run: bool = True,
     allow_unknown: bool = False,
-    approval_id: Optional[str] = None,
+    approval_id: str | None = None,
     runs_root: Path = DEFAULT_RUNS_ROOT,
     runs_log: Path = DEFAULT_RUNS_LOG,
-    packages_root: Optional[Path] = None,
-    approvals_log: Optional[Path] = None,
+    packages_root: Path | None = None,
+    approvals_log: Path | None = None,
 ) -> OrchestratorRun:
     """Plan + execute with approval gate enforcement. Returns OrchestratorRun."""
     orch_run = build_plan(
@@ -90,7 +89,7 @@ def run_with_approval(
 def get_run(
     run_id: str,
     runs_log: Path = DEFAULT_RUNS_LOG,
-) -> Optional[OrchestratorRun]:
+) -> OrchestratorRun | None:
     """Load a run from the log by run_id."""
     if not runs_log.exists():
         return None
@@ -115,7 +114,7 @@ def list_runs(
     """List runs newest first."""
     if not runs_log.exists():
         return []
-    runs = []
+    runs: list[OrchestratorRun] = []
     with runs_log.open(encoding="utf-8") as f:
         for line in f:
             line = line.strip()

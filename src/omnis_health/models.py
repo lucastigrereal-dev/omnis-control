@@ -98,7 +98,7 @@ class HealthReport:
         )
 
     @staticmethod
-    def _normalize_legacy_checks(raw_checks: dict[str, Any]) -> list[CheckResult]:
+    def _normalize_legacy_checks(raw_checks: object) -> list[CheckResult]:
         """Convert legacy dict-of-dicts checks to list of CheckResult."""
         results = []
         if not isinstance(raw_checks, dict):

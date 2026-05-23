@@ -4,7 +4,6 @@ from __future__ import annotations
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Optional
 
 
 # ── ID / timestamp helpers ──────────────────────────────────────────────────
@@ -74,7 +73,7 @@ class ModelConfig:
         cls,
         name: str,
         provider: str,
-        capabilities: Optional[list[str]] = None,
+        capabilities: list[str] | None = None,
         cost_per_1k_tokens: float = 0.0,
         avg_latency_ms: int = 0,
         max_tokens: int = 4096,
@@ -95,7 +94,7 @@ class ModelConfig:
             enabled=enabled,
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "model_id": self.model_id,
             "name": self.name,
@@ -110,7 +109,7 @@ class ModelConfig:
         }
 
     @classmethod
-    def from_dict(cls, d: dict) -> "ModelConfig":
+    def from_dict(cls, d: dict[str, object]) -> "ModelConfig":
         return cls(**{k: v for k, v in d.items() if k in cls.__dataclass_fields__})
 
     @property
@@ -146,7 +145,7 @@ class TaskClass:
         risk_level: str = "low",
         requires_creativity: bool = False,
         requires_precision: bool = False,
-        min_capabilities: Optional[list[str]] = None,
+        min_capabilities: list[str] | None = None,
         max_cost_usd: float = 0.10,
         max_latency_ms: int = 5000,
     ) -> "TaskClass":
@@ -164,7 +163,7 @@ class TaskClass:
             max_latency_ms=max_latency_ms,
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "task_id": self.task_id,
             "task_type": self.task_type,
@@ -179,7 +178,7 @@ class TaskClass:
         }
 
     @classmethod
-    def from_dict(cls, d: dict) -> "TaskClass":
+    def from_dict(cls, d: dict[str, object]) -> "TaskClass":
         return cls(**{k: v for k, v in d.items() if k in cls.__dataclass_fields__})
 
 
@@ -190,7 +189,7 @@ class RoutingRequest:
     request_id: str
     task: TaskClass
     prompt: str
-    context: dict = field(default_factory=dict)
+    context: dict[str, object] = field(default_factory=dict)
     preferred_provider: str = ""
     dry_run: bool = True
     created_at: str = field(default_factory=_now_iso)
@@ -200,7 +199,7 @@ class RoutingRequest:
         cls,
         task: TaskClass,
         prompt: str = "",
-        context: Optional[dict] = None,
+        context: dict[str, object] | None = None,
         preferred_provider: str = "",
         dry_run: bool = True,
     ) -> "RoutingRequest":
@@ -213,7 +212,7 @@ class RoutingRequest:
             dry_run=dry_run,
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "request_id": self.request_id,
             "task": self.task.to_dict(),
@@ -225,7 +224,7 @@ class RoutingRequest:
         }
 
     @classmethod
-    def from_dict(cls, d: dict) -> "RoutingRequest":
+    def from_dict(cls, d: dict[str, object]) -> "RoutingRequest":
         task_data = d.get("task", {})
         if isinstance(task_data, dict) and task_data.get("task_id"):
             task = TaskClass.from_dict(task_data)
@@ -262,7 +261,7 @@ class RoutingDecision:
         cls,
         request_id: str,
         selected_model: ModelConfig,
-        fallback_chain: Optional[list[str]] = None,
+        fallback_chain: list[str] | None = None,
         reason: str = "",
         estimated_cost_usd: float = 0.0,
         estimated_tokens: int = 0,
@@ -281,7 +280,7 @@ class RoutingDecision:
             is_dry_run=is_dry_run,
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "decision_id": self.decision_id,
             "request_id": self.request_id,
@@ -296,7 +295,7 @@ class RoutingDecision:
         }
 
     @classmethod
-    def from_dict(cls, d: dict) -> "RoutingDecision":
+    def from_dict(cls, d: dict[str, object]) -> "RoutingDecision":
         model_data = d.get("selected_model", {})
         if isinstance(model_data, dict) and model_data.get("model_id"):
             selected_model = ModelConfig.from_dict(model_data)

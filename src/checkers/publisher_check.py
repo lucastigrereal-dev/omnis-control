@@ -13,7 +13,7 @@ def _port_open(host: str = "localhost", port: int = 8000) -> bool:
         return False
 
 
-def _try_get(client: httpx.Client, url: str) -> dict | None:
+def _try_get(client: httpx.Client, url: str) -> dict[str, object] | None:
     try:
         resp = client.get(url, timeout=TIMEOUT)
         return {
@@ -25,7 +25,7 @@ def _try_get(client: httpx.Client, url: str) -> dict | None:
         return None
 
 
-def check() -> dict:
+def check() -> dict[str, object]:
     port_open = _port_open()
 
     if not port_open:

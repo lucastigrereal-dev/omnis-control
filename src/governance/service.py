@@ -53,7 +53,7 @@ def _is_destructive(action_type: str) -> bool:
 class RiskClassifier:
     """Classifies actions into risk levels based on action type and target context."""
 
-    def __init__(self, risk_map: dict[str, str] | None = None):
+    def __init__(self, risk_map: dict[str, str] | None = None) -> None:
         self._risk_map = risk_map or dict(DEFAULT_ACTION_RISK_MAP)
 
     def classify(self, action_type: str, target: str = "") -> str:
@@ -67,9 +67,9 @@ class RiskClassifier:
             raise RiskClassificationError(f"Mapped risk level {level!r} is not valid")
         return level
 
-    def classify_batch(self, actions: list[tuple[str, str]]) -> list[dict]:
+    def classify_batch(self, actions: list[tuple[str, str]]) -> list[dict[str, object]]:
         """Classify multiple (action_type, target) pairs. Returns list of dicts with results."""
-        results: list[dict] = []
+        results: list[dict[str, object]] = []
         for action_type, target in actions:
             try:
                 level = self.classify(action_type, target)
@@ -97,7 +97,7 @@ class PolicyEvalResult:
 class ApprovalPolicyEngine:
     """Evaluates an action against a set of approval policies."""
 
-    def __init__(self, policies: list[ApprovalPolicy] | None = None):
+    def __init__(self, policies: list[ApprovalPolicy] | None = None) -> None:
         self._policies: list[ApprovalPolicy] = list(policies or [])
 
     def add_policy(self, policy: ApprovalPolicy) -> None:
@@ -157,7 +157,7 @@ class ApprovalPolicyEngine:
 class ScopeGuard:
     """Guards actions by validating them against allowed and blocked scope rules."""
 
-    def __init__(self, rules: list[ScopeRule] | None = None):
+    def __init__(self, rules: list[ScopeRule] | None = None) -> None:
         self._rules: list[ScopeRule] = list(rules or [])
 
     def add_rule(self, rule: ScopeRule) -> None:
@@ -217,7 +217,7 @@ class ScopeGuard:
 class AuditLogPlanner:
     """Generates and stores audit events for governance actions."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._events: list[AuditEvent] = []
         self._decisions: list[GovernanceDecision] = []
 
@@ -228,7 +228,7 @@ class AuditLogPlanner:
         target: str,
         actor: str,
         verdict: str,
-        details: dict | None = None,
+        details: dict[str, object] | None = None,
         approved_by: str | None = None,
     ) -> AuditEvent:
         """Create and store an audit event."""
@@ -279,9 +279,9 @@ class AuditLogPlanner:
         """Filter decisions by verdict."""
         return [d for d in self._decisions if d.verdict == verdict]
 
-    def generate_audit_log(self) -> list[dict]:
+    def generate_audit_log(self) -> list[dict[str, object]]:
         """Generate a full audit log as a list of dicts merging events and decisions."""
-        log: list[dict] = []
+        log: list[dict[str, object]] = []
         for event in self._events:
             entry = event.to_dict()
             matching_decisions = [d for d in self._decisions if d.audit_event_id == event.event_id]

@@ -5,7 +5,6 @@ Deterministic. No LLM. No network. Uses mission_builder intent detection.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 from src.mission_orchestrator.models import (
     OrchestratorRun,
@@ -21,9 +20,9 @@ def build_plan(
     request_text: str,
     account_handle: str = "",
     objective: str = "engajamento",
-    dry_run: bool = None,
+    dry_run: bool | None = None,
     allow_unknown: bool = False,
-    config_path: Optional[Path] = None,
+    config_path: Path | None = None,
 ) -> OrchestratorRun:
     """Build an OrchestratorRun with planned steps. No execution."""
     dry_run = resolve_dry_run(dry_run)
@@ -31,7 +30,7 @@ def build_plan(
     from src.skill_matcher.matcher import match_capabilities
     from src.sector_registry.matcher import match_sector
 
-    kwargs = {}
+    kwargs: dict[str, Path] = {}
     if config_path is not None:
         kwargs["config_path"] = config_path
 

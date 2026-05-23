@@ -5,7 +5,6 @@ import os
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
 
 from .models import VideoAsset
 from .status import AssetStatus
@@ -20,7 +19,7 @@ class Registry:
         self.path = path
         self._ensure_dir()
 
-    def _ensure_dir(self):
+    def _ensure_dir(self) -> None:
         Path(os.path.dirname(self.path)).mkdir(parents=True, exist_ok=True)
 
     # ------------------------------------------------------------------ CRUD
@@ -34,14 +33,14 @@ class Registry:
         self._append(asset)
         return asset
 
-    def get(self, asset_id: str) -> Optional[VideoAsset]:
+    def get(self, asset_id: str) -> VideoAsset | None:
         """Busca um asset por ID."""
         for asset in self.list_all():
             if asset.asset_id == asset_id:
                 return asset
         return None
 
-    def update(self, asset_id: str, **kwargs) -> Optional[VideoAsset]:
+    def update(self, asset_id: str, **kwargs: object) -> VideoAsset | None:
         """Atualiza campos de um asset."""
         assets = self.list_all()
         found = None
@@ -84,9 +83,12 @@ class Registry:
                         continue
         return assets
 
-    def filter(self, status: Optional[AssetStatus] = None,
-               account: Optional[str] = None,
-               tag: Optional[str] = None) -> list[VideoAsset]:
+    def filter(
+        self,
+        status: AssetStatus | None = None,
+        account: str | None = None,
+        tag: str | None = None,
+    ) -> list[VideoAsset]:
         """Filtra assets por status, conta ou tag."""
         results = self.list_all()
         if status:
@@ -98,7 +100,7 @@ class Registry:
             results = [a for a in results if tag in a.tags]
         return results
 
-    def count(self, status: Optional[AssetStatus] = None) -> int:
+    def count(self, status: AssetStatus | None = None) -> int:
         """Contagem rápida (opcionalmente filtrada por status)."""
         if not os.path.isfile(self.path):
             return 0
@@ -110,7 +112,7 @@ class Registry:
 
     # ------------------------------------------------------------------ Status
 
-    def transition(self, asset_id: str, target: AssetStatus) -> Optional[VideoAsset]:
+    def transition(self, asset_id: str, target: AssetStatus) -> VideoAsset | None:
         """Transiciona asset para novo status, validando a transição."""
         asset = self.get(asset_id)
         if not asset:
@@ -121,7 +123,7 @@ class Registry:
             )
         return self.update(asset_id, status=target)
 
-    def mark_published(self, asset_id: str) -> Optional[VideoAsset]:
+    def mark_published(self, asset_id: str) -> VideoAsset | None:
         """Marca como publicado e auto-preenche used_at."""
         from datetime import datetime, timezone
         now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -129,7 +131,7 @@ class Registry:
 
     # ------------------------------------------------------------------ Stats
 
-    def stats(self) -> dict:
+    def stats(self) -> dict[str, object]:
         """Estatísticas agregadas do registro."""
         assets = self.list_all()
         total = len(assets)
@@ -149,7 +151,7 @@ class Registry:
             "formats": formats,
         }
 
-    def export_csv(self, path: str):
+    def export_csv(self, path: str) -> None:
         """Exporta registro como CSV."""
         assets = self.list_all()
         import csv
@@ -163,11 +165,11 @@ class Registry:
 
     # ------------------------------------------------------------------ Internal
 
-    def _append(self, asset: VideoAsset):
+    def _append(self, asset: VideoAsset) -> None:
         with open(self.path, "a", encoding="utf-8") as f:
             f.write(json.dumps(asset.to_dict(), ensure_ascii=False) + "\n")
 
-    def _rewrite(self, assets: list[VideoAsset]):
+    def _rewrite(self, assets: list[VideoAsset]) -> None:
         with open(self.path, "w", encoding="utf-8") as f:
             for a in assets:
                 f.write(json.dumps(a.to_dict(), ensure_ascii=False) + "\n")

@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Optional
 
-from src.skills_bridge.models import SkillCall
+from src.skills_bridge.models import SkillCall, SkillIntent
 from src.skills_bridge.selection import SkillSelector
 from src.skills_bridge.dryrun import DryRunEngine
 
@@ -18,7 +17,7 @@ from src.multi_model_orchestration.models import (
 from src.multi_model_orchestration.errors import AllModelsExhaustedError
 
 
-def _capabilities_for_intent(intent) -> list[str]:
+def _capabilities_for_intent(intent: SkillIntent | str) -> list[str]:
     """Map SkillIntent to required model capabilities."""
     intent_val = intent.value if hasattr(intent, "value") else str(intent)
     mapping = {
@@ -37,7 +36,7 @@ def _capabilities_for_intent(intent) -> list[str]:
 class SkillAdapter(ABC):
 
     @abstractmethod
-    def call_skill(self, call: SkillCall) -> dict:
+    def call_skill(self, call: SkillCall) -> dict[str, object]:
         ...
 
     @abstractmethod
@@ -47,13 +46,13 @@ class SkillAdapter(ABC):
 
 class MockSkillAdapter(SkillAdapter):
 
-    def __init__(self, dry_run: bool = True):
+    def __init__(self, dry_run: bool = True) -> None:
         self.dry_run = dry_run
         self.selector = SkillSelector(dry_run=dry_run)
         self.dryrun_engine = DryRunEngine(dry_run=dry_run)
         self.calls: list[SkillCall] = []
 
-    def call_skill(self, call: SkillCall) -> dict:
+    def call_skill(self, call: SkillCall) -> dict[str, object]:
         self.calls.append(call)
         selection = self.selector.select(call)
 
@@ -82,7 +81,7 @@ class MockSkillAdapter(SkillAdapter):
 class RealSkillAdapter(SkillAdapter):
     """Real adapter that routes skill calls through ModelRouter → LLM providers."""
 
-    def __init__(self, registry=None, dry_run: bool = True):
+    def __init__(self, registry: object | None = None, dry_run: bool = True) -> None:
         self.dry_run = dry_run
         self.calls: list[SkillCall] = []
 
@@ -96,7 +95,7 @@ class RealSkillAdapter(SkillAdapter):
         from src.multi_model_orchestration.router import ModelRouter
         self._router = ModelRouter(registry=self._registry, dry_run=dry_run)
 
-    def call_skill(self, call: SkillCall) -> dict:
+    def call_skill(self, call: SkillCall) -> dict[str, object]:
         self.calls.append(call)
 
         if call.dry_run or self.dry_run:

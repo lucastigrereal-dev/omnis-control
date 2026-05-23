@@ -18,7 +18,7 @@ class SquadMember:
     intent: str  # create | read | analyze | generate | publish
     primary: bool = False
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "role": self.role,
             "skill_id": self.skill_id,
@@ -46,7 +46,7 @@ class SquadDefinition:
                 return m
         return self.members[0] if self.members else None
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "squad_id": self.squad_id,
             "name": self.name,
@@ -67,7 +67,7 @@ class SquadAssignment:
     reason: str
     assembled_at: str = field(default_factory=_now_iso)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "mission_id": self.mission_id,
             "squad": self.squad.to_dict(),

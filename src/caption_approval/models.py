@@ -2,7 +2,6 @@
 
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
-from typing import Optional
 
 
 class DraftStatus:
@@ -54,17 +53,17 @@ class CaptionDraft:
     objective: str = "alcance"
     format: str = "unknown"
     notes: str = ""
-    rejection_reason: Optional[str] = None
-    asset_id: Optional[str] = None
+    rejection_reason: str | None = None
+    asset_id: str | None = None
     created_at: str = field(default_factory=_now_iso)
     updated_at: str = field(default_factory=_now_iso)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         d = asdict(self)
         return d
 
     @classmethod
-    def from_dict(cls, data: dict) -> "CaptionDraft":
+    def from_dict(cls, data: dict[str, object]) -> "CaptionDraft":
         return cls(**data)
 
 
@@ -73,18 +72,18 @@ class CaptionTemplate:
     template_id: str
     name: str
     objective: str
-    format: Optional[str]  # None = vale para qualquer formato
+    format: str | None  # None = vale para qualquer formato
     hook_template: str
     body_template: str
     cta_template: str
     hashtag_suggestions: list[str] = field(default_factory=list)
     notes: str = ""
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: dict) -> "CaptionTemplate":
+    def from_dict(cls, data: dict[str, object]) -> "CaptionTemplate":
         return cls(**data)
 
 
@@ -95,16 +94,16 @@ class ApprovalLogEntry:
     queue_id: str
     action: str
     actor: str = "local_user"
-    reason: Optional[str] = None
-    previous_status: Optional[str] = None
-    new_status: Optional[str] = None
-    metadata: Optional[dict] = None
+    reason: str | None = None
+    previous_status: str | None = None
+    new_status: str | None = None
+    metadata: dict[str, object] | None = None
     timestamp: str = field(default_factory=_now_iso)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         d = asdict(self)
         return d
 
     @classmethod
-    def from_dict(cls, data: dict) -> "ApprovalLogEntry":
+    def from_dict(cls, data: dict[str, object]) -> "ApprovalLogEntry":
         return cls(**data)

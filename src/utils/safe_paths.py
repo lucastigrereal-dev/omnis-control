@@ -1,5 +1,4 @@
 import os
-import sys
 
 
 CONTROL_DIR = os.path.normpath(os.path.expanduser("~/omnis-control"))

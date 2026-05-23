@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Optional
 
 from src.agentic.task_dispatcher import DispatchEntry, DispatchPlan
 from src.skills_bridge.adapter import MockSkillAdapter, RealSkillAdapter, SkillAdapter
@@ -78,7 +77,7 @@ class ExecutionResult:
     duration_ms: int = 0
     error: str = ""
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "entry_id": self.entry_id,
             "skill_id": self.skill_id,

@@ -50,13 +50,37 @@ def generate(session_id: str) -> str:
     disk = disk_check.check()
     timestamp = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
-    lines = []
+    lines: list[str] = []
+    _append_header(lines, timestamp, session_id)
+    _append_immediate_risks(lines, disk, docker)
+    _append_executive_summary(lines, skills, docker, publisher, memory)
+    _append_general_status(lines, skills, docker, publisher, memory, obsidian, disk)
+    _append_skills(lines, skills)
+    _append_publisher(lines, publisher)
+    _append_docker(lines, docker)
+    _append_memory(lines, memory)
+    _append_obsidian(lines, obsidian)
+    _append_video_pipeline(lines)
+    _append_content_queue(lines)
+    _append_caption_approval(lines)
+    _append_argos_bridge(lines)
+    _append_security(lines)
+    _append_next_steps(lines)
+    _append_unchanged(lines)
+    _append_commands(lines)
+
+    return "\n".join(lines)
+
+
+def _append_header(lines: list[str], timestamp: str, session_id: str) -> None:
     lines.append("# ESTADO ATUAL RESUMIDO — OMNIS / JARVIS CONTROL")
     lines.append("")
     lines.append(f"**Gerado em:** {timestamp}")
     lines.append(f"**Session ID:** `{session_id}`")
     lines.append("")
 
+
+def _append_immediate_risks(lines: list[str], disk: dict, docker: dict) -> None:
     lines.append("## 1. RISCOS IMEDIATOS")
     lines.append("")
     disk_risk = _disk_risk_line(disk)
@@ -75,6 +99,14 @@ def generate(session_id: str) -> str:
     lines.append("---")
     lines.append("")
 
+
+def _append_executive_summary(
+    lines: list[str],
+    skills: dict,
+    docker: dict,
+    publisher: dict,
+    memory: dict,
+) -> None:
     lines.append("## 2. Resumo executivo")
     lines.append("")
     lines.append(
@@ -87,6 +119,16 @@ def generate(session_id: str) -> str:
     )
     lines.append("")
 
+
+def _append_general_status(
+    lines: list[str],
+    skills: dict,
+    docker: dict,
+    publisher: dict,
+    memory: dict,
+    obsidian: dict,
+    disk: dict,
+) -> None:
     lines.append("## 3. Status geral")
     lines.append("")
     lines.append(f"- **Skills:** {skills['total']} ({skills['executable']} executáveis)")
@@ -98,20 +140,24 @@ def generate(session_id: str) -> str:
     lines.append(f"- **Disco:** {disk['severity']}")
     lines.append("")
 
+
+def _append_skills(lines: list[str], skills: dict) -> None:
     lines.append("## 4. Skills")
     lines.append("")
-    lines.append(f"| Tipo | Quantidade |")
-    lines.append(f"|------|-----------|")
+    lines.append("| Tipo | Quantidade |")
+    lines.append("|------|-----------|")
     lines.append(f"| Executáveis (com run.py) | {skills['executable']} |")
     lines.append(f"| Doc (pasta com SKILL.md) | {skills['doc_folder']} |")
     lines.append(f"| Doc (arquivo .md solto) | {skills['doc_file']} |")
     if skills["orphan_skills"]:
         lines.append("")
         lines.append("**Skills órfãs (disco mas não no registry):**")
-        for s in skills["orphan_skills"][:10]:
-            lines.append(f"- {s}")
+        for skill in skills["orphan_skills"][:10]:
+            lines.append(f"- {skill}")
     lines.append("")
 
+
+def _append_publisher(lines: list[str], publisher: dict) -> None:
     lines.append("## 5. Publisher OS")
     lines.append("")
     lines.append(f"- **Status:** {publisher['status']}")
@@ -119,6 +165,8 @@ def generate(session_id: str) -> str:
     lines.append(f"- **Porta 8000 aberta:** {publisher.get('port_open', False)}")
     lines.append("")
 
+
+def _append_docker(lines: list[str], docker: dict) -> None:
     lines.append("## 6. Docker")
     lines.append("")
     lines.append(f"- **Rodando:** {docker['containers_running']}")
@@ -127,11 +175,16 @@ def generate(session_id: str) -> str:
     if docker["containers"]:
         lines.append("| Container | Status | Portas |")
         lines.append("|-----------|--------|-------|")
-        for c in docker["containers"]:
-            indicator = "🔴" if c["unhealthy"] else "✅"
-            lines.append(f"| {indicator} {c['name']} | {c['status'][:30]} | {c.get('ports', '')[:40]} |")
+        for container in docker["containers"]:
+            indicator = "🔴" if container["unhealthy"] else "✅"
+            lines.append(
+                f"| {indicator} {container['name']} | "
+                f"{container['status'][:30]} | {container.get('ports', '')[:40]} |"
+            )
     lines.append("")
 
+
+def _append_memory(lines: list[str], memory: dict) -> None:
     lines.append("## 7. Memória")
     lines.append("")
     q = memory.get("qdrant", {})
@@ -146,16 +199,19 @@ def generate(session_id: str) -> str:
         lines.append(f"  - Status: {a.get('status', 'unknown')}")
     lines.append("")
 
+
+def _append_obsidian(lines: list[str], obsidian: dict) -> None:
     lines.append("## 8. Obsidian")
     lines.append("")
     lines.append(f"- **Vault:** {obsidian.get('vault_path', 'N/A')}")
     lines.append(f"- **Arquivos .md:** {obsidian.get('md_file_count', 'timeout')}")
-    lines.append(f"- **Pastas principais:**")
+    lines.append("- **Pastas principais:**")
     for folder in obsidian.get("top_folders", []):
         lines.append(f"  - {os.path.basename(folder)}")
     lines.append("")
 
-    # Video Pipeline section
+
+def _append_video_pipeline(lines: list[str]) -> None:
     vp = video_pipeline_check.check()
 
     lines.append("## 9. Video Pipeline")
@@ -178,7 +234,8 @@ def generate(session_id: str) -> str:
             lines.append(f"  - {r}")
         lines.append("")
 
-    # Content Queue section
+
+def _append_content_queue(lines: list[str]) -> None:
     lines.append("## 10. Content Queue (Fase 2B)")
     lines.append("")
     try:
@@ -207,6 +264,8 @@ def generate(session_id: str) -> str:
         lines.append(f"- ⚠️ **Erro ao ler Content Queue:** {e}")
     lines.append("")
 
+
+def _append_caption_approval(lines: list[str]) -> None:
     lines.append("## 11. Caption Approval (Fase 2C)")
     lines.append("")
     try:
@@ -231,7 +290,8 @@ def generate(session_id: str) -> str:
         lines.append(f"- ⚠️ **Erro ao ler Caption Approval:** {e}")
     lines.append("")
 
-    # Argos Bridge section
+
+def _append_argos_bridge(lines: list[str]) -> None:
     lines.append("## 12. Argos Bridge (Fase 2E)")
     lines.append("")
     try:
@@ -253,6 +313,8 @@ def generate(session_id: str) -> str:
         lines.append(f"- ⚠️ **Erro ao ler Argos Bridge:** {e}")
     lines.append("")
 
+
+def _append_security(lines: list[str]) -> None:
     lines.append("## 13. Segurança")
 
     lines.append("")
@@ -263,6 +325,8 @@ def generate(session_id: str) -> str:
     lines.append("- Path traversal é bloqueado em todos os comandos")
     lines.append("")
 
+
+def _append_next_steps(lines: list[str]) -> None:
     lines.append("## 14. Próximos passos")
     lines.append("")
     lines.append("1. **Fase 3 — OAuth Meta:** Configurar META_APP_SECRET, rodar OAuth, validar token")
@@ -271,6 +335,8 @@ def generate(session_id: str) -> str:
     lines.append("5. **Fase 6 — Runtime agentic:** LangGraph, tool router, critic loop")
     lines.append("")
 
+
+def _append_unchanged(lines: list[str]) -> None:
     lines.append("## 15. O que NÃO foi alterado")
 
     lines.append("")
@@ -283,6 +349,8 @@ def generate(session_id: str) -> str:
     lines.append("- Instagram / Meta API — não chamado")
     lines.append("")
 
+
+def _append_commands(lines: list[str]) -> None:
     lines.append("## 16. Comandos úteis")
 
     lines.append("")
@@ -317,6 +385,3 @@ def generate(session_id: str) -> str:
     lines.append("python omnis.py templates list")
     lines.append("python omnis.py templates show <template_id>")
     lines.append("```")
-
-    return "\n".join(lines)
-

@@ -24,7 +24,7 @@ CONFIG_PATH = os.path.expanduser("~/omnis-control/config/paths.yaml")
 SCAN_TIMEOUT_S = 30
 
 
-def _load_config() -> dict:
+def _load_config() -> dict[str, object]:
     if not os.path.isfile(CONFIG_PATH):
         return {}
     try:
@@ -35,7 +35,11 @@ def _load_config() -> dict:
         return {}
 
 
-def _scan_local_video_files(roots: list[str], exts: list[str], timeout_s: int) -> dict:
+def _scan_local_video_files(
+    roots: list[str],
+    exts: list[str],
+    timeout_s: int,
+) -> dict[str, object]:
     """Scan local directories for video files, with timeout."""
     deadline = time.time() + timeout_s
     found = []
@@ -60,7 +64,7 @@ def _scan_local_video_files(roots: list[str], exts: list[str], timeout_s: int) -
     return {"files": found, "count": len(found), "timed_out": timed_out}
 
 
-def _check_keyword_in_path(roots: list[str], keywords: list[str]) -> list[dict]:
+def _check_keyword_in_path(roots: list[str], keywords: list[str]) -> list[dict[str, object]]:
     """Check for files/dirs matching video-related keywords."""
     evidence = []
     seen = set()
@@ -86,7 +90,7 @@ def _check_keyword_in_path(roots: list[str], keywords: list[str]) -> list[dict]:
     return evidence
 
 
-def _check_video_to_content_skill() -> list[dict]:
+def _check_video_to_content_skill() -> list[dict[str, object]]:
     """Check for video_to_content skill."""
     evidence = []
     skill_path = os.path.expanduser("~/.claude/skills/video_to_content")
@@ -99,7 +103,7 @@ def _check_video_to_content_skill() -> list[dict]:
     return evidence
 
 
-def _check_argos_bridge_skill() -> list[dict]:
+def _check_argos_bridge_skill() -> list[dict[str, object]]:
     """Check for argos-bridge skill."""
     evidence = []
     skill_path = os.path.expanduser("~/.claude/skills/argos-bridge")
@@ -112,7 +116,7 @@ def _check_argos_bridge_skill() -> list[dict]:
     return evidence
 
 
-def _check_publisher_video_code() -> list[dict]:
+def _check_publisher_video_code() -> list[dict[str, object]]:
     """Scan publisher-os for video/media related code."""
     evidence = []
     pub_root = os.path.expanduser("~/publisher-os")
@@ -142,7 +146,7 @@ def _check_publisher_video_code() -> list[dict]:
     return evidence
 
 
-def _check_video_asset_registry() -> dict:
+def _check_video_asset_registry() -> dict[str, object]:
     """Check if the local Video Asset Registry exists and has data."""
     registry_path = os.path.expanduser("~/omnis-control/data/video_assets.jsonl")
     result = {
@@ -158,7 +162,7 @@ def _check_video_asset_registry() -> dict:
     return result
 
 
-def _check_account_registry() -> dict:
+def _check_account_registry() -> dict[str, object]:
     """Check if the Account Registry exists and has data."""
     path = os.path.expanduser("~/omnis-control/data/accounts.jsonl")
     result = {"exists": os.path.isfile(path), "account_count": 0}
@@ -171,7 +175,7 @@ def _check_account_registry() -> dict:
     return result
 
 
-def _check_content_queue() -> dict:
+def _check_content_queue() -> dict[str, object]:
     """Check if the Content Queue file exists and has data."""
     path = os.path.expanduser("~/omnis-control/data/content_queue.jsonl")
     result = {"exists": os.path.isfile(path), "item_count": 0}
@@ -184,7 +188,7 @@ def _check_content_queue() -> dict:
     return result
 
 
-def check() -> dict:
+def check() -> dict[str, object]:
     """Run all checks and return structured diagnosis."""
     start = time.time()
 
@@ -193,41 +197,95 @@ def check() -> dict:
     known_exts = config.get("known_extensions", [".mp4", ".mov", ".m4v", ".avi", ".webm"])
     keywords = config.get("keywords", [])
 
-    # --- Scans ---
-    video_files = _scan_local_video_files(search_roots, known_exts, SCAN_TIMEOUT_S)
-    keyword_hits = _check_keyword_in_path(search_roots, keywords)
-    vtoc_evidence = _check_video_to_content_skill()
-    argos_evidence = _check_argos_bridge_skill()
-    pub_evidence = _check_publisher_video_code()
-    registry = _check_video_asset_registry()
-    accounts_reg = _check_account_registry()
-    content_queue = _check_content_queue()
+    scans = _run_scans(search_roots, known_exts, keywords)
+    all_evidence = _build_all_evidence(scans)
+    signals = _build_signals(scans, all_evidence)
+    deduped_evidence = _dedupe_evidence(all_evidence)
+    classification, confidence = _classify_pipeline(scans, signals, deduped_evidence)
+    risks = _build_risks(classification, signals, scans["registry"])
 
-    all_evidence = keyword_hits + vtoc_evidence + argos_evidence + pub_evidence
+    duration_ms = int((time.time() - start) * 1000)
+
+    return {
+        "classification": classification,
+        "confidence": confidence,
+        "signals": signals,
+        "counts": {
+            "local_video_files": scans["video_files"]["count"],
+            "keyword_hits": len(scans["keyword_hits"]),
+            "total_evidence": len(deduped_evidence),
+            "registry_assets": scans["registry"]["asset_count"],
+            "registry_accounts": scans["accounts_reg"]["account_count"],
+            "queue_items": scans["content_queue"]["item_count"],
+            "scan_duration_ms": duration_ms,
+            "scan_timed_out": scans["video_files"].get("timed_out", False),
+        },
+        "evidence": deduped_evidence[:20],
+        "evidence_truncated": len(deduped_evidence) > 20 if deduped_evidence else False,
+        "risks": risks,
+    }
+
+
+def _run_scans(
+    search_roots: list[str],
+    known_exts: list[str],
+    keywords: list[str],
+) -> dict[str, object]:
+    video_files = _scan_local_video_files(search_roots, known_exts, SCAN_TIMEOUT_S)
+    return {
+        "video_files": video_files,
+        "keyword_hits": _check_keyword_in_path(search_roots, keywords),
+        "vtoc_evidence": _check_video_to_content_skill(),
+        "argos_evidence": _check_argos_bridge_skill(),
+        "pub_evidence": _check_publisher_video_code(),
+        "registry": _check_video_asset_registry(),
+        "accounts_reg": _check_account_registry(),
+        "content_queue": _check_content_queue(),
+    }
+
+
+def _build_all_evidence(scans: dict[str, object]) -> list[dict[str, object]]:
+    all_evidence = (
+        scans["keyword_hits"]
+        + scans["vtoc_evidence"]
+        + scans["argos_evidence"]
+        + scans["pub_evidence"]
+    )
+    registry = scans["registry"]
+    accounts_reg = scans["accounts_reg"]
+    content_queue = scans["content_queue"]
     if registry["exists"]:
-        registry_path = os.path.expanduser("~/omnis-control/data/video_assets.jsonl")
         all_evidence.append({
-            "path": registry_path,
+            "path": os.path.expanduser("~/omnis-control/data/video_assets.jsonl"),
             "keyword": "video_asset_registry",
             "type": "registry",
         })
     if accounts_reg["exists"]:
-        acc_path = os.path.expanduser("~/omnis-control/data/accounts.jsonl")
         all_evidence.append({
-            "path": acc_path,
+            "path": os.path.expanduser("~/omnis-control/data/accounts.jsonl"),
             "keyword": "instagram_account_mapping",
             "type": "registry",
         })
     if content_queue["exists"]:
-        cq_path = os.path.expanduser("~/omnis-control/data/content_queue.jsonl")
         all_evidence.append({
-            "path": cq_path,
+            "path": os.path.expanduser("~/omnis-control/data/content_queue.jsonl"),
             "keyword": "daily_content_queue",
             "type": "registry",
         })
+    return all_evidence
 
-    # --- Signals ---
-    signals = {
+
+def _build_signals(
+    scans: dict[str, object],
+    all_evidence: list[dict[str, object]],
+) -> dict[str, bool]:
+    video_files = scans["video_files"]
+    vtoc_evidence = scans["vtoc_evidence"]
+    argos_evidence = scans["argos_evidence"]
+    registry = scans["registry"]
+    accounts_reg = scans["accounts_reg"]
+    content_queue = scans["content_queue"]
+    return {
         "local_video_files_found": video_files["count"] > 0,
         "google_drive_code_found": any("drive" in str(e.get("keyword", "")).lower() for e in all_evidence),
         "video_ingestion_code_found": bool(vtoc_evidence) or any(
@@ -261,15 +319,22 @@ def check() -> dict:
         ),
     }
 
-    # --- Evidence dedup ---
+
+def _dedupe_evidence(all_evidence: list[dict[str, object]]) -> list[dict[str, object]]:
     seen_paths = set()
     deduped_evidence = []
-    for e in all_evidence:
-        if e["path"] not in seen_paths:
-            seen_paths.add(e["path"])
-            deduped_evidence.append(e)
+    for evidence in all_evidence:
+        if evidence["path"] not in seen_paths:
+            seen_paths.add(evidence["path"])
+            deduped_evidence.append(evidence)
+    return deduped_evidence
 
-    # --- Classification ---
+
+def _classify_pipeline(
+    scans: dict[str, object],
+    signals: dict[str, bool],
+    deduped_evidence: list[dict[str, object]],
+) -> tuple[str, str]:
     strong_signals = [
         signals["video_asset_registry_found"] or signals["video_asset_schema_found"],
         signals["content_queue_found"] or signals["daily_queue_found"],
@@ -277,41 +342,41 @@ def check() -> dict:
         signals["instagram_account_mapping_found"],
         signals["used_or_published_marker_found"],
     ]
-    strong_count = sum(1 for s in strong_signals if s)
-
+    strong_count = sum(1 for signal in strong_signals if signal)
     partial_signals = [
         signals["video_ingestion_code_found"],
         signals["caption_generation_found"],
         signals["google_drive_code_found"],
         signals["local_video_files_found"],
-        bool(vtoc_evidence),
-        bool(argos_evidence),
-        bool(pub_evidence),
+        bool(scans["vtoc_evidence"]),
+        bool(scans["argos_evidence"]),
+        bool(scans["pub_evidence"]),
     ]
-    partial_count = sum(1 for s in partial_signals if s)
+    partial_count = sum(1 for signal in partial_signals if signal)
+    has_executable_code = (
+        bool(scans["vtoc_evidence"])
+        or bool(scans["argos_evidence"])
+        or bool(scans["pub_evidence"])
+    )
 
-    has_executable_code = bool(vtoc_evidence) or bool(argos_evidence) or bool(pub_evidence)
+    if scans["video_files"].get("timed_out"):
+        return "scan_timeout_partial", "low"
+    if strong_count >= 4:
+        return "operational", "high"
+    if has_executable_code and partial_count >= 2:
+        return "partial", "medium"
+    if has_executable_code:
+        return "partial", "low"
+    if deduped_evidence:
+        return "documented_only", "low"
+    return "not_found", "high"
 
-    if video_files.get("timed_out"):
-        classification = "scan_timeout_partial"
-        confidence = "low"
-    elif strong_count >= 4:
-        classification = "operational"
-        confidence = "high"
-    elif has_executable_code and partial_count >= 2:
-        classification = "partial"
-        confidence = "medium"
-    elif has_executable_code:
-        classification = "partial"
-        confidence = "low"
-    elif deduped_evidence:
-        classification = "documented_only"
-        confidence = "low"
-    else:
-        classification = "not_found"
-        confidence = "high"
 
-    # --- Risks ---
+def _build_risks(
+    classification: str,
+    signals: dict[str, bool],
+    registry: dict[str, object],
+) -> list[str]:
     risks = []
     if classification == "not_found":
         risks.append("Nenhum pipeline de vídeo detectado — conteúdo de vídeo é gerenciado manualmente?")
@@ -328,24 +393,4 @@ def check() -> dict:
         )
     if registry["exists"] and registry["asset_count"] == 0:
         risks.append("Registro de vídeo encontrado mas vazio — nenhum asset importado ainda.")
-
-    duration_ms = int((time.time() - start) * 1000)
-
-    return {
-        "classification": classification,
-        "confidence": confidence,
-        "signals": signals,
-        "counts": {
-            "local_video_files": video_files["count"],
-            "keyword_hits": len(keyword_hits),
-            "total_evidence": len(deduped_evidence),
-            "registry_assets": registry["asset_count"],
-            "registry_accounts": accounts_reg["account_count"],
-            "queue_items": content_queue["item_count"],
-            "scan_duration_ms": duration_ms,
-            "scan_timed_out": video_files.get("timed_out", False),
-        },
-        "evidence": deduped_evidence[:20],
-        "evidence_truncated": len(deduped_evidence) > 20 if deduped_evidence else False,
-        "risks": risks,
-    }
+    return risks

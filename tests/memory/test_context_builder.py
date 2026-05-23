@@ -72,3 +72,44 @@ class TestMemoryContextBuilder:
         assert d["mission_id"] == "test"
         assert d["hits_count"] == 3
         assert d["sources_used"] == ["akasha", "session"]
+
+    def test_build_markdown_includes_optional_similarity_and_patterns(self):
+        builder = MemoryContextBuilder(dry_run=True)
+
+        md = builder._build_markdown(
+            mission_id="test-005",
+            account_handle="oinatalrn",
+            intent="create_campaign",
+            sector="midia",
+            pack_hits=[
+                {
+                    "title": "Natal performa bem em reels",
+                    "relevance": "high",
+                    "snippet": "Use praia e familia no gancho.",
+                    "source_type": "akasha",
+                }
+            ],
+            assembled_text="Texto consolidado de campanha.",
+            source_summary={"akasha": 1},
+            similar_missions=[
+                {
+                    "source_mission": {"title": "Campanha Ponta Negra"},
+                    "similarity_score": 0.82,
+                    "relevant_learnings": ["Gancho com praia aumenta saves"],
+                }
+            ],
+            patterns={
+                "sample_count": 2,
+                "successful_hooks": ["Praia ao amanhecer"],
+                "insights": ["Familia gera comentarios"],
+            },
+        )
+
+        assert "### [akasha:high] Natal performa bem em reels" in md
+        assert "> Use praia e familia no gancho." in md
+        assert "## Texto consolidado" in md
+        assert "## Missoes similares" in md
+        assert "- [82%] Campanha Ponta Negra" in md
+        assert "## Padroes detectados" in md
+        assert "- Hook: Praia ao amanhecer" in md
+        assert "- Insight: Familia gera comentarios" in md

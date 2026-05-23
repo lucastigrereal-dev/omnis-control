@@ -6,7 +6,6 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
 
 from src.governance.models import (
     ACTION_WRITE,
@@ -58,7 +57,7 @@ class ApprovalRequest:
     reason: str = ""
     created_at: str = field(default_factory=_now_iso)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "request_id": self.request_id,
             "mission_id": self.mission_id,
@@ -102,7 +101,7 @@ class ApprovalStatus:
     reason: str = ""
     gate_version: str = APPROVAL_GATE_VERSION
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "mission_id": self.mission_id,
             "request_id": self.request_id,
@@ -114,7 +113,7 @@ class ApprovalStatus:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "ApprovalStatus":
+    def from_dict(cls, data: dict[str, object]) -> "ApprovalStatus":
         return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
 
 
@@ -126,9 +125,9 @@ class ApprovalGate:
     def __init__(
         self,
         dry_run: bool = True,
-        risk_classifier: Optional[RiskClassifier] = None,
-        policy_engine: Optional[ApprovalPolicyEngine] = None,
-        audit_planner: Optional[AuditLogPlanner] = None,
+        risk_classifier: RiskClassifier | None = None,
+        policy_engine: ApprovalPolicyEngine | None = None,
+        audit_planner: AuditLogPlanner | None = None,
     ) -> None:
         self.dry_run = dry_run
         self.risk_classifier = risk_classifier or RiskClassifier()

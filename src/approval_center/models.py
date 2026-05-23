@@ -5,7 +5,6 @@ import hashlib
 import os
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Optional
 
 APPROVAL_STATUS_PENDING = "pending"
 APPROVAL_STATUS_APPROVED = "approved"
@@ -26,7 +25,7 @@ class ApprovalRequest:
     risk_level: str
     status: str
     requested_at: str
-    resolved_at: Optional[str]
+    resolved_at: str | None
     resolution_note: str
 
     @classmethod
@@ -49,7 +48,7 @@ class ApprovalRequest:
             resolution_note="",
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "request_id": self.request_id,
             "subject": self.subject,
@@ -63,7 +62,7 @@ class ApprovalRequest:
         }
 
     @classmethod
-    def from_dict(cls, d: dict) -> "ApprovalRequest":
+    def from_dict(cls, d: dict[str, object]) -> "ApprovalRequest":
         return cls(
             request_id=d["request_id"],
             subject=d["subject"],

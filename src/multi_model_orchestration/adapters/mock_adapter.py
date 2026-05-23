@@ -16,7 +16,7 @@ class MockAdapter:
 
     provider = "mock"
 
-    def execute(self, prompt: str, model: ModelConfig, **kwargs: dict) -> dict:
+    def execute(self, prompt: str, model: ModelConfig, **kwargs: object) -> dict[str, object]:
         return {
             "status": "dry_run",
             "model": model.name,

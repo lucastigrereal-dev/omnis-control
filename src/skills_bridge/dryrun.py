@@ -10,11 +10,11 @@ FALLBACK_SKILL_ID = "manual-review"
 class DryRunEngine:
     """Canonical dry-run engine. Records all calls, never executes for real."""
 
-    def __init__(self, dry_run: bool = True):
+    def __init__(self, dry_run: bool = True) -> None:
         self.dry_run = dry_run
-        self.records: list[dict] = []
+        self.records: list[dict[str, object]] = []
 
-    def execute(self, call: SkillCall) -> dict:
+    def execute(self, call: SkillCall) -> dict[str, object]:
         if not call.dry_run:
             if hasattr(call, 'risk_level') and call.risk_level.upper() in ("HIGH", "CRITICAL"):
                 raise DryRunError(
@@ -37,7 +37,7 @@ class DryRunEngine:
         self.records.append(record)
         return record
 
-    def get_records(self) -> list[dict]:
+    def get_records(self) -> list[dict[str, object]]:
         return self.records
 
     def clear(self) -> None:
@@ -47,17 +47,17 @@ class DryRunEngine:
 class DryRunDispatcher:
     """Alias for DryRunEngine from skill_router_bridge merge. Uses SkillCatalog for resolution."""
 
-    def __init__(self, catalog: SkillCatalog, dry_run: bool = True):
+    def __init__(self, catalog: SkillCatalog, dry_run: bool = True) -> None:
         self.catalog = catalog
         self.dry_run = dry_run
-        self._history: list[dict] = []
+        self._history: list[dict[str, object]] = []
 
-    def dispatch(self, call) -> dict:
+    def dispatch(self, call: SkillCall) -> dict[str, object]:
         if self.dry_run:
             return self._simulate(call)
         raise DispatchError(call.skill_id, "Real dispatch not implemented (dry_run only)")
 
-    def _simulate(self, call) -> dict:
+    def _simulate(self, call: SkillCall) -> dict[str, object]:
         skill = self.catalog.resolve(call.skill_id)
         available = skill is not None and skill.skill_id not in ("", FALLBACK_SKILL_ID)
         if not available and call.skill_id != FALLBACK_SKILL_ID:
@@ -84,5 +84,5 @@ class DryRunDispatcher:
         return result
 
     @property
-    def history(self) -> list[dict]:
+    def history(self) -> list[dict[str, object]]:
         return list(self._history)

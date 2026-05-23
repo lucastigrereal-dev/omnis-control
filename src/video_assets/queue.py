@@ -8,7 +8,6 @@ Operações de alto nível:
 """
 
 from datetime import datetime, timezone
-from typing import Optional
 
 from .models import VideoAsset
 from .registry import Registry
@@ -18,10 +17,10 @@ from .status import AssetStatus
 class Queue:
     """Fila de conteúdo — operações de alto nível sobre o registro."""
 
-    def __init__(self, registry: Optional[Registry] = None):
+    def __init__(self, registry: Registry | None = None):
         self.registry = registry or Registry()
 
-    def next_inbox(self, account: Optional[str] = None) -> Optional[VideoAsset]:
+    def next_inbox(self, account: str | None = None) -> VideoAsset | None:
         """Próximo asset em inbox (mais antigo primeiro)."""
         assets = self.registry.filter(status=AssetStatus.INBOX)
         if account:
@@ -32,7 +31,7 @@ class Queue:
         assets.sort(key=lambda a: a.created_at)
         return assets[0]
 
-    def next_ready_to_schedule(self, account: Optional[str] = None) -> Optional[VideoAsset]:
+    def next_ready_to_schedule(self, account: str | None = None) -> VideoAsset | None:
         """Próximo asset aprovado sem agendamento."""
         assets = self.registry.filter(status=AssetStatus.APPROVED)
         if account:
@@ -43,7 +42,7 @@ class Queue:
         assets.sort(key=lambda a: a.created_at)
         return assets[0]
 
-    def schedule(self, asset_id: str, scheduled_at_iso: str) -> Optional[VideoAsset]:
+    def schedule(self, asset_id: str, scheduled_at_iso: str) -> VideoAsset | None:
         """Agenda um asset para publicação. Valida data futura."""
         try:
             scheduled_dt = datetime.fromisoformat(scheduled_at_iso)
@@ -63,11 +62,11 @@ class Queue:
             scheduled_at=scheduled_dt.strftime("%Y-%m-%dT%H:%M:%SZ"),
         )
 
-    def mark_published(self, asset_id: str) -> Optional[VideoAsset]:
+    def mark_published(self, asset_id: str) -> VideoAsset | None:
         """Marca como publicado."""
         return self.registry.mark_published(asset_id)
 
-    def inbox_count(self, account: Optional[str] = None) -> int:
+    def inbox_count(self, account: str | None = None) -> int:
         """Quantos assets aguardando triagem."""
         return len(self.registry.filter(status=AssetStatus.INBOX, account=account))
 

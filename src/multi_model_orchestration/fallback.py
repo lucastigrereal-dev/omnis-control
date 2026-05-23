@@ -1,8 +1,6 @@
 """P25 FallbackChain — try models sequentially until one succeeds."""
 from __future__ import annotations
 
-from typing import Optional
-
 from src.multi_model_orchestration.adapters import get_adapter
 from src.multi_model_orchestration.errors import AllModelsExhaustedError, ProviderUnavailableError
 from src.multi_model_orchestration.models import ModelConfig
@@ -15,10 +13,10 @@ class FallbackChain:
     def __init__(self, model_names: list[str], registry: ModelRegistry) -> None:
         self.model_names = model_names
         self.registry = registry
-        self._attempts: list[dict] = []
-        self._current_model: Optional[ModelConfig] = None
+        self._attempts: list[dict[str, object]] = []
+        self._current_model: ModelConfig | None = None
 
-    def execute(self, prompt: str, context: Optional[dict] = None) -> dict:
+    def execute(self, prompt: str, context: dict[str, object] | None = None) -> dict[str, object]:
         """Execute prompt, falling back through model chain on failure."""
         context = context or {}
         last_error = None
@@ -61,9 +59,9 @@ class FallbackChain:
         return len(self._attempts)
 
     @property
-    def attempt_log(self) -> list[dict]:
+    def attempt_log(self) -> list[dict[str, object]]:
         return list(self._attempts)
 
     @property
-    def current_model(self) -> Optional[ModelConfig]:
+    def current_model(self) -> ModelConfig | None:
         return self._current_model

@@ -4,10 +4,8 @@ Dependência unidirecional: caption_approval → content_queue.
 Nunca importar content_queue aqui (feito via injeção no CLI).
 """
 
-import csv
-from datetime import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Callable
 
 from .models import (
     CaptionDraft, DraftStatus, ApprovalAction,
@@ -21,7 +19,7 @@ SKIP_PATTERNS = ["[", "]", "TODO", "REVISAR", "PLACEHOLDER"]
 class PreApprovalResult:
     """Resultado da validação pré-aprovação."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.blocks: list[str] = []
         self.warnings: list[str] = []
         self.passed: bool = True
@@ -30,7 +28,7 @@ class PreApprovalResult:
     def blocked(self) -> bool:
         return len(self.blocks) > 0
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "passed": self.passed and not self.blocked,
             "blocks": self.blocks,
@@ -46,8 +44,12 @@ class ApprovalGate:
 
     # ----------------------------------------------------------- Validate
 
-    def validate(self, caption_text: str, hashtags: Optional[list[str]] = None,
-                 cta: str = "") -> PreApprovalResult:
+    def validate(
+        self,
+        caption_text: str,
+        hashtags: list[str] | None = None,
+        cta: str = "",
+    ) -> PreApprovalResult:
         """Valida conteúdo antes de aprovar."""
         result = PreApprovalResult()
 
@@ -78,8 +80,11 @@ class ApprovalGate:
 
     # ----------------------------------------------------------- Approve
 
-    def approve(self, draft_id: str,
-                queue_updater: Optional[callable] = None) -> tuple[Optional[CaptionDraft], Optional[str]]:
+    def approve(
+        self,
+        draft_id: str,
+        queue_updater: Callable[[str, str], bool] | None = None,
+    ) -> tuple[CaptionDraft | None, str | None]:
         """Aprova um draft.
 
         Args:
@@ -138,8 +143,12 @@ class ApprovalGate:
 
     # ----------------------------------------------------------- Reject
 
-    def reject(self, draft_id: str, reason: str,
-               queue_updater: Optional[callable] = None) -> tuple[Optional[CaptionDraft], Optional[str]]:
+    def reject(
+        self,
+        draft_id: str,
+        reason: str,
+        queue_updater: Callable[[str, str], bool] | None = None,
+    ) -> tuple[CaptionDraft | None, str | None]:
         """Rejeita um draft.
 
         Args:
@@ -193,8 +202,11 @@ class ApprovalGate:
 
     # ----------------------------------------------------------- Batch Approve
 
-    def batch_approve(self, limit: int = 5,
-                      queue_updater: Optional[callable] = None) -> dict:
+    def batch_approve(
+        self,
+        limit: int = 5,
+        queue_updater: Callable[[str, str], bool] | None = None,
+    ) -> dict[str, object]:
         """Aprova ate N drafts validos de needs_review/revised."""
         candidates = [
             d for d in self.dm.list_all()

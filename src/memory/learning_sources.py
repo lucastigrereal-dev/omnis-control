@@ -5,7 +5,7 @@ from __future__ import annotations
 class LearningSources:
     """Utilities to cite and validate the provenance of a learning record."""
 
-    def cite(self, learning: dict) -> str:
+    def cite(self, learning: dict[str, object]) -> str:
         """Return a citation string for the given learning record."""
         parts: list[str] = []
 
@@ -29,6 +29,6 @@ class LearningSources:
             return "[source unknown]"
         return " | ".join(parts)
 
-    def validate_source(self, learning: dict) -> bool:
+    def validate_source(self, learning: dict[str, object]) -> bool:
         """Return True only if the learning has a source_file or mission_id."""
         return bool(learning.get("source_file") or learning.get("mission_id"))

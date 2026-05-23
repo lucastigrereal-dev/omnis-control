@@ -4,9 +4,7 @@ Fornece lista de modelos e recomendacao por tipo de tarefa.
 Espelha o TASK_ROUTING do task_router.py sem depender do import.
 """
 
-import os
 from pathlib import Path
-from typing import Optional
 
 import yaml
 
@@ -41,7 +39,7 @@ TASK_ROUTING = {
 DEFAULT_MODEL = "local"
 
 
-def _load_config() -> dict:
+def _load_config() -> dict[str, object]:
     """Le config.yaml, retorna dict vazio se ausente/invalido."""
     if not CONFIG_PATH.is_file():
         return {}
@@ -52,7 +50,7 @@ def _load_config() -> dict:
         return {}
 
 
-def list_models() -> list[dict]:
+def list_models() -> list[dict[str, object]]:
     """Retorna lista de modelos configurados no LiteLLM proxy."""
     cfg = _load_config()
     return cfg.get("model_list", [])

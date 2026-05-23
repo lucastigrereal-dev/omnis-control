@@ -27,7 +27,7 @@ class EmbeddingStrategy:
     dimensions: int = 384
     normalize: bool = True
     dry_run: bool = True
-    metadata: dict = field(default_factory=dict)
+    metadata: dict[str, object] = field(default_factory=dict)
 
     @classmethod
     def mock_default(cls) -> "EmbeddingStrategy":

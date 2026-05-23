@@ -5,7 +5,7 @@ DISK_CRITICAL_THRESHOLD = 10
 DISK_WARNING_THRESHOLD = 20
 
 
-def check() -> dict:
+def check() -> dict[str, object]:
     all_disks = []
     for part in psutil.disk_partitions():
         try:

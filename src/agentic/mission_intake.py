@@ -4,7 +4,6 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone, timedelta
-from typing import Optional
 
 
 def _today() -> str:
@@ -54,7 +53,7 @@ RISK_KEYWORDS: dict[str, list[str]] = {
 }
 
 
-def _find_date(text: str) -> Optional[str]:
+def _find_date(text: str) -> str | None:
     lower = text.lower()
     if any(w in lower for w in ["urgente", "hoje", "agora", "imediatamente"]):
         return _today()
@@ -89,11 +88,11 @@ class MissionIntakeResult:
     setor: str = "general"
     tipo: str = "general"
     risco: str = "baixo"
-    prazo: Optional[str] = None
+    prazo: str | None = None
     texto_original: str = ""
     warnings: list[str] = field(default_factory=list)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "objetivo": self.objetivo,
             "setor": self.setor,
@@ -105,7 +104,7 @@ class MissionIntakeResult:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "MissionIntakeResult":
+    def from_dict(cls, data: dict[str, object]) -> "MissionIntakeResult":
         return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
 
 
@@ -145,7 +144,7 @@ class MissionIntake:
             return "medio"
         return "baixo"
 
-    def _build_warnings(self, risco: str, prazo: Optional[str]) -> list[str]:
+    def _build_warnings(self, risco: str, prazo: str | None) -> list[str]:
         w: list[str] = []
         if risco == "alto":
             w.append("risco alto — requer aprovação antes de executar")

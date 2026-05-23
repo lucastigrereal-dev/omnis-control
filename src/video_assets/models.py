@@ -4,7 +4,6 @@ import unicodedata
 import re
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
-from typing import Optional
 
 from .status import AssetStatus
 
@@ -57,22 +56,22 @@ class VideoAsset:
     status: AssetStatus = AssetStatus.INBOX
 
     # Metadados opcionais
-    drive_file_id: Optional[str] = None
-    account_target: Optional[str] = None  # @handle normalizado
+    drive_file_id: str | None = None
+    account_target: str | None = None  # @handle normalizado
     tags: list[str] = field(default_factory=list)
-    city: Optional[str] = None  # normalizado
+    city: str | None = None  # normalizado
     format: str = AssetFormat.UNKNOWN
-    caption: Optional[str] = None
-    hashtags: Optional[str] = None
-    cta: Optional[str] = None
+    caption: str | None = None
+    hashtags: str | None = None
+    cta: str | None = None
 
     # Timestamps
-    used_at: Optional[str] = None
-    scheduled_at: Optional[str] = None
+    used_at: str | None = None
+    scheduled_at: str | None = None
     created_at: str = field(default_factory=_now_iso)
     updated_at: str = field(default_factory=_now_iso)
 
-    notes: Optional[str] = None
+    notes: str | None = None
 
     @classmethod
     def new(
@@ -83,7 +82,7 @@ class VideoAsset:
         file_name: str,
         extension: str,
         size_bytes: int,
-        **kwargs,
+        **kwargs: object,
     ) -> "VideoAsset":
         modified_at = kwargs.pop("modified_at", _now_iso())
         fingerprint = _make_fingerprint(source_path, size_bytes, modified_at)
@@ -107,18 +106,18 @@ class VideoAsset:
             **kwargs,
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         d = asdict(self)
         d["status"] = self.status.value
         return d
 
     @classmethod
-    def from_dict(cls, data: dict) -> "VideoAsset":
+    def from_dict(cls, data: dict[str, object]) -> "VideoAsset":
         data = dict(data)
         data["status"] = AssetStatus(data.get("status", "inbox"))
         return cls(**data)
 
-    def normalize(self):
+    def normalize(self) -> None:
         """Re-normaliza campos in-place."""
         if self.account_target:
             self.account_target = _normalize_account(self.account_target)

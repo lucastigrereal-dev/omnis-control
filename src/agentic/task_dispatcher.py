@@ -6,7 +6,6 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
 
 from src.agentic.deliverable_mapper import DeliverableManifest, DeliverableSpec
 
@@ -53,11 +52,11 @@ class DispatchEntry:
     executor: str
     status: str = "pending"  # pending | dispatched | running | done | failed
     dry_run: bool = True
-    dispatched_at: Optional[str] = None
-    finished_at: Optional[str] = None
+    dispatched_at: str | None = None
+    finished_at: str | None = None
     result_hint: str = ""
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "task_id": self.task_id,
             "deliverable": self.deliverable,
@@ -70,7 +69,7 @@ class DispatchEntry:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "DispatchEntry":
+    def from_dict(cls, data: dict[str, object]) -> "DispatchEntry":
         return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
 
 
@@ -83,7 +82,7 @@ class DispatchPlan:
     total: int = 0
     summary: str = ""
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "mission_id": self.mission_id,
             "entries": [e.to_dict() for e in self.entries],
@@ -94,7 +93,7 @@ class DispatchPlan:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "DispatchPlan":
+    def from_dict(cls, data: dict[str, object]) -> "DispatchPlan":
         entries = [DispatchEntry.from_dict(e) for e in data.pop("entries", [])]
         plan = cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
         plan.entries = entries
@@ -106,7 +105,7 @@ class DispatchPlan:
 class TaskDispatcher:
     """Roteia deliverables de um manifest para os executores corretos."""
 
-    def __init__(self, dry_run: bool = True, log_dir: Optional[Path] = None) -> None:
+    def __init__(self, dry_run: bool = True, log_dir: Path | None = None) -> None:
         self.dry_run = dry_run
         self.log_dir = log_dir
 

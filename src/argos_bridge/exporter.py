@@ -3,7 +3,6 @@
 import csv
 import json
 import os
-from typing import TextIO
 
 from .draft_builder import list_all
 from .models import ArgosDraft
@@ -16,7 +15,7 @@ def _ensure_dir() -> None:
     os.makedirs(EXPORT_DIR, exist_ok=True)
 
 
-def _csv_row(draft: ArgosDraft) -> dict:
+def _csv_row(draft: ArgosDraft) -> dict[str, object]:
     """View aplainada para CSV."""
     return {
         "draft_id": draft.draft_id,

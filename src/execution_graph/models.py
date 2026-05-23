@@ -50,7 +50,7 @@ class StepNode:
     estimated_duration: str = "5min"
     assigned_role: str = ""
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "step_id": self.step_id,
             "task_id": self.task_id,
@@ -65,7 +65,7 @@ class StepNode:
         }
 
     @classmethod
-    def from_dict(cls, d: dict) -> "StepNode":
+    def from_dict(cls, d: dict[str, object]) -> "StepNode":
         return cls(
             step_id=d["step_id"],
             task_id=d["task_id"],
@@ -95,7 +95,7 @@ class ExecutionGraph:
     def node_map(self) -> dict[str, StepNode]:
         return {n.step_id: n for n in self.nodes}
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "graph_id": self.graph_id,
             "request": self.request,
@@ -108,7 +108,7 @@ class ExecutionGraph:
         }
 
     @classmethod
-    def from_dict(cls, d: dict) -> "ExecutionGraph":
+    def from_dict(cls, d: dict[str, object]) -> "ExecutionGraph":
         return cls(
             graph_id=d["graph_id"],
             request=d["request"],
@@ -130,7 +130,7 @@ class StepRunLog:
     message: str
     timestamp: str
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "step_id": self.step_id,
             "role_id": self.role_id,
@@ -178,7 +178,7 @@ class ShadowConfig:
         """Return set of step_ids still in shadow mode."""
         return {n.step_id for n in graph.nodes if self.is_dry_run(n.step_id)}
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "node_dry_run": self.node_dry_run,
             "shadow_mode": self.shadow_mode,
@@ -187,7 +187,7 @@ class ShadowConfig:
         }
 
     @classmethod
-    def from_dict(cls, d: dict) -> "ShadowConfig":
+    def from_dict(cls, d: dict[str, object]) -> "ShadowConfig":
         return cls(
             node_dry_run=d.get("node_dry_run", {}),
             shadow_mode=d.get("shadow_mode", True),
@@ -207,7 +207,7 @@ class StepRun:
     logs: list[StepRunLog]
     started_at: str
     finished_at: str
-    graph_snapshot: dict | None = None  # graph.to_dict() for resume/replay
+    graph_snapshot: dict[str, object] | None = None  # graph.to_dict() for resume/replay
     approval_id: str | None = None  # linked approval request
     approval_required: bool = False  # whether approval was checked
 
@@ -243,7 +243,7 @@ class StepRun:
             approval_required=approval_required,
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "graph_run_id": self.graph_run_id,
             "graph_id": self.graph_id,

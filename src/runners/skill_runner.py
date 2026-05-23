@@ -9,7 +9,6 @@ import subprocess
 import sys
 import time
 from pathlib import Path
-from typing import Any, Optional
 
 from src.utils.safe_paths import resolve_skill_path, validate_skill_name
 
@@ -26,7 +25,7 @@ SKILLS_PATH = Path(
 )
 
 
-def list_skills() -> list[dict]:
+def list_skills() -> list[dict[str, str]]:
     """Lista skills com run.py disponiveis."""
     if not SKILLS_PATH.is_dir():
         return []
@@ -42,7 +41,7 @@ def run_skill(
     payload_path: str | None = None,
     timeout: int = 60,
     dry_run: bool = True,
-) -> dict:
+) -> dict[str, object]:
     """Run a skill by name with timeout and safety checks.
 
     Args:
@@ -60,6 +59,17 @@ def run_skill(
     """
     validate_skill_name(skill_name)
 
+    run_py = _resolve_run_py(skill_name)
+    timeout = max(1, min(timeout, 300))
+    cmd = _build_command(run_py, payload_path)
+
+    if dry_run:
+        return _dry_run_result(skill_name, cmd)
+
+    return _execute_command(skill_name, cmd, timeout)
+
+
+def _resolve_run_py(skill_name: str) -> str:
     skill_dir = resolve_skill_path(skill_name)
     if not skill_dir:
         raise ValueError(f"Skill '{skill_name}' não encontrada em {SKILLS_PATH}")
@@ -70,29 +80,43 @@ def run_skill(
             f"Skill '{skill_name}' não tem run.py executável. "
             f"Tipo: doc_folder ou doc_file (não executável)"
         )
+    return run_py
 
-    timeout = max(1, min(timeout, 300))
 
+def _build_command(run_py: str, payload_path: str | None) -> list[str]:
     cmd = [sys.executable, run_py]
     if payload_path:
-        payload_abs = os.path.abspath(os.path.expanduser(payload_path))
-        if not os.path.isfile(payload_abs):
-            raise ValueError(f"Payload não encontrado: {payload_path}")
-        try:
-            with open(payload_abs, encoding="utf-8") as f:
-                json.load(f)
-        except (json.JSONDecodeError, OSError) as e:
-            raise ValueError(f"Payload JSON inválido: {e}")
+        payload_abs = _validate_payload_path(payload_path)
         cmd.extend(["--payload", payload_abs])
+    return cmd
 
-    if dry_run:
-        return {
-            "status": "dry_run",
-            "skill": skill_name,
-            "command": " ".join(cmd),
-            "message": "Dry-run: esta skill seria executada. Adicione --yes para executar de verdade.",
-        }
 
+def _validate_payload_path(payload_path: str) -> str:
+    payload_abs = os.path.abspath(os.path.expanduser(payload_path))
+    if not os.path.isfile(payload_abs):
+        raise ValueError(f"Payload não encontrado: {payload_path}")
+    try:
+        with open(payload_abs, encoding="utf-8") as f:
+            json.load(f)
+    except (json.JSONDecodeError, OSError) as e:
+        raise ValueError(f"Payload JSON inválido: {e}")
+    return payload_abs
+
+
+def _dry_run_result(skill_name: str, cmd: list[str]) -> dict[str, object]:
+    return {
+        "status": "dry_run",
+        "skill": skill_name,
+        "command": " ".join(cmd),
+        "message": "Dry-run: esta skill seria executada. Adicione --yes para executar de verdade.",
+    }
+
+
+def _execute_command(
+    skill_name: str,
+    cmd: list[str],
+    timeout: int,
+) -> dict[str, object]:
     start = time.time()
     try:
         proc = subprocess.run(

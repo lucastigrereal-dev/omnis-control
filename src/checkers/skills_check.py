@@ -5,7 +5,7 @@ SKILLS_DIR = os.path.expanduser("~/.claude/skills")
 REGISTRY_FILE = os.path.expanduser("~/.claude/registry/skills.yaml")
 
 
-def _list_skill_entries() -> list[dict]:
+def _list_skill_entries() -> list[dict[str, object]]:
     if not os.path.isdir(SKILLS_DIR):
         return []
     items = []
@@ -57,7 +57,7 @@ def _load_registry_skills() -> set[str]:
         return set()
 
 
-def check() -> dict:
+def check() -> dict[str, object]:
     entries = _list_skill_entries()
     registry_names = _load_registry_skills()
     disk_names = {e["name"] for e in entries}

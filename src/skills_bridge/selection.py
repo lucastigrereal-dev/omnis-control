@@ -1,5 +1,3 @@
-from typing import Optional
-
 from src.skills_bridge.models import SkillCall, SkillSelection, SkillIntent, SkillDefinition, SkillSelectorResult
 from src.skills_bridge.errors import SkillNotFoundError
 from src.skills_bridge.dryrun import FALLBACK_SKILL_ID
@@ -51,7 +49,7 @@ MOCK_SKILLS = [
 ]
 
 
-def _definition_to_skill(definition: SkillDefinition) -> dict:
+def _definition_to_skill(definition: SkillDefinition) -> dict[str, object]:
     """Converte um SkillDefinition para o formato interno do SkillSelector."""
     intents = []
     for intent_str in definition.intents:
@@ -70,7 +68,7 @@ def _definition_to_skill(definition: SkillDefinition) -> dict:
 
 class SkillSelector:
 
-    def __init__(self, catalog: "SkillCatalog | None" = None, dry_run: bool = True):
+    def __init__(self, catalog: "SkillCatalog | None" = None, dry_run: bool = True) -> None:
         self.dry_run = dry_run
         self.catalog = catalog
         self.skills = list(MOCK_SKILLS)

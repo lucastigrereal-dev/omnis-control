@@ -10,7 +10,6 @@ import uuid
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
 
 ACCOUNTS_PATH = os.path.expanduser("~/omnis-control/data/accounts.jsonl")
 DEFAULT_POSTING_TIMES = ["08:50", "17:50", "20:50"]
@@ -36,22 +35,22 @@ class Account:
     account_id: str
     handle: str
     platform: str = "instagram"
-    display_name: Optional[str] = None
+    display_name: str | None = None
     tags: list[str] = field(default_factory=list)
     default_posting_times: list[str] = field(default_factory=lambda: list(DEFAULT_POSTING_TIMES))
     default_formats: list[str] = field(default_factory=lambda: list(DEFAULT_FORMATS))
     priority: str = Priority.MEDIUM
     active: bool = True
-    instagram_user_id: Optional[str] = None
-    notes: Optional[str] = None
+    instagram_user_id: str | None = None
+    notes: str | None = None
     created_at: str = field(default_factory=_now_iso)
     updated_at: str = field(default_factory=_now_iso)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: dict) -> "Account":
+    def from_dict(cls, data: dict[str, object]) -> "Account":
         return cls(**data)
 
 
@@ -62,7 +61,7 @@ class AccountRegistry:
         self.path = path
         Path(os.path.dirname(path)).mkdir(parents=True, exist_ok=True)
 
-    def add(self, handle: str, **kwargs) -> Account:
+    def add(self, handle: str, **kwargs: object) -> Account:
         """Adiciona nova conta. Erro se handle já existir."""
         handle_norm = _normalize_handle(handle)
         existing = self.get_by_handle(handle_norm)
@@ -81,7 +80,7 @@ class AccountRegistry:
         self._append(account)
         return account
 
-    def get_by_handle(self, handle: str) -> Optional[Account]:
+    def get_by_handle(self, handle: str) -> Account | None:
         """Busca conta por handle normalizado."""
         handle_norm = _normalize_handle(handle)
         for a in self.list_all():
@@ -89,13 +88,13 @@ class AccountRegistry:
                 return a
         return None
 
-    def get(self, account_id: str) -> Optional[Account]:
+    def get(self, account_id: str) -> Account | None:
         for a in self.list_all():
             if a.account_id == account_id:
                 return a
         return None
 
-    def update(self, handle: str, **kwargs) -> Optional[Account]:
+    def update(self, handle: str, **kwargs: object) -> Account | None:
         """Atualiza campos de uma conta."""
         handle_norm = _normalize_handle(handle)
         accounts = self.list_all()
@@ -115,7 +114,7 @@ class AccountRegistry:
             self._rewrite(accounts)
         return found
 
-    def deactivate(self, handle: str) -> Optional[Account]:
+    def deactivate(self, handle: str) -> Account | None:
         """Desativa uma conta."""
         return self.update(handle, active=False)
 
@@ -142,11 +141,11 @@ class AccountRegistry:
         with open(self.path, encoding="utf-8") as f:
             return sum(1 for line in f if line.strip())
 
-    def _append(self, account: Account):
+    def _append(self, account: Account) -> None:
         with open(self.path, "a", encoding="utf-8") as f:
             f.write(json.dumps(account.to_dict(), ensure_ascii=False) + "\n")
 
-    def _rewrite(self, accounts: list[Account]):
+    def _rewrite(self, accounts: list[Account]) -> None:
         with open(self.path, "w", encoding="utf-8") as f:
             for a in accounts:
                 f.write(json.dumps(a.to_dict(), ensure_ascii=False) + "\n")

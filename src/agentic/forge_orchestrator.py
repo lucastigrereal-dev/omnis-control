@@ -5,7 +5,6 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
 
 
 def _now_iso() -> str:
@@ -29,7 +28,7 @@ class GapReport:
     suggested_skill_name: str = ""
     suggested_tags: list[str] = field(default_factory=list)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "gap_id": self.gap_id,
             "mission_id": self.mission_id,
@@ -59,7 +58,7 @@ class ForgeResult:
     def success(self) -> bool:
         return self.status in ("dry_run", "scaffolded", "tested", "registered")
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "forge_id": self.forge_id,
             "gap_id": self.gap_id,
@@ -80,9 +79,9 @@ class SkillVersion:
     version: str
     status: str = "active"  # active | superseded | broken
     registered_at: str = field(default_factory=_now_iso)
-    rollback_from: Optional[str] = None
+    rollback_from: str | None = None
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "skill_name": self.skill_name,
             "version": self.version,
@@ -128,7 +127,7 @@ class ForgeOrchestrator:
     def forge(
         self,
         gap: GapReport,
-        output_dir: Optional[Path] = None,
+        output_dir: Path | None = None,
     ) -> ForgeResult:
         """Aciona a forja para criar uma skill a partir de um gap."""
         result = ForgeResult(
@@ -201,7 +200,7 @@ class ForgeOrchestrator:
         sector: str,
         missing_skills: list[str],
         deliverables: list[str],
-        output_dir: Optional[Path] = None,
+        output_dir: Path | None = None,
     ) -> list[ForgeResult]:
         """Pipeline completo: detecta gaps → forja skills → registra."""
         gaps = self.detect_gaps(mission_id, sector, missing_skills, deliverables)

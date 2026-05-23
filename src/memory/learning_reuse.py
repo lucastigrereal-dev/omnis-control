@@ -13,9 +13,9 @@ def _now_iso() -> str:
 class LearningReuse:
     """Loads learnings from JSONL and finds relevant entries by keyword match."""
 
-    def load_learnings(self, jsonl_path: Path) -> list[dict]:
+    def load_learnings(self, jsonl_path: Path) -> list[dict[str, object]]:
         """Load all learning records from a JSONL file."""
-        records: list[dict] = []
+        records: list[dict[str, object]] = []
         if not jsonl_path.exists():
             return records
         with jsonl_path.open(encoding="utf-8") as fh:
@@ -31,16 +31,16 @@ class LearningReuse:
 
     def find_relevant(
         self,
-        learnings: list[dict],
+        learnings: list[dict[str, object]],
         topic: str,
         max_results: int = 5,
-    ) -> list[dict]:
+    ) -> list[dict[str, object]]:
         """Return up to max_results learnings matching topic keywords (case-insensitive)."""
         keywords = [kw.lower().strip() for kw in topic.split() if kw.strip()]
         if not keywords:
             return learnings[:max_results]
 
-        scored: list[tuple[int, dict]] = []
+        scored: list[tuple[int, dict[str, object]]] = []
         for record in learnings:
             text = json.dumps(record, ensure_ascii=False).lower()
             hits = sum(1 for kw in keywords if kw in text)
@@ -52,10 +52,10 @@ class LearningReuse:
 
     def build_reuse_report(
         self,
-        mission_a: dict,
-        mission_b: dict,
-        reused: list[dict],
-    ) -> dict:
+        mission_a: dict[str, object],
+        mission_b: dict[str, object],
+        reused: list[dict[str, object]],
+    ) -> dict[str, object]:
         """Build a structured report showing which learnings from A were reused in B."""
         return {
             "report_type": "memory_reuse",

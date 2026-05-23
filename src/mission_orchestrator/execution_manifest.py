@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
 
 from src.mission_orchestrator.models import OrchestratorRun
 
@@ -13,7 +12,7 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def build_manifest(run: OrchestratorRun) -> dict:
+def build_manifest(run: OrchestratorRun) -> dict[str, object]:
     """Build an execution plan manifest dict from an OrchestratorRun.
 
     No secrets. No raw file paths outside the run folder.
@@ -47,7 +46,7 @@ def build_manifest(run: OrchestratorRun) -> dict:
 
 
 def _derive_next_actions(run: OrchestratorRun) -> list[str]:
-    actions = []
+    actions: list[str] = []
     if run.status == "blocked_pending_approval":
         if run.approval_id:
             actions.append(f"jarvis approvals-center approve {run.approval_id}")
@@ -72,7 +71,7 @@ def write_manifest(run: OrchestratorRun, run_dir: Path) -> Path:
     return out
 
 
-def no_secrets_in_manifest(manifest: dict) -> bool:
+def no_secrets_in_manifest(manifest: dict[str, object]) -> bool:
     """Sanity check: no secret-like keys in the manifest."""
     forbidden_prefixes = ("meta_", "instagram_", "secret", "token", "password", "key", "auth")
     text = json.dumps(manifest).lower()

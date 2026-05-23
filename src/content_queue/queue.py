@@ -9,7 +9,6 @@ import os
 import uuid
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Optional
 
 from .models import QueueItem, QueueStatus, _now_iso
 from .accounts import AccountRegistry, _normalize_handle
@@ -30,8 +29,13 @@ class Queue:
 
     # ------------------------------------------------------------------ Generate
 
-    def generate(self, days: int = MAX_DAYS_DEFAULT, dry_run: bool = True,
-                 force: bool = False, account_filter: Optional[str] = None) -> dict:
+    def generate(
+        self,
+        days: int = MAX_DAYS_DEFAULT,
+        dry_run: bool = True,
+        force: bool = False,
+        account_filter: str | None = None,
+    ) -> dict[str, object]:
         """
         Gera slots de fila para N dias à frente.
 
@@ -126,7 +130,7 @@ class Queue:
                         continue
         return items
 
-    def get(self, queue_id: str) -> Optional[QueueItem]:
+    def get(self, queue_id: str) -> QueueItem | None:
         """Busca por ID (com suporte a prefixo)."""
         items = self.list_all()
         # Exact match first
@@ -141,7 +145,7 @@ class Queue:
             return None  # ambíguo — pedir ID completo
         return None
 
-    def update(self, queue_id: str, **kwargs) -> Optional[QueueItem]:
+    def update(self, queue_id: str, **kwargs: object) -> QueueItem | None:
         items = self.list_all()
         found_item = self.get(queue_id)
         if not found_item:
@@ -164,7 +168,12 @@ class Queue:
 
     # ------------------------------------------------------------------ Assign
 
-    def assign_asset(self, queue_id: str, asset_id: str, force: bool = False) -> Optional[QueueItem]:
+    def assign_asset(
+        self,
+        queue_id: str,
+        asset_id: str,
+        force: bool = False,
+    ) -> tuple[QueueItem | None, str | None]:
         """Atribui um asset a um slot da fila."""
         # Validar asset
         if not os.path.isfile(VIDEO_ASSETS_PATH):
@@ -228,11 +237,14 @@ class Queue:
 
     # ------------------------------------------------------------------ Filters
 
-    def filter(self, account: Optional[str] = None,
-               status: Optional[str] = None,
-               date: Optional[str] = None,
-               date_from: Optional[str] = None,
-               date_to: Optional[str] = None) -> list[QueueItem]:
+    def filter(
+        self,
+        account: str | None = None,
+        status: str | None = None,
+        date: str | None = None,
+        date_from: str | None = None,
+        date_to: str | None = None,
+    ) -> list[QueueItem]:
         """Filtra itens da fila."""
         items = self.list_all()
 
@@ -259,7 +271,7 @@ class Queue:
 
     # ------------------------------------------------------------------ Stats
 
-    def stats(self) -> dict:
+    def stats(self) -> dict[str, object]:
         items = self.list_all()
         total = len(items)
         by_status = {}
@@ -289,10 +301,14 @@ class Queue:
 
     # ------------------------------------------------------------------ Export
 
-    def export_csv(self, path: str, date_from: Optional[str] = None,
-                   date_to: Optional[str] = None,
-                   status_filter: Optional[str] = None,
-                   account_filter: Optional[str] = None):
+    def export_csv(
+        self,
+        path: str,
+        date_from: str | None = None,
+        date_to: str | None = None,
+        status_filter: str | None = None,
+        account_filter: str | None = None,
+    ) -> None:
         """Exporta fila como CSV com filtros."""
         items = self.filter(
             account=account_filter,
@@ -318,11 +334,11 @@ class Queue:
 
     # ------------------------------------------------------------------ Internal
 
-    def _append(self, item: QueueItem):
+    def _append(self, item: QueueItem) -> None:
         with open(self.path, "a", encoding="utf-8") as f:
             f.write(json.dumps(item.to_dict(), ensure_ascii=False) + "\n")
 
-    def _rewrite(self, items: list[QueueItem]):
+    def _rewrite(self, items: list[QueueItem]) -> None:
         with open(self.path, "w", encoding="utf-8") as f:
             for i in items:
                 f.write(json.dumps(i.to_dict(), ensure_ascii=False) + "\n")

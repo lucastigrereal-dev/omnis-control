@@ -6,7 +6,6 @@ Dry-run por padrão.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
 
 from src.mission_orchestrator.models import (
     OrchestratorRun,
@@ -32,8 +31,8 @@ RUN_STATUS_BLOCKED_APPROVAL = "blocked_pending_approval"
 
 def execute(
     run: OrchestratorRun,
-    packages_root: Optional[Path] = None,
-    approvals_log: Optional[Path] = None,
+    packages_root: Path | None = None,
+    approvals_log: Path | None = None,
 ) -> OrchestratorRun:
     """Execute the orchestration run (dry-run: only steps s01 and s02).
 
@@ -83,13 +82,13 @@ def _execute_s01(run: OrchestratorRun) -> None:
     step.output = f"intent={run.intent}"
 
 
-def _execute_s02(run: OrchestratorRun, packages_root: Optional[Path]) -> None:
+def _execute_s02(run: OrchestratorRun, packages_root: Path | None) -> None:
     step = _get_step(run, "s02")
     if step is None:
         return
     from src.mission_builder.executor import run as mb_run
 
-    kwargs: dict = {}
+    kwargs: dict[str, Path] = {}
     if packages_root is not None:
         kwargs["packages_root"] = packages_root
 
@@ -109,7 +108,7 @@ def _execute_s02(run: OrchestratorRun, packages_root: Optional[Path]) -> None:
     step.status = "done"
 
 
-def _get_step(run: OrchestratorRun, step_id: str) -> Optional[OrchestratorStep]:
+def _get_step(run: OrchestratorRun, step_id: str) -> OrchestratorStep | None:
     for s in run.steps:
         if s.step_id == step_id:
             return s

@@ -5,7 +5,6 @@ import json
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
 
 
 MISSION_STATUS_OPEN = "open"
@@ -33,10 +32,10 @@ class MissionContract:
     setor: str
     objetivo: str
     criado_por: str
-    closed_at: Optional[str] = None
-    mission_path: Optional[str] = None
+    closed_at: str | None = None
+    mission_path: str | None = None
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "mission_id": self.mission_id,
             "timestamp": self.timestamp,
@@ -49,14 +48,14 @@ class MissionContract:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "MissionContract":
+    def from_dict(cls, data: dict[str, object]) -> "MissionContract":
         return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
 
 
 class MissionEngine:
     """Gerencia o ciclo de vida de uma missão no filesystem local."""
 
-    def __init__(self, missions_root: Optional[Path] = None) -> None:
+    def __init__(self, missions_root: Path | None = None) -> None:
         self.missions_root = Path(missions_root) if missions_root else MISSIONS_ROOT
 
     def open_mission(
@@ -83,7 +82,7 @@ class MissionEngine:
         self._write_contract(mission_path, contract)
         return contract
 
-    def close_mission(self, mission_id: str) -> Optional[MissionContract]:
+    def close_mission(self, mission_id: str) -> MissionContract | None:
         """Fecha uma missão existente: atualiza status=closed e closed_at."""
         mission_path = self.missions_root / mission_id
         contract_path = mission_path / "mission_contract.json"
@@ -100,7 +99,7 @@ class MissionEngine:
         self._write_contract(mission_path, contract)
         return contract
 
-    def get_mission(self, mission_id: str) -> Optional[MissionContract]:
+    def get_mission(self, mission_id: str) -> MissionContract | None:
         """Retorna o contrato de uma missão existente."""
         mission_path = self.missions_root / mission_id
         return self._read_contract(mission_path)
@@ -124,7 +123,7 @@ class MissionEngine:
             encoding="utf-8",
         )
 
-    def _read_contract(self, mission_path: Path) -> Optional[MissionContract]:
+    def _read_contract(self, mission_path: Path) -> MissionContract | None:
         contract_path = mission_path / "mission_contract.json"
         if not contract_path.exists():
             return None

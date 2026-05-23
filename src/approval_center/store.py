@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
 
 from src.approval_center.models import ApprovalRequest
 
@@ -13,7 +12,7 @@ DEFAULT_APPROVALS_LOG = BASE / "data" / "approval_requests.jsonl"
 
 
 class ApprovalStore:
-    def __init__(self, path=None):
+    def __init__(self, path: Path | str | None = None) -> None:
         self.path = Path(path) if path is not None else DEFAULT_APPROVALS_LOG
 
     def save(self, req: ApprovalRequest) -> None:
@@ -21,7 +20,7 @@ class ApprovalStore:
         with self.path.open("a", encoding="utf-8") as f:
             f.write(json.dumps(req.to_dict(), ensure_ascii=False) + "\n")
 
-    def list_all(self, limit: int = 50, status: Optional[str] = None) -> list[ApprovalRequest]:
+    def list_all(self, limit: int = 50, status: str | None = None) -> list[ApprovalRequest]:
         if not self.path.exists():
             return []
         reqs: dict[str, ApprovalRequest] = {}
@@ -44,13 +43,18 @@ class ApprovalStore:
             result = [r for r in result if r.status == status]
         return result[:limit]
 
-    def get(self, request_id: str) -> Optional[ApprovalRequest]:
+    def get(self, request_id: str) -> ApprovalRequest | None:
         for req in self.list_all(limit=10000):
             if req.request_id == request_id:
                 return req
         return None
 
-    def update_status(self, request_id: str, new_status: str, note: str = "") -> Optional[ApprovalRequest]:
+    def update_status(
+        self,
+        request_id: str,
+        new_status: str,
+        note: str = "",
+    ) -> ApprovalRequest | None:
         req = self.get(request_id)
         if req is None:
             return None

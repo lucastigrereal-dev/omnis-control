@@ -7,7 +7,6 @@ import json
 import os
 import uuid
 from pathlib import Path
-from typing import Optional
 
 from .models import CaptionDraft, DraftStatus, ApprovalAction, ApprovalLogEntry, _now_iso
 
@@ -32,11 +31,18 @@ class DraftsManager:
 
     # -------------------------------------------------------------- Create
 
-    def create(self, queue_id: str, account_handle: str,
-               caption_text: str = "", hashtags: Optional[list[str]] = None,
-               cta: str = "", objective: str = "alcance",
-               format: str = "unknown", notes: str = "",
-               asset_id: Optional[str] = None) -> CaptionDraft:
+    def create(
+        self,
+        queue_id: str,
+        account_handle: str,
+        caption_text: str = "",
+        hashtags: list[str] | None = None,
+        cta: str = "",
+        objective: str = "alcance",
+        format: str = "unknown",
+        notes: str = "",
+        asset_id: str | None = None,
+    ) -> CaptionDraft:
         """Cria um novo rascunho."""
         draft = CaptionDraft(
             draft_id=uuid.uuid4().hex[:12],
@@ -72,7 +78,7 @@ class DraftsManager:
                         continue
         return items
 
-    def get(self, draft_id: str) -> Optional[CaptionDraft]:
+    def get(self, draft_id: str) -> CaptionDraft | None:
         items = self.list_all()
         for item in items:
             if item.draft_id == draft_id:
@@ -83,7 +89,7 @@ class DraftsManager:
             return matches[0]
         return None
 
-    def get_by_queue_id(self, queue_id: str) -> Optional[CaptionDraft]:
+    def get_by_queue_id(self, queue_id: str) -> CaptionDraft | None:
         """Retorna o draft mais recente para um queue_id (último criado no JSONL)."""
         items = [i for i in self.list_all() if i.queue_id == queue_id]
         if not items:
@@ -92,7 +98,7 @@ class DraftsManager:
 
     # -------------------------------------------------------------- Update
 
-    def update(self, draft_id: str, **kwargs) -> Optional[CaptionDraft]:
+    def update(self, draft_id: str, **kwargs: object) -> CaptionDraft | None:
         """Atualiza campos de um rascunho.
 
         Regras:
@@ -137,7 +143,7 @@ class DraftsManager:
 
     # -------------------------------------------------------------- Submit
 
-    def submit(self, draft_id: str) -> Optional[CaptionDraft]:
+    def submit(self, draft_id: str) -> CaptionDraft | None:
         """Marca draft para revisão (draft → needs_review)."""
         items = self.list_all()
         found = self.get(draft_id)
@@ -178,8 +184,12 @@ class DraftsManager:
 
     # -------------------------------------------------------------- Export
 
-    def export_csv(self, path: str, status_filter: Optional[str] = None,
-                   account_filter: Optional[str] = None):
+    def export_csv(
+        self,
+        path: str,
+        status_filter: str | None = None,
+        account_filter: str | None = None,
+    ) -> None:
         """Exporta rascunhos como CSV."""
         items = self.list_all()
         if status_filter:
@@ -214,9 +224,12 @@ class DraftsManager:
 
     # ----------------------------------------------------------- Approval Log
 
-    def get_approval_log(self, limit: int = 50,
-                         draft_id: Optional[str] = None,
-                         action: Optional[str] = None) -> list[ApprovalLogEntry]:
+    def get_approval_log(
+        self,
+        limit: int = 50,
+        draft_id: str | None = None,
+        action: str | None = None,
+    ) -> list[ApprovalLogEntry]:
         if not os.path.isfile(self.log_path):
             return []
         entries = []
@@ -237,19 +250,24 @@ class DraftsManager:
 
     # -------------------------------------------------------------- Internal
 
-    def _append(self, draft: CaptionDraft):
+    def _append(self, draft: CaptionDraft) -> None:
         with open(self.drafts_path, "a", encoding="utf-8") as f:
             f.write(json.dumps(draft.to_dict(), ensure_ascii=False) + "\n")
 
-    def _rewrite(self, items: list[CaptionDraft]):
+    def _rewrite(self, items: list[CaptionDraft]) -> None:
         with open(self.drafts_path, "w", encoding="utf-8") as f:
             for i in items:
                 f.write(json.dumps(i.to_dict(), ensure_ascii=False) + "\n")
 
-    def _log(self, draft_id: str, queue_id: str, action: str,
-             reason: Optional[str] = None,
-             previous_status: Optional[str] = None,
-             new_status: Optional[str] = None):
+    def _log(
+        self,
+        draft_id: str,
+        queue_id: str,
+        action: str,
+        reason: str | None = None,
+        previous_status: str | None = None,
+        new_status: str | None = None,
+    ) -> None:
         entry = ApprovalLogEntry(
             event_id=uuid.uuid4().hex[:12],
             draft_id=draft_id,

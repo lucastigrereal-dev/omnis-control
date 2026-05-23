@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 from src.execution_graph.models import StepRun, StepRunLog, StepStatus
-from src.execution_queue.models import QueueItem, QueueItemStatus, QueueResult
+from src.execution_queue.models import QueueItem, QueueItemStatus
 from src.execution_queue.queue import ExecutionQueue
-from src.runtime_bridge.models import BridgeResult, STATUS_MAP, _SKIP_STATUSES, map_step_status
+from src.runtime_bridge.models import BridgeResult, _SKIP_STATUSES, map_step_status
 from src.runtime_bridge.errors import BridgeMappingError
 
 
@@ -40,7 +40,7 @@ class RuntimeBridge:
     Injeta ExecutionQueue no construtor. Nunca instancia queue internamente.
     """
 
-    def __init__(self, queue: ExecutionQueue, dry_run: bool = True):
+    def __init__(self, queue: ExecutionQueue, dry_run: bool = True) -> None:
         self.queue = queue
         self.dry_run = dry_run
 

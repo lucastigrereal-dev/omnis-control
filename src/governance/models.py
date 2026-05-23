@@ -4,7 +4,6 @@ from __future__ import annotations
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Optional
 
 # ── Risk level constants ──────────────────────────────────────────────────
 RISK_LOW = "low"
@@ -72,7 +71,7 @@ class ApprovalPolicy:
         cls,
         name: str,
         risk_level: str,
-        action_types: Optional[list[str]] = None,
+        action_types: list[str] | None = None,
         requires_approval: bool = True,
         auto_deny: bool = False,
         description: str = "",
@@ -92,7 +91,7 @@ class ApprovalPolicy:
             description=description,
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "policy_id": self.policy_id,
             "name": self.name,
@@ -106,7 +105,7 @@ class ApprovalPolicy:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "ApprovalPolicy":
+    def from_dict(cls, data: dict[str, object]) -> "ApprovalPolicy":
         return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
 
 
@@ -125,10 +124,10 @@ class ScopeRule:
     def new(
         cls,
         name: str,
-        allowed_actions: Optional[list[str]] = None,
-        blocked_actions: Optional[list[str]] = None,
-        target_paths: Optional[list[str]] = None,
-        blocked_paths: Optional[list[str]] = None,
+        allowed_actions: list[str] | None = None,
+        blocked_actions: list[str] | None = None,
+        target_paths: list[str] | None = None,
+        blocked_paths: list[str] | None = None,
         enabled: bool = True,
     ) -> "ScopeRule":
         for at in (allowed_actions or []):
@@ -147,7 +146,7 @@ class ScopeRule:
             enabled=enabled,
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "rule_id": self.rule_id,
             "name": self.name,
@@ -160,7 +159,7 @@ class ScopeRule:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "ScopeRule":
+    def from_dict(cls, data: dict[str, object]) -> "ScopeRule":
         return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
 
 
@@ -173,8 +172,8 @@ class AuditEvent:
     actor: str
     verdict: str
     timestamp: str = field(default_factory=_now_iso)
-    details: dict = field(default_factory=dict)
-    approved_by: Optional[str] = None
+    details: dict[str, object] = field(default_factory=dict)
+    approved_by: str | None = None
 
     @classmethod
     def new(
@@ -184,8 +183,8 @@ class AuditEvent:
         target: str,
         actor: str,
         verdict: str,
-        details: Optional[dict] = None,
-        approved_by: Optional[str] = None,
+        details: dict[str, object] | None = None,
+        approved_by: str | None = None,
     ) -> "AuditEvent":
         if action_type not in VALID_ACTION_TYPES:
             raise ValueError(f"Invalid action type: {action_type!r}. Must be one of {sorted(VALID_ACTION_TYPES)}")
@@ -204,7 +203,7 @@ class AuditEvent:
             approved_by=approved_by,
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "event_id": self.event_id,
             "action_type": self.action_type,
@@ -218,7 +217,7 @@ class AuditEvent:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "AuditEvent":
+    def from_dict(cls, data: dict[str, object]) -> "AuditEvent":
         return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})
 
 
@@ -231,8 +230,8 @@ class GovernanceDecision:
     verdict: str
     reason: str
     timestamp: str = field(default_factory=_now_iso)
-    policy_id: Optional[str] = None
-    audit_event_id: Optional[str] = None
+    policy_id: str | None = None
+    audit_event_id: str | None = None
 
     @classmethod
     def new(
@@ -242,8 +241,8 @@ class GovernanceDecision:
         target: str,
         verdict: str,
         reason: str,
-        policy_id: Optional[str] = None,
-        audit_event_id: Optional[str] = None,
+        policy_id: str | None = None,
+        audit_event_id: str | None = None,
     ) -> "GovernanceDecision":
         if action_type not in VALID_ACTION_TYPES:
             raise ValueError(f"Invalid action type: {action_type!r}. Must be one of {sorted(VALID_ACTION_TYPES)}")
@@ -262,7 +261,7 @@ class GovernanceDecision:
             audit_event_id=audit_event_id,
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "decision_id": self.decision_id,
             "action_type": self.action_type,
@@ -276,5 +275,5 @@ class GovernanceDecision:
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> "GovernanceDecision":
+    def from_dict(cls, data: dict[str, object]) -> "GovernanceDecision":
         return cls(**{k: v for k, v in data.items() if k in cls.__dataclass_fields__})

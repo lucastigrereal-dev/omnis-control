@@ -2,7 +2,6 @@
 
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
-from typing import Optional
 
 
 class QueueStatus:
@@ -49,20 +48,20 @@ class QueueItem:
     date: str          # YYYY-MM-DD
     time: str          # HH:MM
     timezone: str = "America/Sao_Paulo"
-    asset_id: Optional[str] = None
+    asset_id: str | None = None
     format: str = QueueFormat.UNKNOWN
     objective: str = QueueObjective.REACH
     status: str = QueueStatus.PLANNED
     priority: str = Priority.MEDIUM
-    notes: Optional[str] = None
+    notes: str | None = None
     created_at: str = field(default_factory=_now_iso)
     updated_at: str = field(default_factory=_now_iso)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: dict) -> "QueueItem":
+    def from_dict(cls, data: dict[str, object]) -> "QueueItem":
         return cls(**data)
 
     @property

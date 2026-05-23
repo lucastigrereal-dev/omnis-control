@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Optional
 
 
 def _now_iso() -> str:
@@ -20,7 +19,7 @@ class WritebackResult:
     written: int = 0
     blocked: int = 0
     approval_required: int = 0
-    records: list[dict] = field(default_factory=list)
+    records: list[dict[str, object]] = field(default_factory=list)
     details: list[str] = field(default_factory=list)
     dry_run: bool = True
     created_at: str = field(default_factory=_now_iso)
@@ -31,7 +30,7 @@ class WritebackResult:
             self.total_learnings == 0 and self.blocked == 0
         )
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "writeback_id": self.writeback_id,
             "mission_id": self.mission_id,
@@ -61,7 +60,7 @@ class LearningWritebackService:
         mission_id: str,
         journal_dir: str,
         sector: str = "produto",
-        tags: Optional[list[str]] = None,
+        tags: list[str] | None = None,
     ) -> WritebackResult:
         import uuid
 
@@ -150,7 +149,7 @@ class LearningWritebackService:
         mission_id: str,
         insight: str,
         sector: str = "produto",
-        tags: Optional[list[str]] = None,
+        tags: list[str] | None = None,
         confidence: str = "medium",
     ) -> WritebackResult:
         import uuid

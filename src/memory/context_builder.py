@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Optional
 
 
 def _now_iso() -> str:
@@ -27,7 +26,7 @@ class ContextResult:
     dry_run: bool = True
     created_at: str = field(default_factory=_now_iso)
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, object]:
         return {
             "mission_id": self.mission_id,
             "account_handle": self.account_handle,
@@ -59,7 +58,7 @@ class MemoryContextBuilder:
         intent: str,
         sector: str,
         account_handle: str = "",
-        tags: Optional[list[str]] = None,
+        tags: list[str] | None = None,
         max_hits: int = 8,
     ) -> ContextResult:
         from src.memory_intel.service import MemoryIntelligence
@@ -161,16 +160,32 @@ class MemoryContextBuilder:
         account_handle: str,
         intent: str,
         sector: str,
-        pack_hits: list[dict],
+        pack_hits: list[dict[str, object]],
         assembled_text: str,
-        source_summary: dict,
-        similar_missions: list[dict] | None = None,
-        patterns: dict | None = None,
+        source_summary: dict[str, object],
+        similar_missions: list[dict[str, object]] | None = None,
+        patterns: dict[str, object] | None = None,
     ) -> str:
         similar_missions = similar_missions or []
         patterns = patterns or {}
 
-        lines = [
+        lines = self._context_header(mission_id, account_handle, intent, sector)
+        self._append_source_summary(lines, source_summary)
+        self._append_hits(lines, pack_hits)
+        self._append_assembled_text(lines, assembled_text)
+        self._append_similar_missions(lines, similar_missions)
+        self._append_patterns(lines, patterns)
+
+        return "\n".join(lines)
+
+    def _context_header(
+        self,
+        mission_id: str,
+        account_handle: str,
+        intent: str,
+        sector: str,
+    ) -> list[str]:
+        return [
             f"# Contexto Usado — {mission_id}",
             "",
             f"**Conta:** @{account_handle or 'nao informada'}",
@@ -182,6 +197,11 @@ class MemoryContextBuilder:
             "",
         ]
 
+    def _append_source_summary(
+        self,
+        lines: list[str],
+        source_summary: dict[str, object],
+    ) -> None:
         for src, count in sorted(source_summary.items()):
             lines.append(f"- {src}: {count} hits")
 
@@ -194,17 +214,27 @@ class MemoryContextBuilder:
             "",
         ])
 
-        for h in pack_hits:
-            title = h.get("title", "sem titulo")
-            relevance = h.get("relevance", "low")
-            snippet = h.get("snippet", "")
-            source = h.get("source_type", "desconhecido")
+    def _append_hits(
+        self,
+        lines: list[str],
+        pack_hits: list[dict[str, object]],
+    ) -> None:
+        for hit in pack_hits:
+            title = hit.get("title", "sem titulo")
+            relevance = hit.get("relevance", "low")
+            snippet = hit.get("snippet", "")
+            source = hit.get("source_type", "desconhecido")
             lines.append(f"### [{source}:{relevance}] {title}")
             lines.append("")
             if snippet:
                 lines.append(f"> {snippet}")
             lines.append("")
 
+    def _append_assembled_text(
+        self,
+        lines: list[str],
+        assembled_text: str,
+    ) -> None:
         if assembled_text:
             lines.extend([
                 "## Texto consolidado",
@@ -213,6 +243,11 @@ class MemoryContextBuilder:
                 "",
             ])
 
+    def _append_similar_missions(
+        self,
+        lines: list[str],
+        similar_missions: list[dict[str, object]],
+    ) -> None:
         if similar_missions:
             lines.extend([
                 "## Missoes similares",
@@ -228,6 +263,11 @@ class MemoryContextBuilder:
                     lines.append(f"  - {ins}")
             lines.append("")
 
+    def _append_patterns(
+        self,
+        lines: list[str],
+        patterns: dict[str, object],
+    ) -> None:
         if patterns.get("sample_count", 0) > 0:
             lines.extend([
                 "## Padroes detectados",
@@ -239,8 +279,6 @@ class MemoryContextBuilder:
             for insight in patterns.get("insights", [])[:3]:
                 lines.append(f"- Insight: {insight}")
             lines.append("")
-
-        return "\n".join(lines)
 
     def _empty_context(self, mission_id: str, account_handle: str, intent: str) -> str:
         return f"""# Contexto Usado — {mission_id}

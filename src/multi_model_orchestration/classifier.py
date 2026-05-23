@@ -17,7 +17,7 @@ from src.multi_model_orchestration.models import (
 
 # ── Mapping: OMNIS intent → capability requirements ────────────────────────
 
-_INTENT_CAPABILITY_MAP: dict[str, dict] = {
+_INTENT_CAPABILITY_MAP: dict[str, dict[str, object]] = {
     # Classification / routing
     "classify_intent": {
         "complexity": COMPLEXITY_LOW,
