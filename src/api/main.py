@@ -9,7 +9,7 @@ Uso:
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
-from src.api.routers import health, queue, accounts, drafts, assets, missions, skills, reports
+from src.api.routers import health, queue, accounts, drafts, assets, missions, skills, reports, agent
 
 app = FastAPI(
     title="OMNIS API",
@@ -34,6 +34,7 @@ app.include_router(assets.router,   prefix="/assets",   tags=["assets"])
 app.include_router(missions.router, prefix="/missions", tags=["missions"])
 app.include_router(skills.router,   prefix="/skills",   tags=["skills"])
 app.include_router(reports.router,  prefix="/reports",  tags=["reports"])
+app.include_router(agent.router,    prefix="/agent",    tags=["agent"])
 
 
 @app.get("/", tags=["meta"])

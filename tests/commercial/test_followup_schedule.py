@@ -291,8 +291,9 @@ class TestFollowUpSchedule:
                          "Premium", 80, "hot")
         seqr = _make_sequencer_with_leads([hl])
 
-        e1 = scheduler.build(seqr)
-        e2 = scheduler.build(seqr)
+        ref = "2026-01-01T00:00:00Z"
+        e1 = scheduler.build(seqr, reference_date=ref)
+        e2 = scheduler.build(seqr, reference_date=ref)
         assert len(e1) == len(e2)
         for a, b in zip(e1, e2):
             assert a.hotel_name == b.hotel_name
