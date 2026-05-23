@@ -12,6 +12,7 @@ from rich.panel import Panel
 from src.agentic.agent_models import AgentRunRepository, AgentRunStatus, StepStatus
 from src.agentic.batch_runner import BatchReport, BatchRunner, BatchVerdict
 from src.agentic.caption_draft_agent import CaptionDraftAgent
+from src.agentic.llm_adapter import LiteLLMAdapter
 from src.agentic.scheduler import SchedulerService
 from src.content_queue import Queue, QueueStatus
 from src.memory.caption_memory import CaptionMemoryReader
@@ -292,6 +293,9 @@ def agent_status(
     reader = CaptionMemoryReader()
     memory_total = reader.count()
 
+    # LiteLLM health (non-blocking)
+    litellm_available = LiteLLMAdapter().health_check()
+
     if json_out:
         console.print_json(json.dumps({
             "queue": {
@@ -311,6 +315,7 @@ def agent_status(
                 "due_now": len(due_schedules),
             },
             "memory": {"total_entries": memory_total},
+            "litellm_available": litellm_available,
         }))
         return
 
@@ -338,6 +343,11 @@ def agent_status(
 
     # Memory
     console.print(f"  [bold]Memória:[/bold]  [cyan]{memory_total}[/cyan] legendas aprovadas")
+
+    # LiteLLM
+    llm_color = "green" if litellm_available else "red"
+    llm_label = "disponível" if litellm_available else "indisponível (use --dry-run)"
+    console.print(f"  [bold]LiteLLM:[/bold]  [{llm_color}]{llm_label}[/{llm_color}]")
 
     # Recent runs table
     if recent_runs:

@@ -331,3 +331,64 @@ def test_agent_real_gate_draft_approved(tmp_path):
     draft = drafts.get(run.result["draft_id"])
     assert draft is not None
     assert draft.status == DraftStatus.APPROVED
+
+
+# ── LLM failure handling ──────────────────────────────────────────────────────
+
+class _FailingLLM:
+    """Simula LiteLLMAdapter com servidor indisponível."""
+    def generate_caption(self, prompt):
+        import urllib.error
+        raise urllib.error.URLError("Connection refused")
+
+
+class _TimeoutLLM:
+    """Simula LiteLLMAdapter com timeout."""
+    def generate_caption(self, prompt):
+        import socket
+        raise socket.timeout("timed out")
+
+
+def test_agent_llm_connection_error_fails_gracefully(tmp_path):
+    queue, queue_id = _make_queue_with_item(tmp_path)
+    repo = AgentRunRepository(path=str(tmp_path / "runs.jsonl"))
+    agent = CaptionDraftAgent(
+        dry_run=False, queue=queue, repo=repo, llm=_FailingLLM(),
+    )
+    run = agent.run(queue_id)
+    assert run.status == AgentRunStatus.FAILED
+    assert run.error is not None
+    assert "falhou" in run.error or "Connection" in run.error
+
+
+def test_agent_llm_timeout_fails_gracefully(tmp_path):
+    queue, queue_id = _make_queue_with_item(tmp_path)
+    repo = AgentRunRepository(path=str(tmp_path / "runs.jsonl"))
+    agent = CaptionDraftAgent(
+        dry_run=False, queue=queue, repo=repo, llm=_TimeoutLLM(),
+    )
+    run = agent.run(queue_id)
+    assert run.status == AgentRunStatus.FAILED
+
+
+def test_agent_llm_failure_run_persisted(tmp_path):
+    queue, queue_id = _make_queue_with_item(tmp_path)
+    repo = AgentRunRepository(path=str(tmp_path / "runs.jsonl"))
+    agent = CaptionDraftAgent(
+        dry_run=False, queue=queue, repo=repo, llm=_FailingLLM(),
+    )
+    run = agent.run(queue_id)
+    saved = repo.get(run.run_id)
+    assert saved is not None
+    assert saved.status == AgentRunStatus.FAILED
+
+
+def test_agent_llm_failure_has_error_step(tmp_path):
+    queue, queue_id = _make_queue_with_item(tmp_path)
+    repo = AgentRunRepository(path=str(tmp_path / "runs.jsonl"))
+    agent = CaptionDraftAgent(
+        dry_run=False, queue=queue, repo=repo, llm=_FailingLLM(),
+    )
+    run = agent.run(queue_id)
+    error_steps = [s for s in run.steps if s.status == StepStatus.ERROR]
+    assert len(error_steps) >= 1

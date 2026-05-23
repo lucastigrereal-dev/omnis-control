@@ -257,3 +257,10 @@ def test_agent_group_has_status():
     result = runner.invoke(app, ["agent", "--help"])
     assert result.exit_code == 0
     assert "status" in result.output
+
+
+def test_agent_status_json_has_litellm_key():
+    result = runner.invoke(app, ["agent", "status", "--json"])
+    data = json.loads(result.output)
+    assert "litellm_available" in data
+    assert isinstance(data["litellm_available"], bool)

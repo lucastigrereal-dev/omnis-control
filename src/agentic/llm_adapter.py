@@ -110,6 +110,34 @@ class LiteLLMAdapter:
         self.model = model
         self.base_url = base_url
 
+    def health_check(self) -> bool:
+        """Retorna True se o gateway LiteLLM está respondendo."""
+        import urllib.request
+        import urllib.error
+        try:
+            with urllib.request.urlopen(f"{self.base_url}/health", timeout=3):
+                return True
+        except (urllib.error.URLError, OSError):
+            return False
+
+    @staticmethod
+    def _parse_response(raw_content: str) -> tuple[str, str, str, list[str]]:
+        """Extrai hook/body/cta/hashtags do JSON da resposta LLM.
+
+        Retorna fallback de texto livre se o JSON for inválido.
+        """
+        import json
+        try:
+            parsed = json.loads(raw_content)
+            return (
+                parsed.get("hook", ""),
+                parsed.get("body", ""),
+                parsed.get("cta", ""),
+                parsed.get("hashtags", []),
+            )
+        except (json.JSONDecodeError, KeyError):
+            return raw_content[:120], raw_content, "", []
+
     def generate_caption(self, prompt: CaptionPromptInput) -> CaptionLLMOutput:
         import json
         import urllib.request
@@ -150,20 +178,7 @@ class LiteLLMAdapter:
 
         tokens = data.get("usage", {}).get("total_tokens", 0)
         raw_content = data["choices"][0]["message"]["content"]
-
-        try:
-            parsed = json.loads(raw_content)
-            hook = parsed.get("hook", "")
-            body = parsed.get("body", "")
-            cta = parsed.get("cta", "")
-            hashtags = parsed.get("hashtags", [])
-        except (json.JSONDecodeError, KeyError):
-            # fallback: trata resposta como texto livre
-            hook = raw_content[:120]
-            body = raw_content
-            cta = ""
-            hashtags = []
-
+        hook, body, cta, hashtags = self._parse_response(raw_content)
         raw = f"{hook}\n\n{body}\n\n{cta}" if cta else f"{hook}\n\n{body}"
 
         return CaptionLLMOutput(
