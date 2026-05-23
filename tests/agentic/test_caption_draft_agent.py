@@ -53,12 +53,13 @@ def test_agent_dry_run_returns_run(tmp_path):
     assert run.status == AgentRunStatus.DRY_RUN
 
 
-def test_agent_dry_run_has_5_steps(tmp_path):
+def test_agent_dry_run_has_6_steps(tmp_path):
     agent, queue_id, _ = _make_agent(tmp_path)
     run = agent.run(queue_id)
-    assert len(run.steps) == 5
+    assert len(run.steps) == 6
     step_names = [s.name for s in run.steps]
     assert "approval_gate" in step_names
+    assert "memory_writeback" in step_names
 
 
 def test_agent_dry_run_all_steps_ok(tmp_path):
@@ -183,6 +184,86 @@ def test_agent_result_caption_len_positive(tmp_path):
     agent, queue_id, _ = _make_agent(tmp_path)
     run = agent.run(queue_id)
     assert run.result["caption_len"] > 0
+
+
+# ── Memory writeback ──────────────────────────────────────────────────────────
+
+def test_agent_dry_run_no_writeback(tmp_path):
+    agent, queue_id, _ = _make_agent(tmp_path)
+    run = agent.run(queue_id)
+    assert run.result["memory_written"] is False
+
+
+def test_agent_real_approved_writes_memory(tmp_path):
+    from src.memory.caption_memory import CaptionMemoryWriter, CaptionMemoryReader
+    mem_path = str(tmp_path / "caption_memory.jsonl")
+    queue, queue_id = _make_queue_with_item(tmp_path)
+    drafts = DraftsManager(
+        drafts_path=str(tmp_path / "drafts.jsonl"),
+        log_path=str(tmp_path / "log.jsonl"),
+    )
+    repo = AgentRunRepository(path=str(tmp_path / "runs.jsonl"))
+    writer = CaptionMemoryWriter(path=mem_path)
+    agent = CaptionDraftAgent(
+        dry_run=False, queue=queue, drafts_manager=drafts,
+        repo=repo, llm=MockLLMAdapter(), memory_writer=writer,
+    )
+    run = agent.run(queue_id)
+    assert run.result["memory_written"] is True
+    reader = CaptionMemoryReader(path=mem_path)
+    assert reader.count("@oinatalrn") == 1
+
+
+def test_agent_real_approved_memory_readable_next_run(tmp_path):
+    from src.memory.caption_memory import CaptionMemoryWriter, CaptionMemoryReader
+    mem_path = str(tmp_path / "caption_memory.jsonl")
+    queue, queue_id = _make_queue_with_item(tmp_path)
+    drafts = DraftsManager(
+        drafts_path=str(tmp_path / "drafts.jsonl"),
+        log_path=str(tmp_path / "log.jsonl"),
+    )
+    repo = AgentRunRepository(path=str(tmp_path / "runs.jsonl"))
+    writer = CaptionMemoryWriter(path=mem_path)
+    agent = CaptionDraftAgent(
+        dry_run=False, queue=queue, drafts_manager=drafts,
+        repo=repo, llm=MockLLMAdapter(), memory_writer=writer,
+    )
+    agent.run(queue_id)
+    reader = CaptionMemoryReader(path=mem_path)
+    similar = reader.find_similar("@oinatalrn", "alcance")
+    assert len(similar) == 1
+    assert len(similar[0]) > 0
+
+
+def test_agent_needs_review_no_writeback(tmp_path):
+    from src.memory.caption_memory import CaptionMemoryWriter, CaptionMemoryReader
+    from src.agentic.llm_adapter import CaptionLLMOutput
+
+    class BlockedMockLLM:
+        def generate_caption(self, prompt):
+            return CaptionLLMOutput(
+                hook="[HOOK A REVISAR]", body="corpo", cta="cta",
+                hashtags=["#x"], raw="[HOOK A REVISAR]\ncorpo\ncta",
+                model_used="mock/blocked", tokens_used=0,
+            )
+
+    mem_path = str(tmp_path / "caption_memory.jsonl")
+    queue, queue_id = _make_queue_with_item(tmp_path)
+    drafts = DraftsManager(
+        drafts_path=str(tmp_path / "drafts.jsonl"),
+        log_path=str(tmp_path / "log.jsonl"),
+    )
+    repo = AgentRunRepository(path=str(tmp_path / "runs.jsonl"))
+    writer = CaptionMemoryWriter(path=mem_path)
+    agent = CaptionDraftAgent(
+        dry_run=False, queue=queue, drafts_manager=drafts,
+        repo=repo, llm=BlockedMockLLM(), memory_writer=writer,
+    )
+    run = agent.run(queue_id)
+    assert run.result["gate_verdict"] == "needs_review"
+    assert run.result["memory_written"] is False
+    reader = CaptionMemoryReader(path=mem_path)
+    assert reader.count() == 0
 
 
 # ── Approval Gate — dry_run ───────────────────────────────────────────────────

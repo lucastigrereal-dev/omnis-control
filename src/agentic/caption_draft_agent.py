@@ -1,6 +1,6 @@
 """CaptionDraftAgent — agente mínimo real que executa o loop completo.
 
-Loop: QueueItem → MemoryContext → LLM → CaptionDraft → ApprovalGate → QueueItem(caption_ready).
+Loop: QueueItem → Memory → LLM → Draft → Gate → caption_ready → MemoryWriteback.
 dry_run=True por padrão: usa MockLLMAdapter, sem persistência permanente.
 """
 from __future__ import annotations
@@ -19,6 +19,7 @@ from src.caption_approval.drafts import DraftsManager
 from src.caption_approval.models import DraftStatus
 from src.content_queue.models import QueueItem, QueueStatus
 from src.content_queue.queue import Queue
+from src.memory.caption_memory import CaptionMemoryWriter
 from src.memory.interface import MemoryContext, MemoryInterface
 
 
@@ -33,6 +34,7 @@ class CaptionDraftAgent:
         memory: MemoryInterface | None = None,
         repo: AgentRunRepository | None = None,
         llm: LLMAdapter | None = None,
+        memory_writer: CaptionMemoryWriter | None = None,
     ) -> None:
         self.dry_run = dry_run
         self._queue = queue or Queue()
@@ -40,6 +42,7 @@ class CaptionDraftAgent:
         self._memory = memory or MemoryInterface(dry_run=dry_run)
         self._repo = repo or AgentRunRepository()
         self._llm: LLMAdapter = llm or (MockLLMAdapter() if dry_run else LiteLLMAdapter())
+        self._memory_writer = memory_writer or CaptionMemoryWriter()
 
     # ── public ───────────────────────────────────────────────────────────────
 
@@ -66,6 +69,7 @@ class CaptionDraftAgent:
 
         draft_id = self._persist_draft(run, item, llm_output)
         gate_result = self._run_approval_gate(run, draft_id, item)
+        self._write_memory(run, item, llm_output, gate_result, draft_id)
 
         run.complete(result={
             "draft_id": draft_id,
@@ -77,6 +81,7 @@ class CaptionDraftAgent:
             "gate_verdict": gate_result["verdict"],
             "gate_blocks": gate_result["blocks"],
             "queue_status": gate_result["queue_status"],
+            "memory_written": gate_result.get("memory_written", False),
             "dry_run": self.dry_run,
         })
         self._repo.save(run)
@@ -215,3 +220,44 @@ class CaptionDraftAgent:
         except ValueError as exc:
             step.complete(f"verdict=needs_review reason={exc}")
             return {"verdict": "needs_review", "blocks": [str(exc)], "queue_status": "unchanged"}
+
+    def _write_memory(
+        self,
+        run: AgentRun,
+        item: QueueItem,
+        llm_output: "CaptionLLMOutput",  # noqa: F821
+        gate_result: dict[str, object],
+        draft_id: str,
+    ) -> None:
+        verdict = gate_result.get("verdict", "")
+        approved = verdict in ("approved", "approved_dry")
+
+        step = run.add_step(
+            "memory_writeback",
+            input_summary=f"approved={approved} dry_run={self.dry_run}",
+        )
+
+        if not approved:
+            step.skip("não aprovado — sem writeback")
+            gate_result["memory_written"] = False
+            return
+
+        if self.dry_run:
+            step.complete("dry_run — writeback simulado")
+            gate_result["memory_written"] = False
+            return
+
+        try:
+            self._memory_writer.write(
+                account_handle=item.account_handle,
+                objective=run.objective,
+                format=item.format or "feed",
+                caption_text=llm_output.raw,
+                run_id=run.run_id,
+                draft_id=draft_id,
+            )
+            step.complete(f"gravado account={item.account_handle} objective={run.objective}")
+            gate_result["memory_written"] = True
+        except Exception as exc:
+            step.fail(str(exc))
+            gate_result["memory_written"] = False

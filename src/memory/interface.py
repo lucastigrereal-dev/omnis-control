@@ -103,6 +103,18 @@ class MemoryInterface:
         except Exception:
             patterns.append("learning_reuse_unavailable")
 
+        try:
+            from src.memory.caption_memory import CaptionMemoryReader
+            reader = CaptionMemoryReader()
+            caption_hits = reader.find_similar(
+                account_handle=account_handle, objective=intent, top_k=top_k
+            )
+            similar_captions = (caption_hits + similar_captions)[:top_k]
+            if caption_hits:
+                patterns.append(f"caption_memory:{len(caption_hits)}")
+        except Exception:
+            patterns.append("caption_memory_unavailable")
+
         context_md = (
             f"# Contexto real\nMissão: {mission_id}\nConta: {account_handle}\n"
             f"Intenção: {intent}\nFontes: {len(hits)}\nSimilares: {len(similar_captions)}"
