@@ -11,12 +11,15 @@ Regras OMNIS:
 """
 from __future__ import annotations
 
+import logging
 import threading
 from datetime import datetime, timezone
 from typing import Any
 
 from src.interfaces.browser_executor import BrowserExecutor, BrowserTask, BrowserResult
 from src.computer_use.sandbox import SecuritySandbox
+
+_logger = logging.getLogger("omnis.legos.browser")
 
 # ── RAM guard: 1 browser ativo por vez ───────────────────────────────────────
 _BROWSER_SEMAPHORE = threading.Semaphore(1)
@@ -36,7 +39,7 @@ def _now_iso() -> str:
 
 
 def _log(msg: str) -> None:
-    print(f"[browser][{_now_iso()}] {msg}")
+    _logger.info("[browser][%s] %s", _now_iso(), msg)
 
 
 def _is_critical(goal: str) -> bool:
