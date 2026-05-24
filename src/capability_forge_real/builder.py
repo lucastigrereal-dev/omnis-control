@@ -158,13 +158,15 @@ class CapabilityBuilder:
 
         result.transition(BuildState.DONE)
 
-        # Step 7: Activate skill in SkillCatalog (FIO 3)
+        # Step 7: Activate skill in SkillCatalog (FIO 3) — gated by risk
         cap_id = _slug(proposal.capability_name)
-        result.activated_skill_id = cap_id
-        if not self.dry_run:
-            from src.skill_matcher.loader import DEFAULT_CONFIG_PATH as _caps_default
-            _catalog = self.base_dir / "src" / "skills_bridge" / "catalog" / "skills.json"
-            activate_capability(cap_id, caps_path=_caps_default, catalog_path=_catalog, dry_run=False)
+        if not proposal.approval_required:
+            result.activated_skill_id = cap_id
+            if not self.dry_run:
+                from src.skill_matcher.loader import DEFAULT_CONFIG_PATH as _caps_default
+                _catalog = self.base_dir / "src" / "skills_bridge" / "catalog" / "skills.json"
+                activate_capability(cap_id, caps_path=_caps_default, catalog_path=_catalog, dry_run=False)
+        # medium/high risk: build validated but activation held for human approval
 
         return result
 

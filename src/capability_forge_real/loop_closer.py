@@ -1,9 +1,14 @@
-"""FIO 2 — LoopCloser: repetition → auto-propose → build → activate.
+"""Passo 5 / FIO 2 — LoopCloser: repetition → auto-propose → build → activate.
 
 Chains RepetitionDetector (FIO 1) → CapabilityProposal → CapabilityBuilder
 (with sandbox rail from FIO 4) → SkillCatalog activation (FIO 3).
 
-Low-risk repeated tasks are auto-proposed and built without human intervention.
+Governance (Passo 5): risk is inferred from the candidate text.
+- low  → auto-activates (no external side-effects)
+- medium/high → build + validate but HOLD activation; pending_approval=True
+                until a human explicitly approves.
+
+When in doubt, risk is classified UP (medium), never down.
 """
 from __future__ import annotations
 
@@ -13,6 +18,7 @@ from pathlib import Path
 from typing import Optional
 
 from src.capability_forge_real.models import (
+    BuildState,
     CapabilityProposal,
     PROPOSAL_STATUS_APPROVED,
     IMPL_TYPE_CLI_WRAPPER,
@@ -25,6 +31,36 @@ _SECTOR_KEYWORDS: list[tuple[list[str], str]] = [
     (["hotel", "lead", "collab", "venda", "crm", "prospect", "cliente"], "comercial"),
     (["relatorio", "relatório", "report", "metric", "financi", "receita"], "financeiro"),
     (["agenda", "reuniao", "reunião", "tarefa", "schedule", "calendar"], "operacoes"),
+]
+
+# External communication / real-world effects → HIGH
+_HIGH_RISK_PATTERNS = [
+    "whatsapp", "telegram", "email", "sms",
+    "enviar mensagem", "enviar email", "enviar sms", "send message",
+    "publicar", "publish", "postar", "post to",
+    "webhook", "http request", "api call", "chamada api",
+    "notificar", "notify", "broadcast", "disparar",
+]
+
+# File I/O / database writes / deletions → MEDIUM
+_MEDIUM_RISK_PATTERNS = [
+    "salvar arquivo", "gravar arquivo", "escrever arquivo", "write file",
+    "upload", "deletar", "delete", "remover arquivo", "remove file",
+    "banco de dados", "database", "atualizar banco", "inserir banco",
+    "criar conta", "create account", "modificar sistema",
+]
+
+# Pure local computation / read-only → LOW (explicit allowlist)
+_LOW_RISK_PATTERNS = [
+    "listar", "list", "buscar", "search",
+    "calcular", "calculate", "transformar", "transform",
+    "analisar", "analyze", "analisa", "ler", "read",
+    "consultar", "query", "contar", "count",
+    "criar post", "criar caption", "criar carrossel", "criar reel",
+    "criar relatorio", "criar conteudo", "gerar conteudo",
+    "gerar post", "gerar caption", "formatar", "classificar",
+    "extrair", "resumir", "pontuar", "score", "qualificar lead",
+    "criar resumo", "criar script",
 ]
 
 
@@ -41,6 +77,22 @@ def _infer_sector(text: str) -> str:
     return "automacao"
 
 
+def _infer_risk(text: str) -> str:
+    """Infer risk level from request_text.
+
+    Conservative: when no explicit low-risk match, classify as MEDIUM.
+    Order: HIGH check first, then MEDIUM, then explicit LOW allowlist, else MEDIUM.
+    """
+    lower = text.lower()
+    if any(p in lower for p in _HIGH_RISK_PATTERNS):
+        return "high"
+    if any(p in lower for p in _MEDIUM_RISK_PATTERNS):
+        return "medium"
+    if any(p in lower for p in _LOW_RISK_PATTERNS):
+        return "low"
+    return "medium"  # conservative default — never assume low
+
+
 @dataclass
 class LoopResult:
     """Outcome of processing one RepetitionCandidate through the full loop."""
@@ -51,13 +103,19 @@ class LoopResult:
     proposal_id: str | None = None
     build_state: str | None = None
     activated_skill_id: str | None = None
+    pending_approval: bool = False
     skipped: bool = False
     skip_reason: str = ""
     error: str = ""
 
     @property
     def succeeded(self) -> bool:
-        return self.build_state == "done" and not self.skipped and not self.error
+        return (
+            self.build_state == "done"
+            and not self.skipped
+            and not self.error
+            and not self.pending_approval
+        )
 
     def to_dict(self) -> dict:
         return {
@@ -67,6 +125,7 @@ class LoopResult:
             "proposal_id": self.proposal_id,
             "build_state": self.build_state,
             "activated_skill_id": self.activated_skill_id,
+            "pending_approval": self.pending_approval,
             "skipped": self.skipped,
             "skip_reason": self.skip_reason,
             "error": self.error,
@@ -129,7 +188,7 @@ class LoopCloser:
                 capability_name=cap_id,
                 sector=_infer_sector(candidate.normalized_text),
                 desired_output=f"Automate: {candidate.original_text}",
-                risk_level="low",
+                risk_level=_infer_risk(candidate.normalized_text),
                 implementation_type=IMPL_TYPE_CLI_WRAPPER,
             )
             proposal.status = PROPOSAL_STATUS_APPROVED
@@ -146,6 +205,8 @@ class LoopCloser:
             build_result = CapabilityBuilder(dry_run=self.dry_run).build(proposal)
             result.build_state = build_result.state
             result.activated_skill_id = build_result.activated_skill_id
+            if proposal.approval_required and build_result.state == BuildState.DONE.value:
+                result.pending_approval = True
         except Exception as exc:
             result.error = f"build: {exc}"
             return result

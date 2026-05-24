@@ -75,7 +75,7 @@ class TestLoopResult:
         d = r.to_dict()
         expected = {"candidate_text", "candidate_count", "cap_id", "proposal_id",
                     "build_state", "activated_skill_id", "skipped", "skip_reason",
-                    "error", "succeeded"}
+                    "error", "succeeded", "pending_approval"}
         assert set(d.keys()) == expected
 
     def test_to_dict_succeeded_reflects_state(self):
