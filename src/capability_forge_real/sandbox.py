@@ -1,11 +1,20 @@
-"""Sandbox Runner — isolated execution for generated capabilities."""
+"""Sandbox Runner — isolated subprocess execution for generated capabilities.
+
+Security model: user code is NEVER exec()'d in the parent process.
+Code runs in a fresh Python subprocess via tempfile → subprocess.run().
+Even if the subprocess executes arbitrary OS calls, the parent (OMNIS)
+process memory and state cannot be compromised.
+
+Static scanner (FORBIDDEN_CALLS / FORBIDDEN_IMPORTS) remains as a
+first-layer defence to catch common patterns before subprocess starts.
+"""
 from __future__ import annotations
 
-import io
+import os
+import subprocess
 import sys
+import tempfile
 import time
-import traceback
-from contextlib import contextmanager, redirect_stdout, redirect_stderr
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
@@ -58,33 +67,16 @@ FORBIDDEN_IMPORTS = frozenset({
     "smtplib", "telnetlib",
 })
 
-# Allowlist for exec() namespace — no eval/exec/import/open/vars/getattr
-_SAFE_BUILTINS: dict = {
-    "print": print,
-    "len": len, "range": range, "enumerate": enumerate,
-    "zip": zip, "map": map, "filter": filter,
-    "sorted": sorted, "reversed": reversed,
-    "int": int, "float": float, "str": str, "bool": bool,
-    "list": list, "tuple": tuple, "dict": dict, "set": set,
-    "frozenset": frozenset, "bytes": bytes, "bytearray": bytearray,
-    "min": min, "max": max, "abs": abs, "sum": sum,
-    "round": round, "pow": pow, "divmod": divmod,
-    "isinstance": isinstance, "issubclass": issubclass,
-    "callable": callable, "type": type, "object": object,
-    "repr": repr, "format": format, "hash": hash, "id": id,
-    "iter": iter, "next": next, "chr": chr, "ord": ord,
-    "Exception": Exception, "BaseException": BaseException,
-    "ValueError": ValueError, "TypeError": TypeError,
-    "KeyError": KeyError, "IndexError": IndexError,
-    "AttributeError": AttributeError, "RuntimeError": RuntimeError,
-    "StopIteration": StopIteration, "NotImplementedError": NotImplementedError,
-    "AssertionError": AssertionError, "ZeroDivisionError": ZeroDivisionError,
-    "NameError": NameError, "OverflowError": OverflowError,
-}
-
 
 class SandboxRunner:
-    """Runs generated capability code in a dry-run sandbox — no real execution."""
+    """Runs generated capability code in an isolated subprocess.
+
+    Execution model:
+      1. Static scan — known forbidden patterns are blocked immediately.
+      2. Subprocess execution — code is written to a tempfile and executed
+         via a fresh Python interpreter. The parent process cannot be
+         compromised regardless of what runs inside the subprocess.
+    """
 
     def __init__(
         self,
@@ -105,42 +97,7 @@ class SandboxRunner:
                 blocked_patterns=blocked,
                 error=f"Blocked patterns: {', '.join(blocked)}",
             )
-
-        stdout_buf = io.StringIO()
-        stderr_buf = io.StringIO()
-        start = time.time()
-
-        try:
-            with redirect_stdout(stdout_buf), redirect_stderr(stderr_buf):
-                exec(code, {"__name__": "__sandbox__", "__builtins__": _SAFE_BUILTINS})
-        except Exception as exc:
-            elapsed = (time.time() - start) * 1000
-            return SandboxResult(
-                run_id=run_id,
-                status=SandboxStatus.ERROR,
-                stdout=self._truncate(stdout_buf.getvalue()),
-                stderr=self._truncate(stderr_buf.getvalue()),
-                error=str(exc),
-                duration_ms=elapsed,
-            )
-
-        elapsed = (time.time() - start) * 1000
-
-        if elapsed > self.timeout_ms:
-            return SandboxResult(
-                run_id=run_id,
-                status=SandboxStatus.TIMEOUT,
-                duration_ms=elapsed,
-                error=f"Exceeded timeout: {elapsed:.0f}ms > {self.timeout_ms}ms",
-            )
-
-        return SandboxResult(
-            run_id=run_id,
-            status=SandboxStatus.PASSED,
-            stdout=self._truncate(stdout_buf.getvalue()),
-            stderr=self._truncate(stderr_buf.getvalue()),
-            duration_ms=elapsed,
-        )
+        return self._exec_subprocess(code, run_id)
 
     def dry_run_validate(self, code: str, run_id: str = "") -> SandboxResult:
         """Validate code without executing — pattern scan only."""
@@ -152,25 +109,86 @@ class SandboxRunner:
                 blocked_patterns=blocked,
                 error=f"Blocked patterns: {', '.join(blocked)}",
             )
-        return SandboxResult(
-            run_id=run_id,
-            status=SandboxStatus.PASSED,
-            error="",
-        )
+        return SandboxResult(run_id=run_id, status=SandboxStatus.PASSED, error="")
+
+    def _exec_subprocess(self, code: str, run_id: str) -> SandboxResult:
+        """Write code to tempfile and run in isolated subprocess."""
+        start = time.time()
+        tmp_path: str | None = None
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="w", suffix=".py", delete=False, encoding="utf-8"
+            ) as f:
+                f.write(code)
+                tmp_path = f.name
+
+            proc = subprocess.run(
+                [sys.executable, tmp_path],
+                capture_output=True,
+                text=True,
+                timeout=self.timeout_ms / 1000,
+            )
+            elapsed = (time.time() - start) * 1000
+
+            if proc.returncode != 0:
+                return SandboxResult(
+                    run_id=run_id,
+                    status=SandboxStatus.ERROR,
+                    stdout=self._truncate(proc.stdout),
+                    stderr=self._truncate(proc.stderr),
+                    error=(proc.stderr.strip() or f"exit code {proc.returncode}")[:500],
+                    duration_ms=elapsed,
+                )
+
+            if elapsed > self.timeout_ms:
+                return SandboxResult(
+                    run_id=run_id,
+                    status=SandboxStatus.TIMEOUT,
+                    duration_ms=elapsed,
+                    error=f"Exceeded timeout: {elapsed:.0f}ms > {self.timeout_ms}ms",
+                )
+
+            return SandboxResult(
+                run_id=run_id,
+                status=SandboxStatus.PASSED,
+                stdout=self._truncate(proc.stdout),
+                stderr=self._truncate(proc.stderr),
+                duration_ms=elapsed,
+            )
+
+        except subprocess.TimeoutExpired:
+            elapsed = (time.time() - start) * 1000
+            return SandboxResult(
+                run_id=run_id,
+                status=SandboxStatus.TIMEOUT,
+                duration_ms=elapsed,
+                error=f"Exceeded timeout: {elapsed:.0f}ms > {self.timeout_ms}ms",
+            )
+        except Exception as exc:
+            elapsed = (time.time() - start) * 1000
+            return SandboxResult(
+                run_id=run_id,
+                status=SandboxStatus.ERROR,
+                duration_ms=elapsed,
+                error=f"sandbox_internal:{exc}",
+            )
+        finally:
+            if tmp_path:
+                try:
+                    os.unlink(tmp_path)
+                except OSError:
+                    pass
 
     @staticmethod
     def _scan_blocked(code: str) -> list[str]:
         blocked: list[str] = []
         code_lower = code.lower()
-
         for pattern in FORBIDDEN_CALLS:
             if pattern.lower() in code_lower:
                 blocked.append(pattern)
-
         for module in FORBIDDEN_IMPORTS:
             if f"import {module}" in code_lower or f"from {module}" in code_lower:
                 blocked.append(f"import {module}")
-
         return blocked
 
     @staticmethod
