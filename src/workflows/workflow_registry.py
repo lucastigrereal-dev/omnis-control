@@ -1,6 +1,6 @@
 """WorkflowRegistry — catálogo e health-check de todos os workflows OMNIS.
 
-Onda 13 (base) + Ondas 15-20 — cataloga 10 workflows:
+Onda 13 (base) + Ondas 15-21 — cataloga 11 workflows:
   - DeepResearchWorkflow    (WF1)
   - VideoEditWorkflow       (WF2)
   - AppFactoryWorkflow      (WF3)
@@ -10,7 +10,8 @@ Onda 13 (base) + Ondas 15-20 — cataloga 10 workflows:
   - ContentCalendarWorkflow   (Onda 17)
   - OutreachSequenceWorkflow  (Onda 18)
   - SDRBatchWorkflow          (Onda 19)
-  - DailyBriefingWorkflow     (Onda 20)
+  - DailyBriefingWorkflow        (Onda 20)
+  - MultiAccountCalendarWorkflow (Onda 21)
 
 Papel: análogo ao LegoRegistry (Onda 5) — registra, descreve e verifica workflows.
 
@@ -162,7 +163,7 @@ class WorkflowRegistry:
 
     @classmethod
     def default(cls) -> "WorkflowRegistry":
-        """Cria registry com os 10 workflows OMNIS padrão (Ondas 10-20)."""
+        """Cria registry com os 11 workflows OMNIS padrão (Ondas 10-21)."""
         registry = cls()
         registry._register_defaults()
         return registry
@@ -354,6 +355,25 @@ class WorkflowRegistry:
             _logger.error("daily_briefing import failed: %s", e)
             self.register(WorkflowEntry(
                 name="daily_briefing", version="1.0",
+                description="import failed",
+                cost_local_pct=0, dry_run_safe=False,
+            ))
+
+        try:
+            from src.workflows.multi_account_calendar_workflow import MultiAccountCalendarWorkflow
+            self.register(WorkflowEntry(
+                name="multi_account_calendar",
+                version="1.0",
+                description="Batch de calendários: N contas → QueueItems → akasha",
+                cost_local_pct=100,
+                dry_run_safe=True,
+                tags=["content", "calendar", "batch", "multi-account", "local"],
+                factory=MultiAccountCalendarWorkflow,
+            ))
+        except ImportError as e:
+            _logger.error("multi_account_calendar import failed: %s", e)
+            self.register(WorkflowEntry(
+                name="multi_account_calendar", version="1.0",
                 description="import failed",
                 cost_local_pct=0, dry_run_safe=False,
             ))
