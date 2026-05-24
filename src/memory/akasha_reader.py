@@ -1,16 +1,17 @@
 """Akasha Reader — Le memoria real do Akasha (PostgreSQL + pgvector).
 
-DSN local (read-only, sem valor em prod):
-    postgresql://akasha:akasha123@localhost:5432/akasha
+DSN configurado via env: AKASHA_DSN=postgresql://user:pass@host:5432/akasha
 """
 
 import os
 
-DSN = os.getenv("AKASHA_DSN", "postgresql://akasha:akasha123@localhost:5432/akasha")
+DSN = os.getenv("AKASHA_DSN")
 
 
 def _connect():
-    """Retorna conexao ou None."""
+    """Retorna conexao ou None se DSN ausente ou conexao falhar."""
+    if not DSN:
+        return None
     try:
         import psycopg2
         return psycopg2.connect(DSN, connect_timeout=3)

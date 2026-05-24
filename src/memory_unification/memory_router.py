@@ -1,10 +1,14 @@
 """MemoryRouter — unified query across 8 memory sources (mock-first, real when DBs available)."""
 from __future__ import annotations
 
+import os
 import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from typing import Optional
+
+_AKASHA_DSN = os.getenv("AKASHA_DSN", "")
+_BIBLIOTECA_DSN = os.getenv("BIBLIOTECA_DSN", "")
 
 
 def _new_id(prefix: str = "") -> str:
@@ -227,7 +231,7 @@ class MemoryRouter:
         # Real: SELECT * FROM docs ORDER BY embedding <=> query_embedding LIMIT 5
         try:
             import psycopg2
-            conn = psycopg2.connect("host=localhost port=5432 dbname=akasha user=postgres password=postgres")
+            conn = psycopg2.connect(_AKASHA_DSN)
             cur = conn.cursor()
             cur.execute(
                 "SELECT content, 1 AS relevance FROM docs WHERE to_tsvector('portuguese', content) @@ plainto_tsquery('portuguese', %s) LIMIT 5",
@@ -258,7 +262,7 @@ class MemoryRouter:
             return [c for c in MOCK_MEMORY.get("viagem", []) if c.source == "biblioteca"]
         try:
             import psycopg2
-            conn = psycopg2.connect("host=localhost port=5432 dbname=biblioteca_sabedoria user=postgres password=postgres")
+            conn = psycopg2.connect(_BIBLIOTECA_DSN)
             cur = conn.cursor()
             cur.execute(
                 "SELECT insight_text FROM insights WHERE to_tsvector('portuguese', insight_text) @@ plainto_tsquery('portuguese', %s) LIMIT 5",
