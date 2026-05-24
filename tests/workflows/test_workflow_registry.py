@@ -189,9 +189,9 @@ def test_health_report_all_ok_false():
 
 # ── default() registry ────────────────────────────────────────────────────────
 
-def test_default_registry_has_11_workflows():
+def test_default_registry_has_12_workflows():
     reg = WorkflowRegistry.default()
-    assert reg.count == 11
+    assert reg.count == 12
 
 
 def test_default_registry_has_deep_research():

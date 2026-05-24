@@ -1,6 +1,6 @@
 """WorkflowRegistry — catálogo e health-check de todos os workflows OMNIS.
 
-Onda 13 (base) + Ondas 15-21 — cataloga 11 workflows:
+Onda 13 (base) + Ondas 15-22 — cataloga 12 workflows:
   - DeepResearchWorkflow    (WF1)
   - VideoEditWorkflow       (WF2)
   - AppFactoryWorkflow      (WF3)
@@ -12,6 +12,7 @@ Onda 13 (base) + Ondas 15-21 — cataloga 11 workflows:
   - SDRBatchWorkflow          (Onda 19)
   - DailyBriefingWorkflow        (Onda 20)
   - MultiAccountCalendarWorkflow (Onda 21)
+  - SDRPlanWorkflow              (Onda 22)
 
 Papel: análogo ao LegoRegistry (Onda 5) — registra, descreve e verifica workflows.
 
@@ -163,7 +164,7 @@ class WorkflowRegistry:
 
     @classmethod
     def default(cls) -> "WorkflowRegistry":
-        """Cria registry com os 11 workflows OMNIS padrão (Ondas 10-21)."""
+        """Cria registry com os 12 workflows OMNIS padrão (Ondas 10-22)."""
         registry = cls()
         registry._register_defaults()
         return registry
@@ -374,6 +375,25 @@ class WorkflowRegistry:
             _logger.error("multi_account_calendar import failed: %s", e)
             self.register(WorkflowEntry(
                 name="multi_account_calendar", version="1.0",
+                description="import failed",
+                cost_local_pct=0, dry_run_safe=False,
+            ))
+
+        try:
+            from src.workflows.sdr_plan_workflow import SDRPlanWorkflow
+            self.register(WorkflowEntry(
+                name="sdr_plan",
+                version="1.0",
+                description="Plano SDR: prospects → build_batch_plan → SDRPlan finalizado → akasha",
+                cost_local_pct=100,
+                dry_run_safe=True,
+                tags=["sdr", "plan", "batch", "deterministic", "local"],
+                factory=SDRPlanWorkflow,
+            ))
+        except ImportError as e:
+            _logger.error("sdr_plan import failed: %s", e)
+            self.register(WorkflowEntry(
+                name="sdr_plan", version="1.0",
                 description="import failed",
                 cost_local_pct=0, dry_run_safe=False,
             ))
