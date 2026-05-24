@@ -319,6 +319,9 @@ def _collect_real_results(
     )
 
 
+_MAX_STEPS_DEFAULT = 50
+
+
 def run_graph_dry(
     graph: ExecutionGraph,
     fail_at: str | None = None,
@@ -331,6 +334,7 @@ def run_graph_dry(
     circuit_registry: CircuitBreakerRegistry | None = None,
     rollback_plan: RollbackPlan | None = None,
     context_store: dict[str, str] | None = None,
+    max_steps: int = _MAX_STEPS_DEFAULT,
 ) -> StepRun:
     """Simulate executing all steps in topological order. No side effects.
 
@@ -345,6 +349,7 @@ def run_graph_dry(
         retry_policy: Optional retry policy for failed steps.
         circuit_registry: Optional circuit breaker registry for step-level circuit protection.
         rollback_plan: Optional rollback plan — executed on failure to undo completed steps.
+        max_steps: Maximum steps allowed before aborting (anti-chaos guard).
     """
     _validate_graph_dry(graph)
 
@@ -353,10 +358,21 @@ def run_graph_dry(
     logs: list[StepRunLog] = []
     step_states: dict[str, str] = {}
     skip_set = skip_done or set()
+    steps_executed = 0
 
     for step_id in graph.topological_order:
         node = _resolve_dry_step(graph, step_id)
         if node is None:
+            continue
+
+        # Onda 8 Passo 6: max_steps anti-chaos guard
+        if steps_executed >= max_steps:
+            _emit_dry_event(
+                logs, node, StepStatus.SKIPPED.value,
+                message=f"[max_steps] step '{node.step_id}' aborted — limit of {max_steps} reached",
+                role_id="guard",
+            )
+            step_states[node.step_id] = StepStatus.SKIPPED.value
             continue
 
         # Skip already-done steps
@@ -392,6 +408,7 @@ def run_graph_dry(
             message=f"Step '{node.title}' started (role={node.role_id}, est={node.estimated_duration})",
         )
         step_states[node.step_id] = StepStatus.RUNNING.value
+        steps_executed += 1
 
         status, msg = _resolve_dry_step_result(
             node=node,
@@ -467,6 +484,7 @@ def run_graph_real(
     circuit_registry: CircuitBreakerRegistry | None = None,
     rollback_plan: RollbackPlan | None = None,
     context_store: dict[str, str] | None = None,
+    max_steps: int = _MAX_STEPS_DEFAULT,
 ) -> StepRun:
     """Execute all steps in topological order, delegating to SkillRunnerBridge.
 
@@ -479,10 +497,21 @@ def run_graph_real(
     started_at = _now()
     logs: list[StepRunLog] = []
     step_states: dict[str, str] = {}
+    steps_executed = 0
 
     for step_id in graph.topological_order:
         node = _resolve_dry_step(graph, step_id)
         if node is None:
+            continue
+
+        # Onda 8 Passo 6: max_steps anti-chaos guard
+        if steps_executed >= max_steps:
+            _emit_real_event(
+                logs, node, StepStatus.SKIPPED.value,
+                message=f"[max_steps] step '{node.step_id}' aborted — limit of {max_steps} reached",
+                role_id="guard",
+            )
+            step_states[node.step_id] = StepStatus.SKIPPED.value
             continue
 
         # Circuit breaker check
@@ -507,6 +536,7 @@ def run_graph_real(
             message=f"Step '{node.title}' started (role={node.role_id}, est={node.estimated_duration})",
         )
         step_states[node.step_id] = StepStatus.RUNNING.value
+        steps_executed += 1
 
         # Build dispatch entry from step node
         entry = _resolve_real_step(node, bridge)
