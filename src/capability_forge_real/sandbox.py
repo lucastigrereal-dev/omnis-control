@@ -58,6 +58,30 @@ FORBIDDEN_IMPORTS = frozenset({
     "smtplib", "telnetlib",
 })
 
+# Allowlist for exec() namespace — no eval/exec/import/open/vars/getattr
+_SAFE_BUILTINS: dict = {
+    "print": print,
+    "len": len, "range": range, "enumerate": enumerate,
+    "zip": zip, "map": map, "filter": filter,
+    "sorted": sorted, "reversed": reversed,
+    "int": int, "float": float, "str": str, "bool": bool,
+    "list": list, "tuple": tuple, "dict": dict, "set": set,
+    "frozenset": frozenset, "bytes": bytes, "bytearray": bytearray,
+    "min": min, "max": max, "abs": abs, "sum": sum,
+    "round": round, "pow": pow, "divmod": divmod,
+    "isinstance": isinstance, "issubclass": issubclass,
+    "callable": callable, "type": type, "object": object,
+    "repr": repr, "format": format, "hash": hash, "id": id,
+    "iter": iter, "next": next, "chr": chr, "ord": ord,
+    "Exception": Exception, "BaseException": BaseException,
+    "ValueError": ValueError, "TypeError": TypeError,
+    "KeyError": KeyError, "IndexError": IndexError,
+    "AttributeError": AttributeError, "RuntimeError": RuntimeError,
+    "StopIteration": StopIteration, "NotImplementedError": NotImplementedError,
+    "AssertionError": AssertionError, "ZeroDivisionError": ZeroDivisionError,
+    "NameError": NameError, "OverflowError": OverflowError,
+}
+
 
 class SandboxRunner:
     """Runs generated capability code in a dry-run sandbox — no real execution."""
@@ -88,7 +112,7 @@ class SandboxRunner:
 
         try:
             with redirect_stdout(stdout_buf), redirect_stderr(stderr_buf):
-                exec(code, {"__name__": "__sandbox__", "__builtins__": __builtins__})
+                exec(code, {"__name__": "__sandbox__", "__builtins__": _SAFE_BUILTINS})
         except Exception as exc:
             elapsed = (time.time() - start) * 1000
             return SandboxResult(
