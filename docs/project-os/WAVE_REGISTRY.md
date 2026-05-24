@@ -47,6 +47,7 @@
 | W-O11 | ONDA18 | OutreachSequenceWorkflow (SDR 7-passos) | DONE | omnis-5waves | 010e379 | 24 |
 | W-O12 | ONDA19 | SDRBatchWorkflow (score+outreach pipeline) | DONE | omnis-5waves | 4f246d5 | 26 |
 | W-O13 | ONDA20 | DailyBriefingWorkflow (meta-workflow matinal) | DONE | omnis-5waves | 19e5328 | 26 |
+| W-O14 | ONDA21 | MultiAccountCalendarWorkflow (batch 6 contas) | DONE | omnis-5waves | c54efb5 | 26 |
 
 ## Legenda
 - DONE: concluído e commitado

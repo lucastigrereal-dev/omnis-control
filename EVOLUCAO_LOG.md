@@ -51,5 +51,15 @@
 [2026-05-24] Onda 13 WorkflowRegistry: 28/28 testes, commit c961a49
 [2026-05-24] Onda 14 MissionOrchestrator: 18/18 testes, commit 2d99621
 [2026-05-24] Suite projetada: 9215+25+28+18 = 9286 passed
-[2026-05-24] Próxima: verificar catraca completa + continuar roadmap
+[2026-05-24] Onda 15 SystemHealthWorkflow: 17/17 testes, commit 393b629
+[2026-05-24] Onda 16 LeadScoringWorkflow: 21/21 testes, commit 54c2d88
+[2026-05-24] Onda 17 ContentCalendarWorkflow: 30/30 testes, commit fb7fc01
+[2026-05-24] WorkflowRegistry.default() expandido: 4→11 workflows, commit 6b288a5
+[2026-05-24] Onda 18 OutreachSequenceWorkflow: 24/24 testes, commit 010e379
+[2026-05-24] Onda 19 SDRBatchWorkflow: 26/26 testes, commit 4f246d5
+[2026-05-24] Onda 20 DailyBriefingWorkflow: 26/26 testes, commit 19e5328
+[2026-05-24] Onda 21 MultiAccountCalendarWorkflow: 26/26 testes, commit c54efb5
+[2026-05-24] Suite pré-Onda17 confirmada: 9404 passed, 4 skipped, 10 xfailed
+[2026-05-24] Workflows tests só: 328 passed | WAVE_REGISTRY: W-O1→W-O14 completos
+[2026-05-24] WorkflowRegistry: 11 workflows (Ondas 10-21) — 8 imports no gate
 ```
