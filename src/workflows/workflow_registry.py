@@ -1,6 +1,6 @@
 """WorkflowRegistry — catálogo e health-check de todos os workflows OMNIS.
 
-Onda 13 (base) + Ondas 15-19 — cataloga 9 workflows:
+Onda 13 (base) + Ondas 15-20 — cataloga 10 workflows:
   - DeepResearchWorkflow    (WF1)
   - VideoEditWorkflow       (WF2)
   - AppFactoryWorkflow      (WF3)
@@ -10,6 +10,7 @@ Onda 13 (base) + Ondas 15-19 — cataloga 9 workflows:
   - ContentCalendarWorkflow   (Onda 17)
   - OutreachSequenceWorkflow  (Onda 18)
   - SDRBatchWorkflow          (Onda 19)
+  - DailyBriefingWorkflow     (Onda 20)
 
 Papel: análogo ao LegoRegistry (Onda 5) — registra, descreve e verifica workflows.
 
@@ -161,7 +162,7 @@ class WorkflowRegistry:
 
     @classmethod
     def default(cls) -> "WorkflowRegistry":
-        """Cria registry com os 9 workflows OMNIS padrão (Ondas 10-19)."""
+        """Cria registry com os 10 workflows OMNIS padrão (Ondas 10-20)."""
         registry = cls()
         registry._register_defaults()
         return registry
@@ -334,6 +335,25 @@ class WorkflowRegistry:
             _logger.error("sdr_batch import failed: %s", e)
             self.register(WorkflowEntry(
                 name="sdr_batch", version="1.0",
+                description="import failed",
+                cost_local_pct=0, dry_run_safe=False,
+            ))
+
+        try:
+            from src.workflows.daily_briefing_workflow import DailyBriefingWorkflow
+            self.register(WorkflowEntry(
+                name="daily_briefing",
+                version="1.0",
+                description="Briefing matinal: health + leads + calendario → akasha",
+                cost_local_pct=100,
+                dry_run_safe=True,
+                tags=["briefing", "composite", "morning", "local"],
+                factory=DailyBriefingWorkflow,
+            ))
+        except ImportError as e:
+            _logger.error("daily_briefing import failed: %s", e)
+            self.register(WorkflowEntry(
+                name="daily_briefing", version="1.0",
                 description="import failed",
                 cost_local_pct=0, dry_run_safe=False,
             ))

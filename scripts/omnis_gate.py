@@ -34,6 +34,8 @@ _REQUIRED_WORKFLOW_FILES = [
     "tests/workflows/test_content_calendar_e2e.py",
     "tests/workflows/test_outreach_sequence_e2e.py",
     "tests/workflows/test_sdr_batch_e2e.py",
+    "src/workflows/daily_briefing_workflow.py",
+    "tests/workflows/test_daily_briefing_e2e.py",
 ]
 
 _SECRET_PATTERNS = ["ACTUAL_KEY", "sk-", "AKIA", "-----BEGIN", "password=", "secret="]
