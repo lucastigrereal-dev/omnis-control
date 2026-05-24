@@ -2,12 +2,26 @@
 
 MockLLMAdapter: usa template determinístico, sem IO. Padrão em testes e dry_run.
 LiteLLMAdapter: chama gateway LiteLLM (:4002) com modelo configurável via env var.
+  - Retry automático (3 tentativas, backoff exponencial 1-10s) em erros transientes.
+  - Budget guard via RunContext: verifica teto antes de chamar, registra custo após.
 """
 from __future__ import annotations
 
+import logging
 import os
 from dataclasses import dataclass, field
 from typing import Protocol, runtime_checkable
+
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
+
+from src.utils.run_context import BudgetExceededError, RunContext
+
+_logger = logging.getLogger("omnis.llm_adapter")
 
 
 # ── DTOs ─────────────────────────────────────────────────────────────────────
@@ -86,6 +100,8 @@ class MockLLMAdapter:
 
 _LITELLM_BASE = os.getenv("LITELLM_BASE_URL", "http://localhost:4002")
 _DEFAULT_MODEL = os.getenv("OMNIS_LLM_MODEL", "gemini/gemini-2.5-flash")
+# Custo estimado por 1 000 tokens (USD). 0 = sem rastreamento de custo.
+_COST_PER_1K_TOKENS = float(os.getenv("OMNIS_COST_PER_1K_TOKENS", "0.0"))
 
 _SYSTEM_PROMPT = (
     "Você é um especialista em copywriting para Instagram de viagens e gastronomia no Brasil. "
@@ -104,11 +120,21 @@ _USER_TEMPLATE = (
 
 
 class LiteLLMAdapter:
-    """Chama o gateway LiteLLM local para geração real de legendas."""
+    """Chama o gateway LiteLLM local para geração real de legendas.
 
-    def __init__(self, model: str = _DEFAULT_MODEL, base_url: str = _LITELLM_BASE) -> None:
+    Retry automático em erros de rede (3 tentativas, backoff 1-10s).
+    Budget guard via RunContext — verifica teto antes, registra custo após.
+    """
+
+    def __init__(
+        self,
+        model: str = _DEFAULT_MODEL,
+        base_url: str = _LITELLM_BASE,
+        run_context: RunContext | None = None,
+    ) -> None:
         self.model = model
         self.base_url = base_url
+        self._ctx = run_context
 
     def health_check(self) -> bool:
         """Retorna True se o gateway LiteLLM está respondendo."""
@@ -139,6 +165,32 @@ class LiteLLMAdapter:
             return raw_content[:120], raw_content, "", []
 
     def generate_caption(self, prompt: CaptionPromptInput) -> CaptionLLMOutput:
+        prefix = self._ctx.log_prefix() if self._ctx else "[run:none]"
+        _logger.info("%s generate_caption: model=%s account=%s", prefix, self.model, prompt.account_handle)
+
+        # Budget guard: estima custo antes de chamar (max_tokens como proxy)
+        if self._ctx and _COST_PER_1K_TOKENS > 0:
+            estimated = (1024 / 1000) * _COST_PER_1K_TOKENS
+            self._ctx.check_budget(estimated)
+
+        result = self._call_with_retry(prompt)
+
+        # Registra custo real após resposta
+        if self._ctx and _COST_PER_1K_TOKENS > 0:
+            actual_cost = (result.tokens_used / 1000) * _COST_PER_1K_TOKENS
+            self._ctx.add_cost(actual_cost)
+            _logger.info("%s cost=%.5f USD tokens=%d", prefix, actual_cost, result.tokens_used)
+
+        return result
+
+    @retry(
+        retry=retry_if_exception_type(OSError),
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=1, max=10),
+        reraise=True,
+    )
+    def _call_with_retry(self, prompt: CaptionPromptInput) -> CaptionLLMOutput:
+        """Executa a chamada HTTP ao LiteLLM com retry em erros transientes."""
         import json
         import urllib.request
 

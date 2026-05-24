@@ -5,6 +5,7 @@ Resultado por item: approved | needs_review | failed | skipped.
 """
 from __future__ import annotations
 
+import logging
 import uuid
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
@@ -13,6 +14,9 @@ from src.agentic.caption_draft_agent import CaptionDraftAgent
 from src.agentic.agent_models import AgentRunStatus
 from src.content_queue.models import QueueItem, QueueStatus
 from src.content_queue.queue import Queue
+from src.utils.run_context import RunContext
+
+_logger = logging.getLogger("omnis.batch_runner")
 
 
 def _now_iso() -> str:
@@ -123,10 +127,12 @@ class BatchRunner:
         dry_run: bool = True,
         queue: Queue | None = None,
         agent: CaptionDraftAgent | None = None,
+        run_context: RunContext | None = None,
     ) -> None:
         self.dry_run = dry_run
         self._queue = queue or Queue()
         self._agent = agent or CaptionDraftAgent(dry_run=dry_run, queue=self._queue)
+        self._ctx = run_context or RunContext.new()
 
     def run(
         self,
@@ -138,6 +144,7 @@ class BatchRunner:
         statuses = status_filter or PROCESSABLE_STATUSES
         candidates = self._select_candidates(account_filter, statuses, limit)
 
+        prefix = self._ctx.log_prefix()
         report = BatchReport(
             batch_id=uuid.uuid4().hex[:10],
             dry_run=self.dry_run,
@@ -147,12 +154,16 @@ class BatchRunner:
             total_processed=0,
         )
 
+        _logger.info("%s BatchRunner.run: batch=%s candidates=%d", prefix, report.batch_id, len(candidates))
+
         for item in candidates:
             result = self._process_item(item)
             report.results.append(result)
             report.total_processed += 1
+            _logger.info("%s item=%s verdict=%s", prefix, item.queue_id[:8], result.verdict)
 
         report.finish()
+        _logger.info("%s BatchRunner.run done: approved=%d failed=%d", prefix, report.approved, report.failed)
         return report
 
     # ── internals ─────────────────────────────────────────────────────────────
