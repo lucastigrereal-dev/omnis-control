@@ -57,6 +57,7 @@
 | W-O21 | ONDA28 | CapabilityForgeWorkflow (gap detection + forge em lote) | DONE | omnis-5waves | aefd55e | 22 |
 | W-O22 | ONDA29 | SkillExecutionWorkflow (SkillRunnerBridge execute_plan lote) | DONE | omnis-5waves | 6055262 | 23 |
 | W-O23 | ONDA30 | TaskClassificationWorkflow (TaskClassifier classify_batch lote) | DONE | omnis-5waves | ab6b49f | 25 |
+| W-O24 | ONDA31 | CostTrackingWorkflow (CostTracker record+breakdowns lote) | DONE | omnis-5waves | 426ef64 | 22 |
 
 ## Legenda
 - DONE: concluído e commitado

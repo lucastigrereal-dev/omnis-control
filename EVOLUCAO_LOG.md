@@ -79,4 +79,6 @@
 [2026-05-24] WorkflowRegistry: 19 workflows | gate: 15 imports, 39 files | workflows: 511 passed
 [2026-05-24] Onda 30 TaskClassificationWorkflow: 25/25 testes, commit ab6b49f
 [2026-05-24] WorkflowRegistry: 20 workflows | gate: 16 imports, 41 files | workflows: 536 passed
+[2026-05-24] Onda 31 CostTrackingWorkflow: 22/22 testes, commit 426ef64
+[2026-05-24] WorkflowRegistry: 21 workflows | gate: 17 imports, 43 files | workflows: 558 passed
 ```
