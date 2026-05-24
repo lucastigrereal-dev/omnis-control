@@ -181,6 +181,7 @@ class BuildResult:
     test_count: int = 0
     sandbox_result: dict | None = field(default=None)
     scorecard: dict | None = field(default=None)
+    activated_skill_id: str | None = field(default=None)
 
     @classmethod
     def new(cls, proposal: CapabilityProposal, dry_run: bool = True) -> "BuildResult":
@@ -214,6 +215,7 @@ class BuildResult:
             "test_count": self.test_count,
             "sandbox_result": self.sandbox_result,
             "scorecard": self.scorecard,
+            "activated_skill_id": self.activated_skill_id,
         }
 
     @classmethod
@@ -229,6 +231,7 @@ class BuildResult:
             test_count=data.get("test_count", 0),
             sandbox_result=data.get("sandbox_result"),
             scorecard=data.get("scorecard"),
+            activated_skill_id=data.get("activated_skill_id"),
         )
 
 

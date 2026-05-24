@@ -154,6 +154,7 @@ class SkillDefinition:
     category: str = ""
     tags: list[str] = field(default_factory=list)
     intents: list[str] = field(default_factory=list)
+    status: str = "active"
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -166,6 +167,7 @@ class SkillDefinition:
             "category": self.category,
             "tags": self.tags,
             "intents": self.intents,
+            "status": self.status,
         }
 
     @classmethod
@@ -180,6 +182,7 @@ class SkillDefinition:
             category=data.get("category", ""),
             tags=data.get("tags", []),
             intents=data.get("intents", []),
+            status=data.get("status", "active"),
         )
 
 
