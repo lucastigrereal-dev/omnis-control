@@ -33,6 +33,7 @@ _REQUIRED_WORKFLOW_FILES = [
     "src/workflows/task_dispatch_workflow.py",
     "src/workflows/capability_forge_workflow.py",
     "src/workflows/skill_execution_workflow.py",
+    "src/workflows/content_brief_workflow.py",
     "src/workflows/hotel_pitch_workflow.py",
     "src/workflows/caption_generator_workflow.py",
     # utilitários (não no registry, mas devem existir)
@@ -62,6 +63,7 @@ _REQUIRED_WORKFLOW_FILES = [
     "tests/workflows/test_skill_execution_e2e.py",
     "tests/workflows/test_caption_generator_e2e.py",
     "tests/workflows/test_hotel_pitch_e2e.py",
+    "tests/workflows/test_content_brief_e2e.py",
 ]
 
 _SECRET_PATTERNS = ["ACTUAL_KEY", "sk-", "AKIA", "-----BEGIN", "password=", "secret="]
@@ -85,6 +87,7 @@ _REQUIRED_IMPORTS = [
     ("src.workflows.task_dispatch_workflow", "TaskDispatchWorkflow"),
     ("src.workflows.capability_forge_workflow", "CapabilityForgeWorkflow"),
     ("src.workflows.skill_execution_workflow", "SkillExecutionWorkflow"),
+    ("src.workflows.content_brief_workflow", "ContentBriefWorkflow"),
     ("src.workflows.hotel_pitch_workflow", "HotelPitchWorkflow"),
     ("src.workflows.caption_generator_workflow", "CaptionGeneratorWorkflow"),
     ("src.utils.run_context", "RunContext"),

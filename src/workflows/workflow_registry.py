@@ -1,6 +1,6 @@
 """WorkflowRegistry — catálogo e health-check de todos os workflows OMNIS.
 
-Onda 33 — 18 capacidades distintas:
+Onda 34 — 19 capacidades distintas:
   - DeepResearchWorkflow    (WF1)
   - VideoEditWorkflow       (WF2)
   - AppFactoryWorkflow      (WF3)
@@ -17,6 +17,7 @@ Onda 33 — 18 capacidades distintas:
   - TaskDispatchWorkflow         (Onda 27)
   - CapabilityForgeWorkflow      (Onda 28)
   - SkillExecutionWorkflow       (Onda 29)
+  - ContentBriefWorkflow         (Onda 34 — brief editorial via Ollama)
   - HotelPitchWorkflow           (Onda 33 — pitch collab PT-BR via Ollama)
   - CaptionGeneratorWorkflow     (Onda 32 — LLM real Ollama)
 
@@ -489,6 +490,25 @@ class WorkflowRegistry:
             ))
 
         # task_classification e cost_tracking removidos do registry (utilitários — ver módulos direto)
+
+        try:
+            from src.workflows.content_brief_workflow import ContentBriefWorkflow
+            self.register(WorkflowEntry(
+                name="content_brief",
+                version="1.0",
+                description="Brief editorial para pré-produção de conteúdo via Ollama (ângulo, pontos, dicas, hooks)",
+                cost_local_pct=100,
+                dry_run_safe=True,
+                tags=["llm", "editorial", "brief", "ollama", "local", "instagram"],
+                factory=ContentBriefWorkflow,
+            ))
+        except ImportError as e:
+            _logger.error("content_brief import failed: %s", e)
+            self.register(WorkflowEntry(
+                name="content_brief", version="1.0",
+                description="import failed",
+                cost_local_pct=0, dry_run_safe=False,
+            ))
 
         try:
             from src.workflows.hotel_pitch_workflow import HotelPitchWorkflow
