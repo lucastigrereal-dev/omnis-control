@@ -55,6 +55,7 @@ Commits auditados: `9379965`, `cff067b`, `46406d3`, `938eaf7`, `8321ee5`, `5a024
 - O fluxo atual não sanitiza semanticamente texto de contexto (apenas valida mínimo de presença/tamanho).
 - **Não foi encontrado sink de execução direta desse contexto no caminho auditado** (entra como dica textual em payload, não como código executável).
 - Risco residual: envenenamento semântico de contexto (qualidade/decisão), não RCE.
+- Teste de caracterização adicionado confirma que contexto malicioso não sobrescreve `goal` do passo seguinte.
 
 ## 4) Cobertura adicionada (mecânica, reversível)
 
@@ -65,6 +66,9 @@ Commits auditados: `9379965`, `cff067b`, `46406d3`, `938eaf7`, `8321ee5`, `5a024
 - `tests/execution_graph/test_gate_escape_path.py`
   - `test_run_graph_from_orchestrator_should_block_when_approval_required` (**xfail**)  
     Documenta o escape path do gate sem quebrar a suíte.
+- `tests/execution_graph/test_context_poisoning_guard.py`
+  - `test_upstream_context_does_not_override_next_step_goal`  
+    Prova que output malicioso do passo N permanece em `upstream_context` e não vira `goal` executável no passo N+1.
 
 ### Testes já adicionados na auditoria anterior da onda
 - `tests/agentic/test_skill_runner_bridge_lego.py`
@@ -82,6 +86,11 @@ Commits auditados: `9379965`, `cff067b`, `46406d3`, `938eaf7`, `8321ee5`, `5a024
 - `tests/execution_graph/test_gate_escape_path.py`
 - `tests/approval_center/test_shared_gate.py`  
 Resultado: **12 passed, 1 xfailed**
+
+- `tests/execution_graph/test_context_poisoning_guard.py`
+- `tests/execution_graph/test_lego_bridge_security.py`
+- `tests/execution_graph/test_context_flow.py`  
+Resultado: **15 passed**
 
 - `tests/agentic/test_skill_runner_bridge_lego.py`
 - `tests/execution_graph/test_context_flow.py`
