@@ -77,4 +77,6 @@
 [2026-05-24] WorkflowRegistry: 18 workflows | gate: 14 imports, 37 files | workflows: 488 passed
 [2026-05-24] Onda 29 SkillExecutionWorkflow: 23/23 testes, commit 6055262
 [2026-05-24] WorkflowRegistry: 19 workflows | gate: 15 imports, 39 files | workflows: 511 passed
+[2026-05-24] Onda 30 TaskClassificationWorkflow: 25/25 testes, commit ab6b49f
+[2026-05-24] WorkflowRegistry: 20 workflows | gate: 16 imports, 41 files | workflows: 536 passed
 ```
