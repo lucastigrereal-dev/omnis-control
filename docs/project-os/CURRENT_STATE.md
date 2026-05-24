@@ -1,8 +1,8 @@
 # OMNIS Current State
 
-**Atualizado:** 2026-05-23 — Fases 1-14 completas: Consolidação + API HTTP + Agente + LLM real + Observabilidade
+**Atualizado:** 2026-05-23 — Ondas Lego 1-6: 5 legos externos + LegoRegistry + CLI lego
 **Branch:** feature/omnis-5waves-runtime-supreme
-**Último commit:** 93739d7 — docs(audit): Codex audit results — dead code map + consolidation proposal
+**Último commit:** cf6cfd2 — feat(onda5): LegoRegistry — catálogo unificado dos 5 legos externos
 
 ## Status Geral
 Fase: OMNIS_LOCAL_SUPREME_COMPLETE — 11 fases (0-10) concluídas. 30/30 outputs reais gerados. Fábrica local autônoma operacional.
@@ -123,6 +123,20 @@ Fase F (Cockpit HTML local) — CONCLUÍDO
 - `docs/project-os/CODEX_SRC_CONSOLIDATION_PROPOSAL.md` — fronteiras limpas confirmadas
 - `docs/project-os/AGENT_FLOW.md` — fluxo end-to-end documentado
 
+## Legos Externos (Ondas 2-6, 2026-05-23)
+
+| Onda | Lego | Interface | Status |
+|---|---|---|---|
+| 2 | BrowserExecutorLego | BrowserExecutor | DONE |
+| 3 | CodeExecutorLego | CodeExecutor | DONE + RCE fix |
+| 3 | VideoProcessorLego | VideoProcessor | DONE + path traversal + Whisper pin |
+| 4a | ResearchConductorLego | ResearchConductor | DONE (STORM-adapted) |
+| 4b | ChannelMessengerLego | ChannelMessenger | DONE (WA + TG) |
+| 5 | LegoRegistry | — | DONE — catalog + health_check_all |
+| 6 | CLI lego | — | DONE — list/research/send commands |
+
+Suite: **8740 passed, 4 skipped** (estimado após Onda 6)
+
 ## Próxima Ação
-- Wave seguinte do WAVE_REGISTRY — ver `docs/project-os/WAVE_REGISTRY.md`
-- Candidatos: aprovação humana de rascunhos (ApprovalGate UI), pipeline multi-conta, ou scheduling cron real
+- Wave 13: P47 (Akasha real) requer Docker + pgvector — decisão Lucas
+- Alternativas sem infra: aprovação humana de rascunhos (ApprovalGate UI), pipeline multi-conta

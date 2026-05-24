@@ -2283,6 +2283,7 @@ def mission_close(
 
 from src.routers import factory_router, system_router
 from src.cli_agent import agent_app
+from src.cli_lego import lego_app
 
 factory_router.register(app)   # assets, offline, render, quality, campaign, manual-publish, delivery
 system_router.register(app)    # argos-drafts, creative, publisher, forge, pipeline, missions, tools, metrics, oauth, post
@@ -2303,6 +2304,7 @@ app.add_typer(mission_app)
 app.add_typer(idea_app)
 app.add_typer(health_app)
 app.add_typer(local_app, name="local")
+app.add_typer(lego_app)
 
 
 if __name__ == "__main__":
