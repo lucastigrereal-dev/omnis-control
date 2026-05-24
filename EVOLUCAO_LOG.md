@@ -90,6 +90,15 @@
   - Retroativa: LeadScoringWorkflow 4 testes com leads reais Natal/RN (Vila do Mar/Central/Rifoles)
   - Scores reais: WARM 0.595 / 0.595 / 0.532 — ranking correto, Akasha event emitido
 [2026-05-24] WorkflowRegistry: 17 workflows | gate: 15 imports, 42 files | workflows: 615 passed
+[2026-05-24] Onda 33 HotelPitchWorkflow: 24 mock + 1 real Ollama, commit 616a523
+  - SAÍDA REAL (llama3.1:8b, 544 tokens) para Rifoles Praia Hotel:
+  - subject: "Colaboração com Rifoles Praia Hotel"
+  - opening: "Olá Camila, fui indicado para entrar em contato e acredito que possamos criar conteúdo incrível juntos!"
+  - proof: "Com mais de 2 milhões de seguidores, posso garantir que o seu hotel seja visto por pessoas dispostas a viajar para Natal/RN!"
+  - cta: "Vamos marcar um horário para discutir os detalhes e como podemos trabalhar juntos!"
+  - 670 chars | pitch completo gerado em PT-BR sem template
+  - Retroativa pendente: ContentCalendarWorkflow (Onda 17) → próxima onda
+[2026-05-24] WorkflowRegistry: 18 workflows | gate: 16 imports, 44 files | workflows: 639 passed
   - FUNDIDOS: OutreachSequence+SDRBatch+SDRPlan → SDRPipelineWorkflow (mode=execute|plan)
   - REBAIXADOS: TaskClassification+CostTracking (utilitários — fora do registry)
   - COLAPSADO: MultiAccountCalendar → ContentCalendarWorkflow.run_batch()

@@ -65,6 +65,7 @@
 | W-CONS | CONSOLIDACAO | SDRPipelineWorkflow (mode=execute|plan — funde O18+O19+O22) | DONE | omnis-5waves | 01b3f9d | 24 |
 | W-O25 | ONDA32 | CaptionGeneratorWorkflow (OllamaAdapter llama3.1:8b — LLM real) | DONE | omnis-5waves | 08f498a | 23+1real |
 | W-O25r | ONDA32-retro | LeadScoringWorkflow — prova retroativa com leads reais Natal/RN | DONE | omnis-5waves | 08f498a | 4 |
+| W-O26 | ONDA33 | HotelPitchWorkflow (pitch collab PT-BR por tier, Ollama llama3.1:8b) | DONE | omnis-5waves | 616a523 | 24+1real |
 
 ## Legenda
 - DONE: concluído e commitado
