@@ -57,6 +57,21 @@ class SandboxResult:
         }
 
 
+class SandboxDisabledError(RuntimeError):
+    """Raised when real sandbox execution is attempted while disabled.
+
+    The subprocess sandbox is not a true sandbox — user code runs on the host
+    and can create files, read env vars, and spawn processes. Real execution is
+    locked until a container-isolated sandbox is built.
+
+    See: docs/INCIDENTE_RCE1.md
+    """
+
+
+# Real execution is locked pending container sandbox — see INCIDENTE_RCE1.md
+_EXEC_DISABLED = True
+
+
 FORBIDDEN_CALLS = frozenset({
     "subprocess", "os.system", "eval(", "exec(", "__import__",
     "shutil.rmtree", "os.remove", "os.rmdir", "os.unlink",
@@ -96,6 +111,11 @@ class SandboxRunner:
                 status=SandboxStatus.BLOCKED,
                 blocked_patterns=blocked,
                 error=f"Blocked patterns: {', '.join(blocked)}",
+            )
+        if _EXEC_DISABLED:
+            raise SandboxDisabledError(
+                "sandbox real desabilitado por segurança — requer container isolado, "
+                "ver INCIDENTE_RCE1.md"
             )
         return self._exec_subprocess(code, run_id)
 

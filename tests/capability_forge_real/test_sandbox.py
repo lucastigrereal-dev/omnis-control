@@ -1,7 +1,9 @@
+import pytest
 from src.capability_forge_real.sandbox import (
     SandboxRunner,
     SandboxResult,
     SandboxStatus,
+    SandboxDisabledError,
     FORBIDDEN_CALLS,
     FORBIDDEN_IMPORTS,
 )
@@ -45,9 +47,8 @@ class TestSandboxResult:
 class TestSandboxRunner:
     def test_safe_code_passes(self):
         runner = SandboxRunner()
-        result = runner.run("x = 1 + 1\nresult = x * 2")
-        assert result.status == SandboxStatus.PASSED
-        assert result.blocked_patterns == []
+        with pytest.raises(SandboxDisabledError):
+            runner.run("x = 1 + 1\nresult = x * 2")
 
     def test_blocks_subprocess(self):
         runner = SandboxRunner()
@@ -82,17 +83,15 @@ class TestSandboxRunner:
         result = runner.dry_run_validate("def hello():\n    return 'world'")
         assert result.status == SandboxStatus.PASSED
 
-    def test_error_code_captured(self):
+    def test_error_code_raises_disabled(self):
         runner = SandboxRunner()
-        result = runner.run("raise ValueError('test error')")
-        assert result.status == SandboxStatus.ERROR
-        assert "test error" in result.error
+        with pytest.raises(SandboxDisabledError):
+            runner.run("raise ValueError('test error')")
 
-    def test_stdout_captured(self):
+    def test_stdout_code_raises_disabled(self):
         runner = SandboxRunner()
-        result = runner.run("print('hello sandbox')")
-        assert result.status == SandboxStatus.PASSED
-        assert "hello sandbox" in result.stdout
+        with pytest.raises(SandboxDisabledError):
+            runner.run("print('hello sandbox')")
 
     def test_forbidden_calls_set(self):
         assert "subprocess" in FORBIDDEN_CALLS

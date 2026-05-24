@@ -1,19 +1,24 @@
-"""Security tests: subprocess isolation closes all 4 RCE bypass vectors.
+"""Security tests: SandboxRunner real-execution lock.
 
-Vector 1-3 were exec-in-process attacks (getattr/vars/__dict__ on __builtins__).
-Those attacks are now structurally impossible — there is no exec() in the parent
-process anymore, so there are no namespace restrictions to bypass.
+The subprocess sandbox is not a true sandbox (host-exec residual). Real execution
+is locked via _EXEC_DISABLED until a container-isolated sandbox is built.
 
-Vector 4 is subclass introspection (walking __subclasses__() to find os in globals).
-This code bypasses the static scanner and DOES run in the subprocess, but the
-parent process remains completely isolated: no parent variable is reachable or
-modifiable from the subprocess.
+Tests verify:
+  1. Static scanner still blocks known literal patterns (first layer, unaffected).
+  2. Any code that passes the scanner raises SandboxDisabledError — real execution
+     is impossible regardless of bypass technique.
+  3. This includes vector 4 (subclass introspection): even though it bypasses the
+     scanner, it is stopped by the disabled lock before any subprocess starts.
+  4. dry_run_validate() (scan only) remains fully functional.
 
-Key invariant tested: the parent process state is unaffected by anything that
-runs inside the sandbox subprocess.
+See: docs/INCIDENTE_RCE1.md
 """
 import pytest
-from src.capability_forge_real.sandbox import SandboxRunner, SandboxStatus
+from src.capability_forge_real.sandbox import (
+    SandboxRunner,
+    SandboxDisabledError,
+    SandboxStatus,
+)
 
 
 @pytest.fixture
@@ -21,55 +26,51 @@ def runner():
     return SandboxRunner()
 
 
-# ── Static scanner still catches literal patterns ─────────────────────────────
+# ── Static scanner still catches known literal patterns ───────────────────────
 
 def test_literal_os_system_blocked_by_scanner(runner):
-    """'os.system' literal is in FORBIDDEN_CALLS — blocked before subprocess."""
+    """'os.system' literal → BLOCKED before disabled check is even reached."""
     result = runner.run("import os\nos.system('whoami')")
     assert result.status == SandboxStatus.BLOCKED
 
 
 def test_direct_eval_blocked_by_scanner(runner):
-    """eval() literal is caught by the static scanner."""
     result = runner.run("eval('1+1')")
     assert result.status == SandboxStatus.BLOCKED
 
 
 def test_direct_exec_blocked_by_scanner(runner):
-    """exec() literal is caught by the static scanner."""
     result = runner.run("exec('print(1)')")
     assert result.status == SandboxStatus.BLOCKED
 
 
 def test_direct_import_blocked_by_scanner(runner):
-    """__import__ literal is caught by the static scanner."""
     result = runner.run("__import__('os').system('id')")
     assert result.status == SandboxStatus.BLOCKED
 
 
-# ── Vector 4: subclass introspection — subprocess isolated from parent ────────
+# ── Real execution lock: SandboxDisabledError for anything that passes scanner ─
+
+def test_safe_code_raises_disabled(runner):
+    """Harmless code passes scanner but hits the disabled lock."""
+    with pytest.raises(SandboxDisabledError, match="INCIDENTE_RCE1"):
+        runner.run("x = 1 + 1")
+
+
+def test_print_code_raises_disabled(runner):
+    with pytest.raises(SandboxDisabledError):
+        runner.run("print('hello')")
+
+
+def test_exception_code_raises_disabled(runner):
+    with pytest.raises(SandboxDisabledError):
+        runner.run("raise ValueError('test')")
+
+
+# ── Vector 4: subclass introspection — scanner bypass → still hits lock ───────
 
 def test_subclass_introspection_bypasses_scanner(runner):
-    """Subclass escape bypasses static scanner (no literal os.system or subprocess)."""
-    attack = (
-        "for c in ().__class__.__base__.__subclasses__():\n"
-        "    try:\n"
-        "        g = getattr(getattr(c, '__init__', None), '__globals__', {})\n"
-        "        if 'os' in g:\n"
-        "            g['os'].system('echo SUBCLASS_ESCAPE')\n"
-        "            break\n"
-        "    except Exception:\n"
-        "        pass\n"
-        "print('introspection_done')\n"
-    )
-    result = runner.run(attack)
-    # Scanner does NOT block this — no literal forbidden pattern
-    assert result.status != SandboxStatus.BLOCKED
-
-
-def test_subclass_introspection_parent_isolated(runner):
-    """Even if subclass attack runs in subprocess, parent state is unaffected."""
-    parent_sentinel = {"alive": True, "value": 99}
+    """Subclass escape has no literal forbidden pattern — scanner does not block."""
     attack = (
         "for c in ().__class__.__base__.__subclasses__():\n"
         "    try:\n"
@@ -80,58 +81,38 @@ def test_subclass_introspection_parent_isolated(runner):
         "    except Exception:\n"
         "        pass\n"
     )
-    runner.run(attack)
-    # Parent dict is completely unmodified — subprocess cannot reach parent memory
-    assert parent_sentinel == {"alive": True, "value": 99}
+    # Scanner does NOT block this (no literal 'os.system', no 'eval(' etc.)
+    # But the disabled lock stops it before any subprocess starts
+    with pytest.raises(SandboxDisabledError):
+        runner.run(attack)
 
 
-def test_subprocess_cannot_modify_parent_globals(runner):
-    """Code that modifies globals in subprocess has zero effect on parent."""
-    import sys as _parent_sys
-    modules_before = set(_parent_sys.modules.keys())
-
-    runner.run("import sys\nsys.modules.clear()\nprint('cleared')")
-
-    # Parent's sys.modules is intact
-    assert set(_parent_sys.modules.keys()) == modules_before
-
-
-def test_subprocess_cannot_corrupt_parent_time_module(runner):
-    """Deleting 'time' in subprocess does not affect parent's time module."""
-    import time
-    before = time.time()
-
-    runner.run(
-        "import sys\n"
-        "del sys.modules['time']\n"
-        "print('time deleted in subprocess')\n"
+def test_subclass_introspection_cannot_execute(runner):
+    """Confirm: vector 4 raises SandboxDisabledError, no subprocess ever starts."""
+    # Uses os via globals traversal — no literal 'os.system' so scanner passes
+    attack = (
+        "for c in ().__class__.__base__.__subclasses__():\n"
+        "    try:\n"
+        "        g = getattr(getattr(c, '__init__', None), '__globals__', {})\n"
+        "        if 'os' in g:\n"
+        "            g['os'].system('echo PWNED')\n"
+        "            break\n"
+        "    except Exception:\n"
+        "        pass\n"
     )
-
-    import time as t2  # re-import in parent still works
-    assert t2.time() >= before
-
-
-# ── Safe operations still work ────────────────────────────────────────────────
-
-def test_safe_print_works(runner):
-    result = runner.run("print('hello sandbox')")
-    assert result.status == SandboxStatus.PASSED
-    assert "hello sandbox" in result.stdout
+    with pytest.raises(SandboxDisabledError, match="container isolado"):
+        runner.run(attack)
 
 
-def test_safe_exception_works(runner):
-    result = runner.run("raise ValueError('test rce')")
-    assert result.status == SandboxStatus.ERROR
-    assert "test rce" in result.error
+# ── dry_run_validate() unaffected — scan only, no exec path ──────────────────
 
-
-def test_safe_arithmetic_works(runner):
-    result = runner.run("x = 1 + 1\nresult = x * 2")
+def test_dry_run_validate_safe_code_still_works(runner):
+    """dry_run_validate() is scan-only — lock does not affect it."""
+    result = runner.dry_run_validate("x = 1 + 1\nprint(x)")
     assert result.status == SandboxStatus.PASSED
 
 
-def test_multiline_code_works(runner):
-    result = runner.run("for i in range(3):\n    print(i)\n")
-    assert result.status == SandboxStatus.PASSED
-    assert "0" in result.stdout
-    assert "2" in result.stdout
+def test_dry_run_validate_still_blocks_forbidden(runner):
+    """dry_run_validate() still catches forbidden patterns."""
+    result = runner.dry_run_validate("os.system('whoami')")
+    assert result.status == SandboxStatus.BLOCKED
