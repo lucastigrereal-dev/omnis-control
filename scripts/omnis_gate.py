@@ -19,10 +19,12 @@ _REQUIRED_WORKFLOW_FILES = [
     "src/workflows/deep_research_workflow.py",
     "src/workflows/video_edit_workflow.py",
     "src/workflows/app_factory_workflow.py",
+    "src/workflows/code_run_workflow.py",
     "tests/workflows/__init__.py",
     "tests/workflows/test_deep_research_e2e.py",
     "tests/workflows/test_video_edit_e2e.py",
     "tests/workflows/test_app_factory_e2e.py",
+    "tests/workflows/test_code_run_e2e.py",
 ]
 
 _SECRET_PATTERNS = ["ACTUAL_KEY", "sk-", "AKIA", "-----BEGIN", "password=", "secret="]
@@ -37,6 +39,7 @@ _REQUIRED_IMPORTS = [
     ("src.workflows.deep_research_workflow", "DeepResearchWorkflow"),
     ("src.workflows.video_edit_workflow", "VideoEditWorkflow"),
     ("src.workflows.app_factory_workflow", "AppFactoryWorkflow"),
+    ("src.workflows.code_run_workflow", "CodeRunWorkflow"),
     ("src.utils.run_context", "RunContext"),
     ("src.akasha_event_sink.adapter", "MockAkashaSink"),
 ]
