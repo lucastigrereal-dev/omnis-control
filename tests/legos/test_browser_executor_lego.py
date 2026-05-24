@@ -84,12 +84,23 @@ def test_health_check_false_when_playwright_unavailable(monkeypatch):
 
 # ── real extraction (dry_run=True, página estática via data: URL) ─────────────
 
-def test_execute_extracts_title_from_static_page():
-    """Tarefa web real simples: carrega página HTML estática e extrai conteúdo."""
+def test_execute_extracts_title_from_static_page(monkeypatch):
+    """Extração com _run_browser monkeypatched — sandbox valida URL antes de delegar."""
     lego = BrowserExecutorLego()
-    html = "<html><head><title>OMNIS Test</title></head><body><h1>Motor OK</h1></body></html>"
+    body_text = "Motor OK"
+
+    def _mock_run(task: BrowserTask) -> BrowserResult:
+        return BrowserResult(
+            success=True,
+            output=body_text,
+            url_visited=task.url,
+            dry_run=task.dry_run,
+            artifacts={"title": "OMNIS Test", "char_count": len(body_text)},
+        )
+
+    monkeypatch.setattr(lego, "_run_browser", _mock_run)
     task = BrowserTask(
-        url=f"data:text/html,{html}",
+        url="https://test-fixture.omnis-local/page",
         goal="extrair título da página",
         dry_run=True,
         timeout_seconds=15,
@@ -101,10 +112,18 @@ def test_execute_extracts_title_from_static_page():
     assert result.dry_run is True
 
 
-def test_execute_returns_browser_result_type():
+def test_execute_returns_browser_result_type(monkeypatch):
     lego = BrowserExecutorLego()
+
+    def _mock_run(task: BrowserTask) -> BrowserResult:
+        return BrowserResult(
+            success=True, output="ok", url_visited=task.url, dry_run=task.dry_run,
+            artifacts={"title": "ok", "char_count": 2},
+        )
+
+    monkeypatch.setattr(lego, "_run_browser", _mock_run)
     task = BrowserTask(
-        url="data:text/html,<html><body>ok</body></html>",
+        url="https://test-fixture.omnis-local/type-check",
         goal="verificar conteúdo",
         dry_run=True,
         timeout_seconds=10,
@@ -113,10 +132,22 @@ def test_execute_returns_browser_result_type():
     assert isinstance(result, BrowserResult)
 
 
-def test_execute_artifacts_has_char_count():
+def test_execute_artifacts_has_char_count(monkeypatch):
     lego = BrowserExecutorLego()
+    body_text = "hello world"
+
+    def _mock_run(task: BrowserTask) -> BrowserResult:
+        return BrowserResult(
+            success=True,
+            output=body_text,
+            url_visited=task.url,
+            dry_run=task.dry_run,
+            artifacts={"title": "Test", "char_count": len(body_text)},
+        )
+
+    monkeypatch.setattr(lego, "_run_browser", _mock_run)
     task = BrowserTask(
-        url="data:text/html,<html><body>hello world</body></html>",
+        url="https://test-fixture.omnis-local/char-count",
         goal="extrair texto",
         dry_run=True,
         timeout_seconds=10,
@@ -142,7 +173,7 @@ def test_semaphore_timeout_when_held():
     """Se o semáforo estiver ocupado, execute() retorna erro de timeout."""
     lego = BrowserExecutorLego()
     task = BrowserTask(
-        url="data:text/html,<html><body>x</body></html>",
+        url="https://test-fixture.omnis-local/semaphore",
         goal="extrair",
         dry_run=True,
         timeout_seconds=1,  # timeout curto

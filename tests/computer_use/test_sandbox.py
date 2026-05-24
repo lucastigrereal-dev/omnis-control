@@ -45,20 +45,34 @@ class TestSecuritySandbox:
         with pytest.raises(SandboxViolation):
             sb.validate_url("https://gmail.com")
 
-    def test_validate_url_allows_localhost_characterization(self):
-        """Caracterização de risco: localhost não é bloqueado na regra atual."""
-        sb = SecuritySandbox()
-        assert sb.validate_url("http://localhost:8000/internal") is True
+    def test_validate_url_blocks_localhost(self):
+        sb = SecuritySandbox(strict=False)
+        assert sb.validate_url("http://localhost:8000/internal") is False
 
-    def test_validate_url_allows_private_ip_characterization(self):
-        """Caracterização de risco: IP privado não é bloqueado na regra atual."""
-        sb = SecuritySandbox()
-        assert sb.validate_url("http://10.0.0.5/admin") is True
+    def test_validate_url_blocks_localhost_strict(self):
+        sb = SecuritySandbox(strict=True)
+        with pytest.raises(SandboxViolation):
+            sb.validate_url("http://localhost:8000/internal")
 
-    def test_validate_url_allows_file_scheme_characterization(self):
-        """Caracterização de risco: esquema file:// não é bloqueado na regra atual."""
-        sb = SecuritySandbox()
-        assert sb.validate_url("file:///C:/Users/lucas/secret.txt") is True
+    def test_validate_url_blocks_private_ip(self):
+        sb = SecuritySandbox(strict=False)
+        assert sb.validate_url("http://10.0.0.5/admin") is False
+
+    def test_validate_url_blocks_private_ip_192(self):
+        sb = SecuritySandbox(strict=False)
+        assert sb.validate_url("http://192.168.1.1/admin") is False
+
+    def test_validate_url_blocks_file_scheme(self):
+        sb = SecuritySandbox(strict=False)
+        assert sb.validate_url("file:///C:/Users/lucas/secret.txt") is False
+
+    def test_validate_url_blocks_data_scheme(self):
+        sb = SecuritySandbox(strict=False)
+        assert sb.validate_url("data:text/html,<script>alert(1)</script>") is False
+
+    def test_validate_url_blocks_javascript_scheme(self):
+        sb = SecuritySandbox(strict=False)
+        assert sb.validate_url("javascript:alert(1)") is False
 
     def test_validate_action_allows_scrape(self):
         sb = SecuritySandbox()

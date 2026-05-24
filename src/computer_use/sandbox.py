@@ -1,9 +1,11 @@
 """SecuritySandbox — safety guardrails for Computer Use agents."""
 from __future__ import annotations
 
+import ipaddress
 import os
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from urllib.parse import urlparse
 
 
 def _now_iso() -> str:
@@ -32,6 +34,31 @@ ALLOWED_PATHS = [
     "output/",
 ]
 
+_ALLOWED_SCHEMES = frozenset({"http", "https"})
+_BLOCKED_SCHEMES = frozenset({
+    "file", "data", "javascript", "about", "chrome", "vbscript", "blob", "ftp",
+})
+_LOOPBACK_HOSTS = frozenset({"localhost", "0.0.0.0", "127.0.0.1", "::1", "ip6-localhost"})
+_PRIVATE_NETWORKS = [
+    ipaddress.ip_network("10.0.0.0/8"),
+    ipaddress.ip_network("172.16.0.0/12"),
+    ipaddress.ip_network("192.168.0.0/16"),
+    ipaddress.ip_network("127.0.0.0/8"),
+    ipaddress.ip_network("169.254.0.0/16"),
+    ipaddress.ip_network("100.64.0.0/10"),
+    ipaddress.ip_network("::1/128"),
+    ipaddress.ip_network("fc00::/7"),
+    ipaddress.ip_network("fe80::/10"),
+]
+
+
+def _is_private_ip(hostname: str) -> bool:
+    try:
+        addr = ipaddress.ip_address(hostname)
+        return any(addr in net for net in _PRIVATE_NETWORKS)
+    except ValueError:
+        return False
+
 
 @dataclass
 class SandboxViolation(Exception):
@@ -59,7 +86,41 @@ class SecuritySandbox:
         self.allowed_actions: list[dict] = []
 
     def validate_url(self, url: str) -> bool:
-        """Block banking, email, government domains."""
+        """Block dangerous URLs: bad schemes, loopback, private IPs, blocked domains."""
+        parsed = urlparse(url)
+        scheme = parsed.scheme.lower()
+
+        if scheme not in _ALLOWED_SCHEMES:
+            v = SandboxViolation(
+                rule="blocked_scheme",
+                detail=f"URL scheme '{scheme}' is not allowed (only http/https)",
+            )
+            self.violations.append(v)
+            if self.strict:
+                raise v
+            return False
+
+        host = parsed.hostname or ""
+        if host.lower() in _LOOPBACK_HOSTS:
+            v = SandboxViolation(
+                rule="blocked_loopback",
+                detail=f"URL host '{host}' is a loopback address",
+            )
+            self.violations.append(v)
+            if self.strict:
+                raise v
+            return False
+
+        if _is_private_ip(host):
+            v = SandboxViolation(
+                rule="blocked_private_ip",
+                detail=f"URL host '{host}' is a private/internal IP address",
+            )
+            self.violations.append(v)
+            if self.strict:
+                raise v
+            return False
+
         url_lower = url.lower()
         for domain in BLOCKED_DOMAINS:
             if domain in url_lower:
@@ -71,6 +132,7 @@ class SecuritySandbox:
                 if self.strict:
                     raise v
                 return False
+
         return True
 
     def validate_action(self, action: str) -> bool:

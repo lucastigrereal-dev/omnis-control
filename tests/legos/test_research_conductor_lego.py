@@ -13,6 +13,7 @@ from src.legos.research_conductor_lego import (
     ResearchConductorLego,
     NullSearchBackend,
     SearXNGBackend,
+    SearXNGURLError,
     _StormPipeline,
     _LLMClient,
     _requires_publish_approval,
@@ -272,17 +273,30 @@ def test_null_backend_returns_empty():
 
 
 def test_searxng_backend_handles_connection_error():
-    backend = SearXNGBackend("http://localhost:9999")
+    backend = SearXNGBackend("http://searxng.omnis-test.invalid:9999")
     results = backend.search("test query")
     assert results == []
 
 
-def test_searxng_backend_accepts_private_host_without_validation():
-    """Caracterização de risco: backend aceita host privado sem bloqueio SSRF."""
-    backend = SearXNGBackend("http://127.0.0.1:8080/internal")
-    assert backend.name() == "searxng"
-    # comportamento atual: URL é normalizada, mas não validada contra redes internas
-    assert backend._url.startswith("http://127.0.0.1")
+def test_searxng_backend_rejects_loopback_host():
+    """Hardening SSRF: loopback host rejeitado na inicialização."""
+    with pytest.raises(SearXNGURLError):
+        SearXNGBackend("http://127.0.0.1:8080/internal")
+
+
+def test_searxng_backend_rejects_localhost():
+    with pytest.raises(SearXNGURLError):
+        SearXNGBackend("http://localhost:8080/search")
+
+
+def test_searxng_backend_rejects_private_cidr_10():
+    with pytest.raises(SearXNGURLError):
+        SearXNGBackend("http://10.0.0.1:8080/search")
+
+
+def test_searxng_backend_rejects_private_cidr_192():
+    with pytest.raises(SearXNGURLError):
+        SearXNGBackend("http://192.168.1.100:8080/search")
 
 
 def test_storm_pipeline_generates_perspectives_fallback():

@@ -22,12 +22,14 @@ Regras OMNIS:
 from __future__ import annotations
 
 import asyncio
+import ipaddress
 import json
 import logging
 import os
 import threading
 from pathlib import Path
 from typing import Protocol, runtime_checkable
+from urllib.parse import urlparse
 
 from src.interfaces.research_conductor import (
     ResearchConductor, ResearchSpec, ResearchResult,
@@ -41,6 +43,44 @@ STORM_LLM_MODEL = os.getenv("STORM_LLM_MODEL", "ollama/qwen2.5:7b")
 SEARXNG_URL = os.getenv("SEARXNG_URL", "")
 
 _RESEARCH_SEMAPHORE = threading.Semaphore(1)
+
+_SSRF_LOOPBACK_HOSTS = frozenset({"localhost", "0.0.0.0", "127.0.0.1", "::1", "ip6-localhost"})
+_SSRF_PRIVATE_NETWORKS = [
+    ipaddress.ip_network("10.0.0.0/8"),
+    ipaddress.ip_network("172.16.0.0/12"),
+    ipaddress.ip_network("192.168.0.0/16"),
+    ipaddress.ip_network("127.0.0.0/8"),
+    ipaddress.ip_network("169.254.0.0/16"),
+    ipaddress.ip_network("100.64.0.0/10"),
+    ipaddress.ip_network("::1/128"),
+    ipaddress.ip_network("fc00::/7"),
+    ipaddress.ip_network("fe80::/10"),
+]
+
+
+class SearXNGURLError(ValueError):
+    """Raised when a SearXNG URL points to a private/loopback address (SSRF risk)."""
+
+
+def _searxng_is_private_ip(hostname: str) -> bool:
+    try:
+        addr = ipaddress.ip_address(hostname)
+        return any(addr in net for net in _SSRF_PRIVATE_NETWORKS)
+    except ValueError:
+        return False
+
+
+def _validate_searxng_url(url: str) -> None:
+    """Reject URLs that could be used for SSRF via SearXNG backend."""
+    parsed = urlparse(url)
+    scheme = parsed.scheme.lower()
+    if scheme not in ("http", "https"):
+        raise SearXNGURLError(f"SearXNG URL scheme '{scheme}' is not allowed (only http/https)")
+    host = parsed.hostname or ""
+    if host.lower() in _SSRF_LOOPBACK_HOSTS:
+        raise SearXNGURLError(f"SearXNG URL host '{host}' is a loopback address — SSRF blocked")
+    if _searxng_is_private_ip(host):
+        raise SearXNGURLError(f"SearXNG URL host '{host}' is a private IP — SSRF blocked")
 
 _PUBLISH_KEYWORDS = frozenset({
     "publicar", "publish", "upload", "postar", "post",
@@ -92,6 +132,7 @@ class SearXNGBackend:
     """Busca via SearXNG. Não requer API key — apenas SEARXNG_URL apontando para a instância."""
 
     def __init__(self, url: str) -> None:
+        _validate_searxng_url(url)
         self._url = url.rstrip("/")
 
     def name(self) -> str:
