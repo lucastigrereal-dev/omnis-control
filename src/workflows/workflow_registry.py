@@ -1,6 +1,6 @@
 """WorkflowRegistry — catálogo e health-check de todos os workflows OMNIS.
 
-Onda 13 (base) + Ondas 15-22 — cataloga 12 workflows:
+Onda 13 (base) + Ondas 15-23 — cataloga 13 workflows:
   - DeepResearchWorkflow    (WF1)
   - VideoEditWorkflow       (WF2)
   - AppFactoryWorkflow      (WF3)
@@ -13,6 +13,7 @@ Onda 13 (base) + Ondas 15-22 — cataloga 12 workflows:
   - DailyBriefingWorkflow        (Onda 20)
   - MultiAccountCalendarWorkflow (Onda 21)
   - SDRPlanWorkflow              (Onda 22)
+  - ContentQualityWorkflow       (Onda 23)
 
 Papel: análogo ao LegoRegistry (Onda 5) — registra, descreve e verifica workflows.
 
@@ -394,6 +395,25 @@ class WorkflowRegistry:
             _logger.error("sdr_plan import failed: %s", e)
             self.register(WorkflowEntry(
                 name="sdr_plan", version="1.0",
+                description="import failed",
+                cost_local_pct=0, dry_run_safe=False,
+            ))
+
+        try:
+            from src.workflows.content_quality_workflow import ContentQualityWorkflow
+            self.register(WorkflowEntry(
+                name="content_quality",
+                version="1.0",
+                description="Qualidade de conteúdo: N itens → QualityReport lote → akasha",
+                cost_local_pct=100,
+                dry_run_safe=True,
+                tags=["quality", "scoring", "content", "local"],
+                factory=ContentQualityWorkflow,
+            ))
+        except ImportError as e:
+            _logger.error("content_quality import failed: %s", e)
+            self.register(WorkflowEntry(
+                name="content_quality", version="1.0",
                 description="import failed",
                 cost_local_pct=0, dry_run_safe=False,
             ))

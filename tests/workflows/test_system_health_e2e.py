@@ -167,11 +167,11 @@ def test_cost_local_pct_100():
 
 # ── default() factory ─────────────────────────────────────────────────────────
 
-def test_default_has_12_workflows():
+def test_default_has_13_workflows():
     wf = SystemHealthWorkflow.default()
     wf._sink = MockAkashaSink()
     result = wf.run()
-    assert result.workflows_total == 12
+    assert result.workflows_total == 13
 
 
 def test_default_all_workflows_ok():
