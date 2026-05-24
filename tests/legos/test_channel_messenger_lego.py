@@ -237,6 +237,18 @@ def test_telegram_not_configured_returns_error(monkeypatch):
     assert "not_configured" in (tg.error or "")
 
 
+def test_telegram_no_chat_id_returns_error(monkeypatch):
+    import src.legos.channel_messenger_lego as mod
+    monkeypatch.setattr(mod, "TG_BOT_TOKEN", "bot123")
+    monkeypatch.setattr(mod, "TG_DEFAULT_CHAT_ID", "")
+    lego = ChannelMessengerLego(_http_post=_tg_http_ok)
+    spec = MessageSpec(content="msg", channels=["telegram"], recipient="", dry_run=False)
+    result = lego.send(spec)
+    tg = next(d for d in result.deliveries if d.channel == "telegram")
+    assert tg.success is False
+    assert "no_chat_id" in (tg.error or "")
+
+
 # ── multi-canal fan-out ───────────────────────────────────────────────────────
 
 def test_all_channels_dispatched(monkeypatch):
@@ -291,6 +303,23 @@ def test_no_valid_channels_returns_error():
     result = lego.send(spec)
     assert result.success is False
     assert result.error == "no_valid_channels"
+
+
+def test_send_returns_timeout_when_dispatch_semaphore_busy(monkeypatch):
+    import src.legos.channel_messenger_lego as mod
+
+    class _BusySemaphore:
+        def acquire(self, timeout=10):
+            return False
+
+        def release(self):
+            return None
+
+    monkeypatch.setattr(mod, "_DISPATCH_SEMAPHORE", _BusySemaphore())
+    lego = ChannelMessengerLego(_http_post=_wa_http_ok)
+    result = lego.send(MessageSpec(content="msg", channels=["all"], dry_run=False))
+    assert result.success is False
+    assert result.error == "dispatch_semaphore_timeout"
 
 
 # ── MessageResult properties ──────────────────────────────────────────────────

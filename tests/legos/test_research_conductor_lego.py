@@ -219,6 +219,50 @@ def test_pipeline_creates_report_and_citations(tmp_path):
     assert any(f.endswith("citations.json") for f in result.files_created)
 
 
+# ── execute unhappy paths ─────────────────────────────────────────────────────
+
+def test_execute_returns_timeout_when_research_semaphore_busy(monkeypatch):
+    import src.legos.research_conductor_lego as mod
+
+    class _BusySemaphore:
+        def acquire(self, timeout=5):
+            return False
+
+        def release(self):
+            return None
+
+    monkeypatch.setattr(mod, "_RESEARCH_SEMAPHORE", _BusySemaphore())
+    lego = ResearchConductorLego(search_backend=NullSearchBackend(), llm_client=_FakeLLM())
+    result = lego.execute(ResearchSpec(topic="mercado de viagens", dry_run=False))
+    assert result.success is False
+    assert result.error == "research_semaphore_timeout"
+
+
+def test_execute_returns_error_when_pipeline_raises(monkeypatch):
+    import src.legos.research_conductor_lego as mod
+
+    class _GoodSemaphore:
+        def acquire(self, timeout=5):
+            return True
+
+        def release(self):
+            return None
+
+    class _BrokenPipeline:
+        def __init__(self, llm, search):
+            pass
+
+        def run(self, spec):
+            raise RuntimeError("pipeline explode")
+
+    monkeypatch.setattr(mod, "_RESEARCH_SEMAPHORE", _GoodSemaphore())
+    monkeypatch.setattr(mod, "_StormPipeline", _BrokenPipeline)
+    lego = ResearchConductorLego(search_backend=NullSearchBackend(), llm_client=_FakeLLM())
+    result = lego.execute(ResearchSpec(topic="energia", dry_run=False))
+    assert result.success is False
+    assert "pipeline explode" in (result.error or "")
+
+
 # ── search backends ───────────────────────────────────────────────────────────
 
 def test_null_backend_returns_empty():
