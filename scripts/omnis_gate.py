@@ -54,6 +54,8 @@ _REQUIRED_WORKFLOW_FILES = [
     "tests/workflows/test_capability_forge_e2e.py",
     "src/workflows/skill_execution_workflow.py",
     "tests/workflows/test_skill_execution_e2e.py",
+    "src/workflows/task_classification_workflow.py",
+    "tests/workflows/test_task_classification_e2e.py",
 ]
 
 _SECRET_PATTERNS = ["ACTUAL_KEY", "sk-", "AKIA", "-----BEGIN", "password=", "secret="]
@@ -78,6 +80,7 @@ _REQUIRED_IMPORTS = [
     ("src.workflows.task_dispatch_workflow", "TaskDispatchWorkflow"),
     ("src.workflows.capability_forge_workflow", "CapabilityForgeWorkflow"),
     ("src.workflows.skill_execution_workflow", "SkillExecutionWorkflow"),
+    ("src.workflows.task_classification_workflow", "TaskClassificationWorkflow"),
     ("src.utils.run_context", "RunContext"),
     ("src.akasha_event_sink.adapter", "MockAkashaSink"),
 ]
