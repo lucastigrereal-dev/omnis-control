@@ -55,6 +55,7 @@
 | W-O19 | ONDA26 | DeliverableMappingWorkflow (intake+mapper em lote) | DONE | omnis-5waves | b49b289 | 24 |
 | W-O20 | ONDA27 | TaskDispatchWorkflow (despacho de tarefas em lote) | DONE | omnis-5waves | 0a4faef | 21 |
 | W-O21 | ONDA28 | CapabilityForgeWorkflow (gap detection + forge em lote) | DONE | omnis-5waves | aefd55e | 22 |
+| W-O22 | ONDA29 | SkillExecutionWorkflow (SkillRunnerBridge execute_plan lote) | DONE | omnis-5waves | 6055262 | 23 |
 
 ## Legenda
 - DONE: concluído e commitado
