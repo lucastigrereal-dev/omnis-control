@@ -1,13 +1,6 @@
 """Guardrails de propagação de run_context em mission_bridge."""
 from __future__ import annotations
 
-import pytest
-
-
-@pytest.mark.xfail(
-    reason="Known gap: run_full_pipeline_real não injeta run_context no SkillRunnerBridge.",
-    strict=False,
-)
 def test_run_full_pipeline_real_passes_run_context_to_bridge(monkeypatch):
     from src.execution_graph import mission_bridge as mb
     from src.mission_orchestrator.models import OrchestratorRun
@@ -65,4 +58,3 @@ def test_run_full_pipeline_real_passes_run_context_to_bridge(monkeypatch):
 
     # Expectativa desejada: bridge recebe mesmo run_context da run
     assert captured.get("run_context") is ctx
-

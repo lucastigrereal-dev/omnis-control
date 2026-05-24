@@ -9,14 +9,13 @@ Commits auditados: `9379965`, `cff067b`, `46406d3`, `938eaf7`, `8321ee5`, `5a024
 ## Veredito executivo
 - **RCE do CodeExecutor via ponte Graph→Lego: CURADO** no caminho auditado.
 - **Sem novo P0** encontrado nos commits da Onda 8 auditados.
-- Existe **1 gap P1** de enforcement do gate em caminho secundário (detalhado abaixo).
+- P1 de gate e P1 de run_context **foram fechados pela frente de construção** e revalidados nesta auditoria.
 
 ## Achados por prioridade
 
-1. **P1 — caminho de escape do freio em API interna específica**  
-   `run_graph_from_orchestrator()` em `src/execution_graph/mission_bridge.py` chama `run_graph_dry()` direto e não aplica `approval_center.gate` antes da execução do grafo.  
-   Impacto: quem usar esse entrypoint diretamente pode executar dry-run mesmo com `approval_required=True` e sem `approval_id`.  
-   Status: registrado por teste `xfail` (sem alterar comportamento).
+1. **P1 (FECHADO) — caminho de escape do freio em API interna específica**  
+   `run_graph_from_orchestrator()` agora aplica `check_gate()` compartilhado antes de qualquer execução.  
+   Status: teste promovido de `xfail` para obrigatório e passando.
 
 2. **RCE curado continua curado pela nova ponte (`SkillRunnerBridge` → `LegoRegistry`)**  
    A execução real de lego de código continua bloqueando payload malicioso:
@@ -102,12 +101,10 @@ Resultado: **135 passed**
 
 ### Suite completa
 - `python -m pytest tests/ --import-mode=importlib -p no:warnings -q`
-- Resultado: **8902 passed, 4 skipped, 4 xfailed**
+- Resultado após fechamento dos P1: **8905 passed, 4 skipped, 2 xfailed**
 
-## 6) Recomendação para frente de construção
+## 6) Estado dos P1
 
-1. **Fechar escape path do gate (P1):**  
-   em `run_graph_from_orchestrator()`, aplicar gate shared (`approval_center.gate`) antes de executar `run_graph_dry`.
-2. **Fechar propagação de run_context no caminho real (P1 já mapeado):**  
-   injetar `run_context` em `SkillRunnerBridge` em `run_full_pipeline_real()`.
-3. Após correções da frente de construção, remover os `xfail` correspondentes e promover para teste obrigatório.
+1. **Gate escape path:** fechado e validado.
+2. **run_context no bridge real:** fechado e validado.
+3. Ambos os testes de guarda foram promovidos para obrigatórios (sem `xfail`) e estão verdes.
