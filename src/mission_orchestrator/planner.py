@@ -134,8 +134,13 @@ def build_plan(
     dry_run: bool | None = None,
     allow_unknown: bool = False,
     config_path: Path | None = None,
+    run_context=None,
 ) -> OrchestratorRun:
-    """Build an OrchestratorRun with planned steps. No execution."""
+    """Build an OrchestratorRun with planned steps. No execution.
+
+    run_context: optional RunContext — when provided, propagates its run_id
+    so all downstream components (graph, LLM calls) share the same ID.
+    """
     dry_run = resolve_dry_run(dry_run)
     intent, _deliverable, _description = _parse_intent(request_text, config_path)
 
@@ -145,12 +150,14 @@ def build_plan(
     # Raise only when intent is unknown AND no capability covers the request
     _validate_plan(request_text, intent, cap_results, allow_unknown)
 
+    run_id = run_context.run_id if run_context is not None else None
     run = OrchestratorRun.new(
         request_text=request_text,
         account_handle=account_handle,
         objective=objective,
         dry_run=dry_run,
         intent=intent,
+        run_id=run_id,
     )
 
     # Populate P4 intelligence fields

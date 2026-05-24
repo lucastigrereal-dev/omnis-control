@@ -22,6 +22,7 @@ def plan(
     dry_run: bool = True,
     allow_unknown: bool = False,
     config_path: Path | None = None,
+    run_context=None,
 ) -> OrchestratorRun:
     """Build a plan without executing. Returns OrchestratorRun."""
     return build_plan(
@@ -31,6 +32,7 @@ def plan(
         dry_run=dry_run,
         allow_unknown=allow_unknown,
         config_path=config_path,
+        run_context=run_context,
     )
 
 
@@ -44,8 +46,13 @@ def run(
     runs_root: Path = DEFAULT_RUNS_ROOT,
     runs_log: Path = DEFAULT_RUNS_LOG,
     packages_root: Path | None = None,
+    run_context=None,
 ) -> OrchestratorRun:
-    """Plan + execute + persist. Returns OrchestratorRun."""
+    """Plan + execute + persist. Returns OrchestratorRun.
+
+    run_context: optional RunContext — when provided, propagates its run_id
+    so orchestrator, graph, and LLM calls all share the same ID.
+    """
     orch_run = build_plan(
         request_text=request_text,
         account_handle=account_handle,
@@ -53,6 +60,7 @@ def run(
         dry_run=dry_run,
         allow_unknown=allow_unknown,
         config_path=config_path,
+        run_context=run_context,
     )
     orch_run = execute(orch_run, packages_root=packages_root)
     _persist(orch_run, runs_root, runs_log)
@@ -70,6 +78,7 @@ def run_with_approval(
     runs_log: Path = DEFAULT_RUNS_LOG,
     packages_root: Path | None = None,
     approvals_log: Path | None = None,
+    run_context=None,
 ) -> OrchestratorRun:
     """Plan + execute with approval gate enforcement. Returns OrchestratorRun."""
     orch_run = build_plan(
@@ -78,6 +87,7 @@ def run_with_approval(
         objective=objective,
         dry_run=dry_run,
         allow_unknown=allow_unknown,
+        run_context=run_context,
     )
     if approval_id is not None:
         orch_run.approval_id = approval_id

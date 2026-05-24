@@ -63,6 +63,7 @@ def run_full_pipeline(
     runs_log: Optional[Path] = None,
     packages_root: Optional[Path] = None,
     approvals_log=None,
+    run_context=None,
 ) -> tuple[OrchestratorRun, "StepRun"]:
     """Run the full pipeline: Orchestrator → Squad → Graph.
 
@@ -84,6 +85,7 @@ def run_full_pipeline(
             runs_log=runs_log or orch_svc.DEFAULT_RUNS_LOG,
             packages_root=packages_root,
             approvals_log=approvals_log,
+            run_context=run_context,
         )
     else:
         orch_run = orch_svc.run(
@@ -95,6 +97,7 @@ def run_full_pipeline(
             runs_root=runs_root or orch_svc.DEFAULT_RUNS_ROOT,
             runs_log=runs_log or orch_svc.DEFAULT_RUNS_LOG,
             packages_root=packages_root,
+            run_context=run_context,
         )
 
     if orch_run.status in ("failed", "blocked", "blocked_pending_approval"):
@@ -104,12 +107,14 @@ def run_full_pipeline(
     graph = build_graph_from_orchestrator(orch_run)
 
     from src.execution_graph.runner import run_graph_dry
+    graph_run_id = run_context.run_id if run_context is not None else orch_run.run_id
     step_run = run_graph_dry(
         graph,
         fail_at=fail_at,
         include_snapshot=True,
         approval_id=approval_id,
         approval_required=orch_run.approval_required,
+        run_id=graph_run_id,
     )
 
     orch_run.graph_run_id = step_run.graph_run_id
@@ -141,6 +146,7 @@ def run_full_pipeline_real(
     approvals_log=None,
     catalog_path: str | None = None,
     registry=None,
+    run_context=None,
 ) -> tuple[OrchestratorRun, "StepRun"]:
     """Run full pipeline with real SkillRunnerBridge → ModelRouter → LLM.
 
@@ -168,6 +174,7 @@ def run_full_pipeline_real(
             runs_log=runs_log or orch_svc.DEFAULT_RUNS_LOG,
             packages_root=packages_root,
             approvals_log=approvals_log,
+            run_context=run_context,
         )
     else:
         orch_run = orch_svc.run(
@@ -179,6 +186,7 @@ def run_full_pipeline_real(
             runs_root=runs_root or orch_svc.DEFAULT_RUNS_ROOT,
             runs_log=runs_log or orch_svc.DEFAULT_RUNS_LOG,
             packages_root=packages_root,
+            run_context=run_context,
         )
 
     if orch_run.status in ("failed", "blocked", "blocked_pending_approval"):
@@ -205,10 +213,12 @@ def run_full_pipeline_real(
     bridge.selector = selector
 
     # Phase 4: Execute graph with real bridge
+    graph_run_id = run_context.run_id if run_context is not None else None
     step_run = run_graph_real(
         graph,
         bridge,
         include_snapshot=True,
+        run_id=graph_run_id,
     )
 
     orch_run.graph_run_id = step_run.graph_run_id

@@ -74,9 +74,10 @@ class OrchestratorRun:
         objective: str = "engajamento",
         dry_run: bool = True,
         intent: str = "unknown",
+        run_id: str | None = None,
     ) -> "OrchestratorRun":
         return cls(
-            run_id=_run_id(),
+            run_id=run_id or _run_id(),
             request_text=request_text,
             account_handle=account_handle,
             objective=objective,
