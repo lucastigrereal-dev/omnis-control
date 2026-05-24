@@ -54,6 +54,7 @@
 | W-O18 | ONDA25 | SquadAssignmentWorkflow (atribuição squads em lote) | DONE | omnis-5waves | 1b012f3 | 21 |
 | W-O19 | ONDA26 | DeliverableMappingWorkflow (intake+mapper em lote) | DONE | omnis-5waves | b49b289 | 24 |
 | W-O20 | ONDA27 | TaskDispatchWorkflow (despacho de tarefas em lote) | DONE | omnis-5waves | 0a4faef | 21 |
+| W-O21 | ONDA28 | CapabilityForgeWorkflow (gap detection + forge em lote) | DONE | omnis-5waves | aefd55e | 22 |
 
 ## Legenda
 - DONE: concluído e commitado
