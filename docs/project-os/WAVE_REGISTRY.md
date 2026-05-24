@@ -53,6 +53,7 @@
 | W-O17 | ONDA24 | MetricsSnapshotWorkflow (agrega MetricEvents+RunSummaries) | DONE | omnis-5waves | 5d82706 | 24 |
 | W-O18 | ONDA25 | SquadAssignmentWorkflow (atribuição squads em lote) | DONE | omnis-5waves | 1b012f3 | 21 |
 | W-O19 | ONDA26 | DeliverableMappingWorkflow (intake+mapper em lote) | DONE | omnis-5waves | b49b289 | 24 |
+| W-O20 | ONDA27 | TaskDispatchWorkflow (despacho de tarefas em lote) | DONE | omnis-5waves | 0a4faef | 21 |
 
 ## Legenda
 - DONE: concluído e commitado

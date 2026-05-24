@@ -71,4 +71,6 @@
 [2026-05-24] WorkflowRegistry: 14→15 workflows | gate: 11 imports, 31 files | workflows: 421 passed
 [2026-05-24] Onda 26 DeliverableMappingWorkflow: 24/24 testes, commit b49b289
 [2026-05-24] WorkflowRegistry: 16 workflows | gate: 12 imports, 33 files | workflows: 445 passed
+[2026-05-24] Onda 27 TaskDispatchWorkflow: 21/21 testes, commit 0a4faef
+[2026-05-24] WorkflowRegistry: 17 workflows | gate: 13 imports, 35 files | workflows: 466 passed
 ```
