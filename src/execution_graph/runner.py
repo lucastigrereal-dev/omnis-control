@@ -253,6 +253,16 @@ def _collect_real_rollback(
         ))
 
 
+def _validate_step_output(output: str) -> bool:
+    """Light validator: output is non-empty and not a bare error marker."""
+    if not output or len(output.strip()) < 5:
+        return False
+    lower = output.strip().lower()
+    if lower in ("error", "failed", "none", "null", "n/a"):
+        return False
+    return True
+
+
 def _collect_upstream_context(
     node: StepNode,
     context_store: dict[str, str] | None,
@@ -393,9 +403,17 @@ def run_graph_dry(
         _emit_dry_event(logs, node, status.value, msg)
         step_states[node.step_id] = status.value
 
-        # Onda 8 Passo 4: accumulate output for downstream steps
+        # Onda 8 Passo 4+5: validate then accumulate output for downstream steps
         if status == StepStatus.DONE and context_store is not None:
-            context_store[node.step_id] = node.expected_output
+            output = node.expected_output
+            if _validate_step_output(output):
+                context_store[node.step_id] = output
+            else:
+                _emit_dry_event(
+                    logs, node, "validator",
+                    message=f"[validator] step '{node.step_id}' output too short or empty — not propagated",
+                    role_id="validator",
+                )
 
         # Circuit breaker reporting
         if circuit_registry is not None:
@@ -509,13 +527,18 @@ def run_graph_real(
         _emit_real_event(logs, node, status.value, msg)
         step_states[node.step_id] = status.value
 
-        # Onda 8 Passo 4: capture output for downstream steps
+        # Onda 8 Passo 4+5: validate then capture output for downstream steps
         if status == StepStatus.DONE and context_store is not None:
             arrow = " → "
-            if arrow in msg:
-                context_store[node.step_id] = msg.split(arrow, 1)[1]
+            raw_output = msg.split(arrow, 1)[1] if arrow in msg else node.expected_output
+            if _validate_step_output(raw_output):
+                context_store[node.step_id] = raw_output
             else:
-                context_store[node.step_id] = node.expected_output
+                _emit_real_event(
+                    logs, node, "validator",
+                    message=f"[validator] step '{node.step_id}' output too short or empty — not propagated",
+                    role_id="validator",
+                )
 
         # Circuit breaker reporting
         if circuit_registry is not None:

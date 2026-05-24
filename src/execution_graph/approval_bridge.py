@@ -6,17 +6,14 @@ from typing import Optional
 
 from src.execution_graph.models import ExecutionGraph, StepRun, RUN_STATUS_DONE, RUN_STATUS_FAILED
 from src.approval_center import store as store_mod
-from src.approval_center.store import ApprovalStore
-from src.approval_center.models import (
-    APPROVAL_STATUS_PENDING,
-    APPROVAL_STATUS_APPROVED,
-    APPROVAL_STATUS_REJECTED,
+from src.approval_center.gate import (
+    check_gate,
+    GATE_BLOCKED,
+    GATE_APPROVED,
+    GATE_REJECTED,
+    GATE_NOT_REQUIRED,
 )
 
-GATE_BLOCKED = "blocked_pending_approval"
-GATE_APPROVED = "approved"
-GATE_REJECTED = "rejected"
-GATE_NOT_REQUIRED = "not_required"
 RUN_STATUS_BLOCKED = "blocked_pending_approval"
 
 BASE = Path(__file__).resolve().parent.parent.parent
@@ -31,24 +28,11 @@ def check_approval_gate(
 
     Returns one of: "not_required", "approved", "rejected", "blocked_pending_approval".
     """
-    if not approval_required:
-        return GATE_NOT_REQUIRED
-
-    if approval_id is None:
-        return GATE_BLOCKED
-
-    log_path = approvals_log if approvals_log is not None else store_mod.DEFAULT_APPROVALS_LOG
-    store = ApprovalStore(log_path)
-    req = store.get(approval_id)
-
-    if req is None:
-        return GATE_BLOCKED
-
-    if req.status == APPROVAL_STATUS_APPROVED:
-        return GATE_APPROVED
-    if req.status == APPROVAL_STATUS_REJECTED:
-        return GATE_REJECTED
-    return GATE_BLOCKED
+    return check_gate(
+        approval_required=approval_required,
+        approval_id=approval_id,
+        approvals_log=approvals_log,
+    )
 
 
 def request_graph_approval(
