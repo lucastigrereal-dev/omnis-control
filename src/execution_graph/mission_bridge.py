@@ -31,20 +31,39 @@ def run_graph_from_orchestrator(
     approval_id: str | None = None,
     approvals_log=None,
 ) -> "StepRun":
-    """Build + run graph from orchestrator run with approval gate."""
+    """Build + run graph from orchestrator run with approval gate.
+
+    Onda 8 P1 fix: enforces shared approval gate before executing the graph.
+    No execution path bypasses the gate.
+    """
     from src.execution_graph.runner import run_graph_dry
+    from src.approval_center.gate import check_gate, GATE_BLOCKED, GATE_REJECTED
+    from src.execution_graph.models import StepRun
 
     graph = build_graph_from_orchestrator(orch_run)
 
     approval_required = orch_run.approval_required
-    if approval_id is not None:
-        pass  # use provided approval_id
+    effective_approval_id = approval_id or orch_run.approval_id
+
+    gate = check_gate(
+        approval_required=approval_required,
+        approval_id=effective_approval_id,
+        approvals_log=approvals_log,
+    )
+
+    if gate in (GATE_BLOCKED, GATE_REJECTED):
+        return StepRun.blocked(
+            graph=graph,
+            reason=f"Approval required — gate status: {gate}",
+            approval_id=effective_approval_id,
+            approval_required=True,
+        )
 
     step_run = run_graph_dry(
         graph,
         fail_at=fail_at,
         include_snapshot=True,
-        approval_id=approval_id,
+        approval_id=effective_approval_id,
         approval_required=approval_required,
     )
     orch_run.graph_run_id = step_run.graph_run_id
@@ -209,7 +228,7 @@ def run_full_pipeline_real(
     else:
         adapter = RealSkillAdapter(registry=registry, dry_run=False)
 
-    bridge = SkillRunnerBridge(dry_run=dry_run, adapter=adapter)
+    bridge = SkillRunnerBridge(dry_run=dry_run, adapter=adapter, run_context=run_context)
     bridge.selector = selector
 
     # Phase 4: Execute graph with real bridge
