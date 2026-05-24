@@ -94,6 +94,20 @@ def test_research_perspectives_option():
     assert data["success"] is True
 
 
+def test_research_real_publish_keyword_exits_1():
+    result = _invoke("research", "publicar relatório final", "--real")
+    assert result.exit_code == 1
+    assert "Falhou" in result.output
+
+
+def test_research_real_publish_keyword_json_reports_error():
+    result = _invoke("research", "publicar relatório final", "--real", "--json")
+    assert result.exit_code == 0
+    data = json.loads(result.output)
+    assert data["success"] is False
+    assert data["error"] == "approval_required"
+
+
 # ── lego send (dry-run) ───────────────────────────────────────────────────────
 
 def test_send_dry_run_exits_0():
@@ -150,3 +164,17 @@ def test_send_broadcast_content_blocked():
     result = _invoke("send", "broadcast para todos os contatos", "--dry-run", "--json")
     # dry_run bypasses broadcast gate — should succeed
     assert result.exit_code == 0
+
+
+def test_send_real_unknown_channel_exits_1():
+    result = _invoke("send", "hello world", "--real", "--channel", "sms")
+    assert result.exit_code == 1
+    assert "Falhou" in result.output
+
+
+def test_send_real_unknown_channel_json_reports_error():
+    result = _invoke("send", "hello world", "--real", "--channel", "sms", "--json")
+    assert result.exit_code == 0
+    data = json.loads(result.output)
+    assert data["success"] is False
+    assert data["error"] == "no_valid_channels"
