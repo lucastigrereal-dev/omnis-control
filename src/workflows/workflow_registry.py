@@ -1,6 +1,6 @@
 """WorkflowRegistry — catálogo e health-check de todos os workflows OMNIS.
 
-Onda 13 (base) + Ondas 15-23 — cataloga 13 workflows:
+Onda 13 (base) + Ondas 15-24 — cataloga 14 workflows:
   - DeepResearchWorkflow    (WF1)
   - VideoEditWorkflow       (WF2)
   - AppFactoryWorkflow      (WF3)
@@ -14,6 +14,7 @@ Onda 13 (base) + Ondas 15-23 — cataloga 13 workflows:
   - MultiAccountCalendarWorkflow (Onda 21)
   - SDRPlanWorkflow              (Onda 22)
   - ContentQualityWorkflow       (Onda 23)
+  - MetricsSnapshotWorkflow      (Onda 24)
 
 Papel: análogo ao LegoRegistry (Onda 5) — registra, descreve e verifica workflows.
 
@@ -414,6 +415,25 @@ class WorkflowRegistry:
             _logger.error("content_quality import failed: %s", e)
             self.register(WorkflowEntry(
                 name="content_quality", version="1.0",
+                description="import failed",
+                cost_local_pct=0, dry_run_safe=False,
+            ))
+
+        try:
+            from src.workflows.metrics_snapshot_workflow import MetricsSnapshotWorkflow
+            self.register(WorkflowEntry(
+                name="metrics_snapshot",
+                version="1.0",
+                description="Snapshot de métricas: MetricEvents + RunSummaries → akasha",
+                cost_local_pct=100,
+                dry_run_safe=True,
+                tags=["metrics", "aggregation", "snapshot", "local"],
+                factory=MetricsSnapshotWorkflow,
+            ))
+        except ImportError as e:
+            _logger.error("metrics_snapshot import failed: %s", e)
+            self.register(WorkflowEntry(
+                name="metrics_snapshot", version="1.0",
                 description="import failed",
                 cost_local_pct=0, dry_run_safe=False,
             ))
