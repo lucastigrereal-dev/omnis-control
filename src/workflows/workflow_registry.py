@@ -1,6 +1,6 @@
 """WorkflowRegistry — catálogo e health-check de todos os workflows OMNIS.
 
-Onda 34 — 19 capacidades distintas:
+Onda 35 — 20 capacidades distintas:
   - DeepResearchWorkflow    (WF1)
   - VideoEditWorkflow       (WF2)
   - AppFactoryWorkflow      (WF3)
@@ -20,6 +20,7 @@ Onda 34 — 19 capacidades distintas:
   - ContentBriefWorkflow         (Onda 34 — brief editorial via Ollama)
   - HotelPitchWorkflow           (Onda 33 — pitch collab PT-BR via Ollama)
   - CaptionGeneratorWorkflow     (Onda 32 — LLM real Ollama)
+  - SEOgramWorkflow              (Onda 35 — otimização SEO de caption via Ollama)
 
 Removidos do registry (módulos permanecem como utilitários):
   - OutreachSequenceWorkflow  → subsumo por SDRPipelineWorkflow
@@ -544,6 +545,25 @@ class WorkflowRegistry:
             _logger.error("caption_generator import failed: %s", e)
             self.register(WorkflowEntry(
                 name="caption_generator", version="1.0",
+                description="import failed",
+                cost_local_pct=0, dry_run_safe=False,
+            ))
+
+        try:
+            from src.workflows.seogram_workflow import SEOgramWorkflow
+            self.register(WorkflowEntry(
+                name="seogram",
+                version="1.0",
+                description="Otimização SEO de caption Instagram via Ollama (hook, hashtags, score)",
+                cost_local_pct=100,
+                dry_run_safe=True,
+                tags=["llm", "seo", "instagram", "hashtags", "ollama", "local"],
+                factory=SEOgramWorkflow,
+            ))
+        except ImportError as e:
+            _logger.error("seogram import failed: %s", e)
+            self.register(WorkflowEntry(
+                name="seogram", version="1.0",
                 description="import failed",
                 cost_local_pct=0, dry_run_safe=False,
             ))

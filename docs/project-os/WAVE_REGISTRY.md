@@ -66,6 +66,10 @@
 | W-O25 | ONDA32 | CaptionGeneratorWorkflow (OllamaAdapter llama3.1:8b — LLM real) | DONE | omnis-5waves | 08f498a | 23+1real |
 | W-O25r | ONDA32-retro | LeadScoringWorkflow — prova retroativa com leads reais Natal/RN | DONE | omnis-5waves | 08f498a | 4 |
 | W-O26 | ONDA33 | HotelPitchWorkflow (pitch collab PT-BR por tier, Ollama llama3.1:8b) | DONE | omnis-5waves | 616a523 | 24+1real |
+| W-O27 | ONDA34 | ContentBriefWorkflow (brief editorial: angulo+hooks+dicas via Ollama) | DONE | omnis-5waves | 8b4478b | 24+1real |
+| W-O27r | ONDA34-retro | ContentCalendarWorkflow — prova retroativa @oinatalrn + 6 perfis batch | DONE | omnis-5waves | 8b4478b | 3 |
+| W-O28 | ONDA35 | SEOgramWorkflow (SEO caption: hook+hashtags+score 1-10 via Ollama) | DONE | omnis-5waves | — | 25+1real |
+| W-O28r | ONDA35-retro | ContentQualityWorkflow — prova retroativa com captions reais Ponta Negra | DONE | omnis-5waves | — | 5 |
 
 ## Legenda
 - DONE: concluído e commitado

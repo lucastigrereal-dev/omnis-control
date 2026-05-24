@@ -36,6 +36,7 @@ _REQUIRED_WORKFLOW_FILES = [
     "src/workflows/content_brief_workflow.py",
     "src/workflows/hotel_pitch_workflow.py",
     "src/workflows/caption_generator_workflow.py",
+    "src/workflows/seogram_workflow.py",
     # utilitários (não no registry, mas devem existir)
     "src/workflows/outreach_sequence_workflow.py",
     "src/workflows/sdr_batch_workflow.py",
@@ -62,6 +63,7 @@ _REQUIRED_WORKFLOW_FILES = [
     "tests/workflows/test_capability_forge_e2e.py",
     "tests/workflows/test_skill_execution_e2e.py",
     "tests/workflows/test_caption_generator_e2e.py",
+    "tests/workflows/test_seogram_e2e.py",
     "tests/workflows/test_hotel_pitch_e2e.py",
     "tests/workflows/test_content_brief_e2e.py",
 ]
@@ -90,6 +92,7 @@ _REQUIRED_IMPORTS = [
     ("src.workflows.content_brief_workflow", "ContentBriefWorkflow"),
     ("src.workflows.hotel_pitch_workflow", "HotelPitchWorkflow"),
     ("src.workflows.caption_generator_workflow", "CaptionGeneratorWorkflow"),
+    ("src.workflows.seogram_workflow", "SEOgramWorkflow"),
     ("src.utils.run_context", "RunContext"),
     ("src.akasha_event_sink.adapter", "MockAkashaSink"),
 ]

@@ -103,4 +103,26 @@
   - REBAIXADOS: TaskClassification+CostTracking (utilitários — fora do registry)
   - COLAPSADO: MultiAccountCalendar → ContentCalendarWorkflow.run_batch()
 [2026-05-24] Suite consolidação: 588 passed (workflows) | Gate: VERDE 5/5 | 14 imports, 40 files
+[2026-05-24] Onda 34 ContentBriefWorkflow: 24 mock + 1 real Ollama, commit 8b4478b
+  - SAÍDA REAL (llama3.1:8b, 633 tokens) para @oinatalrn CAROUSEL praias secretas:
+  - angle: "Descubra as praias secretas que só os moradores de Natal conhecem!"
+  - hook[0]: "Quem disse que Natal é apenas praia?"
+  - key_points[0]: "Ponta Negra, Genipabu e Maracajaú são algumas das praias mais incríveis..."
+  - research_qs[0]: "Quais são as praias menos conhecidas em Natal?"
+  - Retroativa: ContentCalendarWorkflow 3 testes @oinatalrn + 6 perfis × 7 dias = 42 itens ✓
+[2026-05-24] WorkflowRegistry: 19 workflows | gate: 17 imports, 46 files | workflows: 666 passed
+[2026-05-24] Onda 35 SEOgramWorkflow: 25 mock + 1 real Ollama (607 tokens)
+  - SAÍDA REAL (llama3.1:8b, 607 tokens) para @oinatalrn caption Ponta Negra:
+  - SEO SCORE: 8/10
+  - KEYWORD DENSITY: 0.85
+  - OPTIMIZED HOOK: "Desfrute do por do sol na Praia de Ponta Negra, um momento de Deus!"
+  - HASHTAGS (9): #praiadenatal #pontanegra #natal #riograndenorte #nordeste #viagem #praia #turismorecife #gastronomianatal
+  - CLUSTERS: niche / location / engagement / trending
+  - NOTES: ["Inclua mais fotos de alta qualidade...", "Utilize a hashtag '#visitnatal'..."]
+  - Retroativa: ContentQualityWorkflow 5 testes com captions reais Ponta Negra
+    * boa caption → score > 5, grade B/C
+    * caption ruim ("Natal RN") → score < 7
+    * excelente > ruim: comprovado
+    * lote misto 3 captions: distribuição ok, akasha event emitido
+[2026-05-24] WorkflowRegistry: 20 workflows | gate: 18 imports, 48 files | suite: 9794 passed
 ```
