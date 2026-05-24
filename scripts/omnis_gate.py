@@ -46,6 +46,8 @@ _REQUIRED_WORKFLOW_FILES = [
     "tests/workflows/test_metrics_snapshot_e2e.py",
     "src/workflows/squad_assignment_workflow.py",
     "tests/workflows/test_squad_assignment_e2e.py",
+    "src/workflows/deliverable_mapping_workflow.py",
+    "tests/workflows/test_deliverable_mapping_e2e.py",
 ]
 
 _SECRET_PATTERNS = ["ACTUAL_KEY", "sk-", "AKIA", "-----BEGIN", "password=", "secret="]
@@ -66,6 +68,7 @@ _REQUIRED_IMPORTS = [
     ("src.workflows.content_quality_workflow", "ContentQualityWorkflow"),
     ("src.workflows.metrics_snapshot_workflow", "MetricsSnapshotWorkflow"),
     ("src.workflows.squad_assignment_workflow", "SquadAssignmentWorkflow"),
+    ("src.workflows.deliverable_mapping_workflow", "DeliverableMappingWorkflow"),
     ("src.utils.run_context", "RunContext"),
     ("src.akasha_event_sink.adapter", "MockAkashaSink"),
 ]
