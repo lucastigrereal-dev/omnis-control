@@ -48,3 +48,9 @@ missions/.replays/
 .claude/worktrees/
 reports/ccos/*.log
 reports/ccos/*.md
+
+# Runtime state / generated artifacts
+data/state.json
+output/
+GATE_LOG.jsonl
+*storm_inspect*/
