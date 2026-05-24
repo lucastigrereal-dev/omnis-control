@@ -169,8 +169,12 @@ class HotelPitchWorkflow:
     dry_run=True retorna pitch template sem chamar o modelo.
     """
 
-    def __init__(self, akasha_sink: AkashaSinkAdapter | None = None) -> None:
-        self._sink = akasha_sink or FileAkashaSink()
+    def __init__(
+        self,
+        akasha_sink: AkashaSinkAdapter | None = None,
+        akasha_dir: str = "output/akasha/hotel_pitch/",
+    ) -> None:
+        self._sink = akasha_sink or FileAkashaSink(target_dir=akasha_dir, dry_run=True)
 
     def run(
         self,

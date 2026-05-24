@@ -182,8 +182,12 @@ class ContentBriefWorkflow:
     dry_run=False chama llama3.1:8b local.
     """
 
-    def __init__(self, akasha_sink: AkashaSinkAdapter | None = None) -> None:
-        self._sink = akasha_sink or FileAkashaSink()
+    def __init__(
+        self,
+        akasha_sink: AkashaSinkAdapter | None = None,
+        akasha_dir: str = "output/akasha/content_brief/",
+    ) -> None:
+        self._sink = akasha_sink or FileAkashaSink(target_dir=akasha_dir, dry_run=True)
 
     def run(
         self,

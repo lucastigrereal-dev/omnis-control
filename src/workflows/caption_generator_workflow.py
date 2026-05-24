@@ -94,9 +94,10 @@ class CaptionGeneratorWorkflow:
         self,
         llm: LLMAdapter | None = None,
         akasha_sink: AkashaSinkAdapter | None = None,
+        akasha_dir: str = "output/akasha/caption_generator/",
     ) -> None:
         self._llm = llm
-        self._sink = akasha_sink or FileAkashaSink()
+        self._sink = akasha_sink or FileAkashaSink(target_dir=akasha_dir, dry_run=True)
 
     def _get_llm(self, dry_run: bool) -> LLMAdapter:
         if self._llm is not None:
