@@ -28,6 +28,8 @@ from src.capability_forge_real.scaffold import (
 )
 from src.capability_forge_real.policy_scanner import scan_code
 from src.capability_forge_real.test_generator import generate_test_content, count_test_functions
+from src.capability_forge_real.sandbox import SandboxRunner
+from src.capability_forge_real.evaluator import CapabilityEvaluator
 from src.capability_forge_real.errors import (
     ForgeRealError,
     BuildError,
@@ -98,6 +100,41 @@ class CapabilityBuilder:
             config = get_template_config(proposal.implementation_type)
             if config and result.test_count < config.min_tests:
                 result.transition(BuildState.TEST_FAILED)
+                if not self.dry_run:
+                    self.rollback(result.build_id)
+                return result
+
+            # Step 4b: Sandbox + Evaluator rail
+            result.transition(BuildState.SANDBOX_VALIDATING)
+            source_template = get_template(proposal.implementation_type)
+            rendered_code = render_template(source_template, proposal) if source_template else ""
+
+            sandbox = SandboxRunner()
+            sandbox_run = (
+                sandbox.dry_run_validate(rendered_code, run_id=result.build_id)
+                if self.dry_run
+                else sandbox.run(rendered_code, run_id=result.build_id)
+            )
+            result.sandbox_result = sandbox_run.to_dict()
+
+            if not sandbox_run.is_clean:
+                result.transition(BuildState.SCORE_FAILED)
+                if not self.dry_run:
+                    self.rollback(result.build_id)
+                return result
+
+            policy_clean = bool(result.policy_scan and result.policy_scan.get("passed", True))
+            scorecard = CapabilityEvaluator.evaluate(
+                capability_name=proposal.capability_name,
+                code=rendered_code,
+                test_code=test_content,
+                spec=proposal.to_dict(),
+                policy_scan_clean=policy_clean,
+            )
+            result.scorecard = scorecard.to_dict()
+
+            if not scorecard.passed:
+                result.transition(BuildState.SCORE_FAILED)
                 if not self.dry_run:
                     self.rollback(result.build_id)
                 return result

@@ -74,8 +74,8 @@ class TestBuildState:
         assert BuildState.POLICY_FAILED.value == "policy_failed"
         assert BuildState.TEST_FAILED.value == "test_failed"
 
-    def test_ten_states(self):
-        assert len(BuildState) == 10
+    def test_twelve_states(self):
+        assert len(BuildState) == 12
 
     def test_terminal_states_correct(self):
         assert BuildState.DONE in TERMINAL_STATES
@@ -124,6 +124,7 @@ class TestBuildResult:
         result.transition(BuildState.POLICY_SCANNING)
         result.transition(BuildState.TEST_GENERATING)
         result.transition(BuildState.VALIDATING)
+        result.transition(BuildState.SANDBOX_VALIDATING)
         result.transition(BuildState.REGISTERING)
         result.transition(BuildState.DONE)
         assert result.is_terminal is True

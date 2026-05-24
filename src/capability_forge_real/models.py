@@ -145,6 +145,8 @@ class BuildState(str, Enum):
     TEST_GENERATING = "test_generating"
     VALIDATING = "validating"
     TEST_FAILED = "test_failed"
+    SANDBOX_VALIDATING = "sandbox_validating"
+    SCORE_FAILED = "score_failed"
     REGISTERING = "registering"
     DONE = "done"
     ROLLED_BACK = "rolled_back"
@@ -154,11 +156,18 @@ VALID_TRANSITIONS: dict[BuildState, set[BuildState]] = {
     BuildState.SCAFFOLDING: {BuildState.POLICY_SCANNING, BuildState.REGISTERING},
     BuildState.POLICY_SCANNING: {BuildState.POLICY_FAILED, BuildState.TEST_GENERATING},
     BuildState.TEST_GENERATING: {BuildState.VALIDATING},
-    BuildState.VALIDATING: {BuildState.TEST_FAILED, BuildState.REGISTERING},
+    BuildState.VALIDATING: {BuildState.TEST_FAILED, BuildState.SANDBOX_VALIDATING},
+    BuildState.SANDBOX_VALIDATING: {BuildState.SCORE_FAILED, BuildState.REGISTERING},
     BuildState.REGISTERING: {BuildState.DONE},
 }
 
-TERMINAL_STATES: set[BuildState] = {BuildState.DONE, BuildState.POLICY_FAILED, BuildState.TEST_FAILED, BuildState.ROLLED_BACK}
+TERMINAL_STATES: set[BuildState] = {
+    BuildState.DONE,
+    BuildState.POLICY_FAILED,
+    BuildState.TEST_FAILED,
+    BuildState.SCORE_FAILED,
+    BuildState.ROLLED_BACK,
+}
 
 
 @dataclass
@@ -170,6 +179,8 @@ class BuildResult:
     files_created: list[str] = field(default_factory=list)
     policy_scan: dict | None = field(default_factory=lambda: {"passed": True, "violations": []})
     test_count: int = 0
+    sandbox_result: dict | None = field(default=None)
+    scorecard: dict | None = field(default=None)
 
     @classmethod
     def new(cls, proposal: CapabilityProposal, dry_run: bool = True) -> "BuildResult":
@@ -201,6 +212,8 @@ class BuildResult:
             "files_created": self.files_created,
             "policy_scan": self.policy_scan,
             "test_count": self.test_count,
+            "sandbox_result": self.sandbox_result,
+            "scorecard": self.scorecard,
         }
 
     @classmethod
@@ -214,6 +227,8 @@ class BuildResult:
             files_created=data.get("files_created", []),
             policy_scan=data.get("policy_scan"),
             test_count=data.get("test_count", 0),
+            sandbox_result=data.get("sandbox_result"),
+            scorecard=data.get("scorecard"),
         )
 
 
