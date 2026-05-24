@@ -124,6 +124,34 @@ def test_try_lego_propagates_run_id():
     assert result.status == "dry_run"
 
 
+def test_try_lego_passes_run_id_into_legocog_spec():
+    captured: dict[str, object] = {}
+
+    class _FakeLego:
+        def run(self, spec):
+            captured["run_id"] = spec.run_id
+            from src.legos.protocol import LegoCogResult
+            return LegoCogResult(success=True, output="ok", dry_run=True)
+
+        def health_check(self):
+            return True
+
+    reg = LegoRegistry()
+    reg.register("research_conductor", _FakeLego())
+    ctx = RunContext(run_id="ctx_run_777")
+    bridge = SkillRunnerBridge(dry_run=True, lego_registry=reg, run_context=ctx)
+    entry = DispatchEntry(
+        task_id="tctx",
+        deliverable="research coastal tourism trends",
+        executor="research_lead",
+        dry_run=True,
+    )
+    result = bridge._try_lego(entry)
+    assert result is not None
+    assert result.status == "dry_run"
+    assert captured["run_id"] == "ctx_run_777"
+
+
 # ── execute_entry com lego ────────────────────────────────────────────────────
 
 def test_execute_entry_uses_lego_when_registry_present():
