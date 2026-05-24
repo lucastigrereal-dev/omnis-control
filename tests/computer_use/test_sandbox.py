@@ -70,6 +70,17 @@ class TestSecuritySandbox:
         sb = SecuritySandbox(strict=False)
         assert sb.validate_url("http://[::1]:8080/internal") is False
 
+    @pytest.mark.xfail(reason="Known SSRF bypass: compact loopback formats not normalized yet")
+    @pytest.mark.parametrize("url", [
+        "http://127.1/admin",
+        "http://2130706433/admin",
+        "http://0x7f000001/admin",
+        "http://0177.0.0.1/admin",
+    ])
+    def test_validate_url_blocks_alt_loopback_notation(self, url):
+        sb = SecuritySandbox(strict=False)
+        assert sb.validate_url(url) is False
+
     def test_validate_url_blocks_file_scheme(self):
         sb = SecuritySandbox(strict=False)
         assert sb.validate_url("file:///C:/Users/lucas/secret.txt") is False

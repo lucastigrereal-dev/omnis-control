@@ -315,6 +315,18 @@ def test_searxng_backend_rejects_unsupported_scheme():
         SearXNGBackend("ftp://example.com/search")
 
 
+@pytest.mark.xfail(reason="Known SSRF bypass: compact loopback formats not normalized yet")
+@pytest.mark.parametrize("url", [
+    "http://127.1:8080/search",
+    "http://2130706433:8080/search",
+    "http://0x7f000001:8080/search",
+    "http://0177.0.0.1:8080/search",
+])
+def test_searxng_backend_rejects_alt_loopback_notation(url):
+    with pytest.raises(SearXNGURLError):
+        SearXNGBackend(url)
+
+
 def test_storm_pipeline_generates_perspectives_fallback():
     """Quando LLM retorna JSON inválido, pipeline usa fallback de perspectivas."""
     class _BadLLM:
