@@ -260,6 +260,52 @@ class TestBuilderGovernanceGate:
         result = CapabilityBuilder(dry_run=True).build(proposal)
         assert result.state == BuildState.DONE.value
 
+    def test_medium_risk_never_calls_activate_capability(self, monkeypatch):
+        """Medium risk must not call activator in any build path."""
+        import src.capability_forge_real.builder as builder_mod
+
+        calls: list[tuple[tuple, dict]] = []
+
+        def _fake_activate(*args, **kwargs):
+            calls.append((args, kwargs))
+            return None
+
+        monkeypatch.setattr(builder_mod, "activate_capability", _fake_activate)
+        monkeypatch.setattr(builder_mod.CapabilityBuilder, "scaffold", lambda self, proposal: [])
+        monkeypatch.setattr(builder_mod.CapabilityBuilder, "_write_files", lambda self, proposal: None)
+        monkeypatch.setattr(builder_mod, "register_capability", lambda *args, **kwargs: None)
+
+        proposal = self._make_proposal("medium")
+        proposal.implementation_type = "manual"
+
+        result = builder_mod.CapabilityBuilder(dry_run=False).build(proposal)
+        assert result.state == BuildState.DONE.value
+        assert result.activated_skill_id is None
+        assert calls == []
+
+    def test_low_risk_calls_activate_capability(self, monkeypatch):
+        """Low risk should reach activator path when build is real (dry_run=False)."""
+        import src.capability_forge_real.builder as builder_mod
+
+        calls: list[tuple[tuple, dict]] = []
+
+        def _fake_activate(*args, **kwargs):
+            calls.append((args, kwargs))
+            return None
+
+        monkeypatch.setattr(builder_mod, "activate_capability", _fake_activate)
+        monkeypatch.setattr(builder_mod.CapabilityBuilder, "scaffold", lambda self, proposal: [])
+        monkeypatch.setattr(builder_mod.CapabilityBuilder, "_write_files", lambda self, proposal: None)
+        monkeypatch.setattr(builder_mod, "register_capability", lambda *args, **kwargs: None)
+
+        proposal = self._make_proposal("low")
+        proposal.implementation_type = "manual"
+
+        result = builder_mod.CapabilityBuilder(dry_run=False).build(proposal)
+        assert result.state == BuildState.DONE.value
+        assert result.activated_skill_id == _slug("test_cap")
+        assert len(calls) == 1
+
 
 # ── Full loop: risky text → held ─────────────────────────────────────────────
 
