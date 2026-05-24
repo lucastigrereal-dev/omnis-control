@@ -82,6 +82,14 @@
 [2026-05-24] Onda 31 CostTrackingWorkflow: 22/22 testes, commit 426ef64
 [2026-05-24] WorkflowRegistry: 21 workflows | gate: 17 imports, 43 files | workflows: 558 passed
 [2026-05-24] ONDA DE CONSOLIDAÇÃO: 21 → 16 capacidades distintas, commit 01b3f9d
+[2026-05-24] Onda 32 CaptionGeneratorWorkflow: 23 mock + 1 real Ollama, commit 08f498a
+  - SAÍDA REAL (llama3.1:8b, 408 tokens): hook="Praia de Ponta Negra ao entardecer é um espetáculo de Deus!"
+  - body: [Natal/RN não tem segredos para mim... pôr do sol... cores vibrantes... ondas mansas...]
+  - cta: "Vem me encontrar lá e juntos vamos aproveitar a beleza da Praia de Ponta Negra!"
+  - tags: #PontaNegra #NatalRN #PôrDoSol #ParadiseBeach... | 582 chars
+  - Retroativa: LeadScoringWorkflow 4 testes com leads reais Natal/RN (Vila do Mar/Central/Rifoles)
+  - Scores reais: WARM 0.595 / 0.595 / 0.532 — ranking correto, Akasha event emitido
+[2026-05-24] WorkflowRegistry: 17 workflows | gate: 15 imports, 42 files | workflows: 615 passed
   - FUNDIDOS: OutreachSequence+SDRBatch+SDRPlan → SDRPipelineWorkflow (mode=execute|plan)
   - REBAIXADOS: TaskClassification+CostTracking (utilitários — fora do registry)
   - COLAPSADO: MultiAccountCalendar → ContentCalendarWorkflow.run_batch()
