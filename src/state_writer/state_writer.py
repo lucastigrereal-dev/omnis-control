@@ -74,15 +74,68 @@ def _workflow_count() -> int:
         return 0
 
 
+def _active_mission_title() -> str | None:
+    """Last running mission title from data/missions/index.jsonl. None if not found."""
+    index_path = Path("data/missions/index.jsonl")
+    if not index_path.exists():
+        return None
+    last_running: str | None = None
+    last_any: str | None = None
+    try:
+        with index_path.open("r", encoding="utf-8") as f:
+            for line in f:
+                stripped = line.strip()
+                if not stripped:
+                    continue
+                try:
+                    entry = json.loads(stripped)
+                except json.JSONDecodeError:
+                    continue
+                title = entry.get("title")
+                if title:
+                    last_any = title
+                    if entry.get("status") == "running":
+                        last_running = title
+    except Exception:
+        return None
+    return last_running or last_any
+
+
+def _last_orchestrator_run() -> dict[str, str | None]:
+    """Last entry from data/orchestrator_runs.jsonl. Returns {last_run_id, last_run_status}."""
+    runs_path = Path("data/orchestrator_runs.jsonl")
+    if not runs_path.exists():
+        return {"last_run_id": None, "last_run_status": None}
+    last_line = ""
+    try:
+        with runs_path.open("r", encoding="utf-8") as f:
+            for line in f:
+                stripped = line.strip()
+                if stripped:
+                    last_line = stripped
+        if not last_line:
+            return {"last_run_id": None, "last_run_status": None}
+        entry = json.loads(last_line)
+        return {
+            "last_run_id": entry.get("run_id"),
+            "last_run_status": entry.get("status"),
+        }
+    except Exception:
+        return {"last_run_id": None, "last_run_status": None}
+
+
 def collect_state() -> dict[str, Any]:
-    """Collect OMNIS real state. All values are dynamic — nothing is hardcoded."""
+    """Collect OMNIS real state. All values come from live sources — nothing is hardcoded."""
+    last_run = _last_orchestrator_run()
     return {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "test_count": _count_tests(),
         "last_commit": _last_commit(),
         "branch": _current_branch(),
         "workflows_registered": _workflow_count(),
-        "cost_local_pct": 100,
+        "active_mission_title": _active_mission_title(),
+        "last_run_id": last_run["last_run_id"],
+        "last_run_status": last_run["last_run_status"],
     }
 
 
