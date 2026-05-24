@@ -1,17 +1,45 @@
-"""SkillRunnerBridge — conecta TaskDispatcher entries ao SkillSelector + execução."""
+"""SkillRunnerBridge — conecta TaskDispatcher entries ao SkillSelector + execução.
+
+Onda 8: com lego_registry opcional, roteia StepNodes diretamente para Legos reais
+(via LegoCog.run) antes de cair no caminho skill/model tradicional.
+"""
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
 
 from src.agentic.task_dispatcher import DispatchEntry, DispatchPlan
 from src.skills_bridge.adapter import MockSkillAdapter, RealSkillAdapter, SkillAdapter
 from src.skills_bridge.models import SkillCall, SkillIntent
 from src.skills_bridge.selection import SkillSelector
 
+if TYPE_CHECKING:
+    from src.legos.registry import LegoRegistry
+
+_logger = logging.getLogger("omnis.skill_runner_bridge")
+
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+# Mapeamento de role_id → nome canônico no LegoRegistry
+_ROLE_TO_LEGO: dict[str, str] = {
+    "research_lead": "research_conductor",
+    "research_conductor": "research_conductor",
+    "code_executor": "code_executor",
+    "developer": "code_executor",
+    "channel_messenger": "channel_messenger",
+    "messenger": "channel_messenger",
+    "publisher": "channel_messenger",
+    "video_processor": "video_processor",
+    "video_editor": "video_processor",
+    "browser_executor": "browser_executor",
+    "browser": "browser_executor",
+    "web_researcher": "browser_executor",
+}
 
 
 # ── deliverable filename → search tags ─────────────────────────────────
@@ -91,17 +119,85 @@ class ExecutionResult:
 # ── bridge ─────────────────────────────────────────────────────────────
 
 class SkillRunnerBridge:
-    """Conecta DispatchPlan entries ao SkillSelector e executa skills."""
+    """Conecta DispatchPlan entries ao SkillSelector e executa skills.
 
-    def __init__(self, dry_run: bool = True, adapter: SkillAdapter | None = None) -> None:
+    Onda 8: quando lego_registry é fornecido, tenta rotear o entry para o Lego
+    correto via LegoCog.run() antes de cair no caminho skill/model tradicional.
+    """
+
+    def __init__(
+        self,
+        dry_run: bool = True,
+        adapter: SkillAdapter | None = None,
+        lego_registry: "LegoRegistry | None" = None,
+        run_context=None,
+    ) -> None:
         self.dry_run = dry_run
         self.selector = SkillSelector(dry_run=dry_run)
+        self.lego_registry = lego_registry
+        self.run_context = run_context
         if adapter is not None:
             self.adapter = adapter
         elif dry_run:
             self.adapter = MockSkillAdapter(dry_run=True)
         else:
             self.adapter = RealSkillAdapter(dry_run=False)
+
+    def _try_lego(self, entry: DispatchEntry) -> "ExecutionResult | None":
+        """Tenta rotear o entry para um Lego via LegoCog.run().
+
+        Retorna ExecutionResult se o executor mapeia para um lego registrado,
+        None caso contrário (fall-through para o caminho skill/model).
+        """
+        if self.lego_registry is None:
+            return None
+
+        executor = entry.executor or ""
+        lego_name = _ROLE_TO_LEGO.get(executor) or (
+            executor if executor in self.lego_registry else None
+        )
+        if lego_name is None:
+            return None
+
+        lego = self.lego_registry.get(lego_name)
+        if lego is None:
+            return None
+
+        from src.legos.protocol import LegoCogSpec
+
+        run_id = self.run_context.run_id if self.run_context is not None else ""
+        is_dry = self.dry_run or bool(entry.dry_run)
+
+        spec = LegoCogSpec(
+            goal=entry.deliverable,
+            dry_run=is_dry,
+            run_id=run_id,
+            payload={"executor": executor, "task_id": entry.task_id},
+        )
+
+        try:
+            result = lego.run(spec)
+            status = "dry_run" if is_dry else ("success" if result.success else "failed")
+            _logger.info(
+                "[bridge] lego:%s entry=%s status=%s run_id=%s",
+                lego_name, entry.task_id, status, run_id or "none",
+            )
+            return ExecutionResult(
+                entry_id=entry.task_id,
+                skill_id=f"lego:{lego_name}",
+                status=status,
+                output=result.output,
+                error=result.error,
+            )
+        except Exception as exc:
+            _logger.error("[bridge] lego:%s failed: %s", lego_name, exc)
+            return ExecutionResult(
+                entry_id=entry.task_id,
+                skill_id=f"lego:{lego_name}",
+                status="failed",
+                output="",
+                error=str(exc)[:200],
+            )
 
     def execute_plan(self, plan: DispatchPlan) -> list[ExecutionResult]:
         """Executa todas as entries de um plano, atualizando status."""
@@ -115,7 +211,12 @@ class SkillRunnerBridge:
         return results
 
     def execute_entry(self, entry: DispatchEntry) -> ExecutionResult:
-        """Executa uma DispatchEntry: resolve skill, chama adapter, retorna resultado."""
+        """Executa uma DispatchEntry: tenta Lego primeiro, depois skill/model."""
+        # Onda 8: Lego path — prioridade sobre skill catalog quando registry disponível
+        lego_result = self._try_lego(entry)
+        if lego_result is not None:
+            return lego_result
+
         tags = _resolve_tags(entry.deliverable)
         intent = _resolve_intent(entry.deliverable)
 
