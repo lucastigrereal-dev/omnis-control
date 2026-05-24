@@ -20,6 +20,7 @@ from tenacity import (
 )
 
 from src.utils.run_context import BudgetExceededError, RunContext
+from src.utils.llm_tracer import llm_span, set_llm_span_attrs
 
 _logger = logging.getLogger("omnis.llm_adapter")
 
@@ -190,8 +191,9 @@ class LiteLLMAdapter:
         reraise=True,
     )
     def _call_with_retry(self, prompt: CaptionPromptInput) -> CaptionLLMOutput:
-        """Executa a chamada HTTP ao LiteLLM com retry em erros transientes."""
+        """Executa a chamada HTTP ao LiteLLM com retry e span OpenTelemetry."""
         import json
+        import time
         import urllib.request
 
         similar_block = ""
@@ -225,10 +227,25 @@ class LiteLLMAdapter:
             method="POST",
         )
 
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = json.loads(resp.read())
+        run_id = self._ctx.run_id if self._ctx else ""
 
-        tokens = data.get("usage", {}).get("total_tokens", 0)
+        with llm_span("llm.generate_caption", model=self.model, run_id=run_id) as (span, t0):
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                data = json.loads(resp.read())
+
+            latency_ms = (time.time() - t0) * 1000
+            tokens = data.get("usage", {}).get("total_tokens", 0)
+            cost_usd = (tokens / 1000) * _COST_PER_1K_TOKENS if _COST_PER_1K_TOKENS > 0 else 0.0
+
+            set_llm_span_attrs(
+                span,
+                model=self.model,
+                tokens=tokens,
+                latency_ms=latency_ms,
+                cost_usd=cost_usd,
+                run_id=run_id,
+            )
+
         raw_content = data["choices"][0]["message"]["content"]
         hook, body, cta, hashtags = self._parse_response(raw_content)
         raw = f"{hook}\n\n{body}\n\n{cta}" if cta else f"{hook}\n\n{body}"
