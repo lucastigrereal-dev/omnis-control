@@ -253,6 +253,21 @@ def _collect_real_rollback(
         ))
 
 
+def _collect_upstream_context(
+    node: StepNode,
+    context_store: dict[str, str] | None,
+) -> str:
+    """Build upstream context string from completed dependency outputs."""
+    if context_store is None or not node.depends_on:
+        return ""
+    parts = [
+        f"[{dep_id}]: {context_store[dep_id]}"
+        for dep_id in node.depends_on
+        if dep_id in context_store
+    ]
+    return "\n".join(parts)
+
+
 def _emit_real_event(
     logs: list[StepRunLog],
     node: StepNode,
@@ -305,6 +320,7 @@ def run_graph_dry(
     retry_policy: RetryPolicy | None = None,
     circuit_registry: CircuitBreakerRegistry | None = None,
     rollback_plan: RollbackPlan | None = None,
+    context_store: dict[str, str] | None = None,
 ) -> StepRun:
     """Simulate executing all steps in topological order. No side effects.
 
@@ -377,6 +393,10 @@ def run_graph_dry(
         _emit_dry_event(logs, node, status.value, msg)
         step_states[node.step_id] = status.value
 
+        # Onda 8 Passo 4: accumulate output for downstream steps
+        if status == StepStatus.DONE and context_store is not None:
+            context_store[node.step_id] = node.expected_output
+
         # Circuit breaker reporting
         if circuit_registry is not None:
             if status == StepStatus.FAILED:
@@ -428,6 +448,7 @@ def run_graph_real(
     retry_policy: RetryPolicy | None = None,
     circuit_registry: CircuitBreakerRegistry | None = None,
     rollback_plan: RollbackPlan | None = None,
+    context_store: dict[str, str] | None = None,
 ) -> StepRun:
     """Execute all steps in topological order, delegating to SkillRunnerBridge.
 
@@ -472,6 +493,11 @@ def run_graph_real(
         # Build dispatch entry from step node
         entry = _resolve_real_step(node, bridge)
 
+        # Onda 8 Passo 4: inject upstream output as context hint
+        upstream = _collect_upstream_context(node, context_store)
+        if upstream:
+            entry.result_hint = upstream
+
         status, msg = _execute_real_step_result(
             node=node,
             entry=entry,
@@ -482,6 +508,14 @@ def run_graph_real(
 
         _emit_real_event(logs, node, status.value, msg)
         step_states[node.step_id] = status.value
+
+        # Onda 8 Passo 4: capture output for downstream steps
+        if status == StepStatus.DONE and context_store is not None:
+            arrow = " → "
+            if arrow in msg:
+                context_store[node.step_id] = msg.split(arrow, 1)[1]
+            else:
+                context_store[node.step_id] = node.expected_output
 
         # Circuit breaker reporting
         if circuit_registry is not None:

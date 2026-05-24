@@ -172,7 +172,11 @@ class SkillRunnerBridge:
             goal=entry.deliverable,
             dry_run=is_dry,
             run_id=run_id,
-            payload={"executor": executor, "task_id": entry.task_id},
+            payload={
+                "executor": executor,
+                "task_id": entry.task_id,
+                "upstream_context": entry.result_hint or "",
+            },
         )
 
         try:
