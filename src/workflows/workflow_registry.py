@@ -1,6 +1,6 @@
 """WorkflowRegistry — catálogo e health-check de todos os workflows OMNIS.
 
-Onda 13 (base) + Ondas 15-18 — cataloga 8 workflows:
+Onda 13 (base) + Ondas 15-19 — cataloga 9 workflows:
   - DeepResearchWorkflow    (WF1)
   - VideoEditWorkflow       (WF2)
   - AppFactoryWorkflow      (WF3)
@@ -9,6 +9,7 @@ Onda 13 (base) + Ondas 15-18 — cataloga 8 workflows:
   - LeadScoringWorkflow     (Onda 16)
   - ContentCalendarWorkflow   (Onda 17)
   - OutreachSequenceWorkflow  (Onda 18)
+  - SDRBatchWorkflow          (Onda 19)
 
 Papel: análogo ao LegoRegistry (Onda 5) — registra, descreve e verifica workflows.
 
@@ -160,7 +161,7 @@ class WorkflowRegistry:
 
     @classmethod
     def default(cls) -> "WorkflowRegistry":
-        """Cria registry com os 8 workflows OMNIS padrão (Ondas 10-18)."""
+        """Cria registry com os 9 workflows OMNIS padrão (Ondas 10-19)."""
         registry = cls()
         registry._register_defaults()
         return registry
@@ -314,6 +315,25 @@ class WorkflowRegistry:
             _logger.error("outreach_sequence import failed: %s", e)
             self.register(WorkflowEntry(
                 name="outreach_sequence", version="1.0",
+                description="import failed",
+                cost_local_pct=0, dry_run_safe=False,
+            ))
+
+        try:
+            from src.workflows.sdr_batch_workflow import SDRBatchWorkflow
+            self.register(WorkflowEntry(
+                name="sdr_batch",
+                version="1.0",
+                description="Pipeline SDR: prospects → score → outreach HOT+WARM → akasha",
+                cost_local_pct=100,
+                dry_run_safe=True,
+                tags=["sdr", "batch", "pipeline", "deterministic", "local"],
+                factory=SDRBatchWorkflow,
+            ))
+        except ImportError as e:
+            _logger.error("sdr_batch import failed: %s", e)
+            self.register(WorkflowEntry(
+                name="sdr_batch", version="1.0",
                 description="import failed",
                 cost_local_pct=0, dry_run_safe=False,
             ))

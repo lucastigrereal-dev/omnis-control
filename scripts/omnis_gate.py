@@ -33,6 +33,7 @@ _REQUIRED_WORKFLOW_FILES = [
     "tests/workflows/test_lead_scoring_e2e.py",
     "tests/workflows/test_content_calendar_e2e.py",
     "tests/workflows/test_outreach_sequence_e2e.py",
+    "tests/workflows/test_sdr_batch_e2e.py",
 ]
 
 _SECRET_PATTERNS = ["ACTUAL_KEY", "sk-", "AKIA", "-----BEGIN", "password=", "secret="]
@@ -49,6 +50,7 @@ _REQUIRED_IMPORTS = [
     ("src.workflows.app_factory_workflow", "AppFactoryWorkflow"),
     ("src.workflows.code_run_workflow", "CodeRunWorkflow"),
     ("src.workflows.outreach_sequence_workflow", "OutreachSequenceWorkflow"),
+    ("src.workflows.sdr_batch_workflow", "SDRBatchWorkflow"),
     ("src.utils.run_context", "RunContext"),
     ("src.akasha_event_sink.adapter", "MockAkashaSink"),
 ]

@@ -44,6 +44,7 @@
 | W-O8 | ONDA15 | SystemHealthWorkflow (health snapshot) | DONE | omnis-5waves | 393b629 | 17 |
 | W-O9 | ONDA16 | LeadScoringWorkflow (SDR scoring) | DONE | omnis-5waves | 54c2d88 | 21 |
 | W-O10 | ONDA17 | ContentCalendarWorkflow (calendario editorial) | DONE | omnis-5waves | fb7fc01 | 30 |
+| W-O11 | ONDA18 | OutreachSequenceWorkflow (SDR 7-passos) | DONE | omnis-5waves | 010e379 | 24 |
 
 ## Legenda
 - DONE: concluído e commitado
