@@ -68,6 +68,24 @@ def test_gate_rejected_when_store_has_rejected(tmp_path):
     assert result == GATE_REJECTED
 
 
+def test_gate_pending_request_returns_blocked(tmp_path):
+    from src.approval_center.service import request_approval
+    log = tmp_path / "approvals.jsonl"
+    req = request_approval(
+        subject="test",
+        description="pending",
+        capability_id="cap1",
+        risk_level="low",
+        approvals_log=log,
+    )
+    result = check_gate(
+        approval_required=True,
+        approval_id=req.request_id,
+        approvals_log=log,
+    )
+    assert result == GATE_BLOCKED
+
+
 # ── orchestrator approval_gate delegates to shared gate ──────────────────────
 
 def test_orchestrator_gate_delegates_not_required():
