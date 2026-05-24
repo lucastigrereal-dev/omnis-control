@@ -1,13 +1,14 @@
 """WorkflowRegistry — catálogo e health-check de todos os workflows OMNIS.
 
-Onda 13 (base) + Ondas 15-17 — cataloga 7 workflows:
+Onda 13 (base) + Ondas 15-18 — cataloga 8 workflows:
   - DeepResearchWorkflow    (WF1)
   - VideoEditWorkflow       (WF2)
   - AppFactoryWorkflow      (WF3)
   - CodeRunWorkflow         (WF4)
   - SystemHealthWorkflow    (Onda 15)
   - LeadScoringWorkflow     (Onda 16)
-  - ContentCalendarWorkflow (Onda 17)
+  - ContentCalendarWorkflow   (Onda 17)
+  - OutreachSequenceWorkflow  (Onda 18)
 
 Papel: análogo ao LegoRegistry (Onda 5) — registra, descreve e verifica workflows.
 
@@ -159,7 +160,7 @@ class WorkflowRegistry:
 
     @classmethod
     def default(cls) -> "WorkflowRegistry":
-        """Cria registry com os 7 workflows OMNIS padrão (Ondas 10-17)."""
+        """Cria registry com os 8 workflows OMNIS padrão (Ondas 10-18)."""
         registry = cls()
         registry._register_defaults()
         return registry
@@ -294,6 +295,25 @@ class WorkflowRegistry:
             _logger.error("content_calendar import failed: %s", e)
             self.register(WorkflowEntry(
                 name="content_calendar", version="1.0",
+                description="import failed",
+                cost_local_pct=0, dry_run_safe=False,
+            ))
+
+        try:
+            from src.workflows.outreach_sequence_workflow import OutreachSequenceWorkflow
+            self.register(WorkflowEntry(
+                name="outreach_sequence",
+                version="1.0",
+                description="Outreach SDR: prospects → sequências 7-passos → akasha",
+                cost_local_pct=100,
+                dry_run_safe=True,
+                tags=["sdr", "outreach", "sequence", "deterministic", "local"],
+                factory=OutreachSequenceWorkflow,
+            ))
+        except ImportError as e:
+            _logger.error("outreach_sequence import failed: %s", e)
+            self.register(WorkflowEntry(
+                name="outreach_sequence", version="1.0",
                 description="import failed",
                 cost_local_pct=0, dry_run_safe=False,
             ))

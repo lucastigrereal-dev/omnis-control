@@ -20,11 +20,19 @@ _REQUIRED_WORKFLOW_FILES = [
     "src/workflows/video_edit_workflow.py",
     "src/workflows/app_factory_workflow.py",
     "src/workflows/code_run_workflow.py",
+    "src/workflows/system_health_workflow.py",
+    "src/workflows/lead_scoring_workflow.py",
+    "src/workflows/content_calendar_workflow.py",
+    "src/workflows/outreach_sequence_workflow.py",
     "tests/workflows/__init__.py",
     "tests/workflows/test_deep_research_e2e.py",
     "tests/workflows/test_video_edit_e2e.py",
     "tests/workflows/test_app_factory_e2e.py",
     "tests/workflows/test_code_run_e2e.py",
+    "tests/workflows/test_system_health_e2e.py",
+    "tests/workflows/test_lead_scoring_e2e.py",
+    "tests/workflows/test_content_calendar_e2e.py",
+    "tests/workflows/test_outreach_sequence_e2e.py",
 ]
 
 _SECRET_PATTERNS = ["ACTUAL_KEY", "sk-", "AKIA", "-----BEGIN", "password=", "secret="]
@@ -40,6 +48,7 @@ _REQUIRED_IMPORTS = [
     ("src.workflows.video_edit_workflow", "VideoEditWorkflow"),
     ("src.workflows.app_factory_workflow", "AppFactoryWorkflow"),
     ("src.workflows.code_run_workflow", "CodeRunWorkflow"),
+    ("src.workflows.outreach_sequence_workflow", "OutreachSequenceWorkflow"),
     ("src.utils.run_context", "RunContext"),
     ("src.akasha_event_sink.adapter", "MockAkashaSink"),
 ]

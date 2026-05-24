@@ -6,7 +6,7 @@ Cobertura:
   - akasha snapshot gravado com run_id
   - agencies: active/saturated count
   - summary property
-  - default() factory com 7 workflows
+  - default() factory com 8 workflows
   - to_dict keys
 """
 from __future__ import annotations
@@ -167,11 +167,11 @@ def test_cost_local_pct_100():
 
 # ── default() factory ─────────────────────────────────────────────────────────
 
-def test_default_has_7_workflows():
+def test_default_has_8_workflows():
     wf = SystemHealthWorkflow.default()
     wf._sink = MockAkashaSink()
     result = wf.run()
-    assert result.workflows_total == 7
+    assert result.workflows_total == 8
 
 
 def test_default_all_workflows_ok():
