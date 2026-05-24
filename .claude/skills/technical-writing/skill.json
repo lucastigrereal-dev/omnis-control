@@ -1,0 +1,30 @@
+{
+  "name": "technical-writing",
+  "version": "1.0.0",
+  "description": "Escrita técnica de docs, READMEs, changelogs, runbooks e specs do OMNIS",
+  "status": "approved",
+  "risk_level": "low",
+  "mode": "draft_only",
+  "owner": "tigrao",
+  "tags": ["docs", "writing", "technical", "omnis"],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "doc_type": { "type": "string", "enum": ["readme", "runbook", "changelog", "spec"] },
+      "topic": { "type": "string" }
+    },
+    "required": ["doc_type", "topic"]
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "document": { "type": "string" }
+    },
+    "required": ["document"]
+  },
+  "approval_required": false,
+  "lifecycle": "production",
+  "sandbox_policy": "default",
+  "created_at": "2026-05-24T00:00:00Z",
+  "updated_at": "2026-05-24T00:00:00Z"
+}

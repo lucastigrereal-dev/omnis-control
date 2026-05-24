@@ -1,0 +1,29 @@
+{
+  "name": "context-engineering",
+  "version": "1.0.0",
+  "description": "Engenharia de contexto para janelas de LLM — monta, prioriza e comprime contexto antes de enviar ao modelo",
+  "status": "approved",
+  "risk_level": "low",
+  "mode": "read_only",
+  "owner": "tigrao",
+  "tags": ["context", "llm", "optimization", "omnis"],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "task": { "type": "string" }
+    },
+    "required": ["task"]
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "context_block": { "type": "string" }
+    },
+    "required": ["context_block"]
+  },
+  "approval_required": false,
+  "lifecycle": "production",
+  "sandbox_policy": "default",
+  "created_at": "2026-05-24T00:00:00Z",
+  "updated_at": "2026-05-24T00:00:00Z"
+}

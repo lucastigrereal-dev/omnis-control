@@ -1,0 +1,32 @@
+{
+  "name": "registry-analysis",
+  "version": "1.0.0",
+  "description": "Análise e auditoria do Capability Registry do OMNIS — saúde, duplicatas, gaps",
+  "status": "approved",
+  "risk_level": "low",
+  "mode": "read_only",
+  "owner": "tigrao",
+  "tags": ["registry", "analysis", "capabilities", "omnis"],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "registry_path": { "type": "string" }
+    },
+    "required": []
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "inventory": { "type": "array", "items": { "type": "object" } },
+      "duplicates": { "type": "array", "items": { "type": "string" } },
+      "gaps": { "type": "array", "items": { "type": "string" } },
+      "deprecation_candidates": { "type": "array", "items": { "type": "string" } }
+    },
+    "required": ["inventory", "gaps"]
+  },
+  "approval_required": false,
+  "lifecycle": "production",
+  "sandbox_policy": "default",
+  "created_at": "2026-05-24T00:00:00Z",
+  "updated_at": "2026-05-24T00:00:00Z"
+}

@@ -1,0 +1,31 @@
+{
+  "name": "security-review",
+  "version": "1.0.0",
+  "description": "Review de segurança de código, skills, APIs e infra do OMNIS",
+  "status": "approved",
+  "risk_level": "low",
+  "mode": "read_only",
+  "owner": "tigrao",
+  "tags": ["security", "review", "owasp", "omnis"],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "target": { "type": "string" },
+      "scope": { "type": "string", "enum": ["skill", "api", "infra", "code"] }
+    },
+    "required": ["target"]
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "findings": { "type": "array", "items": { "type": "string" } },
+      "verdict": { "type": "string", "enum": ["pass", "flag", "block"] }
+    },
+    "required": ["findings", "verdict"]
+  },
+  "approval_required": false,
+  "lifecycle": "production",
+  "sandbox_policy": "default",
+  "created_at": "2026-05-24T00:00:00Z",
+  "updated_at": "2026-05-24T00:00:00Z"
+}

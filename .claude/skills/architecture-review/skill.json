@@ -1,0 +1,32 @@
+{
+  "name": "architecture-review",
+  "version": "1.0.0",
+  "description": "Review de arquitetura de módulos, adapters e integrações do OMNIS",
+  "status": "approved",
+  "risk_level": "medium",
+  "mode": "read_only",
+  "owner": "tigrao",
+  "tags": ["architecture", "review", "design", "omnis"],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "module_name": { "type": "string" },
+      "change_description": { "type": "string" }
+    },
+    "required": ["module_name"]
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "verdict": { "type": "string", "enum": ["approved", "flagged", "blocked"] },
+      "red_flags": { "type": "array", "items": { "type": "string" } },
+      "recommendations": { "type": "array", "items": { "type": "string" } }
+    },
+    "required": ["verdict"]
+  },
+  "approval_required": false,
+  "lifecycle": "production",
+  "sandbox_policy": "default",
+  "created_at": "2026-05-24T00:00:00Z",
+  "updated_at": "2026-05-24T00:00:00Z"
+}

@@ -1,0 +1,33 @@
+{
+  "name": "artifact-analysis",
+  "version": "1.0.0",
+  "description": "Análise de artefatos de build, outputs de agentes e pacotes de entrega do OMNIS",
+  "status": "approved",
+  "risk_level": "low",
+  "mode": "read_only",
+  "owner": "tigrao",
+  "tags": ["artifacts", "analysis", "quality", "omnis"],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "artifact_path": { "type": "string" },
+      "artifact_type": { "type": "string" }
+    },
+    "required": ["artifact_path"]
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "origin": { "type": "string" },
+      "schema_compliant": { "type": "boolean" },
+      "complete": { "type": "boolean" },
+      "verdict": { "type": "string", "enum": ["go", "no-go"] }
+    },
+    "required": ["schema_compliant", "verdict"]
+  },
+  "approval_required": false,
+  "lifecycle": "production",
+  "sandbox_policy": "default",
+  "created_at": "2026-05-24T00:00:00Z",
+  "updated_at": "2026-05-24T00:00:00Z"
+}

@@ -1,0 +1,29 @@
+{
+  "name": "git-workflow",
+  "version": "1.0.0",
+  "description": "Workflow Git padrão do OMNIS — commits, branches, PRs, merge gates",
+  "status": "approved",
+  "risk_level": "medium",
+  "mode": "local_write",
+  "owner": "tigrao",
+  "tags": ["git", "workflow", "governance", "omnis"],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "action": { "type": "string", "enum": ["commit", "branch", "pr", "merge"] }
+    },
+    "required": ["action"]
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "result": { "type": "string" }
+    },
+    "required": ["result"]
+  },
+  "approval_required": false,
+  "lifecycle": "production",
+  "sandbox_policy": "default",
+  "created_at": "2026-05-24T00:00:00Z",
+  "updated_at": "2026-05-24T00:00:00Z"
+}

@@ -1,0 +1,33 @@
+{
+  "name": "capability-assessment",
+  "version": "1.0.0",
+  "description": "Avaliação completa de uma capability candidata para entrada no OMNIS Registry",
+  "status": "approved",
+  "risk_level": "low",
+  "mode": "draft_only",
+  "owner": "tigrao",
+  "tags": ["capability", "assessment", "governance", "omnis"],
+  "inputs_schema": {
+    "type": "object",
+    "properties": {
+      "capability_name": { "type": "string" },
+      "description": { "type": "string" },
+      "source_url": { "type": "string" }
+    },
+    "required": ["capability_name", "description"]
+  },
+  "outputs_schema": {
+    "type": "object",
+    "properties": {
+      "priority": { "type": "string", "enum": ["P0", "P1", "P2", "P3", "HYPE", "EVITAR"] },
+      "assessment_yaml": { "type": "string" },
+      "dimensions": { "type": "object" }
+    },
+    "required": ["priority", "assessment_yaml"]
+  },
+  "approval_required": false,
+  "lifecycle": "production",
+  "sandbox_policy": "default",
+  "created_at": "2026-05-24T00:00:00Z",
+  "updated_at": "2026-05-24T00:00:00Z"
+}
