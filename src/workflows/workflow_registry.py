@@ -1,6 +1,6 @@
 """WorkflowRegistry — catálogo e health-check de todos os workflows OMNIS.
 
-Onda 13 (base) + Ondas 15-26 — cataloga 16 workflows:
+Onda 13 (base) + Ondas 15-27 — cataloga 17 workflows:
   - DeepResearchWorkflow    (WF1)
   - VideoEditWorkflow       (WF2)
   - AppFactoryWorkflow      (WF3)
@@ -17,6 +17,7 @@ Onda 13 (base) + Ondas 15-26 — cataloga 16 workflows:
   - MetricsSnapshotWorkflow      (Onda 24)
   - SquadAssignmentWorkflow      (Onda 25)
   - DeliverableMappingWorkflow   (Onda 26)
+  - TaskDispatchWorkflow         (Onda 27)
 
 Papel: análogo ao LegoRegistry (Onda 5) — registra, descreve e verifica workflows.
 
@@ -474,6 +475,25 @@ class WorkflowRegistry:
             _logger.error("deliverable_mapping import failed: %s", e)
             self.register(WorkflowEntry(
                 name="deliverable_mapping", version="1.0",
+                description="import failed",
+                cost_local_pct=0, dry_run_safe=False,
+            ))
+
+        try:
+            from src.workflows.task_dispatch_workflow import TaskDispatchWorkflow
+            self.register(WorkflowEntry(
+                name="task_dispatch",
+                version="1.0",
+                description="Despacho de tarefas: manifests → DispatchPlan lote → akasha",
+                cost_local_pct=100,
+                dry_run_safe=True,
+                tags=["dispatch", "tasks", "executor", "local"],
+                factory=TaskDispatchWorkflow,
+            ))
+        except ImportError as e:
+            _logger.error("task_dispatch import failed: %s", e)
+            self.register(WorkflowEntry(
+                name="task_dispatch", version="1.0",
                 description="import failed",
                 cost_local_pct=0, dry_run_safe=False,
             ))
