@@ -56,8 +56,13 @@
 | W-O20 | ONDA27 | TaskDispatchWorkflow (despacho de tarefas em lote) | DONE | omnis-5waves | 0a4faef | 21 |
 | W-O21 | ONDA28 | CapabilityForgeWorkflow (gap detection + forge em lote) | DONE | omnis-5waves | aefd55e | 22 |
 | W-O22 | ONDA29 | SkillExecutionWorkflow (SkillRunnerBridge execute_plan lote) | DONE | omnis-5waves | 6055262 | 23 |
-| W-O23 | ONDA30 | TaskClassificationWorkflow (TaskClassifier classify_batch lote) | DONE | omnis-5waves | ab6b49f | 25 |
-| W-O24 | ONDA31 | CostTrackingWorkflow (CostTracker record+breakdowns lote) | DONE | omnis-5waves | 426ef64 | 22 |
+| W-O23 | ONDA30 | TaskClassificationWorkflow (utilitário — removido do registry) | CONSOLIDATED | omnis-5waves | ab6b49f | 25 |
+| W-O24 | ONDA31 | CostTrackingWorkflow (utilitário — removido do registry) | CONSOLIDATED | omnis-5waves | 426ef64 | 22 |
+| W-O11c | ONDA18c | OutreachSequenceWorkflow → fundido em SDRPipelineWorkflow | CONSOLIDATED | omnis-5waves | 01b3f9d | — |
+| W-O12c | ONDA19c | SDRBatchWorkflow → fundido em SDRPipelineWorkflow | CONSOLIDATED | omnis-5waves | 01b3f9d | — |
+| W-O14c | ONDA21c | MultiAccountCalendarWorkflow → run_batch() em ContentCalendarWorkflow | CONSOLIDATED | omnis-5waves | 01b3f9d | — |
+| W-O15c | ONDA22c | SDRPlanWorkflow → fundido em SDRPipelineWorkflow (mode=plan) | CONSOLIDATED | omnis-5waves | 01b3f9d | — |
+| W-CONS | CONSOLIDACAO | SDRPipelineWorkflow (mode=execute|plan — funde O18+O19+O22) | DONE | omnis-5waves | 01b3f9d | 24 |
 
 ## Legenda
 - DONE: concluído e commitado

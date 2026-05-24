@@ -81,4 +81,9 @@
 [2026-05-24] WorkflowRegistry: 20 workflows | gate: 16 imports, 41 files | workflows: 536 passed
 [2026-05-24] Onda 31 CostTrackingWorkflow: 22/22 testes, commit 426ef64
 [2026-05-24] WorkflowRegistry: 21 workflows | gate: 17 imports, 43 files | workflows: 558 passed
+[2026-05-24] ONDA DE CONSOLIDAÇÃO: 21 → 16 capacidades distintas, commit 01b3f9d
+  - FUNDIDOS: OutreachSequence+SDRBatch+SDRPlan → SDRPipelineWorkflow (mode=execute|plan)
+  - REBAIXADOS: TaskClassification+CostTracking (utilitários — fora do registry)
+  - COLAPSADO: MultiAccountCalendar → ContentCalendarWorkflow.run_batch()
+[2026-05-24] Suite consolidação: 588 passed (workflows) | Gate: VERDE 5/5 | 14 imports, 40 files
 ```
