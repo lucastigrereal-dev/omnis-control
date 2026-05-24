@@ -1,10 +1,13 @@
 """WorkflowRegistry — catálogo e health-check de todos os workflows OMNIS.
 
-Onda 13 — wires existing workflows without adding new algorithms:
-  - DeepResearchWorkflow  (WF1)
-  - VideoEditWorkflow     (WF2)
-  - AppFactoryWorkflow    (WF3)
-  - CodeRunWorkflow       (WF4)
+Onda 13 (base) + Ondas 15-17 — cataloga 7 workflows:
+  - DeepResearchWorkflow    (WF1)
+  - VideoEditWorkflow       (WF2)
+  - AppFactoryWorkflow      (WF3)
+  - CodeRunWorkflow         (WF4)
+  - SystemHealthWorkflow    (Onda 15)
+  - LeadScoringWorkflow     (Onda 16)
+  - ContentCalendarWorkflow (Onda 17)
 
 Papel: análogo ao LegoRegistry (Onda 5) — registra, descreve e verifica workflows.
 
@@ -156,7 +159,7 @@ class WorkflowRegistry:
 
     @classmethod
     def default(cls) -> "WorkflowRegistry":
-        """Cria registry com os 4 workflows OMNIS padrão."""
+        """Cria registry com os 7 workflows OMNIS padrão (Ondas 10-17)."""
         registry = cls()
         registry._register_defaults()
         return registry
@@ -234,6 +237,63 @@ class WorkflowRegistry:
             _logger.error("code_run import failed: %s", e)
             self.register(WorkflowEntry(
                 name="code_run", version="1.0",
+                description="import failed",
+                cost_local_pct=0, dry_run_safe=False,
+            ))
+
+        try:
+            from src.workflows.system_health_workflow import SystemHealthWorkflow
+            self.register(WorkflowEntry(
+                name="system_health",
+                version="1.0",
+                description="Health snapshot: workflows + agências → akasha",
+                cost_local_pct=100,
+                dry_run_safe=True,
+                tags=["health", "monitoring", "local"],
+                factory=SystemHealthWorkflow,
+            ))
+        except ImportError as e:
+            _logger.error("system_health import failed: %s", e)
+            self.register(WorkflowEntry(
+                name="system_health", version="1.0",
+                description="import failed",
+                cost_local_pct=0, dry_run_safe=False,
+            ))
+
+        try:
+            from src.workflows.lead_scoring_workflow import LeadScoringWorkflow
+            self.register(WorkflowEntry(
+                name="lead_scoring",
+                version="1.0",
+                description="Lead scoring: prospects → score deterministico → ranking → akasha",
+                cost_local_pct=100,
+                dry_run_safe=True,
+                tags=["sdr", "scoring", "deterministic", "local"],
+                factory=LeadScoringWorkflow,
+            ))
+        except ImportError as e:
+            _logger.error("lead_scoring import failed: %s", e)
+            self.register(WorkflowEntry(
+                name="lead_scoring", version="1.0",
+                description="import failed",
+                cost_local_pct=0, dry_run_safe=False,
+            ))
+
+        try:
+            from src.workflows.content_calendar_workflow import ContentCalendarWorkflow
+            self.register(WorkflowEntry(
+                name="content_calendar",
+                version="1.0",
+                description="Calendário editorial: brief → QueueItems → akasha",
+                cost_local_pct=100,
+                dry_run_safe=True,
+                tags=["content", "calendar", "queue", "local"],
+                factory=ContentCalendarWorkflow,
+            ))
+        except ImportError as e:
+            _logger.error("content_calendar import failed: %s", e)
+            self.register(WorkflowEntry(
+                name="content_calendar", version="1.0",
                 description="import failed",
                 cost_local_pct=0, dry_run_safe=False,
             ))

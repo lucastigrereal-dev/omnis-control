@@ -41,6 +41,9 @@
 | W-O5 | ONDA12 | WF4 CodeRunWorkflow (molde) | DONE | omnis-5waves | 541e398 | 25 |
 | W-O6 | ONDA13 | WorkflowRegistry (catalogo) | DONE | omnis-5waves | c961a49 | 28 |
 | W-O7 | ONDA14 | MissionOrchestrator | DONE | omnis-5waves | 2d99621 | 18 |
+| W-O8 | ONDA15 | SystemHealthWorkflow (health snapshot) | DONE | omnis-5waves | 393b629 | 17 |
+| W-O9 | ONDA16 | LeadScoringWorkflow (SDR scoring) | DONE | omnis-5waves | 54c2d88 | 21 |
+| W-O10 | ONDA17 | ContentCalendarWorkflow (calendario editorial) | DONE | omnis-5waves | fb7fc01 | 30 |
 
 ## Legenda
 - DONE: concluído e commitado
