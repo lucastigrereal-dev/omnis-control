@@ -67,6 +67,21 @@ def test_health_check_true_when_playwright_available():
     assert lego.health_check() is True
 
 
+def test_health_check_false_when_playwright_unavailable(monkeypatch):
+    import builtins
+
+    real_import = builtins.__import__
+
+    def _block_playwright(name, *args, **kwargs):
+        if name.startswith("playwright"):
+            raise ImportError("playwright missing")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", _block_playwright)
+    lego = BrowserExecutorLego()
+    assert lego.health_check() is False
+
+
 # ── real extraction (dry_run=True, página estática via data: URL) ─────────────
 
 def test_execute_extracts_title_from_static_page():

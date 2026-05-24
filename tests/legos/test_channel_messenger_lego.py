@@ -305,6 +305,15 @@ def test_no_valid_channels_returns_error():
     assert result.error == "no_valid_channels"
 
 
+def test_non_broadcast_real_flow_not_blocked_by_approval():
+    """Mensagem normal em modo real não deve cair no gate de broadcast."""
+    lego = _make_lego()
+    spec = MessageSpec(content="status semanal pronto", channels=["sms"], dry_run=False)
+    result = lego.send(spec)
+    assert result.error != "approval_required"
+    assert result.error == "no_valid_channels"
+
+
 def test_send_returns_timeout_when_dispatch_semaphore_busy(monkeypatch):
     import src.legos.channel_messenger_lego as mod
 

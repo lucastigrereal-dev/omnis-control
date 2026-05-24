@@ -112,6 +112,36 @@ def test_local_sandbox_runs_python(monkeypatch):
     assert result.artifacts.get("mode") == "local_sandbox"
 
 
+def test_local_sandbox_uses_argv_not_goal_interpolation(monkeypatch):
+    """Prova estrutural: goal vai em argv, não dentro do script python -c."""
+    monkeypatch.setattr("src.legos.code_executor_lego.CodeExecutorLego.health_check", lambda _: False)
+    captured = {}
+
+    class _Proc:
+        returncode = 0
+        stdout = "sandbox: goal recebido\noutput_dir: /tmp/out"
+        stderr = ""
+
+    def _fake_run(cmd, **kwargs):
+        captured["cmd"] = cmd
+        captured["kwargs"] = kwargs
+        return _Proc()
+
+    monkeypatch.setattr("subprocess.run", _fake_run)
+    lego = CodeExecutorLego()
+    payload = "goal harmless with symbols [] {} : %"
+    result = lego.execute(CodeSpec(goal=payload, language="python", dry_run=False, output_dir="/tmp/out"))
+
+    assert result.success is True
+    cmd = captured["cmd"]
+    # comando fixo: python -c <script> -- <goal> <output_dir>
+    assert cmd[1] == "-c"
+    assert "--" in cmd
+    assert payload in cmd
+    # payload não deve aparecer dentro do script (posição 2)
+    assert payload not in cmd[2]
+
+
 def test_local_sandbox_rejects_non_python(monkeypatch):
     monkeypatch.setattr("src.legos.code_executor_lego.CodeExecutorLego.health_check", lambda _: False)
     lego = CodeExecutorLego()

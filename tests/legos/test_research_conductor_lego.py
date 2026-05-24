@@ -277,6 +277,14 @@ def test_searxng_backend_handles_connection_error():
     assert results == []
 
 
+def test_searxng_backend_accepts_private_host_without_validation():
+    """Caracterização de risco: backend aceita host privado sem bloqueio SSRF."""
+    backend = SearXNGBackend("http://127.0.0.1:8080/internal")
+    assert backend.name() == "searxng"
+    # comportamento atual: URL é normalizada, mas não validada contra redes internas
+    assert backend._url.startswith("http://127.0.0.1")
+
+
 def test_storm_pipeline_generates_perspectives_fallback():
     """Quando LLM retorna JSON inválido, pipeline usa fallback de perspectivas."""
     class _BadLLM:
