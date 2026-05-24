@@ -2,8 +2,12 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 import threading
+import time
 
+import pytest
 from src.utils.file_lock import jsonl_write_lock
 
 
@@ -84,3 +88,38 @@ def test_nested_same_path_does_not_deadlock(tmp_path):
     t1.join(timeout=5)
     t2.join(timeout=5)
     assert sorted(results) == ["A", "B"]
+
+
+@pytest.mark.xfail(
+    reason="Known gap: jsonl_write_lock is not blocking across processes (advisory lock file only).",
+    strict=False,
+)
+def test_cross_process_lock_blocks_until_release(tmp_path):
+    """Expectativa desejada: processo B só entra após A liberar o lock."""
+    path = str(tmp_path / "store.jsonl")
+    child_code = (
+        "import sys,time; "
+        "from src.utils.file_lock import jsonl_write_lock; "
+        "p=sys.argv[1]; "
+        "lock=jsonl_write_lock(p); "
+        "lock.__enter__(); "
+        "print('child_entered', flush=True); "
+        "time.sleep(2); "
+        "lock.__exit__(None,None,None)"
+    )
+    proc = subprocess.Popen(
+        [sys.executable, "-c", child_code, path],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+    line = proc.stdout.readline().strip()
+    assert line == "child_entered"
+
+    t0 = time.time()
+    with jsonl_write_lock(path):
+        elapsed = time.time() - t0
+
+    proc.communicate(timeout=10)
+    # Quando lock cross-process estiver correto, elapsed deve ser ~2s.
+    assert elapsed >= 1.5
