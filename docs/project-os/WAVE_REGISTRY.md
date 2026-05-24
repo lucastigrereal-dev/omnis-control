@@ -52,6 +52,7 @@
 | W-O16 | ONDA23 | ContentQualityWorkflow (score qualidade em lote) | DONE | omnis-5waves | bf400a1 | 25 |
 | W-O17 | ONDA24 | MetricsSnapshotWorkflow (agrega MetricEvents+RunSummaries) | DONE | omnis-5waves | 5d82706 | 24 |
 | W-O18 | ONDA25 | SquadAssignmentWorkflow (atribuição squads em lote) | DONE | omnis-5waves | 1b012f3 | 21 |
+| W-O19 | ONDA26 | DeliverableMappingWorkflow (intake+mapper em lote) | DONE | omnis-5waves | b49b289 | 24 |
 
 ## Legenda
 - DONE: concluído e commitado

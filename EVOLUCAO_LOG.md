@@ -69,4 +69,6 @@
 [2026-05-24] Onda 24 MetricsSnapshotWorkflow: 24/24 testes, commit 5d82706
 [2026-05-24] Onda 25 SquadAssignmentWorkflow: 21/21 testes, commit 1b012f3
 [2026-05-24] WorkflowRegistry: 14→15 workflows | gate: 11 imports, 31 files | workflows: 421 passed
+[2026-05-24] Onda 26 DeliverableMappingWorkflow: 24/24 testes, commit b49b289
+[2026-05-24] WorkflowRegistry: 16 workflows | gate: 12 imports, 33 files | workflows: 445 passed
 ```
