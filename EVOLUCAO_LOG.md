@@ -62,4 +62,8 @@
 [2026-05-24] Suite pré-Onda17 confirmada: 9404 passed, 4 skipped, 10 xfailed
 [2026-05-24] Workflows tests só: 328 passed | WAVE_REGISTRY: W-O1→W-O14 completos
 [2026-05-24] WorkflowRegistry: 11 workflows (Ondas 10-21) — 8 imports no gate
+[2026-05-24] Onda 22 SDRPlanWorkflow: 23/23 testes, commit 4c9d841
+[2026-05-24] Onda 23 ContentQualityWorkflow: 25/25 testes, commit bf400a1
+[2026-05-24] WorkflowRegistry: 12→13 workflows | gate: 9 imports, 27 files
+[2026-05-24] Suite pós-Onda23 base: 9456 passed (background) | workflows: 376 passed
 ```
