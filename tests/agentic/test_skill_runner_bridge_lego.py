@@ -152,6 +152,34 @@ def test_try_lego_passes_run_id_into_legocog_spec():
     assert captured["run_id"] == "ctx_run_777"
 
 
+def test_try_lego_passes_upstream_context_into_payload():
+    captured: dict[str, object] = {}
+
+    class _FakeLego:
+        def run(self, spec):
+            captured["payload"] = spec.payload
+            from src.legos.protocol import LegoCogResult
+            return LegoCogResult(success=True, output="ok", dry_run=True)
+
+        def health_check(self):
+            return True
+
+    reg = LegoRegistry()
+    reg.register("research_conductor", _FakeLego())
+    bridge = SkillRunnerBridge(dry_run=True, lego_registry=reg)
+    entry = DispatchEntry(
+        task_id="tctx2",
+        deliverable="research boutique hotels",
+        executor="research_lead",
+        dry_run=True,
+        result_hint="[s1]: prior market analysis",
+    )
+    result = bridge._try_lego(entry)
+    assert result is not None
+    assert result.status == "dry_run"
+    assert captured["payload"]["upstream_context"] == "[s1]: prior market analysis"
+
+
 # ── execute_entry com lego ────────────────────────────────────────────────────
 
 def test_execute_entry_uses_lego_when_registry_present():
