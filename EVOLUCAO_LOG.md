@@ -66,4 +66,7 @@
 [2026-05-24] Onda 23 ContentQualityWorkflow: 25/25 testes, commit bf400a1
 [2026-05-24] WorkflowRegistry: 12→13 workflows | gate: 9 imports, 27 files
 [2026-05-24] Suite pós-Onda23 base: 9456 passed (background) | workflows: 376 passed
+[2026-05-24] Onda 24 MetricsSnapshotWorkflow: 24/24 testes, commit 5d82706
+[2026-05-24] Onda 25 SquadAssignmentWorkflow: 21/21 testes, commit 1b012f3
+[2026-05-24] WorkflowRegistry: 14→15 workflows | gate: 11 imports, 31 files | workflows: 421 passed
 ```

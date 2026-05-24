@@ -50,6 +50,8 @@
 | W-O14 | ONDA21 | MultiAccountCalendarWorkflow (batch 6 contas) | DONE | omnis-5waves | c54efb5 | 26 |
 | W-O15 | ONDA22 | SDRPlanWorkflow (plano SDR finalizado) | DONE | omnis-5waves | 4c9d841 | 23 |
 | W-O16 | ONDA23 | ContentQualityWorkflow (score qualidade em lote) | DONE | omnis-5waves | bf400a1 | 25 |
+| W-O17 | ONDA24 | MetricsSnapshotWorkflow (agrega MetricEvents+RunSummaries) | DONE | omnis-5waves | 5d82706 | 24 |
+| W-O18 | ONDA25 | SquadAssignmentWorkflow (atribuição squads em lote) | DONE | omnis-5waves | 1b012f3 | 21 |
 
 ## Legenda
 - DONE: concluído e commitado
