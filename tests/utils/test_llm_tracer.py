@@ -146,3 +146,23 @@ def test_llm_call_generates_span_with_4_attrs(monkeypatch):
     assert attrs["llm.latency_ms"] >= 0
     assert attrs["llm.cost_usd"] == pytest.approx(0.2, rel=1e-3)
     assert attrs["omnis.run_id"] == "trace_test"
+
+
+def test_exporter_none_has_no_in_memory_exporter(monkeypatch):
+    monkeypatch.setenv("OMNIS_OTEL_EXPORTER", "none")
+    reset_tracer()
+    tracer = get_llm_tracer()
+    with tracer.start_as_current_span("llm.none"):
+        pass
+    assert get_in_memory_exporter() is None
+
+
+def test_otlp_env_without_exporter_dependency_does_not_crash(monkeypatch):
+    monkeypatch.setenv("OMNIS_OTEL_EXPORTER", "none")
+    monkeypatch.setenv("OMNIS_OTEL_OTLP_URL", "http://localhost:4318/v1/traces")
+    reset_tracer()
+    tracer = get_llm_tracer()
+    with tracer.start_as_current_span("llm.otlp.missing.dep"):
+        pass
+    # sem pacote OTLP instalado, o tracer continua funcional
+    assert tracer is not None

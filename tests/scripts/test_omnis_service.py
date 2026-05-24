@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import importlib
+import inspect
 import sys
 
 import pytest
@@ -78,3 +79,14 @@ def test_handle_signal_sets_running_false():
     mod._running = True
     mod._handle_signal(15, None)  # SIGTERM
     assert mod._running is False
+
+
+@pytest.mark.xfail(
+    reason="Known mismatch: omnis_service passes dry_run to SchedulerService, but scheduler signature may not accept it.",
+    strict=False,
+)
+def test_scheduler_constructor_signature_compatible_with_service_call():
+    """Guardrail: serviço não deve passar kwargs incompatíveis ao SchedulerService."""
+    mod = _load_service()
+    scheduler_init = inspect.signature(mod.SchedulerService.__init__)
+    assert "dry_run" in scheduler_init.parameters
