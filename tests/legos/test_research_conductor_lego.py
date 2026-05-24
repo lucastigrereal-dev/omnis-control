@@ -299,6 +299,22 @@ def test_searxng_backend_rejects_private_cidr_192():
         SearXNGBackend("http://192.168.1.100:8080/search")
 
 
+def test_searxng_backend_rejects_link_local_metadata_ip():
+    """SSRF hardening: block cloud metadata/link-local targets."""
+    with pytest.raises(SearXNGURLError):
+        SearXNGBackend("http://169.254.169.254/latest/meta-data")
+
+
+def test_searxng_backend_rejects_ipv6_loopback():
+    with pytest.raises(SearXNGURLError):
+        SearXNGBackend("http://[::1]:8080/search")
+
+
+def test_searxng_backend_rejects_unsupported_scheme():
+    with pytest.raises(SearXNGURLError):
+        SearXNGBackend("ftp://example.com/search")
+
+
 def test_storm_pipeline_generates_perspectives_fallback():
     """Quando LLM retorna JSON inválido, pipeline usa fallback de perspectivas."""
     class _BadLLM:

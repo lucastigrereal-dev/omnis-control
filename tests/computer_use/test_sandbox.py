@@ -62,6 +62,14 @@ class TestSecuritySandbox:
         sb = SecuritySandbox(strict=False)
         assert sb.validate_url("http://192.168.1.1/admin") is False
 
+    def test_validate_url_blocks_link_local_metadata_ip(self):
+        sb = SecuritySandbox(strict=False)
+        assert sb.validate_url("http://169.254.169.254/latest/meta-data") is False
+
+    def test_validate_url_blocks_ipv6_loopback(self):
+        sb = SecuritySandbox(strict=False)
+        assert sb.validate_url("http://[::1]:8080/internal") is False
+
     def test_validate_url_blocks_file_scheme(self):
         sb = SecuritySandbox(strict=False)
         assert sb.validate_url("file:///C:/Users/lucas/secret.txt") is False
