@@ -34,6 +34,10 @@
 | W-C1-C5 | G30 | Approval Gate + Guardrails + Autonomy | DONE | supreme | — | — |
 | W-D1-D5 | G31 | Squad Selector + Squads Especializados | DONE | supreme | — | — |
 | W-E1-E4 | G32 | Gap Detector + Forge Orchestrator | DONE | supreme | — | — |
+| W-O1 | ONDA10 | WF1 DeepResearchWorkflow (molde) | DONE | omnis-5waves | 4e11859 | 32 |
+| W-O2 | ONDA10 | WF2 VideoEditWorkflow (molde) | DONE | omnis-5waves | 0f02a50 | 38 |
+| W-O3 | ONDA10 | WF3 AppFactoryWorkflow (molde) | DONE | omnis-5waves | 93fcab3 | 35 |
+| W-O4 | ONDA11 | Agency como organismo | DONE | omnis-5waves | pending | 30 |
 
 ## Legenda
 - DONE: concluído e commitado
