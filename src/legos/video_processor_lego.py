@@ -80,6 +80,23 @@ class VideoProcessorLego:
         has_ffmpeg = shutil.which("ffmpeg") is not None
         return has_whisper and has_ffmpeg
 
+    def run(self, spec: "LegoCogSpec") -> "LegoCogResult":
+        """Implementa LegoCog.run() — converte LegoCogSpec → VideoSpec."""
+        from src.legos.protocol import LegoCogSpec, LegoCogResult  # noqa: F401
+        native = VideoSpec(
+            video_path=spec.payload.get("video_path", ""),
+            goal=spec.goal,
+            dry_run=spec.dry_run,
+        )
+        result = self.execute(native)
+        return LegoCogResult(
+            success=result.success,
+            output=result.output,
+            dry_run=result.dry_run,
+            error=result.error or "",
+            artifacts=result.artifacts,
+        )
+
     def execute(self, spec: VideoSpec) -> VideoResult:
         """Processa vídeo de acordo com spec.goal."""
         # Path traversal gate — bloqueia ../ em video_path e output_dir

@@ -67,6 +67,23 @@ class BrowserExecutorLego:
         except Exception:
             return False
 
+    def run(self, spec: "LegoCogSpec") -> "LegoCogResult":
+        """Implementa LegoCog.run() — converte LegoCogSpec → BrowserTask."""
+        from src.legos.protocol import LegoCogSpec, LegoCogResult  # noqa: F401
+        task = BrowserTask(
+            url=spec.payload.get("url", "https://example.com"),
+            goal=spec.goal,
+            dry_run=spec.dry_run,
+        )
+        result = self.execute(task)
+        return LegoCogResult(
+            success=result.success,
+            output=result.output,
+            dry_run=result.dry_run,
+            error=result.error or "",
+            artifacts=result.artifacts,
+        )
+
     def execute(self, task: BrowserTask) -> BrowserResult:
         """Executa uma tarefa web e retorna resultado estruturado.
 

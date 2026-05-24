@@ -357,6 +357,23 @@ class ResearchConductorLego:
         except ImportError:
             return False
 
+    def run(self, spec: "LegoCogSpec") -> "LegoCogResult":
+        """Implementa LegoCog.run() — converte LegoCogSpec → ResearchSpec."""
+        from src.legos.protocol import LegoCogSpec, LegoCogResult  # noqa: F401
+        native = ResearchSpec(
+            topic=spec.goal,
+            dry_run=spec.dry_run,
+            extra={"run_id": spec.run_id} if spec.run_id else {},
+        )
+        result = self.execute(native)
+        return LegoCogResult(
+            success=result.success,
+            output=result.report,
+            dry_run=result.dry_run,
+            error=result.error or "",
+            artifacts=result.artifacts or {},
+        )
+
     def execute(self, spec: ResearchSpec) -> ResearchResult:
         """Executa pesquisa via pipeline STORM adaptado."""
         if not spec.dry_run and _requires_publish_approval(spec.topic):

@@ -88,6 +88,27 @@ class ChannelMessengerLego:
         tg_ready = bool(TG_BOT_TOKEN)
         return wa_ready or tg_ready
 
+    def run(self, spec: "LegoCogSpec") -> "LegoCogResult":
+        """Implementa LegoCog.run() — converte LegoCogSpec → MessageSpec."""
+        from src.legos.protocol import LegoCogSpec, LegoCogResult  # noqa: F401
+        native = MessageSpec(
+            content=spec.goal,
+            channels=spec.payload.get("channels", ["telegram"]),
+            dry_run=spec.dry_run,
+            recipient=spec.payload.get("recipient", ""),
+        )
+        result = self.send(native)
+        deliveries_summary = ",".join(
+            d.channel for d in result.deliveries if d.success
+        ) if result.deliveries else ""
+        return LegoCogResult(
+            success=result.success,
+            output=deliveries_summary,
+            dry_run=result.dry_run,
+            error=result.error or "",
+            artifacts=result.artifacts,
+        )
+
     def send(self, spec: MessageSpec) -> MessageResult:
         """Despacha mensagem para os canais em spec.channels."""
         if not spec.dry_run and _requires_broadcast_approval(spec.content):

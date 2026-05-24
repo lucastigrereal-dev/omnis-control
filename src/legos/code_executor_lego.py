@@ -71,6 +71,24 @@ class CodeExecutorLego:
         except (urllib.error.URLError, OSError):
             return False
 
+    def run(self, spec: "LegoCogSpec") -> "LegoCogResult":
+        """Implementa LegoCog.run() — converte LegoCogSpec → CodeSpec."""
+        from src.legos.protocol import LegoCogSpec, LegoCogResult  # noqa: F401
+        native = CodeSpec(
+            goal=spec.goal,
+            dry_run=spec.dry_run,
+            language=spec.payload.get("language", "python"),
+            extra={"run_id": spec.run_id} if spec.run_id else {},
+        )
+        result = self.execute(native)
+        return LegoCogResult(
+            success=result.success,
+            output=result.output,
+            dry_run=result.dry_run,
+            error=result.error or "",
+            artifacts=result.artifacts,
+        )
+
     def execute(self, spec: CodeSpec) -> CodeResult:
         """Executa spec via OpenHands (se disponível) ou sandbox local."""
         # Approval gate

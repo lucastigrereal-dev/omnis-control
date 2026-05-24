@@ -5,6 +5,7 @@ from .video_processor_lego import VideoProcessorLego
 from .research_conductor_lego import ResearchConductorLego
 from .channel_messenger_lego import ChannelMessengerLego
 from .registry import LegoRegistry, default_registry
+from .protocol import LegoCog, LegoCogSpec, LegoCogResult
 
 __all__ = [
     "BrowserExecutorLego",
@@ -14,4 +15,7 @@ __all__ = [
     "ChannelMessengerLego",
     "LegoRegistry",
     "default_registry",
+    "LegoCog",
+    "LegoCogSpec",
+    "LegoCogResult",
 ]
