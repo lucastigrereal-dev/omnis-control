@@ -45,6 +45,21 @@ class TestSecuritySandbox:
         with pytest.raises(SandboxViolation):
             sb.validate_url("https://gmail.com")
 
+    def test_validate_url_allows_localhost_characterization(self):
+        """Caracterização de risco: localhost não é bloqueado na regra atual."""
+        sb = SecuritySandbox()
+        assert sb.validate_url("http://localhost:8000/internal") is True
+
+    def test_validate_url_allows_private_ip_characterization(self):
+        """Caracterização de risco: IP privado não é bloqueado na regra atual."""
+        sb = SecuritySandbox()
+        assert sb.validate_url("http://10.0.0.5/admin") is True
+
+    def test_validate_url_allows_file_scheme_characterization(self):
+        """Caracterização de risco: esquema file:// não é bloqueado na regra atual."""
+        sb = SecuritySandbox()
+        assert sb.validate_url("file:///C:/Users/lucas/secret.txt") is True
+
     def test_validate_action_allows_scrape(self):
         sb = SecuritySandbox()
         assert sb.validate_action("scrape_profile") is True
