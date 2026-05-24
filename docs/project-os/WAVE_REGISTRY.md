@@ -37,7 +37,10 @@
 | W-O1 | ONDA10 | WF1 DeepResearchWorkflow (molde) | DONE | omnis-5waves | 4e11859 | 32 |
 | W-O2 | ONDA10 | WF2 VideoEditWorkflow (molde) | DONE | omnis-5waves | 0f02a50 | 38 |
 | W-O3 | ONDA10 | WF3 AppFactoryWorkflow (molde) | DONE | omnis-5waves | 93fcab3 | 35 |
-| W-O4 | ONDA11 | Agency como organismo | DONE | omnis-5waves | pending | 30 |
+| W-O4 | ONDA11 | Agency como organismo | DONE | omnis-5waves | 5fc5ab5 | 30 |
+| W-O5 | ONDA12 | WF4 CodeRunWorkflow (molde) | DONE | omnis-5waves | 541e398 | 25 |
+| W-O6 | ONDA13 | WorkflowRegistry (catalogo) | DONE | omnis-5waves | c961a49 | 28 |
+| W-O7 | ONDA14 | MissionOrchestrator | DONE | omnis-5waves | 2d99621 | 18 |
 
 ## Legenda
 - DONE: concluído e commitado
