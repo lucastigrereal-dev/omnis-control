@@ -26,6 +26,9 @@ jarvis = "src.cli:app"
 testpaths = ["tests"]
 pythonpath = ["."]
 norecursedirs = ["tests/_archive", ".git", "__pycache__", "*.egg-info"]
+markers = [
+    "real_llm: chama LLM real (Ollama local) — requer Ollama rodando",
+]
 
 [build-system]
 requires = ["setuptools>=61.0"]

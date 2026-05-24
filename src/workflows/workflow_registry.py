@@ -1,6 +1,6 @@
 """WorkflowRegistry — catálogo e health-check de todos os workflows OMNIS.
 
-Consolidação pós-inventário — 16 capacidades distintas:
+Onda 32 — 17 capacidades distintas:
   - DeepResearchWorkflow    (WF1)
   - VideoEditWorkflow       (WF2)
   - AppFactoryWorkflow      (WF3)
@@ -17,6 +17,7 @@ Consolidação pós-inventário — 16 capacidades distintas:
   - TaskDispatchWorkflow         (Onda 27)
   - CapabilityForgeWorkflow      (Onda 28)
   - SkillExecutionWorkflow       (Onda 29)
+  - CaptionGeneratorWorkflow     (Onda 32 — LLM real Ollama)
 
 Removidos do registry (módulos permanecem como utilitários):
   - OutreachSequenceWorkflow  → subsumo por SDRPipelineWorkflow
@@ -487,3 +488,22 @@ class WorkflowRegistry:
             ))
 
         # task_classification e cost_tracking removidos do registry (utilitários — ver módulos direto)
+
+        try:
+            from src.workflows.caption_generator_workflow import CaptionGeneratorWorkflow
+            self.register(WorkflowEntry(
+                name="caption_generator",
+                version="1.0",
+                description="Geração de legenda Instagram via Ollama local (LLM real, custo zero)",
+                cost_local_pct=100,
+                dry_run_safe=True,
+                tags=["llm", "instagram", "caption", "ollama", "local"],
+                factory=CaptionGeneratorWorkflow,
+            ))
+        except ImportError as e:
+            _logger.error("caption_generator import failed: %s", e)
+            self.register(WorkflowEntry(
+                name="caption_generator", version="1.0",
+                description="import failed",
+                cost_local_pct=0, dry_run_safe=False,
+            ))
