@@ -12,6 +12,12 @@ from src.computer_use.sandbox import SecuritySandbox
 
 logger = logging.getLogger(__name__)
 
+ALLOWED_APPS: frozenset[str] = frozenset({
+    "notepad.exe", "calc.exe", "mspaint.exe", "explorer.exe",
+    "wordpad.exe", "write.exe", "charmap.exe", "snippingtool.exe",
+    "taskmgr.exe", "control.exe", "regedit.exe", "msconfig.exe",
+})
+
 
 def _now_iso() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -92,6 +98,10 @@ class DesktopAgent:
 
     def open_app(self, app_name: str) -> DesktopResult:
         """Open a Windows application by name."""
+        if app_name not in ALLOWED_APPS:
+            result = DesktopResult(success=False, action="open", error=f"app_not_allowed:{app_name}")
+            self._results.append(result)
+            return result
         if self._should_validate():
             self.sandbox.validate_action(f"open_app:{app_name}")
         self._actions.append(DesktopAction(action="open", target=app_name))
@@ -109,7 +119,7 @@ class DesktopAgent:
         else:
             try:
                 import subprocess
-                subprocess.Popen(app_name, shell=True)
+                subprocess.Popen([app_name])
                 result = DesktopResult(success=True, action="open", data=f"Opened {app_name}")
             except Exception as exc:
                 result = DesktopResult(success=False, action="open", error=str(exc))
