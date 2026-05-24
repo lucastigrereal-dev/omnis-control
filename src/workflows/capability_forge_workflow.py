@@ -9,7 +9,7 @@ import logging
 from dataclasses import dataclass
 
 from src.agentic.forge_orchestrator import ForgeOrchestrator, GapReport, ForgeResult
-from src.akasha_event_sink.adapter import AkashaSinkAdapter
+from src.akasha_event_sink.adapter import AkashaSinkAdapter, FileAkashaSink
 from src.akasha_event_sink.models import SinkEvent
 from src.utils.run_context import RunContext
 
@@ -70,8 +70,12 @@ class CapabilityForgeResult:
 class CapabilityForgeWorkflow:
     """Detecta gaps de skill e gera ForgeResults para N missões."""
 
-    def __init__(self, akasha_sink=None) -> None:
-        self._sink = akasha_sink or AkashaSinkAdapter()
+    def __init__(
+        self,
+        akasha_sink: AkashaSinkAdapter | None = None,
+        akasha_dir: str = "output/akasha/capability_forge/",
+    ) -> None:
+        self._sink = akasha_sink or FileAkashaSink(target_dir=akasha_dir, dry_run=True)
 
     def run(
         self,

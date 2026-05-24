@@ -16,7 +16,7 @@ from src.metrics.aggregations import (
     compute_run_stats,
     compute_mission_summary,
 )
-from src.akasha_event_sink.adapter import AkashaSinkAdapter
+from src.akasha_event_sink.adapter import AkashaSinkAdapter, FileAkashaSink
 from src.akasha_event_sink.models import SinkEvent
 from src.utils.run_context import RunContext
 
@@ -60,8 +60,12 @@ class MetricsSnapshotResult:
 class MetricsSnapshotWorkflow:
     """Agrega listas de MetricEvent e RunSummary em snapshot consolidado."""
 
-    def __init__(self, akasha_sink=None) -> None:
-        self._sink = akasha_sink or AkashaSinkAdapter()
+    def __init__(
+        self,
+        akasha_sink: AkashaSinkAdapter | None = None,
+        akasha_dir: str = "output/akasha/metrics_snapshot/",
+    ) -> None:
+        self._sink = akasha_sink or FileAkashaSink(target_dir=akasha_dir, dry_run=True)
 
     def run(
         self,

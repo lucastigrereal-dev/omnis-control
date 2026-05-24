@@ -10,7 +10,7 @@ from dataclasses import dataclass
 
 from src.agentic.deliverable_mapper import DeliverableManifest
 from src.agentic.task_dispatcher import TaskDispatcher, DispatchPlan
-from src.akasha_event_sink.adapter import AkashaSinkAdapter
+from src.akasha_event_sink.adapter import AkashaSinkAdapter, FileAkashaSink
 from src.akasha_event_sink.models import SinkEvent
 from src.utils.run_context import RunContext
 
@@ -59,8 +59,12 @@ class TaskDispatchResult:
 class TaskDispatchWorkflow:
     """Roteia deliverables de N missões para executores, emite snapshot akasha."""
 
-    def __init__(self, akasha_sink=None) -> None:
-        self._sink = akasha_sink or AkashaSinkAdapter()
+    def __init__(
+        self,
+        akasha_sink: AkashaSinkAdapter | None = None,
+        akasha_dir: str = "output/akasha/task_dispatch/",
+    ) -> None:
+        self._sink = akasha_sink or FileAkashaSink(target_dir=akasha_dir, dry_run=True)
 
     def run(
         self,

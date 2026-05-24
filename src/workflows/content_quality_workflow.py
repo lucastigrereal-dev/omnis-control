@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 
 from src.quality_gate.scorer import QualityScorer
 from src.quality_gate.models import QualityReport
-from src.akasha_event_sink.adapter import AkashaSinkAdapter
+from src.akasha_event_sink.adapter import AkashaSinkAdapter, FileAkashaSink
 from src.akasha_event_sink.models import SinkEvent
 from src.utils.run_context import RunContext
 
@@ -75,8 +75,12 @@ class ContentQualityResult:
 class ContentQualityWorkflow:
     """Avalia qualidade de N conteúdos em lote, emite snapshot no akasha."""
 
-    def __init__(self, akasha_sink=None) -> None:
-        self._sink = akasha_sink or AkashaSinkAdapter()
+    def __init__(
+        self,
+        akasha_sink: AkashaSinkAdapter | None = None,
+        akasha_dir: str = "output/akasha/content_quality/",
+    ) -> None:
+        self._sink = akasha_sink or FileAkashaSink(target_dir=akasha_dir, dry_run=True)
 
     def run(
         self,
