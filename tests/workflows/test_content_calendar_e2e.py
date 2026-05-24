@@ -261,3 +261,49 @@ def test_to_dict_items_list():
     result = wf.run(_HANDLE, _TOPICS, num_days=3)
     d = result.to_dict()
     assert len(d["items"]) == 3
+
+
+# ── run_batch (ex-MultiAccountCalendarWorkflow) ───────────────────────────────
+
+def test_batch_succeeds():
+    wf, _ = _make_wf()
+    accounts = [{"handle": _HANDLE, "topics": _TOPICS}, {"handle": "@outro", "topics": _TOPICS}]
+    result = wf.run_batch(accounts, num_days=3)
+    assert result.success is True
+
+
+def test_batch_accounts_total():
+    wf, _ = _make_wf()
+    accounts = [{"handle": _HANDLE, "topics": _TOPICS}, {"handle": "@outro", "topics": _TOPICS}]
+    result = wf.run_batch(accounts, num_days=3)
+    assert result.accounts_total == 2
+
+
+def test_batch_total_items():
+    wf, _ = _make_wf()
+    accounts = [{"handle": _HANDLE, "topics": _TOPICS}, {"handle": "@b", "topics": _TOPICS}]
+    result = wf.run_batch(accounts, num_days=5)
+    assert result.total_items == 10  # 2 contas × 5 dias
+
+
+def test_batch_empty_accounts_fails():
+    wf, _ = _make_wf()
+    result = wf.run_batch([])
+    assert result.success is False
+    assert result.error == "empty_accounts_list"
+
+
+def test_batch_emits_akasha_event():
+    wf, sink = _make_wf()
+    wf.run_batch([{"handle": _HANDLE, "topics": _TOPICS}], num_days=3)
+    events = sink.query_events("content_calendar_batch_generated")
+    assert len(events) == 1
+
+
+def test_batch_to_dict_has_keys():
+    wf, _ = _make_wf()
+    result = wf.run_batch([{"handle": _HANDLE, "topics": _TOPICS}], num_days=3)
+    d = result.to_dict()
+    for key in ["run_id", "success", "accounts_total", "accounts_ok",
+                "total_items", "akasha_event_id", "dry_run"]:
+        assert key in d

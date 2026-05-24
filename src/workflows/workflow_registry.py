@@ -1,18 +1,15 @@
 """WorkflowRegistry — catálogo e health-check de todos os workflows OMNIS.
 
-Onda 13 (base) + Ondas 15-31 — cataloga 21 workflows:
+Consolidação pós-inventário — 16 capacidades distintas:
   - DeepResearchWorkflow    (WF1)
   - VideoEditWorkflow       (WF2)
   - AppFactoryWorkflow      (WF3)
   - CodeRunWorkflow         (WF4)
   - SystemHealthWorkflow    (Onda 15)
   - LeadScoringWorkflow     (Onda 16)
-  - ContentCalendarWorkflow   (Onda 17)
-  - OutreachSequenceWorkflow  (Onda 18)
-  - SDRBatchWorkflow          (Onda 19)
+  - ContentCalendarWorkflow   (Onda 17 + batch de O21)
+  - SDRPipelineWorkflow       (consolida O18+O19+O22)
   - DailyBriefingWorkflow        (Onda 20)
-  - MultiAccountCalendarWorkflow (Onda 21)
-  - SDRPlanWorkflow              (Onda 22)
   - ContentQualityWorkflow       (Onda 23)
   - MetricsSnapshotWorkflow      (Onda 24)
   - SquadAssignmentWorkflow      (Onda 25)
@@ -20,8 +17,14 @@ Onda 13 (base) + Ondas 15-31 — cataloga 21 workflows:
   - TaskDispatchWorkflow         (Onda 27)
   - CapabilityForgeWorkflow      (Onda 28)
   - SkillExecutionWorkflow       (Onda 29)
-  - TaskClassificationWorkflow   (Onda 30)
-  - CostTrackingWorkflow         (Onda 31)
+
+Removidos do registry (módulos permanecem como utilitários):
+  - OutreachSequenceWorkflow  → subsumo por SDRPipelineWorkflow
+  - SDRBatchWorkflow          → subsumo por SDRPipelineWorkflow
+  - MultiAccountCalendarWorkflow → run_batch() em ContentCalendarWorkflow
+  - SDRPlanWorkflow           → subsumo por SDRPipelineWorkflow
+  - TaskClassificationWorkflow → utilitário (TaskClassifier)
+  - CostTrackingWorkflow       → utilitário (CostTracker)
 
 Papel: análogo ao LegoRegistry (Onda 5) — registra, descreve e verifica workflows.
 
@@ -313,39 +316,20 @@ class WorkflowRegistry:
             ))
 
         try:
-            from src.workflows.outreach_sequence_workflow import OutreachSequenceWorkflow
+            from src.workflows.sdr_pipeline_workflow import SDRPipelineWorkflow
             self.register(WorkflowEntry(
-                name="outreach_sequence",
+                name="sdr_pipeline",
                 version="1.0",
-                description="Outreach SDR: prospects → sequências 7-passos → akasha",
+                description="Pipeline SDR unificado: mode=execute (score+outreach) ou mode=plan (SDRPlan)",
                 cost_local_pct=100,
                 dry_run_safe=True,
-                tags=["sdr", "outreach", "sequence", "deterministic", "local"],
-                factory=OutreachSequenceWorkflow,
+                tags=["sdr", "pipeline", "outreach", "plan", "deterministic", "local"],
+                factory=SDRPipelineWorkflow,
             ))
         except ImportError as e:
-            _logger.error("outreach_sequence import failed: %s", e)
+            _logger.error("sdr_pipeline import failed: %s", e)
             self.register(WorkflowEntry(
-                name="outreach_sequence", version="1.0",
-                description="import failed",
-                cost_local_pct=0, dry_run_safe=False,
-            ))
-
-        try:
-            from src.workflows.sdr_batch_workflow import SDRBatchWorkflow
-            self.register(WorkflowEntry(
-                name="sdr_batch",
-                version="1.0",
-                description="Pipeline SDR: prospects → score → outreach HOT+WARM → akasha",
-                cost_local_pct=100,
-                dry_run_safe=True,
-                tags=["sdr", "batch", "pipeline", "deterministic", "local"],
-                factory=SDRBatchWorkflow,
-            ))
-        except ImportError as e:
-            _logger.error("sdr_batch import failed: %s", e)
-            self.register(WorkflowEntry(
-                name="sdr_batch", version="1.0",
+                name="sdr_pipeline", version="1.0",
                 description="import failed",
                 cost_local_pct=0, dry_run_safe=False,
             ))
@@ -365,44 +349,6 @@ class WorkflowRegistry:
             _logger.error("daily_briefing import failed: %s", e)
             self.register(WorkflowEntry(
                 name="daily_briefing", version="1.0",
-                description="import failed",
-                cost_local_pct=0, dry_run_safe=False,
-            ))
-
-        try:
-            from src.workflows.multi_account_calendar_workflow import MultiAccountCalendarWorkflow
-            self.register(WorkflowEntry(
-                name="multi_account_calendar",
-                version="1.0",
-                description="Batch de calendários: N contas → QueueItems → akasha",
-                cost_local_pct=100,
-                dry_run_safe=True,
-                tags=["content", "calendar", "batch", "multi-account", "local"],
-                factory=MultiAccountCalendarWorkflow,
-            ))
-        except ImportError as e:
-            _logger.error("multi_account_calendar import failed: %s", e)
-            self.register(WorkflowEntry(
-                name="multi_account_calendar", version="1.0",
-                description="import failed",
-                cost_local_pct=0, dry_run_safe=False,
-            ))
-
-        try:
-            from src.workflows.sdr_plan_workflow import SDRPlanWorkflow
-            self.register(WorkflowEntry(
-                name="sdr_plan",
-                version="1.0",
-                description="Plano SDR: prospects → build_batch_plan → SDRPlan finalizado → akasha",
-                cost_local_pct=100,
-                dry_run_safe=True,
-                tags=["sdr", "plan", "batch", "deterministic", "local"],
-                factory=SDRPlanWorkflow,
-            ))
-        except ImportError as e:
-            _logger.error("sdr_plan import failed: %s", e)
-            self.register(WorkflowEntry(
-                name="sdr_plan", version="1.0",
                 description="import failed",
                 cost_local_pct=0, dry_run_safe=False,
             ))
@@ -540,40 +486,4 @@ class WorkflowRegistry:
                 cost_local_pct=0, dry_run_safe=False,
             ))
 
-        try:
-            from src.workflows.task_classification_workflow import TaskClassificationWorkflow
-            self.register(WorkflowEntry(
-                name="task_classification",
-                version="1.0",
-                description="Classificação de tasks: intents → TaskClassifier → akasha",
-                cost_local_pct=100,
-                dry_run_safe=True,
-                tags=["classification", "routing", "deterministic", "local"],
-                factory=TaskClassificationWorkflow,
-            ))
-        except ImportError as e:
-            _logger.error("task_classification import failed: %s", e)
-            self.register(WorkflowEntry(
-                name="task_classification", version="1.0",
-                description="import failed",
-                cost_local_pct=0, dry_run_safe=False,
-            ))
-
-        try:
-            from src.workflows.cost_tracking_workflow import CostTrackingWorkflow
-            self.register(WorkflowEntry(
-                name="cost_tracking",
-                version="1.0",
-                description="Rastreamento de custos: uso de modelos → CostTracker → akasha",
-                cost_local_pct=100,
-                dry_run_safe=True,
-                tags=["cost", "tracking", "models", "local"],
-                factory=CostTrackingWorkflow,
-            ))
-        except ImportError as e:
-            _logger.error("cost_tracking import failed: %s", e)
-            self.register(WorkflowEntry(
-                name="cost_tracking", version="1.0",
-                description="import failed",
-                cost_local_pct=0, dry_run_safe=False,
-            ))
+        # task_classification e cost_tracking removidos do registry (utilitários — ver módulos direto)

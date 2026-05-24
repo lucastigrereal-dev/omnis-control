@@ -1,4 +1,7 @@
-"""ContentCalendarWorkflow — molde: brief → calendário editorial → queue items → akasha.
+"""ContentCalendarWorkflow — brief → calendário editorial → queue items → akasha.
+
+Suporta conta única (run) e múltiplas contas (run_batch).
+run_batch() absorveu MultiAccountCalendarWorkflow (consolidação).
 
 Onda 17 — wires existing pieces without adding new algorithms:
   - RunContext        → run_id único
@@ -69,6 +72,83 @@ _OBJECTIVE_ROTATION = [
 ]
 
 _DEFAULT_TIME = "09:00"
+
+# Contas padrão OMNIS (Lucas Tigre) — movidas de MultiAccountCalendarWorkflow
+DEFAULT_ACCOUNTS: list[dict] = [
+    {"handle": "@lucastigrereal",      "topics": ["lifestyle", "viagem", "bastidores"]},
+    {"handle": "@oinatalrn",           "topics": ["praias", "hoteis", "gastronomia", "turismo"]},
+    {"handle": "@agenteviajabrasil",   "topics": ["destinos", "dicas", "roteiros", "hospedagem"]},
+    {"handle": "@afamiliatigrereal",   "topics": ["familia", "viagem", "experiencias"]},
+    {"handle": "@oquecomernatalrn",    "topics": ["restaurantes", "gastronomia", "drinks"]},
+    {"handle": "@natalaivoueu",        "topics": ["praias", "guia", "turismo local"]},
+]
+
+
+@dataclass
+class AccountCalendarResult:
+    """Resultado de calendário para uma conta no batch."""
+    account_handle: str
+    topics: list[str]
+    result: "ContentCalendarResult"
+
+    @property
+    def items_count(self) -> int:
+        return self.result.items_count
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "account_handle": self.account_handle,
+            "topics": self.topics,
+            "items_count": self.items_count,
+            "success": self.result.success,
+            "format_distribution": self.result.format_distribution,
+            "akasha_event_id": self.result.akasha_event_id,
+        }
+
+
+@dataclass
+class ContentCalendarBatchResult:
+    """Resultado de batch de calendários para múltiplas contas."""
+    run_id: str
+    success: bool
+    accounts_total: int = 0
+    accounts_ok: int = 0
+    calendars: list[AccountCalendarResult] = field(default_factory=list)
+    akasha_event_id: str = ""
+    dry_run: bool = True
+    cost_local_pct: int = _COST_LOCAL_PCT
+    error: str | None = None
+
+    @property
+    def total_items(self) -> int:
+        return sum(c.items_count for c in self.calendars)
+
+    @property
+    def accounts_failed(self) -> int:
+        return self.accounts_total - self.accounts_ok
+
+    @property
+    def format_distribution_all(self) -> dict[str, int]:
+        dist: dict[str, int] = {}
+        for cal in self.calendars:
+            for fmt, count in cal.result.format_distribution.items():
+                dist[fmt] = dist.get(fmt, 0) + count
+        return dist
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "run_id": self.run_id,
+            "success": self.success,
+            "accounts_total": self.accounts_total,
+            "accounts_ok": self.accounts_ok,
+            "accounts_failed": self.accounts_failed,
+            "total_items": self.total_items,
+            "format_distribution_all": self.format_distribution_all,
+            "akasha_event_id": self.akasha_event_id,
+            "dry_run": self.dry_run,
+            "cost_local_pct": self.cost_local_pct,
+            "error": self.error,
+        }
 
 
 @dataclass
@@ -227,4 +307,96 @@ class ContentCalendarWorkflow:
                 "akasha_event_id": event.event_id,
                 "format_distribution": fmt_dist,
             },
+        )
+
+    def run_batch(
+        self,
+        accounts: list[dict[str, Any]],
+        num_days: int = 7,
+        start_date: date | None = None,
+        post_time: str = _DEFAULT_TIME,
+        dry_run: bool = True,
+    ) -> ContentCalendarBatchResult:
+        """Gera calendários para múltiplas contas (ex-MultiAccountCalendarWorkflow).
+
+        Args:
+            accounts:   Lista de {handle: str, topics: list[str]}.
+            num_days:   Número de dias por conta.
+            start_date: Data de início (default: hoje).
+            post_time:  Horário padrão dos posts.
+            dry_run:    True → sem persistência de arquivos.
+        """
+        ctx = RunContext.new(budget_usd=self._budget_usd)
+        _logger.info(
+            "%s ContentCalendarWorkflow.run_batch: %d contas, %d dias",
+            ctx.log_prefix(), len(accounts), num_days,
+        )
+
+        if not accounts:
+            event = SinkEvent(
+                event_type="content_calendar_batch_generated",
+                source=ctx.run_id,
+                payload={"error": "empty_accounts_list", "accounts_total": 0},
+            )
+            self._sink.write_event(event)
+            return ContentCalendarBatchResult(
+                run_id=ctx.run_id, success=False, dry_run=dry_run,
+                akasha_event_id=event.event_id,
+                error="empty_accounts_list",
+            )
+
+        calendars: list[AccountCalendarResult] = []
+        accounts_ok = 0
+
+        for acc in accounts:
+            handle = acc.get("handle", "")
+            topics = acc.get("topics", [])
+            try:
+                result = self.run(
+                    account_handle=handle,
+                    topics=topics,
+                    num_days=num_days,
+                    start_date=start_date,
+                    post_time=post_time,
+                    dry_run=dry_run,
+                )
+                if result.success:
+                    accounts_ok += 1
+                calendars.append(AccountCalendarResult(
+                    account_handle=handle,
+                    topics=topics,
+                    result=result,
+                ))
+            except Exception as exc:
+                _logger.warning(
+                    "%s batch: calendar failed for %s: %s", ctx.log_prefix(), handle, exc
+                )
+
+        total_items = sum(c.items_count for c in calendars)
+        fmt_dist: dict[str, int] = {}
+        for cal in calendars:
+            for fmt, count in cal.result.format_distribution.items():
+                fmt_dist[fmt] = fmt_dist.get(fmt, 0) + count
+
+        event = SinkEvent(
+            event_type="content_calendar_batch_generated",
+            source=ctx.run_id,
+            payload={
+                "accounts_total": len(accounts),
+                "accounts_ok": accounts_ok,
+                "total_items": total_items,
+                "num_days": num_days,
+                "dry_run": dry_run,
+            },
+        )
+        self._sink.write_event(event)
+
+        return ContentCalendarBatchResult(
+            run_id=ctx.run_id,
+            success=True,
+            accounts_total=len(accounts),
+            accounts_ok=accounts_ok,
+            calendars=calendars,
+            akasha_event_id=event.event_id,
+            dry_run=dry_run,
         )
