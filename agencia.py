@@ -58,6 +58,8 @@ def video(
     max_clips: int = typer.Option(5, "--max-clips", help="Máximo de clipes a gerar"),
     target_duration: float = typer.Option(30.0, "--target-duration", help="Duração alvo de cada clipe (segundos)"),
     max_hooks: int = typer.Option(10, "--max-hooks", help="Máximo de hooks a detectar"),
+    burn_captions: bool = typer.Option(True, "--burn-captions/--no-burn-captions", help="Camada 2: queima legenda no vídeo (SRT burn-in)"),
+    remove_silence: bool = typer.Option(False, "--remove-silence/--no-remove-silence", help="Camada 2: corta silêncios do áudio"),
 ) -> None:
     """Processa um vídeo longo e entrega clipes cortados numa pasta."""
     if not arquivo.exists():
@@ -70,18 +72,22 @@ def video(
 
     mode = "DRY-RUN (simulação)" if dry_run else "REAL (Whisper + FFmpeg)"
     typer.echo(f"\n{'='*60}")
-    typer.echo(f"  AGÊNCIA DE VÍDEO OMNIS — Camada 1 (cortes inteligentes)")
+    typer.echo(f"  AGÊNCIA DE VÍDEO OMNIS — Camada 1+2 (cortes + acabamento)")
     typer.echo(f"{'='*60}")
     typer.echo(f"  vídeo:   {arquivo}")
     typer.echo(f"  perfil:  {perfil}")
     typer.echo(f"  preset:  {preset}")
     typer.echo(f"  modo:    {mode}")
     typer.echo(f"  clips:   máx {max_clips} × {target_duration}s")
+    typer.echo(f"  legenda: {'queimada (burn-in)' if burn_captions else 'desligada'}")
+    typer.echo(f"  silêncio:{'corte ligado' if remove_silence else ' mantido'}")
     typer.echo(f"{'='*60}\n")
 
     pipeline = AgenciaPipeline(
         dry_run=dry_run,
         max_hooks=max_hooks,
+        burn_captions=burn_captions,
+        remove_silence=remove_silence,
     )
 
     result = pipeline.run(

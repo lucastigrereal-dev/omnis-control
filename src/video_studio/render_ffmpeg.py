@@ -15,12 +15,18 @@ logger = logging.getLogger(__name__)
 def _subtitles_filter(srt_path: Path) -> str:
     """Converte Path para argumento subtitles= compatível com FFmpeg.
 
-    No Windows o filtro exige forward slashes e ':' escapado como '\\:'.
+    O filtergraph do FFmpeg tem DOIS níveis de escaping. Um único '\\:' é
+    consumido no 2º nível (deixa ':' cru), que o 1º nível trata como separador
+    de opção — quebrando o caminho ('original_size' inválido). O colon precisa
+    de DUPLO backslash ('\\\\:') para sobreviver aos dois níveis:
+      2º nível: '\\\\:' -> '\\:'   (remove um backslash)
+      1º nível: '\\:'  -> ':'     (colon literal no filename)
+    No Windows também troca '\\' por '/' antes de escapar o colon do drive.
     """
     p = str(srt_path.resolve())
     if os.name == "nt":
         p = p.replace("\\", "/")
-    p = p.replace(":", "\\:")
+    p = p.replace(":", "\\\\:")
     return f"subtitles={p}"
 
 
