@@ -3,12 +3,17 @@
 Camada 1 (Opus Clip): Whisper real → HookDetector (regex) → CutPlanGenerator
                        → FFmpegRenderer com preset → output/agencia/<perfil>/<data>/
 
+Camada 2 (Acabamento): legenda QUEIMADA (burn-in via FFmpeg subtitles=),
+                        corte de silêncio (silenceremove filter), formato vertical.
+
 dry_run=True  → manifests JSON, nenhuma chamada Whisper/FFmpeg.
 dry_run=False → Whisper real + FFmpeg real.
 
 Uso:
     from src.agencia.pipeline import AgenciaPipeline
-    result = AgenciaPipeline(dry_run=False).run(Path("video.mp4"), perfil="lucastigrereal")
+    result = AgenciaPipeline(dry_run=False, burn_captions=True, remove_silence=True).run(
+        Path("video.mp4"), perfil="lucastigrereal"
+    )
 """
 from __future__ import annotations
 
@@ -27,6 +32,8 @@ from src.video_studio.cut_plan import CutPlanGenerator, CutSegment
 from src.video_studio.render_ffmpeg import FFmpegRenderer
 from src.video_studio.render_presets import RenderPresets, RenderPreset
 from src.video_studio.models import VideoSource, VideoSourceKind, TranscriptSegment
+from src.video_studio.srt_generator import SRTGenerator
+from src.agencia.silence_cutter import SilenceCutter
 
 logger = logging.getLogger("omnis.agencia")
 
@@ -53,6 +60,11 @@ class ClipResult:
     hook_score: float
     hook_reason: str
     dry_run: bool
+    # Camada 2
+    srt_path: Optional[Path] = None
+    silence_report: Optional[dict] = None
+    burn_captions: bool = False
+    remove_silence: bool = False
 
     def to_dict(self) -> dict:
         return {
@@ -65,6 +77,10 @@ class ClipResult:
             "hook_score": self.hook_score,
             "hook_reason": self.hook_reason,
             "dry_run": self.dry_run,
+            "srt_path": str(self.srt_path) if self.srt_path else None,
+            "silence_report": self.silence_report,
+            "burn_captions": self.burn_captions,
+            "remove_silence": self.remove_silence,
         }
 
 
@@ -131,12 +147,19 @@ class AgenciaPipeline:
         dry_run: bool = True,
         max_hooks: int = 10,
         transcription_adapter=None,
+        burn_captions: bool = True,
+        remove_silence: bool = False,
+        min_silence_gap: float = 0.5,
     ) -> None:
         self.dry_run = dry_run
+        self.burn_captions = burn_captions
+        self.remove_silence = remove_silence
         self._hook_detector = HookDetector(max_hooks=max_hooks)
         self._cut_generator = CutPlanGenerator()
         self._renderer = FFmpegRenderer()
         self._transcription_adapter = transcription_adapter
+        self._silence_cutter = SilenceCutter(min_silence_gap=min_silence_gap)
+        self._srt_generator = SRTGenerator()
 
     # ------------------------------------------------------------------
     # Public API
@@ -221,8 +244,10 @@ class AgenciaPipeline:
             )[:max_clips]
             logger.info("[agencia %s] %d cortes planejados", session_id, len(cut_segments))
 
-            # 4 — Renderização
-            clips = self._render_clips(cut_segments, video_path, output_dir, preset, hook_score_map)
+            # 4 — Renderização (all_segments alimenta SRT + relatório de silêncio da Camada 2)
+            clips = self._render_clips(
+                cut_segments, video_path, output_dir, preset, hook_score_map, segments
+            )
 
             result = AgenciaResult(
                 session_id=session_id,
@@ -316,17 +341,35 @@ class AgenciaPipeline:
         output_dir: Path,
         preset: Optional[RenderPreset],
         hook_score_map: dict,
+        all_segments: list,  # list[TranscriptSegment] — para SRT e silence
     ) -> list[ClipResult]:
         clips: list[ClipResult] = []
         for i, cs in enumerate(cut_segments, start=1):
             suffix = preset.output_suffix if preset else ""
             clip_path = output_dir / f"clip_{i:03d}{suffix}.mp4"
 
+            # Camada 2a — gera SRT ajustado para a janela do clipe
+            srt_path: Optional[Path] = None
+            srt_cuts = SRTGenerator.from_segments_in_window(
+                all_segments, cs.start_seconds, cs.end_seconds
+            )
+            if srt_cuts:
+                srt_path = output_dir / f"clip_{i:03d}.srt"
+                self._srt_generator.generate(srt_cuts, srt_path)
+
+            # Camada 2b — relatório de silêncio
+            sil_report = self._silence_cutter.silence_report(
+                all_segments, cs.start_seconds, cs.end_seconds
+            )
+
+            # Render — Camada 2 params passados ao renderer
             has_filters = preset and (preset.scale_filter or preset.crop_filter)
             if has_filters:
                 rendered = self._renderer.render_with_preset(
                     video_path, cs.start_seconds, cs.end_seconds, clip_path,
                     preset=preset, dry_run=self.dry_run,
+                    srt_path=srt_path if self.burn_captions else None,
+                    remove_silence=self.remove_silence,
                 )
             else:
                 rendered = self._renderer.render_cut(
@@ -345,6 +388,10 @@ class AgenciaPipeline:
                 hook_score=score,
                 hook_reason=reason,
                 dry_run=self.dry_run,
+                srt_path=srt_path,
+                silence_report=sil_report,
+                burn_captions=self.burn_captions and has_filters and srt_path is not None,
+                remove_silence=self.remove_silence,
             ))
         return clips
 

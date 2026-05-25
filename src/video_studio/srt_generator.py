@@ -38,6 +38,34 @@ class SRTGenerator:
         return output_path
 
     @staticmethod
+    def from_segments_in_window(
+        segments: list,  # list[TranscriptSegment]
+        clip_start: float,
+        clip_end: float,
+    ) -> list[dict]:
+        """Filtra segmentos dentro de [clip_start, clip_end] e ajusta timestamps.
+
+        Os timestamps no SRT gerado são relativos ao início do clipe (t=0),
+        pois o vídeo renderizado começa do zero, não de clip_start.
+        """
+        result: list[dict] = []
+        for seg in segments:
+            # Ignora segmentos fora da janela
+            if seg.end_seconds <= clip_start or seg.start_seconds >= clip_end:
+                continue
+            # Clipa às bordas da janela e ajusta para tempo relativo
+            adj_start = max(seg.start_seconds - clip_start, 0.0)
+            adj_end = min(seg.end_seconds - clip_start, clip_end - clip_start)
+            if adj_end <= adj_start:
+                continue
+            result.append({
+                "start": round(adj_start, 3),
+                "end": round(adj_end, 3),
+                "text": seg.text,
+            })
+        return result
+
+    @staticmethod
     def from_transcription(transcription_text: str, duration: float) -> list[dict]:
         """Split transcription_text into timed segments spread across duration."""
         if not transcription_text.strip() or duration <= 0:
