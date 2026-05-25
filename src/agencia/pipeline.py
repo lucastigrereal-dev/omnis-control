@@ -35,6 +35,9 @@ _OUTPUT_BASE = Path("output/agencia")
 # Apenas letras, dígitos, _ e - — sem ponto, barra, dois-pontos ou espaço.
 _PERFIL_SLUG_RE = re.compile(r"^[a-zA-Z0-9_-]+$")
 
+# Chars inseguros no stem do arquivo de vídeo (qualquer coisa fora de word chars, - e .)
+_STEM_UNSAFE_RE = re.compile(r"[^\w.-]")
+
 # Modelo Whisper padrão — pode ser sobreposto via env WHISPER_MODEL_SIZE
 _DEFAULT_WHISPER_MODEL = "small"  # tiny=rápido/impreciso, small=bom balanço, medium/large=melhor
 
@@ -149,6 +152,15 @@ class AgenciaPipeline:
             )
 
     @staticmethod
+    def _safe_stem(stem: str) -> str:
+        """Remove separadores de path do stem do vídeo, substitui por _."""
+        # Troca / \ e .. por _ para evitar traversal via nome de arquivo
+        safe = stem.replace("\\", "_").replace("/", "_")
+        safe = re.sub(r"\.{2,}", "_", safe)   # .. → _
+        safe = _STEM_UNSAFE_RE.sub("_", safe)
+        return safe or "video"
+
+    @staticmethod
     def _validate_output_dir(output_dir: Path) -> None:
         """Garante que o path resolvido fica dentro de _OUTPUT_BASE."""
         base = _OUTPUT_BASE.resolve()
@@ -175,7 +187,8 @@ class AgenciaPipeline:
 
         self._validate_perfil(perfil)
         preset = self._resolve_preset(preset_name)
-        output_dir = _OUTPUT_BASE / perfil / datetime.now().strftime("%Y-%m-%d") / video_path.stem
+        safe_stem = self._safe_stem(video_path.stem)
+        output_dir = _OUTPUT_BASE / perfil / datetime.now().strftime("%Y-%m-%d") / safe_stem
         self._validate_output_dir(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
 

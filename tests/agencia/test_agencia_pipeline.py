@@ -279,6 +279,43 @@ class TestPerfilSanitizacao:
                 AgenciaPipeline._validate_perfil(ataque)
 
 
+class TestStemSanitizacao:
+    """Stem do vídeo não pode causar traversal no output_dir."""
+
+    def test_stem_normal_preservado(self):
+        assert AgenciaPipeline._safe_stem("video_normal") == "video_normal"
+
+    def test_stem_com_espaco_vira_underscore(self):
+        assert AgenciaPipeline._safe_stem("Meu Video 2026") == "Meu_Video_2026"
+
+    def test_stem_vazio_vira_video(self):
+        assert AgenciaPipeline._safe_stem("") == "video"
+
+    def test_stem_traversal_dois_pontos_sanitizado(self):
+        safe = AgenciaPipeline._safe_stem("../../escape")
+        assert ".." not in safe
+        assert "/" not in safe
+        assert "\\" not in safe
+
+    def test_stem_traversal_tres_pontos_sanitizado(self):
+        safe = AgenciaPipeline._safe_stem("../../../escape")
+        assert ".." not in safe
+
+    def test_stem_traversal_barra_invertida_sanitizado(self):
+        safe = AgenciaPipeline._safe_stem("..\\..\\escape")
+        assert ".." not in safe
+        assert "\\" not in safe
+
+    def test_output_dir_com_stem_malicioso_fica_dentro_da_base(self, pipeline, fake_video, tmp_path):
+        # Mesmo que o stem viesse com ../ , após _safe_stem o output_dir fica seguro
+        stem_malicioso = "../../escape"
+        safe = AgenciaPipeline._safe_stem(stem_malicioso)
+        from src.agencia.pipeline import _OUTPUT_BASE
+        output_dir = _OUTPUT_BASE / "lucastigrereal" / "2026-05-25" / safe
+        # Não deve levantar — path está dentro da base
+        AgenciaPipeline._validate_output_dir(output_dir)
+
+
 class TestFFmpegRealModeFallback:
     """Garante que o FFmpegRenderer levanta RuntimeError quando ffmpeg está ausente em modo real."""
 
