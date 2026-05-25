@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import time
 import uuid
 from dataclasses import dataclass, field
@@ -30,6 +31,9 @@ from src.video_studio.models import VideoSource, VideoSourceKind, TranscriptSegm
 logger = logging.getLogger("omnis.agencia")
 
 _OUTPUT_BASE = Path("output/agencia")
+
+# Apenas letras, dígitos, _ e - — sem ponto, barra, dois-pontos ou espaço.
+_PERFIL_SLUG_RE = re.compile(r"^[a-zA-Z0-9_-]+$")
 
 # Modelo Whisper padrão — pode ser sobreposto via env WHISPER_MODEL_SIZE
 _DEFAULT_WHISPER_MODEL = "small"  # tiny=rápido/impreciso, small=bom balanço, medium/large=melhor
@@ -135,6 +139,27 @@ class AgenciaPipeline:
     # Public API
     # ------------------------------------------------------------------
 
+    @staticmethod
+    def _validate_perfil(perfil: str) -> None:
+        """Rejeita qualquer valor que não seja um slug seguro [a-zA-Z0-9_-]."""
+        if not _PERFIL_SLUG_RE.match(perfil):
+            raise ValueError(
+                f"perfil inválido {perfil!r} — use apenas letras, números, _ e - "
+                "(sem /, \\, .., :, espaço)"
+            )
+
+    @staticmethod
+    def _validate_output_dir(output_dir: Path) -> None:
+        """Garante que o path resolvido fica dentro de _OUTPUT_BASE."""
+        base = _OUTPUT_BASE.resolve()
+        resolved = output_dir.resolve()
+        try:
+            resolved.relative_to(base)
+        except ValueError:
+            raise ValueError(
+                f"output_dir {resolved} escapa de {base} — operação bloqueada por segurança"
+            )
+
     def run(
         self,
         video_path: Path,
@@ -148,8 +173,10 @@ class AgenciaPipeline:
         session_id = str(uuid.uuid4())[:8]
         video_path = Path(video_path)
 
+        self._validate_perfil(perfil)
         preset = self._resolve_preset(preset_name)
         output_dir = _OUTPUT_BASE / perfil / datetime.now().strftime("%Y-%m-%d") / video_path.stem
+        self._validate_output_dir(output_dir)
         output_dir.mkdir(parents=True, exist_ok=True)
 
         logger.info(

@@ -222,6 +222,96 @@ class TestRenderWithPreset:
             assert key in data, f"campo ausente: {key}"
 
 
+class TestPerfilSanitizacao:
+    """Testes regressivos de path traversal no parâmetro --perfil."""
+
+    def test_perfil_valido_aceito(self, pipeline, fake_video):
+        result = pipeline.run(fake_video, perfil="lucastigrereal")
+        assert result.perfil == "lucastigrereal"
+
+    def test_perfil_com_hifen_e_underscore_aceito(self, pipeline, fake_video):
+        result = pipeline.run(fake_video, perfil="oi-natal_rn")
+        assert result.perfil == "oi-natal_rn"
+
+    def test_perfil_path_traversal_barra_dupla_rejeitado(self, mock_adapter, fake_video):
+        p = AgenciaPipeline(dry_run=True, transcription_adapter=mock_adapter)
+        with pytest.raises(ValueError, match="perfil inválido"):
+            p.run(fake_video, perfil="../../escape")
+
+    def test_perfil_path_traversal_barra_simples_rejeitado(self, mock_adapter, fake_video):
+        p = AgenciaPipeline(dry_run=True, transcription_adapter=mock_adapter)
+        with pytest.raises(ValueError, match="perfil inválido"):
+            p.run(fake_video, perfil="../escape")
+
+    def test_perfil_barra_invertida_rejeitado(self, mock_adapter, fake_video):
+        p = AgenciaPipeline(dry_run=True, transcription_adapter=mock_adapter)
+        with pytest.raises(ValueError, match="perfil inválido"):
+            p.run(fake_video, perfil="..\\..\\escape")
+
+    def test_perfil_dois_pontos_rejeitado(self, mock_adapter, fake_video):
+        p = AgenciaPipeline(dry_run=True, transcription_adapter=mock_adapter)
+        with pytest.raises(ValueError, match="perfil inválido"):
+            p.run(fake_video, perfil="C:\\Windows\\System32")
+
+    def test_perfil_ponto_rejeitado(self, mock_adapter, fake_video):
+        p = AgenciaPipeline(dry_run=True, transcription_adapter=mock_adapter)
+        with pytest.raises(ValueError, match="perfil inválido"):
+            p.run(fake_video, perfil="perfil.com.ponto")
+
+    def test_perfil_vazio_rejeitado(self, mock_adapter, fake_video):
+        p = AgenciaPipeline(dry_run=True, transcription_adapter=mock_adapter)
+        with pytest.raises(ValueError, match="perfil inválido"):
+            p.run(fake_video, perfil="")
+
+    def test_perfil_espaco_rejeitado(self, mock_adapter, fake_video):
+        p = AgenciaPipeline(dry_run=True, transcription_adapter=mock_adapter)
+        with pytest.raises(ValueError, match="perfil inválido"):
+            p.run(fake_video, perfil="perfil com espaco")
+
+    def test_validate_perfil_metodo_direto(self):
+        AgenciaPipeline._validate_perfil("lucastigrereal")
+        AgenciaPipeline._validate_perfil("oi-natal_rn")
+        AgenciaPipeline._validate_perfil("ABC123")
+
+    def test_validate_perfil_rejeita_ataques_direto(self):
+        for ataque in ["../../escape", "../..", "C:\\escape", "/etc/passwd", "a b", "a.b"]:
+            with pytest.raises(ValueError, match="perfil inválido"):
+                AgenciaPipeline._validate_perfil(ataque)
+
+
+class TestFFmpegRealModeFallback:
+    """Garante que o FFmpegRenderer levanta RuntimeError quando ffmpeg está ausente em modo real."""
+
+    def test_render_cut_sem_ffmpeg_levanta(self, tmp_path, monkeypatch):
+        from src.video_studio.render_ffmpeg import FFmpegRenderer
+        renderer = FFmpegRenderer()
+        monkeypatch.setattr(FFmpegRenderer, "is_ffmpeg_available", staticmethod(lambda: False))
+        with pytest.raises(RuntimeError, match="ffmpeg não encontrado"):
+            renderer.render_cut(
+                tmp_path / "v.mp4", 0.0, 5.0, tmp_path / "out.mp4", dry_run=False
+            )
+
+    def test_render_with_preset_sem_ffmpeg_levanta(self, tmp_path, monkeypatch):
+        from src.video_studio.render_ffmpeg import FFmpegRenderer
+        from src.video_studio.render_presets import RenderPresets
+        renderer = FFmpegRenderer()
+        monkeypatch.setattr(FFmpegRenderer, "is_ffmpeg_available", staticmethod(lambda: False))
+        with pytest.raises(RuntimeError, match="ffmpeg não encontrado"):
+            renderer.render_with_preset(
+                tmp_path / "v.mp4", 0.0, 5.0, tmp_path / "out.mp4",
+                preset=RenderPresets.REEL, dry_run=False,
+            )
+
+    def test_render_cut_dry_run_nao_levanta_sem_ffmpeg(self, tmp_path, monkeypatch):
+        from src.video_studio.render_ffmpeg import FFmpegRenderer
+        renderer = FFmpegRenderer()
+        monkeypatch.setattr(FFmpegRenderer, "is_ffmpeg_available", staticmethod(lambda: False))
+        result = renderer.render_cut(
+            tmp_path / "v.mp4", 0.0, 5.0, tmp_path / "out.mp4", dry_run=True
+        )
+        assert result.suffix == ".json"
+
+
 class TestWhisperToSegments:
     """Testa a conversão de dicts Whisper → TranscriptSegment."""
 

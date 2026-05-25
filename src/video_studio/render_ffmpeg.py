@@ -25,9 +25,7 @@ class FFmpegRenderer:
         output_path: Path,
         dry_run: bool = True,
     ) -> Path:
-        if dry_run or not self.is_ffmpeg_available():
-            if not dry_run:
-                logger.warning("ffmpeg not found — falling back to dry_run manifest")
+        if dry_run:
             manifest = {
                 "dry_run": True,
                 "video_path": str(video_path),
@@ -41,6 +39,11 @@ class FFmpegRenderer:
             manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
             return manifest_path
 
+        if not self.is_ffmpeg_available():
+            raise RuntimeError(
+                "ffmpeg não encontrado — instale ffmpeg para usar --no-dry-run"
+            )
+
         output_path.parent.mkdir(parents=True, exist_ok=True)
         cmd = [
             "ffmpeg", "-y",
@@ -50,12 +53,7 @@ class FFmpegRenderer:
             "-c", "copy",
             str(output_path),
         ]
-        try:
-            subprocess.run(cmd, check=True, capture_output=True)
-        except subprocess.CalledProcessError as exc:
-            logger.warning("ffmpeg render failed (%s) — falling back to manifest", exc)
-            return self.render_cut(video_path, start, end, output_path, dry_run=True)
-
+        subprocess.run(cmd, check=True, capture_output=True)
         return output_path
 
     def render_with_preset(
@@ -69,11 +67,10 @@ class FFmpegRenderer:
     ) -> Path:
         """Render a cut applying scale/crop/fps from a RenderPreset.
 
-        Falls back to manifest JSON when dry_run=True or ffmpeg unavailable.
+        dry_run=True → manifesto JSON (sem chamar FFmpeg).
+        dry_run=False → FFmpeg real; levanta RuntimeError se indisponível ou falhar.
         """
-        if dry_run or not self.is_ffmpeg_available():
-            if not dry_run:
-                logger.warning("ffmpeg not found — falling back to dry_run manifest")
+        if dry_run:
             manifest = {
                 "dry_run": True,
                 "video_path": str(video_path),
@@ -87,6 +84,11 @@ class FFmpegRenderer:
             manifest_path.parent.mkdir(parents=True, exist_ok=True)
             manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
             return manifest_path
+
+        if not self.is_ffmpeg_available():
+            raise RuntimeError(
+                "ffmpeg não encontrado — instale ffmpeg para usar --no-dry-run"
+            )
 
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -107,11 +109,5 @@ class FFmpegRenderer:
             cmd += ["-c", "copy"]
 
         cmd.append(str(output_path))
-
-        try:
-            subprocess.run(cmd, check=True, capture_output=True)
-        except subprocess.CalledProcessError as exc:
-            logger.warning("ffmpeg preset render failed (%s) — manifest fallback", exc)
-            return self.render_with_preset(video_path, start, end, output_path, preset, dry_run=True)
-
+        subprocess.run(cmd, check=True, capture_output=True)
         return output_path
