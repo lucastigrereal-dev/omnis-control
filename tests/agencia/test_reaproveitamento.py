@@ -249,3 +249,121 @@ def _patch_formato_result():
 
 
 _patch_formato_result()
+
+
+# ------------------------------------------------------------------
+# TestConversaoReal — Requer FFmpeg instalado
+# ------------------------------------------------------------------
+
+class TestConversaoReal:
+    """Testes que validam conversão real com mock de FFmpeg.
+
+    Simula FFmpeg criando um arquivo .mp4 fictício mas válido,
+    sem depender de instalação real de FFmpeg (que pode ter issues).
+    """
+
+    SAMPLE_VIDEO = Path(__file__).parent.parent / "video_studio" / "fixtures" / "sample.mp4"
+
+    @pytest.fixture(autouse=True)
+    def check_sample_video_exists(self):
+        """Skip se video fixture não existe."""
+        if not self.SAMPLE_VIDEO.exists():
+            pytest.skip(f"Vídeo fixture não encontrado: {self.SAMPLE_VIDEO}")
+
+    def _mock_ffmpeg_success(self, cmd, **kwargs):
+        """Mock de subprocess.run que simula FFmpeg criando arquivo válido."""
+        # Busca o path de output (último argumento da cmd ffmpeg)
+        if isinstance(cmd, list) and cmd[0] == "ffmpeg" and len(cmd) > 0:
+            output_path = Path(cmd[-1])
+            # Cria arquivo com conteúdo mínimo
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            output_path.write_bytes(b"fake_mp4_" + b"x" * 1024)
+        # Simula sucesso
+        return MagicMock(returncode=0)
+
+    def test_dry_run_false_mock_cria_arquivo_reel(self, tmp_path):
+        """dry_run=False com mock: deve criar arquivo .mp4 e reportar ok."""
+        reap = ReaproveitadorDeVideo(dry_run=False)
+
+        with patch("subprocess.run", side_effect=self._mock_ffmpeg_success):
+            result = reap.reaproveitamento(
+                self.SAMPLE_VIDEO,
+                formatos=["reel"],
+                output_dir=tmp_path,
+            )
+
+        assert len(result.formatos) == 1
+        fr = result.formatos[0]
+
+        # Mock funciona: arquivo foi criado
+        assert fr.status == "ok"
+        output_file = Path(fr.output_path)
+        assert output_file.exists()
+        assert output_file.stat().st_size > 0
+
+    def test_dry_run_false_mock_cria_multiplos(self, tmp_path):
+        """dry_run=False com mock: múltiplos formatos geram múltiplos arquivos."""
+        reap = ReaproveitadorDeVideo(dry_run=False)
+
+        with patch("subprocess.run", side_effect=self._mock_ffmpeg_success):
+            result = reap.reaproveitamento(
+                self.SAMPLE_VIDEO,
+                formatos=["reel", "feed"],
+                output_dir=tmp_path,
+            )
+
+        assert len(result.formatos) == 2
+        for fr in result.formatos:
+            assert fr.status == "ok"
+            output_file = Path(fr.output_path)
+            assert output_file.exists()
+            assert output_file.stat().st_size > 0
+
+    def test_dry_run_false_mock_valida_arquivo_criado(self, tmp_path):
+        """dry_run=False: valida que arquivo foi criado antes de retornar ok."""
+        reap = ReaproveitadorDeVideo(dry_run=False)
+
+        def _mock_without_file(*args, **kwargs):
+            """Mock que NÃO cria arquivo."""
+            return MagicMock(returncode=0)
+
+        with patch("subprocess.run", side_effect=_mock_without_file):
+            result = reap.reaproveitamento(
+                self.SAMPLE_VIDEO,
+                formatos=["reel"],
+                output_dir=tmp_path,
+            )
+
+        # Sem arquivo criado, status deve ser 'skip' ou 'fail' (erro controlado)
+        fr = result.formatos[0]
+        # A validação que adicionamos gera uma exceção → capturada → status fail ou skip
+        assert fr.status != "ok", "Deveria falhar ou ser skip quando arquivo não existe"
+
+    def test_dry_run_false_mock_manifest_registra_status(self, tmp_path):
+        """dry_run=False com mock: manifest.json registra status='ok'."""
+        reap = ReaproveitadorDeVideo(dry_run=False)
+
+        with patch("subprocess.run", side_effect=self._mock_ffmpeg_success):
+            result = reap.reaproveitamento(
+                self.SAMPLE_VIDEO,
+                formatos=["reel"],
+                output_dir=tmp_path,
+            )
+
+        data = json.loads(Path(result.manifest_path).read_text())
+        assert data["dry_run"] is False
+        assert data["formatos"][0]["status"] == "ok"
+
+    def test_dry_run_false_mock_diferentes_outputs(self, tmp_path):
+        """dry_run=False: cada formato gera output_path diferente."""
+        reap = ReaproveitadorDeVideo(dry_run=False)
+
+        with patch("subprocess.run", side_effect=self._mock_ffmpeg_success):
+            result = reap.reaproveitamento(
+                self.SAMPLE_VIDEO,
+                formatos=["reel", "feed"],
+                output_dir=tmp_path,
+            )
+
+        paths = [fr.output_path for fr in result.formatos]
+        assert len(set(paths)) == 2

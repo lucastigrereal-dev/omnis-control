@@ -272,6 +272,13 @@ class ReaproveitadorDeVideo:
         # Real: chama FFmpeg
         try:
             self._run_ffmpeg(video_path, fmt, cfg, output_path)
+
+            # Valida se arquivo foi realmente criado no disco
+            if not output_path.exists():
+                raise FileNotFoundError(
+                    f"FFmpeg não criou arquivo: {output_path}"
+                )
+
             # Tenta medir duração real
             real_dur = self._probe_duration(output_path)
             return FormatoResult(
