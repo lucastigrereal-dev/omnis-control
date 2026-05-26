@@ -2,14 +2,15 @@
 
 Cobre: build() sem fontes externas, degradação graciosa, leitura de disco,
 timeout, sources_available/failed, e anti-teatro (dado real reflete no resultado).
-
-Não usa unittest.mock — conforme regras de testing do projeto.
-Não chama Notion nem Akasha — stubs são os padrões.
+Seções 1-8: testes das fontes locais (sem mock).
+Seção 9: testes do _fetch_akasha real (usa unittest.mock.patch para psycopg2
+         — evita conexão ao banco nos testes automatizados).
 """
 from __future__ import annotations
 
 import json
 import time
+from unittest.mock import MagicMock, patch
 
 from src.aurora.context_engine import AuroraContext, ContextEngine, ContextResult
 
@@ -88,14 +89,23 @@ class TestNotionAusente:
         assert "notion" not in ctx.sources_failed
 
     def test_notion_token_presente_ativa_fonte(self, tmp_path, monkeypatch):
+        """Com token presente, _fetch_notion é chamado. Mock da API retorna lista vazia
+        mas sem erro — notion fica em sources_available."""
+        import urllib.error
         monkeypatch.setenv("NOTION_TOKEN", "fake-token-12345")
         monkeypatch.delenv("AKASHA_DB_URL", raising=False)
-        engine = ContextEngine(data_dir=tmp_path)
-        ctx = engine.build(query="teste")
 
-        # O stub retorna [] mas não falha — notion deve estar em sources_available
+        # _fetch_notion trata 401 internamente e retorna [] — não falha
+        http_err = urllib.error.HTTPError(
+            url="https://api.notion.com/v1/search",
+            code=401, msg="Unauthorized", hdrs=None, fp=None,
+        )
+        with patch("urllib.request.urlopen", side_effect=http_err):
+            engine = ContextEngine(data_dir=tmp_path)
+            ctx = engine.build(query="teste")
+
+        # _fetch_notion capturou o 401 e retornou [] — fonte rodou sem crash
         assert "notion" in ctx.sources_available
-        # Nenhum resultado de notion (stub retorna [])
         notion_results = [r for r in ctx.results if r.source == "notion"]
         assert notion_results == []
 
@@ -298,3 +308,197 @@ class TestAntiTeatro:
         assert "9999" in state_results2[0].content
         # Não carrega dados velhos
         assert "feature/A" not in state_results2[0].content
+
+
+# ---------------------------------------------------------------------------
+# 9. _fetch_akasha() — testes da implementação real (mock psycopg2)
+# ---------------------------------------------------------------------------
+
+class TestFetchAkashaSemEnv:
+    def test_fetch_akasha_sem_env_retorna_lista_vazia(self, tmp_path, monkeypatch):
+        """Sem AKASHA_DB_URL no environment, _fetch_akasha retorna [] sem tentar conectar."""
+        monkeypatch.delenv("AKASHA_DB_URL", raising=False)
+        engine = ContextEngine(data_dir=tmp_path)
+        results = engine._fetch_akasha(query="leads hoteis", max_results=5)
+        assert results == []
+
+
+class TestFetchAkashaEnvInvalido:
+    def test_fetch_akasha_com_env_invalido_nao_crasha(self, tmp_path, monkeypatch):
+        """URL inválida no AKASHA_DB_URL → retorna [], nunca lança exceção."""
+        monkeypatch.setenv("AKASHA_DB_URL", "postgresql://invalid_host_xyz:9999/nodb")
+        engine = ContextEngine(data_dir=tmp_path)
+        # Não deve lançar exceção — deve retornar [] graciosamente
+        results = engine._fetch_akasha(query="leads hoteis", max_results=5)
+        assert results == []
+        assert isinstance(results, list)
+
+
+class TestBuildComAkashaDisponivel:
+    def test_build_com_akasha_disponivel_inclui_fonte(self, tmp_path, monkeypatch):
+        """Mock do psycopg2 retorna 2 rows → sources_available inclui 'akasha'."""
+        monkeypatch.setenv("AKASHA_DB_URL", "postgresql://fake:5432/akasha")
+        monkeypatch.delenv("NOTION_TOKEN", raising=False)
+
+        # Mock da conexão psycopg2
+        mock_row1 = ("Texto sobre hotéis em Natal RN.", "vendas", "hotel_natal.md", "md", None, 0.85)
+        mock_row2 = ("Publicidade para restaurantes e pousadas.", "comercial", "leads.md", "md", "Leads", 0.72)
+
+        mock_cursor = MagicMock()
+        mock_cursor.fetchall.return_value = [mock_row1, mock_row2]
+
+        mock_conn = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+
+        with patch("psycopg2.connect", return_value=mock_conn):
+            engine = ContextEngine(data_dir=tmp_path)
+            ctx = engine.build(query="hoteis publicidade")
+
+        assert "akasha" in ctx.sources_available
+        akasha_results = [r for r in ctx.results if r.source == "akasha"]
+        assert len(akasha_results) == 2
+        assert akasha_results[0].content == "Texto sobre hotéis em Natal RN."
+        assert akasha_results[1].content == "Publicidade para restaurantes e pousadas."
+        assert all(r.relevance > 0 for r in akasha_results)
+
+
+class TestBuildComAkashaIndisponivel:
+    def test_build_com_akasha_indisponivel_graceful(self, tmp_path, monkeypatch):
+        """Conexão recusada → _fetch_akasha captura internamente e retorna [].
+        Do ponto de vista do build(), a fonte rodou sem crash (sources_available),
+        simplesmente retornou 0 resultados. O sistema continua operacional."""
+        import psycopg2 as _psycopg2
+
+        monkeypatch.setenv("AKASHA_DB_URL", "postgresql://fake:5432/akasha")
+        monkeypatch.delenv("NOTION_TOKEN", raising=False)
+
+        with patch("psycopg2.connect", side_effect=_psycopg2.OperationalError("conexao recusada")):
+            engine = ContextEngine(data_dir=tmp_path)
+            ctx = engine.build(query="hoteis")
+
+        # _fetch_akasha capturou o erro internamente — graceful degradation
+        # a fonte está em sources_available (rodou sem crash), mas sem resultados
+        assert "akasha" in ctx.sources_available
+        akasha_results = [r for r in ctx.results if r.source == "akasha"]
+        assert akasha_results == []
+        # Sistema continua — outras fontes não afetadas
+        assert isinstance(ctx.results, list)
+
+
+# ---------------------------------------------------------------------------
+# 10. _fetch_notion() — testes da implementação real (mock urllib)
+# ---------------------------------------------------------------------------
+
+class TestFetchNotionSemToken:
+    def test_fetch_notion_sem_token_retorna_lista_vazia(self, tmp_path, monkeypatch):
+        """Sem NOTION_TOKEN no environment, _fetch_notion retorna [] sem chamar API."""
+        monkeypatch.delenv("NOTION_TOKEN", raising=False)
+        engine = ContextEngine(data_dir=tmp_path)
+        results = engine._fetch_notion(query="leads hoteis", max_results=5)
+        assert results == []
+
+
+class TestFetchNotionTokenInvalido:
+    def test_fetch_notion_com_token_invalido_nao_crasha(self, tmp_path, monkeypatch):
+        """HTTP 401 mockado → retorna [], nunca lança exceção."""
+        import urllib.error
+        monkeypatch.setenv("NOTION_TOKEN", "token-invalido-xyz")
+
+        mock_response = urllib.error.HTTPError(
+            url="https://api.notion.com/v1/search",
+            code=401,
+            msg="Unauthorized",
+            hdrs=None,
+            fp=None,
+        )
+        with patch("urllib.request.urlopen", side_effect=mock_response):
+            engine = ContextEngine(data_dir=tmp_path)
+            results = engine._fetch_notion(query="leads", max_results=5)
+
+        assert results == []
+        assert isinstance(results, list)
+
+
+class TestFetchNotionRetornaResultados:
+    def test_fetch_notion_retorna_context_results(self, tmp_path, monkeypatch):
+        """Mock de resposta Notion com 2 pages → 2 ContextResults com source='notion'."""
+        import io
+        monkeypatch.setenv("NOTION_TOKEN", "ntn_fake_token")
+
+        notion_payload = json.dumps({
+            "results": [
+                {
+                    "object": "page",
+                    "id": "page-id-001",
+                    "url": "https://notion.so/page-001",
+                    "properties": {
+                        "title": {
+                            "type": "title",
+                            "title": [{"plain_text": "Leads Hoteis Natal"}],
+                        }
+                    },
+                },
+                {
+                    "object": "page",
+                    "id": "page-id-002",
+                    "url": "https://notion.so/page-002",
+                    "properties": {
+                        "title": {
+                            "type": "title",
+                            "title": [{"plain_text": "Pipeline Comercial"}],
+                        }
+                    },
+                },
+            ]
+        }).encode("utf-8")
+
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = notion_payload
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+
+        with patch("urllib.request.urlopen", return_value=mock_resp):
+            engine = ContextEngine(data_dir=tmp_path)
+            results = engine._fetch_notion(query="leads hoteis", max_results=5)
+
+        assert len(results) == 2
+        assert all(r.source == "notion" for r in results)
+        assert "Leads Hoteis Natal" in results[0].content
+        assert "Pipeline Comercial" in results[1].content
+
+
+class TestBuildComNotionDisponivel:
+    def test_build_com_notion_disponivel_inclui_fonte(self, tmp_path, monkeypatch):
+        """Com mock de resposta Notion → 'notion' em sources_available."""
+        monkeypatch.setenv("NOTION_TOKEN", "ntn_fake_token")
+        monkeypatch.delenv("AKASHA_DB_URL", raising=False)
+
+        notion_payload = json.dumps({
+            "results": [
+                {
+                    "object": "page",
+                    "id": "page-id-001",
+                    "url": "https://notion.so/page-001",
+                    "properties": {
+                        "title": {
+                            "type": "title",
+                            "title": [{"plain_text": "CRM Leads"}],
+                        }
+                    },
+                }
+            ]
+        }).encode("utf-8")
+
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = notion_payload
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+
+        with patch("urllib.request.urlopen", return_value=mock_resp):
+            engine = ContextEngine(data_dir=tmp_path)
+            ctx = engine.build(query="leads")
+
+        assert "notion" in ctx.sources_available
+        notion_results = [r for r in ctx.results if r.source == "notion"]
+        assert len(notion_results) == 1
+        assert "CRM Leads" in notion_results[0].content

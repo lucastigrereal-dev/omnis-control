@@ -247,51 +247,225 @@ class ContextEngine:
     # ------------------------------------------------------------------
 
     def _fetch_notion(self, query: str, max_results: int) -> list[ContextResult]:
-        """Busca contexto no Notion.
+        """Busca contexto no Notion via REST API (urllib stdlib, sem dependências).
 
-        STUB — Frente 1 implementa este método.
-
-        Contrato esperado:
         - Usa NOTION_TOKEN do environment (já checado antes de chamar)
-        - Retorna lista[ContextResult] com source="notion"
-        - Nunca lança exceção — falha silenciosa (retorna [])
-        - Timeout interno recomendado: 4s (abaixo do timeout do ThreadPoolExecutor)
-
-        Interface para Frente 1:
-            notion_client = Client(auth=os.environ["NOTION_TOKEN"])
-            results = notion_client.search(query=query, page_size=max_results)
-            # Para cada resultado, construir ContextResult(source="notion", ...)
+        - POST https://api.notion.com/v1/search com query
+        - Extrai título de cada page/database retornado
+        - Retorna [] se sem resultados, sem páginas compartilhadas ou falha de rede
+        - Nunca lança exceção — toda falha é silenciosa
+        - Timeout: 8s (API externa)
         """
-        _logger.info(
-            "context_engine: _fetch_notion stub chamado (query=%r, max=%d) — "
-            "aguardando implementação da Frente 1",
-            query,
-            max_results,
+        import urllib.request
+        import urllib.error
+
+        token = os.environ.get("NOTION_TOKEN", "")
+        if not token:
+            return []
+
+        payload = json.dumps({
+            "query": query,
+            "page_size": max(1, min(max_results, 20)),
+        }).encode("utf-8")
+
+        req = urllib.request.Request(
+            "https://api.notion.com/v1/search",
+            data=payload,
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Notion-Version": "2022-06-28",
+                "Content-Type": "application/json",
+            },
+            method="POST",
         )
-        return []
+
+        try:
+            with urllib.request.urlopen(req, timeout=8) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            _logger.warning(
+                "context_engine: Notion HTTP %d — %s", exc.code, exc.reason
+            )
+            return []
+        except Exception as exc:  # noqa: BLE001
+            _logger.warning("context_engine: Notion falhou (%s: %s) — ignorado", type(exc).__name__, exc)
+            return []
+
+        results: list[ContextResult] = []
+        for item in data.get("results", []):
+            obj_type = item.get("object", "")
+            item_id = item.get("id", "")
+
+            # Extrai título — formato varia entre page e database
+            title = ""
+            props = item.get("properties", {})
+            for prop in props.values():
+                ptype = prop.get("type", "")
+                if ptype == "title":
+                    parts = prop.get("title", [])
+                    title = "".join(p.get("plain_text", "") for p in parts)
+                    break
+            if not title:
+                # Databases têm title no top-level
+                for part in item.get("title", []):
+                    title += part.get("plain_text", "")
+
+            if not title:
+                title = f"[{obj_type} sem título]"
+
+            # Monta conteúdo: título + URL da página
+            url = item.get("url", "")
+            content = f"{title}"
+            if url:
+                content += f" ({url})"
+
+            results.append(
+                ContextResult(
+                    source="notion",
+                    content=content,
+                    relevance=1.0,
+                    metadata={"id": item_id, "type": obj_type, "url": url},
+                )
+            )
+
+        _logger.debug(
+            "context_engine: Notion retornou %d resultados para query=%r",
+            len(results),
+            query,
+        )
+        return results
 
     def _fetch_akasha(self, query: str, max_results: int) -> list[ContextResult]:
-        """Busca contexto no Akasha (pgvector).
+        """Busca contexto no Akasha via full-text search (tsvector) no pgvector DB.
 
-        STUB — Frente 2 implementa este método.
-
-        Contrato esperado:
-        - Usa AKASHA_DB_URL do environment (já checado antes de chamar)
-        - Retorna lista[ContextResult] com source="akasha"
-        - Nunca lança exceção — falha silenciosa (retorna [])
-        - Timeout interno recomendado: 4s (abaixo do timeout do ThreadPoolExecutor)
-
-        Interface para Frente 2 (psycopg2 / pgvector):
-            conn = psycopg2.connect(os.environ["AKASHA_DB_URL"])
-            # SELECT content, 1-(embedding <=> %s::vector) AS score
-            #   FROM documents ORDER BY score DESC LIMIT %s
-            # Para cada linha, construir ContextResult(source="akasha",
-            #     content=row.content, relevance=row.score, ...)
+        Princípios:
+        - Checar AKASHA_DB_URL via os.getenv — se ausente retorna [] (graceful)
+        - Conectar com connect_timeout=3s para não bloquear o ThreadPoolExecutor
+        - Busca FTS em document_chunks.tsv (tsvector indexado) + join em documents
+        - Fallback ILIKE se FTS não retornar resultados
+        - Fechar conexão sempre (try/finally)
+        - Nunca lança exceção — toda falha retorna [] com log
+        - Nunca inventa dado: banco vazio ou query sem match → retorna []
         """
-        _logger.info(
-            "context_engine: _fetch_akasha stub chamado (query=%r, max=%d) — "
-            "aguardando implementação da Frente 2",
-            query,
-            max_results,
-        )
-        return []
+        db_url = os.environ.get("AKASHA_DB_URL")
+        if not db_url:
+            _logger.debug("context_engine: AKASHA_DB_URL ausente — akasha ignorado")
+            return []
+
+        try:
+            import psycopg2  # import local para não quebrar se psycopg2 não instalado
+        except ImportError:
+            _logger.warning("context_engine: psycopg2 não instalado — akasha ignorado")
+            return []
+
+        conn = None
+        try:
+            conn = psycopg2.connect(db_url, connect_timeout=3)
+            cur = conn.cursor()
+            cur.execute("SET statement_timeout = 5000")  # 5s por query (psycopg2 API)
+
+            results: list[ContextResult] = []
+
+            # Estratégia 1: full-text search via tsvector (coluna indexada)
+            # Usa 'simple' para aceitar qualquer idioma sem stemming agressivo
+            if query.strip():
+                try:
+                    cur.execute(
+                        """
+                        SELECT
+                            dc.chunk_text,
+                            d.domain,
+                            d.file_name,
+                            d.file_type,
+                            dc.section_title,
+                            ts_rank(dc.tsv, plainto_tsquery('simple', %(q)s)) AS rank
+                        FROM document_chunks dc
+                        JOIN documents d ON dc.document_id = d.id
+                        WHERE dc.tsv @@ plainto_tsquery('simple', %(q)s)
+                        ORDER BY rank DESC
+                        LIMIT %(limit)s
+                        """,
+                        {"q": query, "limit": max_results},
+                    )
+                    rows = cur.fetchall()
+                    for row in rows:
+                        chunk_text, domain, file_name, file_type, section_title, rank = row
+                        if not chunk_text:
+                            continue
+                        results.append(
+                            ContextResult(
+                                source="akasha",
+                                content=str(chunk_text),
+                                relevance=float(rank) if rank else 0.5,
+                                metadata={
+                                    "domain": domain,
+                                    "file_name": file_name,
+                                    "file_type": file_type,
+                                    "section_title": section_title,
+                                    "strategy": "fts_tsvector",
+                                },
+                            )
+                        )
+                except Exception as exc:  # noqa: BLE001
+                    _logger.debug("context_engine: akasha FTS falhou (%s) — sem resultados", exc)
+
+            # Estratégia 2: ILIKE fallback se FTS não retornou nada e query não está vazia
+            if not results and query.strip():
+                try:
+                    cur.execute(
+                        """
+                        SELECT
+                            dc.chunk_text,
+                            d.domain,
+                            d.file_name,
+                            d.file_type,
+                            dc.section_title
+                        FROM document_chunks dc
+                        JOIN documents d ON dc.document_id = d.id
+                        WHERE dc.chunk_text ILIKE %(pattern)s
+                        LIMIT %(limit)s
+                        """,
+                        {"pattern": f"%{query}%", "limit": max_results},
+                    )
+                    rows = cur.fetchall()
+                    for row in rows:
+                        chunk_text, domain, file_name, file_type, section_title = row
+                        if not chunk_text:
+                            continue
+                        results.append(
+                            ContextResult(
+                                source="akasha",
+                                content=str(chunk_text),
+                                relevance=0.5,
+                                metadata={
+                                    "domain": domain,
+                                    "file_name": file_name,
+                                    "file_type": file_type,
+                                    "section_title": section_title,
+                                    "strategy": "ilike_fallback",
+                                },
+                            )
+                        )
+                except Exception as exc:  # noqa: BLE001
+                    _logger.debug("context_engine: akasha ILIKE falhou (%s) — sem resultados", exc)
+
+            _logger.debug(
+                "context_engine: akasha retornou %d resultados para query=%r",
+                len(results),
+                query,
+            )
+            return results
+
+        except Exception as exc:  # noqa: BLE001
+            _logger.warning(
+                "context_engine: akasha conexao falhou (%s: %s) — retornando []",
+                type(exc).__name__,
+                exc,
+            )
+            return []
+        finally:
+            if conn is not None:
+                try:
+                    conn.close()
+                except Exception:  # noqa: BLE001
+                    pass
