@@ -140,6 +140,61 @@ class PublerBatchExporter:
         header_line = ",".join(headers)
         return header_line + "\n" + "\n".join(rows)
 
+    def export_batch_to_disk(self, batch_id: str, output_path: Path | str) -> Path:
+        """Export batch as CSV file to disk.
+
+        Args:
+            batch_id:    ID of the batch to export
+            output_path: Directory or file path. If directory, uses batch_id.csv.
+
+        Returns:
+            Path to the created CSV file.
+
+        Raises:
+            ValueError: If batch not found or has no items.
+        """
+        output_path = Path(output_path)
+
+        batch = self.batches.get(batch_id)
+        if batch is None or not batch.items:
+            raise ValueError(f"Batch {batch_id} not found or has no items")
+
+        # Determine if output_path is a directory or file
+        # If it doesn't exist yet, treat as file unless it ends with separator
+        if output_path.exists() and output_path.is_dir():
+            csv_file = output_path / f"{batch_id}.csv"
+        elif output_path.suffix:  # Has a file extension
+            csv_file = output_path
+        elif str(output_path).endswith(("/", "\\")):  # Ends with path separator
+            csv_file = output_path / f"{batch_id}.csv"
+        else:
+            # Assume file if no extension and doesn't exist
+            csv_file = output_path if output_path.suffix else output_path.with_suffix(".csv")
+            # Actually, if it looks like a directory path, treat as such
+            if not output_path.suffix:
+                csv_file = output_path / f"{batch_id}.csv"
+
+        # Create parent directories if needed
+        csv_file.parent.mkdir(parents=True, exist_ok=True)
+
+        # Prepare rows for CSV
+        headers = ["item_id", "caption", "account_handle", "platform", "media_url", "hashtags", "schedule_iso"]
+        rows = []
+        for item in batch.items:
+            row_dict = item.to_dict()
+            row_dict["hashtags"] = " ".join(item.hashtags)
+            rows.append(row_dict)
+
+        # Write CSV using csv.DictWriter
+        import csv
+        with csv_file.open("w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=headers)
+            writer.writeheader()
+            for row in rows:
+                writer.writerow({h: row.get(h, "") for h in headers})
+
+        return csv_file
+
     def to_dict(self) -> dict:
         return {
             "dry_run": self.dry_run,
