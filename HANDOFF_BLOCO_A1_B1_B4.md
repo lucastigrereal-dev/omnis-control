@@ -54,11 +54,14 @@ rename da nova classe para `PublerZipExporter`. Retrocompatível.
 
 ---
 
-### PRÓXIMA FILA (BLOCO A — sequencial)
+### BLOCO A — COMPLETO ✅
 
-- **A2** — `src/aurora/recovery.py` — fio mental (project_resume): onde parou, próximo passo
-- **A3** — `src/aurora/guardrail.py` — regra de permissão em código, bloqueia ação perigosa
-- **A4** — `src/aurora/voice.py` — tom Tigre (corpus legendas), insight personalizado
+| Item | Arquivo | Testes | Commit |
+|------|---------|--------|--------|
+| A1 | `src/aurora/priority.py` | 36/36 | `0e5c96d` |
+| A2 | `src/aurora/recovery.py` | 31/31 | `365b91f` |
+| A3 | `src/aurora/guardrail.py` | 78/78 | `1d017a9` |
+| A4 | `src/aurora/voice.py` | 42/42 | `a7bcaf5` |
 
 ### KRATOS (BLOCO C — após A+B fechados)
 
