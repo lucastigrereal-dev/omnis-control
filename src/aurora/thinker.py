@@ -16,6 +16,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
+from src.aurora.context_engine import AuroraContext, ContextEngine
+
 _logger = logging.getLogger("omnis.aurora.thinker")
 
 _OLLAMA_BASE = "http://localhost:11434"
@@ -170,6 +172,20 @@ class AuroraThinker:
             except Exception:
                 pass
 
+        # 5 — Context Engine (Notion + Akasha quando disponíveis via env vars)
+        # Sempre roda; fontes opcionais retornam [] se não configuradas.
+        try:
+            engine = ContextEngine(data_dir=self.data_dir)
+            ctx = engine.build(query="leads hoteis publicidade receita")
+            snapshot["context_results"] = ctx.results
+            snapshot["context_sources"] = ctx.sources_available
+            snapshot["context_failed"] = ctx.sources_failed
+        except Exception as exc:  # noqa: BLE001
+            _logger.warning("aurora._load_data: context_engine falhou (%s) — ignorado", exc)
+            snapshot["context_results"] = []
+            snapshot["context_sources"] = []
+            snapshot["context_failed"] = []
+
         return snapshot
 
     # Statuses que são ruído de automação de testes — não representam bloqueio real
@@ -201,7 +217,7 @@ class AuroraThinker:
         # Leads summary
         leads_summary = self._build_leads_summary(snapshot.get("leads", []))
 
-        return _USER_TEMPLATE.format(
+        base_prompt = _USER_TEMPLATE.format(
             date=datetime.now().strftime("%d/%m/%Y"),
             active_mission=state.get("active_mission_title", "sem missão ativa"),
             last_run_status=sys_run_status,
@@ -213,6 +229,20 @@ class AuroraThinker:
             last_run_request=last_run.get("request_text", "sem dados")[:120],
             last_run_result=last_run_result,
         )
+
+        # Seção CONTEXTO EXTERNO — inclusa apenas se ContextEngine trouxe dados extras
+        # (Notion ou Akasha ativos). Fontes state_json e leads já aparecem acima.
+        external_results = [
+            r for r in snapshot.get("context_results", [])
+            if r.source not in ("state_json", "leads")
+        ]
+        if external_results:
+            lines = ["\nCONTEXTO EXTERNO (Notion/Akasha):"]
+            for r in external_results[:5]:  # máximo 5 itens para não inflar o prompt
+                lines.append(f"- [{r.source}] {r.content[:200]}")
+            base_prompt += "\n".join(lines)
+
+        return base_prompt
 
     @staticmethod
     def _build_leads_summary(leads: list[dict]) -> str:
