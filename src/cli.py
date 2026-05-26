@@ -44,6 +44,7 @@ from src.reports import briefing as briefing_mod
 from src.app_factory.idea_cli import idea_app
 from src.cli_local import app as local_app
 from src.cli_commands.content_cmd import content_app
+from src.cli_commands.mission_cmd import runs_app
 
 app = typer.Typer(
     name="jarvis",
@@ -2307,6 +2308,7 @@ app.add_typer(health_app)
 app.add_typer(local_app, name="local")
 app.add_typer(lego_app)
 app.add_typer(content_app)
+app.add_typer(runs_app)
 
 
 if __name__ == "__main__":
