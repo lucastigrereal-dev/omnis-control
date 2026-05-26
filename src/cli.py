@@ -46,6 +46,7 @@ from src.cli_local import app as local_app
 from src.cli_commands.content_cmd import content_app
 from src.cli_commands.mission_cmd import runs_app
 from src.cli_commands.notion_cmd import notion_app
+from src.cli_commands.akasha_cmd import akasha_app
 
 app = typer.Typer(
     name="jarvis",
@@ -2311,6 +2312,7 @@ app.add_typer(lego_app)
 app.add_typer(content_app)
 app.add_typer(runs_app)
 app.add_typer(notion_app)
+app.add_typer(akasha_app)
 
 
 # ---------------------------------------------------------------------------

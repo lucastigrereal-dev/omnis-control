@@ -360,9 +360,10 @@ class ContextEngine:
 
         conn = None
         try:
-            conn = psycopg2.connect(db_url, connect_timeout=3)
+            conn = psycopg2.connect(db_url, connect_timeout=2)
             cur = conn.cursor()
-            cur.execute("SET statement_timeout = 5000")  # 5s por query (psycopg2 API)
+            # FTS timeout: 2s (query indexada — rápida)
+            cur.execute("SET statement_timeout = '2000'")
 
             results: list[ContextResult] = []
 
@@ -409,9 +410,13 @@ class ContextEngine:
                 except Exception as exc:  # noqa: BLE001
                     _logger.debug("context_engine: akasha FTS falhou (%s) — sem resultados", exc)
 
-            # Estratégia 2: ILIKE fallback se FTS não retornou nada e query não está vazia
+            # Estratégia 2: ILIKE fallback se FTS não retornou nada e query não está vazia.
+            # Usa apenas a primeira palavra da query para evitar seq-scan lento em 607K rows.
             if not results and query.strip():
                 try:
+                    # Reduz timeout para ILIKE (seq-scan): 1.5s máx para não estourar budget
+                    cur.execute("SET statement_timeout = '1500'")
+                    first_word = query.strip().split()[0]  # só primeira palavra p/ ILIKE
                     cur.execute(
                         """
                         SELECT
@@ -425,7 +430,7 @@ class ContextEngine:
                         WHERE dc.chunk_text ILIKE %(pattern)s
                         LIMIT %(limit)s
                         """,
-                        {"pattern": f"%{query}%", "limit": max_results},
+                        {"pattern": f"%{first_word}%", "limit": max_results},
                     )
                     rows = cur.fetchall()
                     for row in rows:
