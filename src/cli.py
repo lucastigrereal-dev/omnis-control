@@ -2311,6 +2311,81 @@ app.add_typer(content_app)
 app.add_typer(runs_app)
 
 
+# ---------------------------------------------------------------------------
+# HEALTH SCORE (WAVE 10)
+# ---------------------------------------------------------------------------
+
+@app.command(name="health-score")
+def cmd_health_score(
+    json_out: bool = typer.Option(False, "--json", help="Saída em JSON"),
+    history: int = typer.Option(0, "--history", "-H", help="Exibe N últimos scores do histórico"),
+    persist: bool = typer.Option(True, "--persist/--no-persist", help="Salvar score no log"),
+) -> None:
+    """Score único de saúde do sistema OMNIS (0-100 | verde/amarelo/vermelho).
+
+    Agrega: Ollama, Akasha/Docker, drafts pendentes, conteúdo recente, mission logger.
+    """
+    from src.health.score import HealthScorer
+
+    scorer = HealthScorer(persist=persist)
+
+    if history > 0:
+        records = scorer.read_history(limit=history)
+        if json_out:
+            console.print_json(json.dumps(records, ensure_ascii=False))
+        else:
+            table = Table(title=f"Health Score — últimos {history} registros")
+            table.add_column("Data",  style="dim",   width=17)
+            table.add_column("Score", justify="right", width=6)
+            table.add_column("Cor",   width=10)
+            _COLOR_STYLE = {"green": "green", "yellow": "yellow", "red": "red"}
+            for r in records:
+                color = r.get("color", "?")
+                s = _COLOR_STYLE.get(color, "white")
+                table.add_row(
+                    r.get("date", "?"),
+                    str(r.get("score", "?")),
+                    f"[{s}]{color}[/{s}]",
+                )
+            console.print(table)
+        return
+
+    hs = scorer.calculate()
+
+    if json_out:
+        console.print_json(json.dumps(hs.to_dict(), ensure_ascii=False))
+        return
+
+    _ICON = {"green": "[VERDE]", "yellow": "[AMARELO]", "red": "[VERMELHO]"}
+    icon = _ICON.get(hs.color, "")
+    console.print(f"\n[bold]HEALTH SCORE: {hs.score}/100[/bold]  [{hs.color}]{icon}[/{hs.color}]")
+    console.print(f"   gerado em: {hs.generated_at[:19]} UTC\n")
+
+    table = Table(show_header=True)
+    table.add_column("Check",   style="cyan",  width=22)
+    table.add_column("Score",   justify="right", width=10)
+    table.add_column("Status",  width=8)
+    table.add_column("Detalhe", width=45)
+
+    _ST = {"ok": "green", "warn": "yellow", "fail": "red", "skip": "dim"}
+    for c in hs.checks:
+        st = _ST.get(c.status, "")
+        table.add_row(
+            c.name,
+            f"{c.score}/{c.max_score}",
+            f"[{st}]{c.status}[/{st}]",
+            c.detail,
+        )
+    console.print(table)
+
+    if hs.warnings:
+        for w in hs.warnings:
+            console.print(f"  [yellow]⚠  {w}[/yellow]")
+
+    if persist:
+        console.print(f"\n  [dim]score salvo em logs/health_scores.jsonl[/dim]")
+
+
 if __name__ == "__main__":
     app()
 
