@@ -180,6 +180,46 @@ def cmd_reject(
 
 
 # ------------------------------------------------------------------
+# content export
+# ------------------------------------------------------------------
+
+@content_app.command(name="export")
+def cmd_export(
+    account: str = typer.Option("", "--account", "-a", help="Filtra por @perfil"),
+    output: str = typer.Option("", "--output", "-o", help="Pasta de destino (default: data/exports/<date>)"),
+    dry_run: bool = typer.Option(True, "--dry-run/--real", help="--real escreve arquivos; --dry-run só gera manifesto"),
+    json_out: bool = typer.Option(False, "--json"),
+) -> None:
+    """Exporta drafts aprovados em pacote CSV+assets pronto para Publer.
+
+    Por padrão roda em --dry-run (sem copiar assets). Use --real para gerar pasta completa.
+    """
+    from pathlib import Path
+    from src.agencia.export import ContentExporter
+
+    exporter = ContentExporter(dry_run=dry_run)
+    result = exporter.export(
+        account_filter=account or None,
+        export_dir=Path(output) if output else None,
+    )
+
+    if json_out:
+        import json
+        console.print_json(json.dumps(result.to_dict(), ensure_ascii=False))
+        return
+
+    console.print(f"[green]Export concluido:[/green]")
+    console.print(f"  ID:      {result.export_id}")
+    console.print(f"  dir:     {result.export_dir}")
+    console.print(f"  csv:     {result.csv_path.name}")
+    console.print(f"  drafts:  {result.total_drafts}")
+    console.print(f"  assets:  {result.total_assets_copied}")
+    console.print(f"  dry_run: {result.dry_run}")
+    for w in result.warnings:
+        console.print(f"  [yellow]AVISO:[/yellow] {w}")
+
+
+# ------------------------------------------------------------------
 # content status
 # ------------------------------------------------------------------
 
