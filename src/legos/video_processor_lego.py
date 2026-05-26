@@ -35,6 +35,7 @@ _WHISPER_CACHE_DIR = os.getenv(
 
 # 1 operação pesada por vez (Whisper consome RAM)
 _VIDEO_SEMAPHORE = threading.Semaphore(1)
+_VIDEO_SEMAPHORE_TIMEOUT_SECONDS = float(os.getenv("VIDEO_SEMAPHORE_TIMEOUT_SECONDS", "120"))
 
 _PUBLISH_KEYWORDS = frozenset({
     "publicar", "publish", "upload", "postar", "post",
@@ -146,7 +147,7 @@ class VideoProcessorLego:
                 artifacts={"mode": "dry_run", "language": spec.language},
             )
 
-        acquired = _VIDEO_SEMAPHORE.acquire(timeout=120)
+        acquired = _VIDEO_SEMAPHORE.acquire(timeout=_VIDEO_SEMAPHORE_TIMEOUT_SECONDS)
         if not acquired:
             return VideoResult(
                 success=False, output="", files_created=[],

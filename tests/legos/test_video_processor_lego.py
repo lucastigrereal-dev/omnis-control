@@ -112,8 +112,12 @@ def test_unknown_goal_returns_error():
     assert "goal desconhecido" in (result.error or "")
 
 
-def test_transcribe_real_returns_semaphore_timeout_when_busy():
+def test_transcribe_real_returns_semaphore_timeout_when_busy(monkeypatch):
     lego = VideoProcessorLego()
+    monkeypatch.setattr(
+        "src.legos.video_processor_lego._VIDEO_SEMAPHORE_TIMEOUT_SECONDS",
+        0.1,
+    )
     acquired = _VIDEO_SEMAPHORE.acquire(blocking=False)
     assert acquired, "semaphore should be free before test"
     try:
