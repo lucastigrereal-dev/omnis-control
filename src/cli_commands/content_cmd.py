@@ -242,6 +242,34 @@ def cmd_export(
 
 
 # ------------------------------------------------------------------
+# content prepare-publish
+# ------------------------------------------------------------------
+
+@content_app.command(name="prepare-publish")
+def cmd_prepare_publish(
+    account: str = typer.Option("", "--account", "-a", help="Filtra por @perfil"),
+    real: bool = typer.Option(False, "--real", help="Gera CSV + ManyChat stub (default: dry-run)"),
+    json_out: bool = typer.Option(False, "--json"),
+) -> None:
+    """Prepara payload para Publer (CSV) + ManyChat stub. NUNCA publica.
+
+    Por padrão roda em dry-run (gera apenas manifesto).
+    Use --real para gerar publer_bulk.csv e manychat_stub.json.
+    """
+    from src.agencia.publisher_prepare import PublisherPrepare
+
+    prep = PublisherPrepare(dry_run=not real)
+    pkg = prep.prepare(account_filter=account or None)
+
+    if json_out:
+        import json
+        console.print_json(json.dumps(pkg.to_dict(), ensure_ascii=False))
+        return
+
+    console.print(pkg.summary())
+
+
+# ------------------------------------------------------------------
 # content status
 # ------------------------------------------------------------------
 
