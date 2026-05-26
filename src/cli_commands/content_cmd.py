@@ -180,6 +180,28 @@ def cmd_reject(
 
 
 # ------------------------------------------------------------------
+# content report
+# ------------------------------------------------------------------
+
+@content_app.command(name="report")
+def cmd_report(
+    days: int = typer.Option(7, "--days", "-d", help="Período em dias"),
+    json_out: bool = typer.Option(False, "--json"),
+) -> None:
+    """Relatório de performance: clips, carrosseis, aprovações, custo (R$0,00)."""
+    from src.agencia.performance_report import PerformanceReporter
+    reporter = PerformanceReporter()
+    report = reporter.generate(period_days=days)
+
+    if json_out:
+        import json
+        console.print_json(json.dumps(report.to_dict(), ensure_ascii=False))
+        return
+
+    console.print(report.summary())
+
+
+# ------------------------------------------------------------------
 # content export
 # ------------------------------------------------------------------
 
