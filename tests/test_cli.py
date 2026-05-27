@@ -34,6 +34,7 @@ def test_jarvis_py_exists():
     assert os.path.isfile(path)
 
 
+@pytest.mark.integration  # requer psutil funcional
 def test_status_does_not_crash():
     """jarvis status não levanta exceção (usa paths reais)."""
     output = subprocess.run(

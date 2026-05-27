@@ -51,6 +51,7 @@ def _valid_event(**overrides) -> dict:
 # Test 1: Redis connectivity
 # ---------------------------------------------------------------------------
 class TestRedisConnectivity:
+    @pytest.mark.integration
     def test_connect_to_redis(self):
         """
         Verify we can connect to Redis on localhost:6382.
@@ -144,6 +145,7 @@ class TestEnvelopeValidation:
 # Test 3: Channel subscription
 # ---------------------------------------------------------------------------
 class TestChannelSubscription:
+    @pytest.mark.integration
     def test_subscribe_to_channels(self):
         """Verify we subscribe to exactly 3 channels."""
         import redis as redis_lib
@@ -310,6 +312,7 @@ class TestMessageHandling:
 # Test 5: Reconnect on disconnect (unit, no Redis needed)
 # ---------------------------------------------------------------------------
 class TestReconnectBehavior:
+    @pytest.mark.integration
     def test_reconnect_on_disconnect(self):
         """When listen() encounters a connection error, it attempts reconnect."""
         mock_redis = MagicMock()

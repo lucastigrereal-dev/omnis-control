@@ -4,6 +4,7 @@ from __future__ import annotations
 import pytest
 
 
+@pytest.mark.integration
 class TestDiskCheck:
     def test_check_returns_dict_with_expected_keys(self, monkeypatch):
         """Disk check returns dict with severity, disks, critical, warning, summary."""

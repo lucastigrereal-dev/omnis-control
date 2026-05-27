@@ -24,6 +24,7 @@ def test_omnis_py_exists():
     assert os.path.isfile(path), f"omnis.py não encontrado em {path}"
 
 
+@pytest.mark.integration  # requer psutil funcional
 def test_omnis_status_works():
     """python omnis.py status funciona sem erro."""
     output = subprocess.run(
@@ -95,6 +96,7 @@ def test_doctor_includes_video_pipeline():
     assert "video_pipeline" in data.get("checks", {})
 
 
+@pytest.mark.integration  # requer psutil funcional
 def test_report_includes_video_pipeline():
     """report gera seção Video Pipeline."""
     output = subprocess.run(
@@ -109,6 +111,7 @@ def test_report_includes_video_pipeline():
     assert "## 9. Video Pipeline" in content
 
 
+@pytest.mark.integration  # requer psutil funcional
 def test_jarvis_status_still_works():
     """jarvis.py status continua funcionando."""
     output = subprocess.run(
