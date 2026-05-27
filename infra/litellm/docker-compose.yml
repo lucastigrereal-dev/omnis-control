@@ -5,6 +5,7 @@ services:
     ports: ["4001:4000"]
     environment:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OLLAMA_API_KEY=${OLLAMA_API_KEY}
     volumes:
       - ./litellm_config.yaml:/app/config.yaml
     command: --config /app/config.yaml --port 4000

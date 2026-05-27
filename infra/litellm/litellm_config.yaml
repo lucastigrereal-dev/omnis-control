@@ -2,45 +2,41 @@
 # Política oficial: notion.so/36d22eba8f088199a2d6cf5a7e958cee
 # Benchmarks: notion.so/36d22eba8f08815b9b29c5de05d032fb
 # NUNCA usar claude-opus*, gpt-4*, gpt-4o*, gpt-5*
-# Ollama Pro Cloud URL: https://ollama.com
+# Rota: LiteLLM → Ollama daemon local (host.docker.internal:11434) → Cloud
+# Auth: Device Key PROMETHEUS (gerenciado pelo Ollama app, não pelo LiteLLM)
+# Os modelos :cloud são roteados automaticamente pelo daemon para Ollama Cloud
 
 model_list:
-  # ── Ollama Cloud Premium (primários) ─────────────────────────────────────
+  # ── Ollama Cloud Premium via daemon local ────────────────────────────────
   - model_name: ollama-fast
     litellm_params:
       model: ollama/glm-5.1:cloud
-      api_base: https://ollama.com
-      api_key: os.environ/OLLAMA_API_KEY
+      api_base: http://host.docker.internal:11434
 
   - model_name: ollama-code
     litellm_params:
       model: ollama/kimi-k2.6:cloud
-      api_base: https://ollama.com
-      api_key: os.environ/OLLAMA_API_KEY
+      api_base: http://host.docker.internal:11434
 
   - model_name: ollama-build
     litellm_params:
       model: ollama/minimax-m2.7:cloud
-      api_base: https://ollama.com
-      api_key: os.environ/OLLAMA_API_KEY
+      api_base: http://host.docker.internal:11434
 
   - model_name: ollama-smart
     litellm_params:
       model: ollama/deepseek-v4-pro:cloud
-      api_base: https://ollama.com
-      api_key: os.environ/OLLAMA_API_KEY
+      api_base: http://host.docker.internal:11434
 
   - model_name: ollama-longctx
     litellm_params:
       model: ollama/minimax-m2.7:cloud
-      api_base: https://ollama.com
-      api_key: os.environ/OLLAMA_API_KEY
+      api_base: http://host.docker.internal:11434
 
   - model_name: ollama-backup
     litellm_params:
       model: ollama/qwen3.5:397b:cloud
-      api_base: https://ollama.com
-      api_key: os.environ/OLLAMA_API_KEY
+      api_base: http://host.docker.internal:11434
 
   # ── Anthropic fallback (COMENTADO — desativado por enquanto) ──────────────
   # - model_name: fallback-cheap
