@@ -1,7 +1,7 @@
 # ESTADO ATUAL RESUMIDO — OMNIS / JARVIS CONTROL
 
-**Gerado em:** 2026-05-24T21:15:46Z
-**Session ID:** `20dfc315-8d20-458d-bd0b-1353f31b4671`
+**Gerado em:** 2026-05-25T04:44:52Z
+**Session ID:** `f2ed4415-9ef7-48ad-964b-cd40d529bf89`
 
 ## 1. RISCOS IMEDIATOS
 
@@ -13,11 +13,11 @@
 
 ## 2. Resumo executivo
 
-Sistema OMNIS operacional. 101 skills detectadas, 14 containers rodando, Publisher OS identificado na porta 8000. Memória: Qdrant acessível, Akasha encontrado.
+Sistema OMNIS operacional. 112 skills detectadas, 14 containers rodando, Publisher OS identificado na porta 8000. Memória: Qdrant acessível, Akasha encontrado.
 
 ## 3. Status geral
 
-- **Skills:** 101 (15 executáveis)
+- **Skills:** 112 (15 executáveis)
 - **Docker:** 14 rodando, 1 unhealthy
 - **Publisher OS:** ok
 - **Qdrant:** ok
@@ -30,7 +30,7 @@ Sistema OMNIS operacional. 101 skills detectadas, 14 containers rodando, Publish
 | Tipo | Quantidade |
 |------|-----------|
 | Executáveis (com run.py) | 15 |
-| Doc (pasta com SKILL.md) | 43 |
+| Doc (pasta com SKILL.md) | 54 |
 | Doc (arquivo .md solto) | 43 |
 
 ## 5. Publisher OS
@@ -104,7 +104,7 @@ Sistema OMNIS operacional. 101 skills detectadas, 14 containers rodando, Publish
   - registry_assets: 1
   - registry_accounts: 2
   - queue_items: 42
-  - scan_duration_ms: 103
+  - scan_duration_ms: 78
   - scan_timed_out: False
 
 ## 10. Content Queue (Fase 2B)

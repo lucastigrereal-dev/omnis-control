@@ -1,0 +1,24 @@
+{
+  "package_id": "aa9a6495",
+  "created_at": "2026-05-26T04:55:09.998655+00:00",
+  "output_dir": "data\\publish_ready\\2026-05-26-aa9a6495",
+  "total_posts": 1,
+  "slots": [
+    {
+      "account": "@lucastigrereal",
+      "scheduled_date": "2026-05-27",
+      "scheduled_time": "08:00",
+      "caption": "O Brasil tem lugares que parecem cena de filme. E o melhor: muitos deles ficam aqui pertinho, sem precisar de passaporte.\n\nDe Norte a Sul, cada regiao guarda um pedaco de paraiso que so quem viaja descobre. Natureza, cultura, historia e uma culinaria que abraca.\n\nQual lugar no Brasil ainda ta na sua lista? Bota ai nos comentarios!",
+      "hashtags": "#viagempelobrasil #turismonacional #brasilquerido #destinosbrasil #viajarfazbem",
+      "cta": "Qual lugar no Brasil ainda ta na sua lista? Bota ai nos comentarios!",
+      "media_files": "",
+      "draft_id": "1d482d8231e3",
+      "post_type": "reel"
+    }
+  ],
+  "publer_csv_path": "data\\publish_ready\\2026-05-26-aa9a6495\\publer_bulk.csv",
+  "manychat_stub_path": "data\\publish_ready\\2026-05-26-aa9a6495\\manychat_stub.json",
+  "manifest_path": "data\\publish_ready\\2026-05-26-aa9a6495\\manifest.json",
+  "dry_run": false,
+  "warnings": []
+}

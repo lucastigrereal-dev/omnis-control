@@ -1,8 +1,8 @@
 # OMNIS Current State
 
-**Atualizado:** 2026-05-23 — Ondas Lego 1-6: 5 legos externos + LegoRegistry + CLI lego
+**Atualizado:** 2026-05-25 — OPUSPLAN Fila 3/3: bug _render_clips + Aurora Fase 2 + burn-in Camada 2
 **Branch:** feature/omnis-5waves-runtime-supreme
-**Último commit:** cf6cfd2 — feat(onda5): LegoRegistry — catálogo unificado dos 5 legos externos
+**Último commit:** ec070ae — fix(agencia): Camada 2 burn-in — corrige escaping do colon
 
 ## Status Geral
 Fase: OMNIS_LOCAL_SUPREME_COMPLETE — 11 fases (0-10) concluídas. 30/30 outputs reais gerados. Fábrica local autônoma operacional.
@@ -136,6 +136,21 @@ Fase F (Cockpit HTML local) — CONCLUÍDO
 | 6 | CLI lego | — | DONE — list/research/send commands |
 
 Suite: **8740 passed, 4 skipped** (estimado após Onda 6)
+
+## OPUSPLAN Fila (2026-05-25) — CONCLUÍDA ✅
+
+| Etapa | Commit | Prova de execução real |
+|---|---|---|
+| fix: bug `_render_clips` (Agência) | `9c42c35` | 0→5 clipes, SRT em disco, anti-teatro 3x |
+| feat: Aurora Fase 2 grava state.json | `9fa42e2` | state.json 10→14 chaves, merge não-destrutivo |
+| fix: Camada 2 burn-in (colon escaping) | `ec070ae` | ffmpeg EINVAL→EXIT 0, legenda nos pixels |
+| test: Aurora visível no painel KRATOS | `41aeabb` (KRATOS) | corrente OMNIS→endpoint→card auditada |
+
+- Total testes novos: **37** OMNIS + **10** KRATOS aurora route = **47**
+- Suite módulos-alvo OMNIS: **324 passed em 3.52s**
+- Suite aurora route KRATOS: **10 passed em 0.23s**
+- Workflow dia a dia: `python -m pytest tests/agencia/ tests/video_studio/ tests/aurora/ --import-mode=importlib -p no:warnings -q`
+- Dívida: suite completa pendura (~68min) — investigar culpado quando sobrar tempo (não urgente)
 
 ## Próxima Ação
 - Wave 13: P47 (Akasha real) requer Docker + pgvector — decisão Lucas

@@ -1,0 +1,31 @@
+{
+  "_note": "ManyChat automation stub — configure no painel ManyChat com estes dados",
+  "_status": "STUB — não conectado a API real",
+  "trigger": {
+    "type": "post_comment",
+    "keyword": "QUERO",
+    "match": "contains"
+  },
+  "flow": [
+    {
+      "action": "send_dm",
+      "message": "Oi! Vi que você comentou no post. Clica no link aqui pra saber mais: {{link}}"
+    },
+    {
+      "action": "tag_subscriber",
+      "tag": "lead_instagram"
+    },
+    {
+      "action": "add_to_sequence",
+      "sequence": "nurturing_7dias"
+    }
+  ],
+  "posts": [
+    {
+      "draft_id": "1d482d8231e3",
+      "account": "@lucastigrereal",
+      "scheduled": "2026-05-27 08:00"
+    }
+  ],
+  "generated_at": "2026-05-26T04:55:09.997611+00:00"
+}
