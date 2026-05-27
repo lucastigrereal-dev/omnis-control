@@ -15,11 +15,12 @@ from src.api.routers.marketing import router as marketing_router
 from src.api.routers.aurora import router as aurora_router
 from src.api.routers.cost import router as cost_router
 from src.api.routers.events import router as events_router
+from src.api.auth import dev_mode
 
 app = FastAPI(
     title="OMNIS API",
-    description="Data API para KRATOS cockpit",
-    version="1.1.0",
+    description="Data API para KRATOS cockpit — W18: Auth + SSE EventBus",
+    version="1.2.0",
     docs_url="/docs",
     redoc_url=None,
 )
@@ -49,4 +50,9 @@ app.include_router(events_router,      prefix="/events",    tags=["events"])
 
 @app.get("/", tags=["meta"])
 def root() -> dict:
-    return {"service": "omnis-api", "version": "1.1.0", "status": "ok"}
+    return {
+        "service": "omnis-api",
+        "version": "1.2.0",
+        "status": "ok",
+        "auth": "dev" if dev_mode() else "required",
+    }
