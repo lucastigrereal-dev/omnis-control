@@ -233,6 +233,7 @@ def test_error_has_run_id():
 
 # ── REAL LLM — Ollama llama3.1:8b ─────────────────────────────────────────────
 
+@pytest.mark.integration
 @pytest.mark.real_llm
 def test_real_ollama_pitch_rifoles():
     """PROVA REAL: Ollama gera pitch para Rifoles Praia Hotel (lead HOT/WARM real)."""

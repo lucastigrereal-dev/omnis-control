@@ -62,7 +62,9 @@ def test_health_check_returns_bool():
     assert isinstance(result, bool)
 
 
+@pytest.mark.integration
 def test_health_check_true_when_playwright_available():
+    """Requer playwright instalado."""
     lego = BrowserExecutorLego()
     assert lego.health_check() is True
 

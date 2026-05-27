@@ -199,6 +199,7 @@ def test_unknown_account_succeeds():
 
 # ── real_llm ──────────────────────────────────────────────────────────────────
 
+@pytest.mark.integration
 @pytest.mark.real_llm
 def test_real_ollama_seogram_oinatalrn():
     """Prova real: Ollama otimiza caption @oinatalrn Ponta Negra."""

@@ -92,10 +92,12 @@ def test_publish_topic_not_blocked_dry_run():
 
 # ── health_check ──────────────────────────────────────────────────────────────
 
+@pytest.mark.integration
 def test_health_check_returns_bool():
     assert isinstance(ResearchConductorLego().health_check(), bool)
 
 
+@pytest.mark.integration
 def test_health_check_true_when_litellm_available():
     assert ResearchConductorLego().health_check() is True
 

@@ -2,7 +2,8 @@
 
 Suite dividida em duas marcas:
   - sem marca: usa MockLLMAdapter (dry_run=True) — rápido, sem IO
-  - @pytest.mark.real_llm: chama Ollama real (llama3.1:8b) — prova fundação real
+  - @pytest.mark.integration
+@pytest.mark.real_llm: chama Ollama real (llama3.1:8b) — prova fundação real
 
 Cobertura (mock):
   - run() basic: success, run_id, account_handle, format, topic
@@ -195,6 +196,7 @@ def test_error_result_has_run_id():
 
 # ── REAL LLM test — chama Ollama (llama3.1:8b) ───────────────────────────────
 
+@pytest.mark.integration
 @pytest.mark.real_llm
 def test_real_ollama_caption_oinatalrn():
     """PROVA REAL: Ollama llama3.1:8b gera legenda para @oinatalrn.

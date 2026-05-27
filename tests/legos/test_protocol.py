@@ -157,7 +157,9 @@ def test_messenger_lego_run_payload_channels():
 
 # ── all legos have health_check ───────────────────────────────────────────────
 
+@pytest.mark.integration
 def test_all_legos_have_health_check():
+    """Requer litellm + whisper instalados corretamente."""
     legos: list[LegoCog] = [
         ResearchConductorLego(),
         CodeExecutorLego(),

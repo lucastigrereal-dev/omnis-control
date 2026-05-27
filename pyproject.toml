@@ -31,8 +31,10 @@ jarvis = "src.cli:app"
 testpaths = ["tests"]
 pythonpath = ["."]
 norecursedirs = ["tests/_archive", ".git", "__pycache__", "*.egg-info"]
+timeout = 30
 markers = [
     "real_llm: chama LLM real (Ollama local) — requer Ollama rodando",
+    "integration: requer container externo (Qdrant, LiteLLM, n8n) — roda separado",
 ]
 
 [build-system]

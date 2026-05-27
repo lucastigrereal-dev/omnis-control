@@ -45,10 +45,12 @@ def test_dry_run_not_blocked_by_approval():
 
 # ── health_check ─────────────────────────────────────────────────────────────
 
+@pytest.mark.integration
 def test_health_check_returns_bool():
     assert isinstance(VideoProcessorLego().health_check(), bool)
 
 
+@pytest.mark.integration
 def test_health_check_true_when_whisper_and_ffmpeg_available():
     assert VideoProcessorLego().health_check() is True
 

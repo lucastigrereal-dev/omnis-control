@@ -34,8 +34,12 @@ def test_script_imports_cleanly():
     assert result.returncode == 0, f"Script has syntax errors: {result.stderr}"
 
 
+@pytest.mark.integration
 def test_report_generated():
-    """Report should exist (even if stale, to confirm script was run)."""
+    """Report should exist (even if stale, to confirm script was run).
+
+    Marcado integration: subprocess scan de disco demora > 30s.
+    """
     # Run the script
     result = subprocess.run(
         [sys.executable, str(SCRIPT)],
