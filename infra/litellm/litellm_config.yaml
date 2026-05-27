@@ -10,31 +10,37 @@ model_list:
     litellm_params:
       model: ollama/glm-5.1:cloud
       api_base: https://ollama.com
+      api_key: os.environ/OLLAMA_API_KEY
 
   - model_name: ollama-code
     litellm_params:
       model: ollama/kimi-k2.6:cloud
       api_base: https://ollama.com
+      api_key: os.environ/OLLAMA_API_KEY
 
   - model_name: ollama-build
     litellm_params:
       model: ollama/minimax-m2.7:cloud
       api_base: https://ollama.com
+      api_key: os.environ/OLLAMA_API_KEY
 
   - model_name: ollama-smart
     litellm_params:
       model: ollama/deepseek-v4-pro:cloud
       api_base: https://ollama.com
+      api_key: os.environ/OLLAMA_API_KEY
 
   - model_name: ollama-longctx
     litellm_params:
       model: ollama/minimax-m2.7:cloud
       api_base: https://ollama.com
+      api_key: os.environ/OLLAMA_API_KEY
 
   - model_name: ollama-backup
     litellm_params:
       model: ollama/qwen3.5:397b:cloud
       api_base: https://ollama.com
+      api_key: os.environ/OLLAMA_API_KEY
 
   # ── Anthropic fallback (COMENTADO — desativado por enquanto) ──────────────
   # - model_name: fallback-cheap
