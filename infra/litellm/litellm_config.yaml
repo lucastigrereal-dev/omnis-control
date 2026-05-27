@@ -1,0 +1,22 @@
+model_list:
+  - model_name: haiku
+    litellm_params:
+      model: claude-haiku-4-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+  - model_name: sonnet
+    litellm_params:
+      model: claude-sonnet-4-6
+      api_key: os.environ/ANTHROPIC_API_KEY
+  - model_name: local-fast
+    litellm_params:
+      model: ollama/llama3.2
+      api_base: http://localhost:11434
+
+router_settings:
+  routing_strategy: cost-based-routing
+  fallbacks:
+    - {"haiku": ["local-fast"]}
+
+general_settings:
+  max_budget: 50
+  budget_duration: 1mo
