@@ -118,7 +118,9 @@ class TestApiEndpointAuth:
         assert r.status_code == 200
         data = r.json()
         assert data["auth"] == "dev"
-        assert data["version"] == "1.2.0"
+        # Version bumps with each wave; just check it exists and looks like semver
+        assert "version" in data
+        assert "." in data["version"]
 
     def teardown_method(self):
         _configured_key.cache_clear()
