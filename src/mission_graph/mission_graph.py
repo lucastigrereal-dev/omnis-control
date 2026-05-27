@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from .mission_state import MissionGraphState
 from .nodes.validate_node import validate_node, route_after_validate
+from .nodes.plan_node import plan_node
 from .nodes.execute_node import execute_node, route_after_execute
 from .nodes.checkpoint_node import checkpoint_node
 from .nodes.finalize_node import finalize_node
@@ -25,15 +26,17 @@ def build_mission_graph():
 
     g = StateGraph(MissionGraphState)
     g.add_node("validate", validate_node)
+    g.add_node("plan", plan_node)
     g.add_node("execute", execute_node)
     g.add_node("checkpoint", checkpoint_node)
     g.add_node("finalize", finalize_node)
 
     g.set_entry_point("validate")
     g.add_conditional_edges("validate", route_after_validate, {
-        "execute": "execute",
+        "execute": "plan",
         "fail": "finalize",
     })
+    g.add_edge("plan", "execute")
     g.add_conditional_edges("execute", route_after_execute, {
         "retry": "execute",
         "checkpoint": "checkpoint",
