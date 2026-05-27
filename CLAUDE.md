@@ -1,5 +1,11 @@
 # OMNIS Control — Claude Operating Rules
 
+## ⚡ Política Oficial de Roteamento de Modelos v2.0
+Verdade institucional: https://www.notion.so/36d22eba8f0881519268f05675380a8c
+SEMPRE consulte esta página antes de alterar litellm_config.yaml ou router.py.
+Resumo: Ollama-First (glm-5.1 / kimi-k2.6 / deepseek-v4-pro) + Claude apenas fallback.
+NUNCA: claude-opus*, gpt-4*. Aurora default = ollama-smart.
+
 ## Identidade
 OMNIS é o motor executor e orquestrador operacional.
 KRATOS é o cockpit (observa). Aurora interpreta e orienta.
