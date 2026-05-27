@@ -9,6 +9,7 @@ def run_mission_graph(
     max_retries: int = 3,
     mission_brief: Optional[dict] = None,
     config: Optional[dict] = None,
+    action: str = "execute_step",
 ) -> MissionGraphState:
     """Execute a mission via LangGraph (opt-in).
 
@@ -21,6 +22,7 @@ def run_mission_graph(
         max_retries: Maximum retry attempts per node.
         mission_brief: Optional dict with mission context (e.g. titulo, setor).
         config: Optional LangGraph config dict.
+        action: Action name checked by AuroraGuardrail in execute_node (default "execute_step").
     """
     if not use_langgraph:
         raise NotImplementedError(
@@ -28,7 +30,7 @@ def run_mission_graph(
             "Para o runtime existente, use src/missions/runtime.py"
         )
     from .mission_graph import compile_mission_graph  # noqa: PLC0415
-    state = initial_state(mission_id, max_retries=max_retries, brief=mission_brief)
+    state = initial_state(mission_id, max_retries=max_retries, brief=mission_brief, action=action)
     graph = compile_mission_graph()
     cfg = config or {}
     final = graph.invoke(state, cfg)

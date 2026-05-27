@@ -20,9 +20,16 @@ class MissionGraphState(TypedDict):
     aurora_priority_score: int  # AuroraPriority score 0-100 (0 = Aurora unavailable)
     aurora_tom: str  # AuroraVoice adapted message ("" = Aurora unavailable)
     state_json_path: str  # path to the state.json written by finalize_node ("" = not yet written)
+    brief: dict  # optional mission brief passed by caller (e.g. {"titulo": ..., "setor": ...})
+    action: str  # current action name checked by AuroraGuardrail (default "execute_step")
 
 
-def initial_state(mission_id: str, max_retries: int = 3) -> MissionGraphState:
+def initial_state(
+    mission_id: str,
+    max_retries: int = 3,
+    brief: Optional[dict] = None,
+    action: str = "execute_step",
+) -> MissionGraphState:
     """Create the initial state for a mission graph run."""
     return MissionGraphState(
         mission_id=mission_id,
@@ -38,6 +45,8 @@ def initial_state(mission_id: str, max_retries: int = 3) -> MissionGraphState:
         aurora_priority_score=0,
         aurora_tom="",
         state_json_path="",
+        brief=brief if brief is not None else {},
+        action=action,
     )
 
 
