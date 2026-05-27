@@ -1,5 +1,15 @@
 # OMNIS Control — Claude Operating Rules
 
+## ⚡ Próximas waves (W23-W26)
+
+**Master das waves W23-W26 (Notion):** https://www.notion.so/36d22eba8f08813daa28e1789aa668b6
+
+Quando `omnis-w22-monetization-mvp` estiver tagueada: iniciar W23 lendo a página acima.
+Executar exatamente conforme os 10 blocos com paralelismo marcado.
+Tag obrigatória ao fechar: `omnis-w23-saneamento`.
+
+---
+
 ## ⚡ Política Oficial de Roteamento de Modelos v2.0 — Ollama-First
 
 **Verdade institucional (Notion):** https://www.notion.so/36d22eba8f0881519268f05675380a8c
