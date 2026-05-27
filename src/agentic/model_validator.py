@@ -1,12 +1,31 @@
-"""model_validator — Bloqueia uso de modelos proibidos (opus) em execução OMNIS.
+"""model_validator — Bloqueia uso de modelos proibidos em execução OMNIS.
 
-Regra: apenas haiku, sonnet, local-fast e local-code são permitidos.
-Qualquer modelo contendo 'opus' no nome é bloqueado imediatamente.
+v2.1 Quality-First: modelos lógicos Ollama Cloud como primários.
+Qualquer modelo contendo 'opus', 'gpt-4', 'gpt-4o' ou 'gpt-5' é bloqueado.
 """
 from __future__ import annotations
 
-ALLOWED_MODELS = {"haiku", "sonnet", "local-fast", "local-code"}
-BLOCKED_MODELS = {"opus", "claude-opus", "claude-opus-4-5", "claude-opus-4-6"}
+# Modelos lógicos permitidos (nomes LiteLLM v2.1)
+ALLOWED_MODELS = {
+    # Ollama Cloud v2.1
+    "ollama-fast",
+    "ollama-code",
+    "ollama-build",
+    "ollama-smart",
+    "ollama-longctx",
+    "ollama-backup",
+    # Aliases retrocompat (Claude — só via fallback LiteLLM)
+    "haiku",
+    "sonnet",
+    "fallback-cheap",
+    "fallback-premium",
+    # Legacy local
+    "local-fast",
+    "local-code",
+}
+
+# Termos proibidos (substring match, case-insensitive)
+BLOCKED_MODELS = {"opus", "claude-opus", "claude-opus-4-5", "claude-opus-4-6", "gpt-4", "gpt-5"}
 
 
 def validate_model(model: str) -> None:

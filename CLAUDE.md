@@ -10,29 +10,30 @@ Tag obrigatória ao fechar: `omnis-w23-saneamento`.
 
 ---
 
-## ⚡ Política Oficial de Roteamento de Modelos v2.0 — Ollama-First
+## ⚡ Política Oficial de Roteamento de Modelos v2.1 — Quality-First
 
-**Verdade institucional (Notion):** https://www.notion.so/36d22eba8f0881519268f05675380a8c
+**Verdade institucional (Notion):** https://www.notion.so/36d22eba8f088199a2d6cf5a7e958cee
+**Benchmarks:** https://www.notion.so/36d22eba8f08815b9b29c5de05d032fb
 
 SEMPRE consulte esta página antes de alterar `infra/litellm/litellm_config.yaml`, `core/llm/router.py`, ou qualquer chamada de modelo nos agentes.
 
-### Stack oficial:
-- `ollama-fast` → glm-5.1:cloud (operação, ~70% das chamadas)
-- `ollama-code` → kimi-k2.6:cloud (App Factory, builds)
-- `ollama-smart` → deepseek-v4-pro:cloud (raciocínio profundo)
-- `ollama-backup` → qwen3.5:cloud (backup open)
-- `fallback-cheap` → claude-haiku-4-5 (só fallback)
-- `fallback-premium` → claude-sonnet-4-6 (só Aurora premium ou análise crítica)
+### Stack oficial (6 modelos Ollama Pro Cloud):
+- `ollama-fast`    → glm-5.1:cloud        (operação, ~70% das chamadas)
+- `ollama-code`    → kimi-k2.6:cloud      (código, SDR, Aurora, conversação)
+- `ollama-build`   → minimax-m2.7:cloud   (App Factory, scaffolding)
+- `ollama-smart`   → deepseek-v4-pro:cloud (raciocínio profundo, performance)
+- `ollama-longctx` → minimax-m2.7:cloud   (RAG, Akasha, docs longos)
+- `ollama-backup`  → qwen3.5:397b:cloud   (fallback geral)
 
 ### Regras invioláveis:
-- ❌ NUNCA usar claude-opus*, gpt-4*, gpt-4o*
-- ❌ NUNCA chamar Anthropic SDK direto (sempre via LiteLLM @ :4001)
-- ✅ SEMPRE usar nomes lógicos (ollama-fast/code/smart, fallback-*)
-- ✅ Aurora default = ollama-smart; premium = fallback-premium sob `/aurora premium`
+- ❌ NUNCA usar claude-opus*, gpt-4*, gpt-4o*, gpt-5*
+- ❌ NUNCA chamar Anthropic/Ollama SDK direto (sempre via LiteLLM @ :4001)
+- ✅ SEMPRE usar nomes lógicos (ollama-fast/code/build/smart/longctx/backup)
+- ✅ Anthropic comentado na config — reativar só com ANTHROPIC_API_KEY no .env
 
 ### Budget:
-- Ollama Pro: $20/mês (assinatura)
-- Anthropic via LiteLLM: $25/mês HARD CAP (alerta em $20)
+- Ollama Pro: $20/mês (assinatura — cobre todos os 6 modelos)
+- Anthropic via LiteLLM: $25/mês HARD CAP (alerta em $20, desativado por ora)
 
 ## Identidade
 OMNIS é o motor executor e orquestrador operacional.
