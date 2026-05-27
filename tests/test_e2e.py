@@ -48,6 +48,7 @@ def _run_cli(shim: str, *args: str, timeout: int = 30) -> subprocess.CompletedPr
 # 1. omnis status
 # ---------------------------------------------------------------------------
 
+@pytest.mark.integration  # requer psutil funcional
 class TestE2E1OmnisStatus:
     """python omnis.py status roda e retorna status do ecossistema."""
 
@@ -116,6 +117,7 @@ class TestE2E2OmnisDoctor:
 # 3. omnis report
 # ---------------------------------------------------------------------------
 
+@pytest.mark.integration  # requer psutil funcional
 class TestE2E3OmnisReport:
     """python omnis.py report gera docs/ESTADO_ATUAL_RESUMIDO.md."""
 
@@ -186,6 +188,7 @@ class TestE2E4OmnisVideoStatus:
 # 5. jarvis alias legado
 # ---------------------------------------------------------------------------
 
+@pytest.mark.integration  # requer psutil funcional
 class TestE2E5JarvisAlias:
     """python jarvis.py status continua funcionando como alias."""
 
