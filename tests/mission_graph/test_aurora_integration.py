@@ -246,6 +246,38 @@ def test_aurora_graceful_degradation_full_flow():
 
 
 # ---------------------------------------------------------------------------
+# finalize_node + AuroraRecovery
+# ---------------------------------------------------------------------------
+
+def test_finalize_node_calls_aurora_recovery():
+    """finalize_node calls AuroraRecovery.save_checkpoint after completion."""
+    state = initial_state("mission-recovery-ok")
+    state["steps"] = [{"name": "step1"}, {"name": "step2"}]
+    mock_recovery = MagicMock()
+
+    with patch("src.aurora.recovery.AuroraRecovery", return_value=mock_recovery):
+        result = finalize_node(state)
+
+    assert result["status"] == "completed"
+    mock_recovery.save_checkpoint.assert_called_once()
+    call_kwargs = mock_recovery.save_checkpoint.call_args.kwargs
+    assert "mission-recovery-ok" in call_kwargs["session_context"]
+    assert call_kwargs["last_action"] == "finalize_mission"
+    assert call_kwargs["phase"] == "D1-W5"
+
+
+def test_finalize_node_recovery_degradation():
+    """If AuroraRecovery raises, finalize_node returns result normally."""
+    state = initial_state("mission-recovery-fail")
+    state["error"] = None
+
+    with patch("src.aurora.recovery.AuroraRecovery", side_effect=RuntimeError("disk full")):
+        result = finalize_node(state)
+
+    assert result["status"] == "completed"
+
+
+# ---------------------------------------------------------------------------
 # MissionGraphState — new fields default values
 # ---------------------------------------------------------------------------
 
