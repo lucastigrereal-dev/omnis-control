@@ -1,10 +1,28 @@
 # OMNIS Control — Claude Operating Rules
 
-## ⚡ Política Oficial de Roteamento de Modelos v2.0
-Verdade institucional: https://www.notion.so/36d22eba8f0881519268f05675380a8c
-SEMPRE consulte esta página antes de alterar litellm_config.yaml ou router.py.
-Resumo: Ollama-First (glm-5.1 / kimi-k2.6 / deepseek-v4-pro) + Claude apenas fallback.
-NUNCA: claude-opus*, gpt-4*. Aurora default = ollama-smart.
+## ⚡ Política Oficial de Roteamento de Modelos v2.0 — Ollama-First
+
+**Verdade institucional (Notion):** https://www.notion.so/36d22eba8f0881519268f05675380a8c
+
+SEMPRE consulte esta página antes de alterar `infra/litellm/litellm_config.yaml`, `core/llm/router.py`, ou qualquer chamada de modelo nos agentes.
+
+### Stack oficial:
+- `ollama-fast` → glm-5.1:cloud (operação, ~70% das chamadas)
+- `ollama-code` → kimi-k2.6:cloud (App Factory, builds)
+- `ollama-smart` → deepseek-v4-pro:cloud (raciocínio profundo)
+- `ollama-backup` → qwen3.5:cloud (backup open)
+- `fallback-cheap` → claude-haiku-4-5 (só fallback)
+- `fallback-premium` → claude-sonnet-4-6 (só Aurora premium ou análise crítica)
+
+### Regras invioláveis:
+- ❌ NUNCA usar claude-opus*, gpt-4*, gpt-4o*
+- ❌ NUNCA chamar Anthropic SDK direto (sempre via LiteLLM @ :4001)
+- ✅ SEMPRE usar nomes lógicos (ollama-fast/code/smart, fallback-*)
+- ✅ Aurora default = ollama-smart; premium = fallback-premium sob `/aurora premium`
+
+### Budget:
+- Ollama Pro: $20/mês (assinatura)
+- Anthropic via LiteLLM: $25/mês HARD CAP (alerta em $20)
 
 ## Identidade
 OMNIS é o motor executor e orquestrador operacional.
