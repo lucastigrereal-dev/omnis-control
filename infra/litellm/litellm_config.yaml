@@ -1,22 +1,60 @@
+# LiteLLM Config — Ollama-First v2.0
+# Política oficial: notion.so/36d22eba8f0881519268f05675380a8c
+# NUNCA usar claude-opus*, gpt-4*
+# Ollama URL: host.docker.internal (container→host)
+
 model_list:
+  # ── Ollama-First (primários) ──────────────────────────────────────
+  - model_name: ollama-smart
+    litellm_params:
+      model: ollama/deepseek-v4-pro:cloud
+      api_base: http://host.docker.internal:11434
+
+  - model_name: ollama-code
+    litellm_params:
+      model: ollama/qwen-coder-q5-recommended:latest
+      api_base: http://host.docker.internal:11434
+
+  - model_name: ollama-fast
+    litellm_params:
+      model: ollama/llama3.2:3b
+      api_base: http://host.docker.internal:11434
+
+  - model_name: ollama-backup
+    litellm_params:
+      model: ollama/llama3.1:8b
+      api_base: http://host.docker.internal:11434
+
+  # ── Claude fallback (só quando Ollama falha) ──────────────────────
+  - model_name: fallback-cheap
+    litellm_params:
+      model: claude-haiku-4-5
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+  - model_name: fallback-premium
+    litellm_params:
+      model: claude-sonnet-4-6
+      api_key: os.environ/ANTHROPIC_API_KEY
+
+  # ── Aliases retrocompatíveis ──────────────────────────────────────
   - model_name: haiku
     litellm_params:
       model: claude-haiku-4-5
       api_key: os.environ/ANTHROPIC_API_KEY
+
   - model_name: sonnet
     litellm_params:
       model: claude-sonnet-4-6
       api_key: os.environ/ANTHROPIC_API_KEY
-  - model_name: local-fast
-    litellm_params:
-      model: ollama/llama3.2
-      api_base: http://localhost:11434
 
 router_settings:
-  routing_strategy: cost-based-routing
+  routing_strategy: simple-shuffle
   fallbacks:
-    - {"haiku": ["local-fast"]}
+    - {"ollama-smart":  ["fallback-premium"]}
+    - {"ollama-code":   ["fallback-cheap"]}
+    - {"ollama-fast":   ["ollama-backup", "fallback-cheap"]}
+    - {"haiku":         ["ollama-fast"]}
 
 general_settings:
-  max_budget: 50
+  max_budget: 25
   budget_duration: 1mo
