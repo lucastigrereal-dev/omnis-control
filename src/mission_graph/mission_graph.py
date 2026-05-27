@@ -14,6 +14,15 @@ from .nodes.plan_node import plan_node
 from .nodes.execute_node import execute_node, route_after_execute
 from .nodes.checkpoint_node import checkpoint_node
 from .nodes.finalize_node import finalize_node
+from src.sectors.marketing.graph_node import marketing_sector_node
+
+
+def _route_after_plan(state: MissionGraphState) -> str:
+    """Rota condicional após o nó plan: marketing → marketing_sector, default → execute."""
+    brief = state.get("brief") or {}
+    if brief.get("sector") == "marketing":
+        return "marketing_sector"
+    return "execute"
 
 
 def build_mission_graph():
@@ -30,18 +39,23 @@ def build_mission_graph():
     g.add_node("execute", execute_node)
     g.add_node("checkpoint", checkpoint_node)
     g.add_node("finalize", finalize_node)
+    g.add_node("marketing_sector", marketing_sector_node)
 
     g.set_entry_point("validate")
     g.add_conditional_edges("validate", route_after_validate, {
         "execute": "plan",
         "fail": "finalize",
     })
-    g.add_edge("plan", "execute")
+    g.add_conditional_edges("plan", _route_after_plan, {
+        "execute": "execute",
+        "marketing_sector": "marketing_sector",
+    })
     g.add_conditional_edges("execute", route_after_execute, {
         "retry": "execute",
         "checkpoint": "checkpoint",
         "fail": "finalize",
     })
+    g.add_edge("marketing_sector", "checkpoint")
     g.add_edge("checkpoint", "finalize")
     g.add_edge("finalize", END)
 
