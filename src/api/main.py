@@ -16,14 +16,19 @@ from src.api.routers.aurora import router as aurora_router
 from src.api.routers.cost import router as cost_router
 from src.api.routers.events import router as events_router
 from src.api.auth import dev_mode
+from src.api.structured_logging import StructuredLoggingMiddleware, setup_logging
+
+setup_logging()
 
 app = FastAPI(
     title="OMNIS API",
-    description="Data API para KRATOS cockpit — W18: Auth + SSE EventBus",
-    version="1.2.0",
+    description="Data API para KRATOS cockpit — W19: Structured Logging + Budget Guardrail",
+    version="1.3.0",
     docs_url="/docs",
     redoc_url=None,
 )
+
+app.add_middleware(StructuredLoggingMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
@@ -52,7 +57,7 @@ app.include_router(events_router,      prefix="/events",    tags=["events"])
 def root() -> dict:
     return {
         "service": "omnis-api",
-        "version": "1.2.0",
+        "version": "1.3.0",
         "status": "ok",
         "auth": "dev" if dev_mode() else "required",
     }
