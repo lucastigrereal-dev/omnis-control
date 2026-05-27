@@ -1,7 +1,7 @@
 version: '3.9'
 services:
   litellm:
-    image: ghcr.io/berriai/litellm:main
+    image: litellm/litellm:latest  # ghcr berriai:main = v1.10.1 (bug Azure init), Docker Hub = OK
     ports: ["4001:4000"]
     environment:
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
