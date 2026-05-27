@@ -52,6 +52,13 @@ app.include_router(aurora_router,      prefix="/aurora",    tags=["aurora"])
 app.include_router(cost_router,        prefix="/cost",      tags=["cost"])
 app.include_router(events_router,      prefix="/events",    tags=["events"])
 
+# v1 versioned contract (read-only integration surface for KRATOS)
+app.include_router(missions.router,    prefix="/v1/missions", tags=["v1-missions"])
+app.include_router(events_router,      prefix="/v1/events",   tags=["v1-events"])
+
+# legacy live alias used by KRATOS current hooks
+app.include_router(events_router,      prefix="/live",      tags=["live-events"])
+
 
 @app.get("/", tags=["meta"])
 def root() -> dict:

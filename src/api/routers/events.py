@@ -17,6 +17,29 @@ from src.api.event_bus import OmnisEvent, get_event_bus
 router = APIRouter()
 
 _HEARTBEAT_INTERVAL = 30  # segundos
+_EVENT_TYPE_MAP = {
+    "mission_started": "mission:update",
+    "mission_completed": "mission:update",
+    "mission_failed": "mission:update",
+    "cost_updated": "cost:update",
+}
+
+
+def _to_sse(event_type: str, data: dict, ts: float) -> str:
+    payload = json.dumps({"type": event_type, "data": data, "ts": ts})
+    return f"event: {event_type}\ndata: {payload}\n\n"
+
+
+def _normalize_event(event: OmnisEvent) -> tuple[str, dict]:
+    canonical = _EVENT_TYPE_MAP.get(event.event_type, event.event_type)
+    data = dict(event.data or {})
+    if event.event_type == "mission_started":
+        data.setdefault("status", "running")
+    elif event.event_type == "mission_completed":
+        data.setdefault("status", "completed")
+    elif event.event_type == "mission_failed":
+        data.setdefault("status", "failed")
+    return canonical, data
 
 
 async def event_stream_generator(request: Request):
@@ -40,7 +63,8 @@ async def event_stream_generator(request: Request):
         async for event in bus.subscribe():
             if await request.is_disconnected():
                 break
-            yield event.to_sse()
+            canonical_type, canonical_data = _normalize_event(event)
+            yield _to_sse(canonical_type, canonical_data, event.ts)
     finally:
         if heartbeat_task:
             heartbeat_task.cancel()
@@ -65,6 +89,12 @@ async def sse_events(request: Request):
             "X-Accel-Buffering": "no",  # Desativa buffering Nginx
         },
     )
+
+
+@router.get("/stream", dependencies=[Depends(require_api_key)])
+async def sse_events_stream(request: Request):
+    """Alias explícito para contrato v1 (/events/stream e /live/stream via prefix)."""
+    return await sse_events(request)
 
 
 @router.get("/status", dependencies=[Depends(require_api_key)])
