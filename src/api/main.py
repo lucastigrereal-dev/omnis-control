@@ -6,7 +6,7 @@ KRATOS lê daqui. OMNIS nunca escreve via API.
 Uso:
     python -m uvicorn src.api.main:app --host 0.0.0.0 --port 8765 --reload
 """
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api.routers import health, queue, accounts, drafts, assets, missions, skills, reports, agent
@@ -15,7 +15,7 @@ from src.api.routers.marketing import router as marketing_router
 from src.api.routers.aurora import router as aurora_router
 from src.api.routers.cost import router as cost_router
 from src.api.routers.events import router as events_router
-from src.api.auth import dev_mode
+from src.api.auth import dev_mode, require_api_key
 from src.api.structured_logging import StructuredLoggingMiddleware, setup_logging
 
 setup_logging()
@@ -53,8 +53,18 @@ app.include_router(cost_router,        prefix="/cost",      tags=["cost"])
 app.include_router(events_router,      prefix="/events",    tags=["events"])
 
 # v1 versioned contract (read-only integration surface for KRATOS)
-app.include_router(missions.router,    prefix="/v1/missions", tags=["v1-missions"])
-app.include_router(events_router,      prefix="/v1/events",   tags=["v1-events"])
+app.include_router(
+    missions.router,
+    prefix="/v1/missions",
+    tags=["v1-missions"],
+    dependencies=[Depends(require_api_key)],
+)
+app.include_router(
+    events_router,
+    prefix="/v1/events",
+    tags=["v1-events"],
+    dependencies=[Depends(require_api_key)],
+)
 
 # legacy live alias used by KRATOS current hooks
 app.include_router(events_router,      prefix="/live",      tags=["live-events"])
