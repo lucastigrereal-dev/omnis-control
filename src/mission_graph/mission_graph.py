@@ -9,51 +9,10 @@ calling these functions (see tests/mission_graph/conftest.py).
 from __future__ import annotations
 
 from .mission_state import MissionGraphState
-
-
-def _validate_node(state: MissionGraphState) -> dict:
-    """Validate mission_id and initial state."""
-    if not state["mission_id"]:
-        return {"status": "failed", "error": "mission_id obrigatório"}
-    return {"status": "running", "current_step": 0}
-
-
-def _execute_node(state: MissionGraphState) -> dict:
-    """Stub — execute current step. Returns partial update."""
-    return {"current_step": state["current_step"] + 1}
-
-
-def _checkpoint_node(state: MissionGraphState) -> dict:
-    """Persist checkpoint via JsonlRepository (if available)."""
-    import uuid
-    return {"run_checkpoint_id": str(uuid.uuid4())[:8]}
-
-
-def _finalize_node(state: MissionGraphState) -> dict:
-    """Finalise the mission."""
-    if state.get("error"):
-        return {"status": "failed"}
-    return {"status": "completed"}
-
-
-def _route_after_validate(state: MissionGraphState) -> str:
-    """Conditional edge after validate: proceed to execute or short-circuit to finalize."""
-    if state.get("error"):
-        return "fail"
-    return "execute"
-
-
-def _route_after_execute(state: MissionGraphState) -> str:
-    """Conditional edge: retry | checkpoint | fail"""
-    node = "execute"
-    if state.get("error"):
-        from .mission_state import should_retry
-        if should_retry(state, node):
-            return "retry"
-        return "fail"
-    if state["current_step"] >= 3:  # stub: 3 steps = done
-        return "checkpoint"
-    return "checkpoint"
+from .nodes.validate_node import validate_node, route_after_validate
+from .nodes.execute_node import execute_node, route_after_execute
+from .nodes.checkpoint_node import checkpoint_node
+from .nodes.finalize_node import finalize_node
 
 
 def build_mission_graph():
@@ -65,17 +24,17 @@ def build_mission_graph():
     from langgraph.graph import StateGraph, END  # noqa: PLC0415
 
     g = StateGraph(MissionGraphState)
-    g.add_node("validate", _validate_node)
-    g.add_node("execute", _execute_node)
-    g.add_node("checkpoint", _checkpoint_node)
-    g.add_node("finalize", _finalize_node)
+    g.add_node("validate", validate_node)
+    g.add_node("execute", execute_node)
+    g.add_node("checkpoint", checkpoint_node)
+    g.add_node("finalize", finalize_node)
 
     g.set_entry_point("validate")
-    g.add_conditional_edges("validate", _route_after_validate, {
+    g.add_conditional_edges("validate", route_after_validate, {
         "execute": "execute",
         "fail": "finalize",
     })
-    g.add_conditional_edges("execute", _route_after_execute, {
+    g.add_conditional_edges("execute", route_after_execute, {
         "retry": "execute",
         "checkpoint": "checkpoint",
         "fail": "finalize",

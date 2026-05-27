@@ -1,6 +1,6 @@
 import pytest
 from src.mission_graph.runner import run_mission_graph
-from src.mission_graph.mission_graph import _execute_node
+from src.mission_graph.nodes.execute_node import execute_node as _execute_node
 
 
 class TestRetryFlow:
