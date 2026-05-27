@@ -1,6 +1,9 @@
 from __future__ import annotations
-from typing import TypedDict, Annotated
+from typing import TypedDict, Annotated, Optional, TYPE_CHECKING
 import operator
+
+if TYPE_CHECKING:
+    from .retry_policy import RetryPolicy
 
 
 class MissionGraphState(TypedDict):
@@ -30,9 +33,14 @@ def initial_state(mission_id: str, max_retries: int = 3) -> MissionGraphState:
     )
 
 
-def should_retry(state: MissionGraphState, node: str) -> bool:
-    """Return True if the node has not exhausted its retry budget."""
+def should_retry(state: MissionGraphState, node: str, policy: Optional["RetryPolicy"] = None) -> bool:
+    """Return True if the node has not exhausted its retry budget.
+
+    If a RetryPolicy is provided, it takes precedence over state["max_retries"].
+    """
     attempts = state["attempts_by_node"].get(node, 0)
+    if policy is not None:
+        return policy.should_retry(node, attempts)
     return attempts < state["max_retries"]
 
 
