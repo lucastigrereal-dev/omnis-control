@@ -3,6 +3,10 @@ from __future__ import annotations
 
 from ..mission_state import MissionGraphState, should_retry
 
+# Custo estimado por step (stub — sem LLM real)
+COST_PER_STEP_USD = 0.001
+TOKENS_PER_STEP = 100
+
 
 def execute_node(state: MissionGraphState) -> dict:
     """Execute current step. Returns partial update.
@@ -30,12 +34,26 @@ def execute_node(state: MissionGraphState) -> dict:
     except Exception:
         pass  # graceful degradation: guardrail indisponível, continua
 
+    # Acumula custo estimado por step
+    new_cost = state.get("cost_usd", 0.0) + COST_PER_STEP_USD
+    new_tokens = state.get("token_count", 0) + TOKENS_PER_STEP
+
     if state.get("error"):
         from src.mission_graph.mission_state import record_attempt  # noqa: PLC0415
 
         attempt_patch = record_attempt(state, "execute")
-        return {**attempt_patch, "error": None, "current_step": state["current_step"] + 1}
-    return {"current_step": state["current_step"] + 1}
+        return {
+            **attempt_patch,
+            "error": None,
+            "current_step": state["current_step"] + 1,
+            "cost_usd": new_cost,
+            "token_count": new_tokens,
+        }
+    return {
+        "current_step": state["current_step"] + 1,
+        "cost_usd": new_cost,
+        "token_count": new_tokens,
+    }
 
 
 def route_after_execute(state: MissionGraphState) -> str:

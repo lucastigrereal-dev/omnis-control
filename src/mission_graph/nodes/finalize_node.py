@@ -40,6 +40,8 @@ def _write_state_json(state: MissionGraphState, aurora_tom: str) -> str:
             "run_checkpoint_id": state.get("run_checkpoint_id") or "",
             "steps_count": len(state.get("steps", [])),
             "generated_at": datetime.now(timezone.utc).isoformat(),
+            "cost_usd": state.get("cost_usd", 0.0),
+            "token_count": state.get("token_count", 0),
         }
         path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
         return str(path)
@@ -92,6 +94,22 @@ def finalize_node(state: MissionGraphState) -> dict:
         )
     except Exception:
         pass  # graceful degradation: Recovery indisponível, continua
+
+    # --- CostTracker (graceful degradation) ---
+    try:
+        from src.agencia.cost_tracker import CostTracker  # noqa: PLC0415
+
+        cost_usd = state.get("cost_usd", 0.0)
+        tokens = state.get("token_count", 0)
+        mission_id = state["mission_id"]
+
+        # Registra custo da missão no log (operation = "mission_graph/{mission_id}")
+        ct = CostTracker(f"mission_graph/{mission_id}", dry_run=False)
+        ct.__enter__()
+        # finish() registra a duração e salva; custo BRL é sempre 0 (local)
+        ct.finish()
+    except Exception:
+        pass  # graceful degradation: CostTracker indisponível, continua
 
     # --- state.json para KRATOS C4 ---
     # Mescla status final no state temporário para que _write_state_json use o valor correto

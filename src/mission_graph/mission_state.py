@@ -22,6 +22,8 @@ class MissionGraphState(TypedDict):
     state_json_path: str  # path to the state.json written by finalize_node ("" = not yet written)
     brief: dict  # optional mission brief passed by caller (e.g. {"titulo": ..., "setor": ...})
     action: str  # current action name checked by AuroraGuardrail (default "execute_step")
+    cost_usd: float  # accumulated estimated cost in USD for this run (stub: 0.001 per step)
+    token_count: int  # accumulated token count estimate for this run (stub: 100 per step)
 
 
 def initial_state(
@@ -47,6 +49,8 @@ def initial_state(
         state_json_path="",
         brief=brief if brief is not None else {},
         action=action,
+        cost_usd=0.0,
+        token_count=0,
     )
 
 
