@@ -122,6 +122,15 @@ class TestMissionsEndpoint:
         assert "total" in data
         assert "missions" in data
 
+    def test_list_missions_v1_alias_200(self):
+        r = client.get("/v1/missions")
+        assert r.status_code == 200
+
+    def test_list_missions_v1_alias_schema(self):
+        data = client.get("/v1/missions").json()
+        assert "total" in data
+        assert "missions" in data
+
     def test_get_mission_not_found(self):
         r = client.get("/missions/nonexistent-id-000")
         assert r.status_code == 404

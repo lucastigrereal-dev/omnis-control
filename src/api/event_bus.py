@@ -23,6 +23,15 @@ from dataclasses import dataclass, field
 from typing import AsyncGenerator
 from weakref import WeakSet
 
+_MISSION_UPDATE_STATUS_BY_LEGACY_EVENT: dict[str, str] = {
+    "mission_started": "running",
+    "mission_completed": "completed",
+    "mission_failed": "failed",
+    "mission_paused": "paused",
+    "mission_resumed": "running",
+    "mission_cancelled": "cancelled",
+}
+
 
 @dataclass
 class OmnisEvent:
@@ -83,6 +92,7 @@ class EventBus:
         Returns: número de subscribers que receberam o evento.
         """
         event = OmnisEvent(event_type=event_type, data=data)
+        compat_event = _build_contract_v1_alias_event(event_type, data)
         count = 0
         async with self._lock:
             queues = list(self._queues)
@@ -90,6 +100,8 @@ class EventBus:
             try:
                 q.put_nowait(event)
                 count += 1
+                if compat_event is not None:
+                    q.put_nowait(compat_event)
             except asyncio.QueueFull:
                 # Subscriber lento — descarta evento (non-blocking)
                 pass
@@ -142,6 +154,21 @@ def reset_event_bus() -> None:
     """Reseta o singleton — usado apenas em testes."""
     global _bus
     _bus = None
+
+
+def _build_contract_v1_alias_event(event_type: str, data: dict) -> OmnisEvent | None:
+    """Gera alias canônico v1 para eventos de missão sem quebrar legado."""
+    status = _MISSION_UPDATE_STATUS_BY_LEGACY_EVENT.get(event_type)
+    if status is None:
+        return None
+
+    alias_data = {
+        "mission_id": data.get("mission_id"),
+        "status": status,
+        "legacy_event": event_type,
+        **data,
+    }
+    return OmnisEvent(event_type="mission:update", data=alias_data)
 
 
 # ── Helpers de publicação ─────────────────────────────────────────────────────

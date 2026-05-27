@@ -3,7 +3,8 @@
 Modo dev: se OMNIS_API_KEY não estiver no ambiente, todas as requisições
 são permitidas (sem auth). Útil para testes locais e KRATOS dev.
 
-Modo prod: OMNIS_API_KEY obrigatório no header X-API-Key ou
+Modo prod: OMNIS_API_KEY obrigatório no header X-KRATOS-KEY (canônico) ou
+X-API-Key (legado) ou
 Authorization: Bearer <key>.
 
 Uso:
@@ -20,7 +21,9 @@ from functools import lru_cache
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import APIKeyHeader
 
-# Header padrão para KRATOS enviar a chave
+# Header canônico para KRATOS enviar a chave
+_KRATOS_KEY_HEADER = APIKeyHeader(name="X-KRATOS-KEY", auto_error=False)
+# Header legado para compatibilidade temporária
 _API_KEY_HEADER = APIKeyHeader(name="X-API-Key", auto_error=False)
 _BEARER_HEADER = APIKeyHeader(name="Authorization", auto_error=False)
 
@@ -37,20 +40,26 @@ def dev_mode() -> bool:
 
 
 def require_api_key(
+    x_kratos_key: str | None = Security(_KRATOS_KEY_HEADER),
     x_api_key: str | None = Security(_API_KEY_HEADER),
     authorization: str | None = Security(_BEARER_HEADER),
 ) -> bool:
     """FastAPI dependency — verifica API key.
 
     - Dev mode (OMNIS_API_KEY não set): sempre passa.
-    - Prod mode: exige X-API-Key ou Authorization: Bearer <key>.
+    - Prod mode: exige X-KRATOS-KEY (canônico) ou
+      X-API-Key (legado) ou Authorization: Bearer <key>.
     """
     key = _configured_key()
     if key is None:
         # Dev mode — sem autenticação
         return True
 
-    # Extrai a chave do header X-API-Key
+    # Header canônico
+    if x_kratos_key and x_kratos_key == key:
+        return True
+
+    # Header legado (compat)
     if x_api_key and x_api_key == key:
         return True
 
@@ -62,5 +71,5 @@ def require_api_key(
 
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
-        detail="API key inválida ou ausente. Use X-API-Key header.",
+        detail="API key inválida ou ausente. Use X-KRATOS-KEY header.",
     )

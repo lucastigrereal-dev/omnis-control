@@ -55,18 +55,25 @@ class TestRequireApiKey:
         result = require_api_key(x_api_key=None, authorization=None)
         assert result is True
 
-    def test_prod_mode_correct_x_api_key(self, monkeypatch):
-        """Prod mode: X-API-Key correto → passa."""
+    def test_prod_mode_correct_x_kratos_key(self, monkeypatch):
+        """Prod mode: X-KRATOS-KEY correto → passa."""
         monkeypatch.setenv("OMNIS_API_KEY", "my-secret")
         _configured_key.cache_clear()
-        result = require_api_key(x_api_key="my-secret", authorization=None)
+        result = require_api_key(x_kratos_key="my-secret", x_api_key=None, authorization=None)
+        assert result is True
+
+    def test_prod_mode_correct_x_api_key(self, monkeypatch):
+        """Prod mode: X-API-Key legado ainda passa (compat)."""
+        monkeypatch.setenv("OMNIS_API_KEY", "my-secret")
+        _configured_key.cache_clear()
+        result = require_api_key(x_kratos_key=None, x_api_key="my-secret", authorization=None)
         assert result is True
 
     def test_prod_mode_correct_bearer(self, monkeypatch):
         """Prod mode: Authorization: Bearer <key> correto → passa."""
         monkeypatch.setenv("OMNIS_API_KEY", "my-secret")
         _configured_key.cache_clear()
-        result = require_api_key(x_api_key=None, authorization="Bearer my-secret")
+        result = require_api_key(x_kratos_key=None, x_api_key=None, authorization="Bearer my-secret")
         assert result is True
 
     def test_prod_mode_wrong_key_raises_403(self, monkeypatch):
@@ -75,7 +82,7 @@ class TestRequireApiKey:
         monkeypatch.setenv("OMNIS_API_KEY", "my-secret")
         _configured_key.cache_clear()
         with pytest.raises(HTTPException) as exc_info:
-            require_api_key(x_api_key="wrong-key", authorization=None)
+            require_api_key(x_kratos_key=None, x_api_key="wrong-key", authorization=None)
         assert exc_info.value.status_code == 403
 
     def test_prod_mode_no_key_raises_403(self, monkeypatch):
@@ -84,7 +91,7 @@ class TestRequireApiKey:
         monkeypatch.setenv("OMNIS_API_KEY", "my-secret")
         _configured_key.cache_clear()
         with pytest.raises(HTTPException) as exc_info:
-            require_api_key(x_api_key=None, authorization=None)
+            require_api_key(x_kratos_key=None, x_api_key=None, authorization=None)
         assert exc_info.value.status_code == 403
 
     def teardown_method(self):
@@ -105,6 +112,16 @@ class TestApiEndpointAuth:
         from src.api.main import app
         with TestClient(app) as client:
             r = client.get("/events/status")
+        assert r.status_code == 200
+        data = r.json()
+        assert "subscribers" in data
+
+    def test_v1_events_status_alias_dev_mode(self):
+        """Alias v1 mantém compatibilidade de auth/status."""
+        _configured_key.cache_clear()
+        from src.api.main import app
+        with TestClient(app) as client:
+            r = client.get("/v1/events/status")
         assert r.status_code == 200
         data = r.json()
         assert "subscribers" in data
@@ -296,7 +313,8 @@ class TestPublishHelpers:
         async def consume():
             async for e in bus.subscribe():
                 received.append(e)
-                break
+                if len(received) >= 2:
+                    break
 
         task = asyncio.create_task(consume())
         await asyncio.sleep(0.01)
@@ -305,6 +323,10 @@ class TestPublishHelpers:
 
         assert received[0].event_type == "mission_started"
         assert received[0].data["mission_id"] == "m1"
+        assert received[1].event_type == "mission:update"
+        assert received[1].data["mission_id"] == "m1"
+        assert received[1].data["status"] == "running"
+        assert received[1].data["legacy_event"] == "mission_started"
 
     @pytest.mark.asyncio
     async def test_publish_mission_completed(self):
